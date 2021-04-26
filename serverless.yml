@@ -16,7 +16,7 @@ provider:
 
 custom:
   s3Sync:
-    - bucketName: icpdao.9527.${self:provider.region}.icpdao-interface.${self:provider.stage}
+    - bucketName: ${env:WEBSITE_BUCKET_NAME}
       localDir: build
       deleteRemoved: false
       acl: public-read
@@ -35,7 +35,7 @@ resources:
     WebsiteBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: icpdao.9527.${self:provider.region}.icpdao-interface.${self:provider.stage}
+        BucketName: ${env:WEBSITE_BUCKET_NAME}
         AccessControl: PublicRead
         WebsiteConfiguration:
           IndexDocument: index.html
