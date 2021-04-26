@@ -56,7 +56,7 @@ jobs:
         REACT_APP_ICPDAO_BACKEND_BASE_URL: ${{secrets.TEST_REACT_APP_ICPDAO_BACKEND_BASE_URL}}
         SERVERLESS_ACCESS_KEY: ${{secrets.SERVERLESS_ACCESS_KEY}}
       run: |
-        yarn global add serverless
+        npm install -g serverless
         yarn
         yarn build
         sls client deploy --stage dev --no-delete-contents --no-config-change --no-policy-change --no-cors-change
