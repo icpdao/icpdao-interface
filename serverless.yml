@@ -1,0 +1,31 @@
+org: icpdao
+app: icpdao
+service: icpdao-interface
+
+disabledDeprecations:
+  - CLI_OPTIONS_SCHEMA
+
+provider:
+  name: aws
+  lambdaHashingVersion: 20201221
+  region: us-east-1
+  stage: ${opt:stage}
+  stackName: icpdao-interface-${self:provider.stage}
+  deploymentBucket:
+    name: icpdao.9527.${self:provider.region}.deploys
+
+custom:
+  client:
+    bucketName: icpdao.9527.${self:provider.region}.icpdao-interface.${self:provider.stage}
+    distributionFolder: build 
+    indexDocument: index.html 
+    errorDocument: index.html
+    objectHeaders:
+      'index.html':
+        - name: 'Cache-Control'
+          value: 'no-cache'
+      '*.js':
+        - name: 'Cache-Control'
+          value: 'public, max-age=31536000'
+plugins:
+  - serverless-finch

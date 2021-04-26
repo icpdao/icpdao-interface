@@ -1,0 +1,62 @@
+name: deploy
+
+on:
+  push:
+    branches:
+      - feature/*
+      - fix/*
+      - dev
+      - prod
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js 14
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: test
+      env:
+        REACT_APP_GITHUB_APP_CLIENT_ID: ${{secrets.TEST_ICPDAO_GITHUB_APP_CLIENT_ID}}
+        REACT_APP_ICPDAO_BACKEND_BASE_URL: ${{secrets.TEST_REACT_APP_ICPDAO_BACKEND_BASE_URL}}
+      run: |
+        yarn
+        yarn build
+
+  deploy_dev:
+    needs: [test]
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/feature/fushang318'
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js 14
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Configure AWS credentials from Test account
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: deploy
+      env:
+        REACT_APP_GITHUB_APP_CLIENT_ID: ${{secrets.TEST_ICPDAO_GITHUB_APP_CLIENT_ID}}
+        REACT_APP_ICPDAO_BACKEND_BASE_URL: ${{secrets.TEST_REACT_APP_ICPDAO_BACKEND_BASE_URL}}
+        SERVERLESS_ACCESS_KEY: ${{secrets.SERVERLESS_ACCESS_KEY}}
+      run: |
+        yarn global add serverless
+        yarn
+        yarn build
+        sls client deploy --stage dev --no-delete-contents --no-config-change --no-policy-change --no-cors-change
