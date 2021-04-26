@@ -15,17 +15,31 @@ provider:
     name: icpdao.9527.${self:provider.region}.deploys
 
 custom:
-  client:
-    bucketName: icpdao.9527.${self:provider.region}.icpdao-interface.${self:provider.stage}
-    distributionFolder: build 
-    indexDocument: index.html 
-    errorDocument: index.html
-    objectHeaders:
-      'index.html':
-        - name: 'Cache-Control'
-          value: 'no-cache'
-      '*.js':
-        - name: 'Cache-Control'
-          value: 'public, max-age=31536000'
+  s3Sync:
+    - bucketName: icpdao.9527.${self:provider.region}.icpdao-interface.${self:provider.stage}
+      localDir: build
+      deleteRemoved: false
+      acl: public-read
+      followSymlinks: true
+      params:
+        - index.html:
+            CacheControl: 'no-cache'
+        - "*.js":
+            CacheControl: 'public, max-age=31536000'
+
 plugins:
-  - serverless-finch
+  - serverless-s3-sync
+
+resources:
+  Resources:
+    WebsiteBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: icpdao.9527.${self:provider.region}.icpdao-interface.${self:provider.stage}
+        AccessControl: PublicRead
+        WebsiteConfiguration:
+          IndexDocument: index.html
+          ErrorDocument: index.html
+  Outputs:
+    WebsiteBucketOutputKey:
+      Value: !Ref WebsiteBucket

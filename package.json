@@ -47,6 +47,6 @@
     ]
   },
   "devDependencies": {
-    "serverless-finch": "^2.6.0"
+    "serverless-s3-sync": "^1.17.1"
   }
 }

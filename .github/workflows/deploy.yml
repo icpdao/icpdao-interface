@@ -59,4 +59,4 @@ jobs:
         npm install -g serverless
         yarn
         yarn build
-        sls client deploy --stage dev --no-delete-contents --no-config-change --no-policy-change --no-cors-change
+        sls deploy --stage dev
