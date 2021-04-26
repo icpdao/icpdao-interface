@@ -23,8 +23,8 @@ jobs:
 
     - name: test
       env:
-        REACT_APP_GITHUB_APP_CLIENT_ID: ${{secrets.TEST_ICPDAO_GITHUB_APP_CLIENT_ID}}
-        REACT_APP_ICPDAO_BACKEND_BASE_URL: ${{secrets.TEST_REACT_APP_ICPDAO_BACKEND_BASE_URL}}
+        REACT_APP_GITHUB_APP_CLIENT_ID: ${{secrets.DEV__ICPDAO_GITHUB_APP_CLIENT_ID}}
+        REACT_APP_ICPDAO_BACKEND_BASE_URL: ${{secrets.DEV__REACT_APP_ICPDAO_BACKEND_BASE_URL}}
       run: |
         yarn
         yarn build
@@ -52,9 +52,9 @@ jobs:
 
     - name: deploy
       env:
-        REACT_APP_GITHUB_APP_CLIENT_ID: ${{secrets.TEST_ICPDAO_GITHUB_APP_CLIENT_ID}}
-        REACT_APP_ICPDAO_BACKEND_BASE_URL: ${{secrets.TEST_REACT_APP_ICPDAO_BACKEND_BASE_URL}}
         SERVERLESS_ACCESS_KEY: ${{secrets.SERVERLESS_ACCESS_KEY}}
+        REACT_APP_GITHUB_APP_CLIENT_ID: ${{secrets.DEV__ICPDAO_GITHUB_APP_CLIENT_ID}}
+        REACT_APP_ICPDAO_BACKEND_BASE_URL: ${{secrets.DEV__REACT_APP_ICPDAO_BACKEND_BASE_URL}}
       run: |
         npm install -g serverless
         yarn
