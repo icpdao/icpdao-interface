@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import GlobalModal from "@/components/Modal";
-import { useIntl, FormattedMessage } from 'umi';
+import { useIntl, FormattedMessage, history } from 'umi';
 import styles from './Home.less';
 import {getUserInfo} from "@/utils/utils";
 import {acceptIcpperships} from "@/services/icpdao-interface/icpperships";
@@ -62,6 +62,7 @@ export default (): React.ReactNode => {
     } finally {
       setMentorAcceptLoading(false);
       setMentorWelcomeVisible(false);
+      history.replace('/account/mentor');
     }
   }
   const mentorWelcomeModal = (

@@ -11,7 +11,7 @@ export const updateTheme = (
     return;
   }
 
-  const href = dark ? `${publicPath}/dark` : `${publicPath}/`;
+  const href = dark ? `${publicPath}/dark` : `${publicPath}/light`;
   let colorFileName =
     dark && color
       ? `-${encodeURIComponent(color)}`
