@@ -1,10 +1,17 @@
 {
   "theme": [
     {
-      "theme": "dark"
+      "theme": "dark",
+      "fileName": "dark.css",
+      "modifyVars": {}
     },
     {
-      "theme": "light"
+      "theme": "light",
+      "fileName": "light.css",
+      "modifyVars": {}
     }
-  ]
+  ],
+  "min": true,
+  "isModule": true,
+  "ignoreAntd": false
 }
