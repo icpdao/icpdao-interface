@@ -1,0 +1,122 @@
+@import '~antd/es/style/themes/default.less';
+
+html,
+body,
+#root {
+  height: 100%;
+  font-family: Lucida Grande, sans-serif !important;
+  background: var(--background-color) !important;
+}
+
+.colorWeak {
+  filter: invert(80%);
+}
+
+:global {
+
+  .ant-layout {
+    min-height: 100vh;
+    background: transparent;
+  }
+
+  .ant-layout-footer {
+    background: transparent;
+  }
+
+  .ant-layout-header {
+    background: transparent;
+  }
+
+  .ant-pro-global-header {
+    background: transparent;
+    box-shadow: unset;
+  }
+
+  .ant-pro-sider.ant-layout-sider.ant-pro-sider-fixed {
+    left: unset;
+  }
+
+  .ant-modal-content {
+    border-radius: 10px !important;
+  }
+
+  .ant-modal-close {
+    color: var(--modal-close-button-color) !important;
+  }
+
+  .ant-modal-footer {
+    padding-top: 32px !important;
+    padding-bottom: 32px !important;
+    border-top: unset !important;
+  }
+
+  .has-breadcrumb {
+    width: 100%;
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+  }
+
+  .ant-tooltip-inner {
+    color: var(--font-color);
+    background-color: var(--tooltip-background-color);
+  }
+
+}
+
+
+canvas {
+  display: block;
+}
+
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+@media (max-width: @screen-xs) {
+  .ant-table {
+    width: 100%;
+    overflow-x: auto;
+    &-thead > tr,
+    &-tbody > tr {
+      > th,
+      > td {
+        white-space: pre;
+        > span {
+          display: block;
+        }
+      }
+    }
+  }
+}
+
+.body-wrap-light {
+  --background-color: radial-gradient(50% 50% at 50% 50%, rgba(252, 7, 125, 0.063) 0%, rgba(255, 255, 255, 0) 100%);
+  --font-color: #262626;
+  --switch-theme-hover-color: #177DDC;
+  --modal-close-button-color: #DBDBDB;
+  --tooltip-background-color: #fff;
+  --preicpper-invited-background-color: #fff;
+}
+
+.body-wrap-dark {
+  --background-color: linear-gradient(180deg, #0E0F11 0%, #111620 100%);
+  --font-color: #F2F2F2;
+  --switch-theme-hover-color: #177DDC;
+  --modal-close-button-color: #DBDBDB;
+  --tooltip-background-color: #141414;
+  --preicpper-invited-background-color: #141414;
+}
+
+// 兼容IE11
+@media screen and(-ms-high-contrast: active), (-ms-high-contrast: none) {
+  body .ant-design-pro > .ant-layout {
+    min-height: 100vh;
+  }
+}
