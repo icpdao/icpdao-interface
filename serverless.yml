@@ -17,7 +17,7 @@ provider:
 custom:
   s3Sync:
     - bucketName: ${env:WEBSITE_BUCKET_NAME}
-      localDir: build
+      localDir: dist
       deleteRemoved: false
       acl: public-read
       followSymlinks: true
