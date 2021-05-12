@@ -1,0 +1,464 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "icpdao-backend",
+    "version": "0.0.1"
+  },
+  "servers": [
+    {
+      "url": "https://apis.icpdao.co/dev"
+    },
+    {
+      "url": "http://localhost:8000/dev"
+    }
+  ],
+  "paths": {
+    "/v1/users/github/auth_callback": {
+      "get": {
+        "tags": [
+          "login"
+        ],
+        "description": "github app callback",
+        "operationId": "github_callback",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success return jwt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/users/profile": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "description": "查询个人基础信息",
+        "operationId": "get_user_profile",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_1"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/users/icpperships/{id}/accept": {
+      "put": {
+        "tags": [
+          "icpperships"
+        ],
+        "description": "接收邀请",
+        "operationId": "accept_icpperships",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_2"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTKeyAuth": []
+          }
+        ],
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/v1/users/icpperships": {
+      "get": {
+        "tags": [
+          "icpperships"
+        ],
+        "description": "查询所有 icpper 邀请",
+        "operationId": "get_icpperships",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_3"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTKeyAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "icpperships"
+        ],
+        "description": "发送邀请",
+        "operationId": "send_icpperships",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/body"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_2"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/users/icpperships/{id}": {
+      "delete": {
+        "tags": [
+          "icpperships"
+        ],
+        "description": "删除邀请",
+        "operationId": "remove_icpperships",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_4"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTKeyAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "GithubCallback": {
+        "type": "object",
+        "properties": {
+          "jwt": {
+            "type": "string"
+          }
+        }
+      },
+      "UserStatus": {
+        "type": "integer",
+        "enum": [
+          0,
+          1,
+          2
+        ]
+      },
+      "IcpperShip": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "progress": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/UserStatus"
+          },
+          "mentor": {
+            "$ref": "#/components/schemas/IcpperShip_mentor"
+          }
+        }
+      },
+      "UserProfile": {
+        "type": "object",
+        "properties": {
+          "nickname": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string"
+          },
+          "github_login": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/UserStatus"
+          },
+          "icppership": {
+            "$ref": "#/components/schemas/IcpperShip"
+          },
+          "erc20_address": {
+            "type": "string"
+          }
+        }
+      },
+      "InviteResults": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/InviteResult"
+        }
+      },
+      "InviteResult": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "progress": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/UserStatus"
+          },
+          "mentor_github_login": {
+            "type": "string"
+          },
+          "icpper": {
+            "$ref": "#/components/schemas/InviteResult_icpper"
+          },
+          "create_at": {
+            "type": "integer",
+            "format": "datetime"
+          },
+          "pre_icpper_at": {
+            "type": "integer",
+            "format": "datetime"
+          },
+          "icpper_at": {
+            "type": "integer",
+            "format": "datetime"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "required": [
+          "errorCode"
+        ],
+        "type": "object",
+        "properties": {
+          "errorCode": {
+            "type": "string",
+            "description": "业务约定的错误码"
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "业务上的错误信息"
+          },
+          "success": {
+            "type": "boolean",
+            "description": "业务上的请求是否成功"
+          }
+        }
+      },
+      "inline_response_200": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "default": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/GithubCallback"
+          }
+        }
+      },
+      "inline_response_200_1": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "default": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserProfile"
+          }
+        }
+      },
+      "inline_response_200_2": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "default": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/InviteResult"
+          }
+        }
+      },
+      "inline_response_200_3": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "default": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/InviteResults"
+          }
+        }
+      },
+      "body": {
+        "type": "object",
+        "properties": {
+          "icpper_github_login": {
+            "type": "string"
+          }
+        }
+      },
+      "inline_response_200_4": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "default": true
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      },
+      "IcpperShip_mentor": {
+        "type": "object",
+        "properties": {
+          "nickname": {
+            "type": "string"
+          },
+          "github_login": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string"
+          },
+          "number_of_instructors": {
+            "type": "integer"
+          }
+        }
+      },
+      "InviteResult_icpper": {
+        "type": "object",
+        "properties": {
+          "nickname": {
+            "type": "string"
+          },
+          "github_login": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "JWTKeyAuth": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  }
+}
