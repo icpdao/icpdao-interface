@@ -33,7 +33,7 @@ declare namespace API {
     mentor_github_login?: string;
     icpper?: InviteResultIcpper;
     create_at?: number;
-    pre_icpper_at?: number;
+    accept_at?: number;
     icpper_at?: number;
   };
 

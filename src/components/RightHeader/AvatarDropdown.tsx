@@ -103,7 +103,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = () => {
           </Menu.Item>
         }
         {
-          profile.status === 2 && <Menu.Item key="/account/icpper">
+          !!profile && <Menu.Item key="/account/icpper">
             <TeamOutlined />
             {intl.formatMessage({id: 'component.globalHeader.avatar.dropdown.icpper'})}
           </Menu.Item>

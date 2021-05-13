@@ -1,10 +1,10 @@
 import {useRequest} from "@@/plugin-request/request";
 import {getIcpperships, removeIcpperships, sendIcpperships} from "@/services/icpdao-interface/icpperships";
 import {PageLoading} from "@ant-design/pro-layout";
-import {getTimeDistance, getUserInfo} from "@/utils/utils";
+import {getFormatTime, getTimeDistance, getTimeDistanceDays, getUserInfo} from "@/utils/utils";
 import {FormattedMessage, useIntl} from "umi";
 import ProDescriptions from "@ant-design/pro-descriptions";
-import {Button, Col, Row} from "antd";
+import {Button, Col, Row, Table} from "antd";
 import styles from "@/pages/Account/index.less";
 import React, {useState} from "react";
 import GlobalModal from "@/components/Modal";
@@ -27,7 +27,7 @@ const handleSendInvite = async (githubLogin: string) => {
   }
 }
 
-const PreIcpperList: React.FC = () => {
+const IcpperList: React.FC = () => {
   const intl = useIntl();
   const [inviteCancelModalVisible, setInviteCancelModalVisible] = useState(false);
   const [inviteCancelModalRemoveLoading, setInviteCancelModalRemoveLoading] = useState(false);
@@ -56,7 +56,55 @@ const PreIcpperList: React.FC = () => {
       <GlobalTooltip title={<FormattedMessage id={'pages.account.icpper.preiccper.tooltip'} />} key={'preiccper.tooltip'}/>
     </>
   )
+  const icpperTitle = (
+    <>
+      <span style={{marginRight: 6}}><FormattedMessage id={'pages.account.icpper.iccper'} /></span>
+      <GlobalTooltip title={<FormattedMessage id={'pages.account.icpper.iccper.tooltip'} />} key={'icpper.tooltip'}/>
+    </>
+  )
+  const handleCancel = (id: string | undefined, github_login: string | undefined) => {
+    setInviteCancelModalVisible(true);
+    setInviteCancelId(id || '')
+    setInviteCancelGithubLogin(github_login || '')
+  }
+  const icpperColumns = [
+    {
+      title: intl.formatMessage({id: 'pages.account.icpper.table.column.1'}),
+      key: 'index',
+      render: (text: any, record: any, index: number) => <>{index + 1}</>,
+    },
+    {
+      title: intl.formatMessage({id: 'pages.account.icpper.table.column.2'}),
+      dataIndex: 'github_login',
+      key: 'github_login',
+    },
+    {
+      title: intl.formatMessage({id: 'pages.account.icpper.table.column.3'}),
+      dataIndex: 'accept_time',
+      key: 'accept_time',
+    },
+    {
+      title: intl.formatMessage({id: 'pages.account.icpper.table.column.4'}),
+      dataIndex: 'be_mentor_days',
+      key: 'be_mentor_days',
+    },
+    {
+      title: intl.formatMessage({id: 'pages.account.icpper.table.column.5'}),
+      key: 'tokens',
+      render: () => <>20 {intl.formatMessage({id: 'pages.account.icpper.table.column.5.text'})}</>,
+    },
+    {
+      title: intl.formatMessage({id: 'pages.account.icpper.table.column.6'}),
+      key: 'action',
+      render: (record: any) => (
+        <a onClick={() => {handleCancel(record.id, record.github_login)}}>
+        {intl.formatMessage({id: 'pages.account.icpper.table.column.6.text'})}</a>
+      ),
+    }
+  ]
+
   const invited = [];
+  const icpper = [];
   if (data) {
     for (let i: number = 0; i < data.length; i+=1) {
       if (data[i].progress === 0 || data[i].progress === 1) {
@@ -78,9 +126,7 @@ const PreIcpperList: React.FC = () => {
               </Col>
               <Col span={4}>
                 <Button block onClick={() => {
-                  setInviteCancelModalVisible(true);
-                  setInviteCancelId(datum.id || '')
-                  setInviteCancelGithubLogin(datum.icpper?.github_login || '')
+                  handleCancel(datum.id, datum.icpper?.github_login)
                 }}>
                   <FormattedMessage id={'pages.account.icpper.invite.cancel'} />
                 </Button>
@@ -89,10 +135,23 @@ const PreIcpperList: React.FC = () => {
           </ProDescriptions.Item>
         ))
       }
+      if (data[i].progress === 2) {
+        const datum = data[i]
+        const beMentorDays = getTimeDistanceDays(
+          (new Date()).getTime() / 1000, data[i].accept_at || 0)
+        const acceptTime = getFormatTime(data[i].accept_at || 0, 'LL')
+        icpper.push({
+          key: i,
+          id: datum.id || '',
+          github_login: datum.icpper?.github_login || '',
+          accept_time: acceptTime,
+          be_mentor_days: beMentorDays
+        })
+      }
     }
   }
   return (<>
-    <ProDescriptions className={styles.first} column={1} title={preIcpperTitle}>
+    <ProDescriptions key={'preicpper'} className={styles.first} column={1} title={preIcpperTitle}>
       <ProDescriptions.Item key={'input'} valueType="text">
         <ProForm<{githubLogin: string}>
           submitter={{render: (props, ) => {
@@ -185,7 +244,12 @@ const PreIcpperList: React.FC = () => {
         </div>
       </div>
     </GlobalModal>
+    <ProDescriptions key={'icpper'} className={styles.second} column={1} title={icpperTitle}>
+    </ProDescriptions>
+    <div>
+      <Table columns={icpperColumns} dataSource={icpper} />
+    </div>
   </>);
 };
 
-export default PreIcpperList;
+export default IcpperList;

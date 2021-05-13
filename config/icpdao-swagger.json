@@ -326,7 +326,7 @@
             "type": "integer",
             "format": "datetime"
           },
-          "pre_icpper_at": {
+          "accept_at": {
             "type": "integer",
             "format": "datetime"
           },
