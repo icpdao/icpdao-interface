@@ -9,3 +9,15 @@ export async function getUserProfile(options?: { [key: string]: any }) {
     ...(options || {}),
   });
 }
+
+/** 更新用户基础信息 PUT /v1/users/profile */
+export async function updateUserProfile(body: API.body, options?: { [key: string]: any }) {
+  return request<API.inlineResponse2001>('/v1/users/profile', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}

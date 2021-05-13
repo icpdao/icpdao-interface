@@ -23,6 +23,11 @@
     access: 'hadMentor'
   },
   {
+    path: '/account/wallet',
+    component: './Account/Wallet',
+    access: 'isNormal'
+  },
+  {
     component: './404',
   },
 ];

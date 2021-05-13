@@ -27,7 +27,7 @@ export async function getIcpperships(options?: { [key: string]: any }) {
 }
 
 /** 发送邀请 POST /v1/users/icpperships */
-export async function sendIcpperships(body: API.body, options?: { [key: string]: any }) {
+export async function sendIcpperships(body: API.body1, options?: { [key: string]: any }) {
   return request<API.inlineResponse2002>('/v1/users/icpperships', {
     method: 'POST',
     headers: {
