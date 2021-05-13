@@ -2,6 +2,8 @@
 import type {MenuTheme} from "antd";
 import moment from 'moment';
 
+moment.locale('en');
+
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
 
 export const isUrl = (path: string): boolean => reg.test(path);
@@ -54,6 +56,16 @@ export const getTimeDistance = (timeA: number, timeB: number): string => {
   const b = moment.unix(timeB)
   const dura = moment.duration(a.diff(b, 'seconds'), 'seconds')
   return dura.locale('en').humanize();
+}
+
+export const getTimeDistanceDays = (timeA: number, timeB: number): number => {
+  const a = moment.unix(timeA)
+  const b = moment.unix(timeB)
+  return Math.round(moment.duration(a.diff(b, 'seconds'), 'seconds').asDays());
+}
+
+export const getFormatTime = (time: number, format: string): string => {
+  return  moment.unix(time).format(format)
 }
 
 export const githubCallback = '/login/auth_callback'
