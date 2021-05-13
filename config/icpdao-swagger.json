@@ -70,6 +70,40 @@
             "JWTKeyAuth": []
           }
         ]
+      },
+      "put": {
+        "tags": [
+          "user"
+        ],
+        "description": "更新用户基础信息",
+        "operationId": "update_user_profile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/body"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_1"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTKeyAuth": []
+          }
+        ]
       }
     },
     "/v1/users/icpperships/{id}/accept": {
@@ -156,7 +190,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/body"
+                "$ref": "#/components/schemas/body_1"
               }
             }
           },
@@ -380,6 +414,14 @@
           }
         }
       },
+      "body": {
+        "type": "object",
+        "properties": {
+          "erc20_address": {
+            "type": "string"
+          }
+        }
+      },
       "inline_response_200_2": {
         "type": "object",
         "properties": {
@@ -404,7 +446,7 @@
           }
         }
       },
-      "body": {
+      "body_1": {
         "type": "object",
         "properties": {
           "icpper_github_login": {

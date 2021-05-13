@@ -56,6 +56,10 @@ declare namespace API {
     data?: UserProfile;
   };
 
+  type body = {
+    erc20_address?: string;
+  };
+
   type inlineResponse2002 = {
     success?: boolean;
     data?: InviteResult;
@@ -66,7 +70,7 @@ declare namespace API {
     data?: InviteResults;
   };
 
-  type body = {
+  type body1 = {
     icpper_github_login?: string;
   };
 

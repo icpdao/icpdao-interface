@@ -47,4 +47,9 @@ export default {
   'pages.account.mentor.table.column.1': 'Nickname',
   'pages.account.mentor.table.column.2': 'Github account',
   'pages.account.mentor.table.column.3': 'Number of instructors',
+  'pages.account.wallet.tips': 'PLEASE ENTER YOUR WALLET ADDRESS, SO WE KNOW WHERE TO SEND TOKEN TO YOU.',
+  'pages.account.wallet.label': 'Wallet address :',
+  'pages.account.wallet.save': 'SAVE',
+  'pages.account.wallet.input.placeholder': '0xA23c75e32ae8Ee45cf76Cf23FBCcc0995acaEAEe',
+  'pages.account.wallet.save.warning': 'invalid address',
 };
