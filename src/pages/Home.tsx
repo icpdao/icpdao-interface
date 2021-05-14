@@ -52,17 +52,17 @@ export default (): React.ReactNode => {
   const [mentorAcceptLoading, setMentorAcceptLoading] = useState(false)
 
   const [mentorWelcomeVisible, setMentorWelcomeVisible] = useState(defaultWelcome)
-  const { initialState } = useModel('@@initialState');
+  const { refresh } = useModel('@@initialState');
 
   const handleAccept = async () => {
     setMentorAcceptLoading(true);
     try {
       await acceptIcpperships({id: welcome.id});
-      if (initialState && initialState.fetchUserInfo) await initialState.fetchUserInfo();
+      await refresh();
     } finally {
       setMentorAcceptLoading(false);
       setMentorWelcomeVisible(false);
-      history.replace('/account/mentor');
+      history.push('/account/mentor');
     }
   }
   const mentorWelcomeModal = (
