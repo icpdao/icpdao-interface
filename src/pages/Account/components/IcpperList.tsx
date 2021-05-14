@@ -36,7 +36,6 @@ const IcpperList: React.FC = () => {
   const [inviteModalVisible, setInviteModalVisible] = useState(false);
   const [inviteModalSendLoading, setInviteModalSendLoading] = useState(false);
   const [inviteGithubLogin, setInviteGithubLogin] = useState<string>('');
-
   const {data, error, loading, mutate} = useRequest(() => {
     return getIcpperships()
   })
@@ -52,14 +51,14 @@ const IcpperList: React.FC = () => {
   }
   const preIcpperTitle = (
     <>
-      <span style={{marginRight: 6}}><FormattedMessage id={'pages.account.icpper.preiccper'} /></span>
-      <GlobalTooltip title={<FormattedMessage id={'pages.account.icpper.preiccper.tooltip'} />} key={'preiccper.tooltip'}/>
+      <span style={{marginRight: 6}}><FormattedMessage id={'pages.account.icpper.preicpper'} /></span>
+      <GlobalTooltip title={<FormattedMessage id={'pages.account.icpper.preicpper.tooltip'} />} key={'preicpper.tooltip'}/>
     </>
   )
   const icpperTitle = (
     <>
-      <span style={{marginRight: 6}}><FormattedMessage id={'pages.account.icpper.iccper'} /></span>
-      <GlobalTooltip title={<FormattedMessage id={'pages.account.icpper.iccper.tooltip'} />} key={'icpper.tooltip'}/>
+      <span style={{marginRight: 6}}><FormattedMessage id={'pages.account.icpper.icpper'} /></span>
+      <GlobalTooltip title={<FormattedMessage id={'pages.account.icpper.icpper.tooltip'} />} key={'icpper.tooltip'}/>
     </>
   )
   const handleCancel = (id: string | undefined, github_login: string | undefined) => {
@@ -87,6 +86,11 @@ const IcpperList: React.FC = () => {
       title: intl.formatMessage({id: 'pages.account.icpper.table.column.4'}),
       dataIndex: 'be_mentor_days',
       key: 'be_mentor_days',
+    },
+    {
+      title: 'icpper',
+      key: 'icpper',
+      render: () => <>x</>,
     },
     {
       title: intl.formatMessage({id: 'pages.account.icpper.table.column.5'}),
@@ -152,36 +156,38 @@ const IcpperList: React.FC = () => {
   }
   return (<>
     <ProDescriptions key={'preicpper'} className={styles.first} column={1} title={preIcpperTitle}>
-      <ProDescriptions.Item key={'input'} valueType="text">
-        <ProForm<{githubLogin: string}>
-          submitter={{render: (props, ) => {
-              return (
-                <Col span={4} style={{paddingLeft: 12, paddingRight: 12}}>
-                  <Button block type={'primary'} htmlType={'submit'} onClick={async ()=>{
-                    props.form?.validateFields().then(values => {
-                      setInviteGithubLogin(values.githubLogin);
-                      setInviteModalVisible(true)
-                    }).catch(() => {})
-                  }}>
-                    <FormattedMessage id={'pages.account.icpper.invite'} />
-                  </Button>
-                </Col>
-              )}}}
-          className={'ant-row antd-pro-pages-account-index-row'}
-          style={{marginLeft: -12, marginRight: -12, rowGap: 0, height: 45}}
-        >
-          <Col span={20} style={{paddingLeft: 12, paddingRight: 12}}>
-            <ProFormText
-              name="githubLogin"
-              rules={[{
-                required: true,
-                message: intl.formatMessage({id: 'pages.account.icpper.input.invite.placeholder'})
-              }]}
-              hasFeedback
-              placeholder={intl.formatMessage({id: 'pages.account.icpper.input.invite.placeholder'})} />
-          </Col>
-        </ProForm>
-      </ProDescriptions.Item>
+      {
+        invited.length < 2 && <ProDescriptions.Item key={'input'} valueType="text">
+          <ProForm<{githubLogin: string}>
+            submitter={{render: (props, ) => {
+                return (
+                  <Col span={4} style={{paddingLeft: 12, paddingRight: 12}}>
+                    <Button block type={'primary'} htmlType={'submit'} onClick={async ()=>{
+                      props.form?.validateFields().then(values => {
+                        setInviteGithubLogin(values.githubLogin);
+                        setInviteModalVisible(true)
+                      }).catch(() => {})
+                    }}>
+                      <FormattedMessage id={'pages.account.icpper.invite'} />
+                    </Button>
+                  </Col>
+                )}}}
+            className={'ant-row antd-pro-pages-account-index-row'}
+            style={{marginLeft: -12, marginRight: -12, rowGap: 0, height: 45}}
+          >
+            <Col span={20} style={{paddingLeft: 12, paddingRight: 12}}>
+              <ProFormText
+                name="githubLogin"
+                rules={[{
+                  required: true,
+                  message: intl.formatMessage({id: 'pages.account.icpper.input.invite.placeholder'})
+                }]}
+                hasFeedback
+                placeholder={intl.formatMessage({id: 'pages.account.icpper.input.invite.placeholder'})} />
+            </Col>
+          </ProForm>
+        </ProDescriptions.Item>
+      }
       {invited}
     </ProDescriptions>
 

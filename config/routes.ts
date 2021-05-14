@@ -15,7 +15,7 @@
   {
     path: '/account/icpper',
     component: './Account/Icpper',
-    access: 'isNormal'
+    access: 'hadAccept'
   },
   {
     path: '/account/mentor',
