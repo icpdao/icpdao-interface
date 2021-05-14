@@ -10,7 +10,7 @@ import {
   GithubOutlined
 } from '@ant-design/icons';
 import {Avatar, Button, Menu, Spin} from 'antd';
-import {history, useIntl, useModel, useLocation} from 'umi';
+import {history, useIntl, useModel, useLocation, useAccess} from 'umi';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
 import {clearAuthorization, githubCallback} from "@/utils/utils";
@@ -77,6 +77,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = () => {
       />
     </span>
   );
+  const access = useAccess();
 
   if (!initialState) {
     return loading;
@@ -87,7 +88,6 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = () => {
       <LoginButton />
     );
   }
-  const {profile} = initialState.currentUser();
 
   const menuHeaderDropdown = () => {
     return (
@@ -97,13 +97,13 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = () => {
           {intl.formatMessage({id: 'component.globalHeader.avatar.dropdown.wallet'})}
         </Menu.Item>
         {
-          profile.icppership?.mentor?.github_login && <Menu.Item key="/account/mentor">
+          access.hadMentor() && <Menu.Item key="/account/mentor">
             <UserOutlined />
             {intl.formatMessage({id: 'component.globalHeader.avatar.dropdown.mentor'})}
           </Menu.Item>
         }
         {
-          !!profile && <Menu.Item key="/account/icpper">
+          access.canInviteIcpper() && <Menu.Item key="/account/icpper">
             <TeamOutlined />
             {intl.formatMessage({id: 'component.globalHeader.avatar.dropdown.icpper'})}
           </Menu.Item>

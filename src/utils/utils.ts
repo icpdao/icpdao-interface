@@ -69,3 +69,4 @@ export const getFormatTime = (time: number, format: string): string => {
 }
 
 export const githubCallback = '/login/auth_callback'
+export const getProfile = '/users/profile'
