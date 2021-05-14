@@ -2,7 +2,8 @@
 import type {RequestOptionsInit} from 'umi-request';
 import { notification } from 'antd';
 import type { RequestConfig } from 'umi';
-import {getAuthorization} from "@/utils/utils";
+import {history} from 'umi';
+import {clearAuthorization, getAuthorization, getProfile} from "@/utils/utils";
 
 const codeMessage: Record<number, string> = {
   200: '服务器成功返回请求的数据。',
@@ -26,8 +27,13 @@ const codeMessage: Record<number, string> = {
  * @zh-CN 异常处理程序
  * @en-US Exception handler
  */
-const errorHandler = (error: { response: Response, name: string, data: any }): Response => {
-  const { response, name, data } = error;
+const errorHandler = (error: { response: Response, name: string, data: any, request: any }): Response => {
+  const { response, name, data, request } = error;
+  if ((name === 'BizError' && data.errorMessage === 'UNAUTHError') || request.url.endsWith(getProfile)) {
+    clearAuthorization();
+    history.replace('/');
+    return response;
+  }
   if (name === 'BizError') {
     notification.warn({
       message: `Request data not success, Error Message: ${data.errorMessage}`,
