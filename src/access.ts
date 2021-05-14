@@ -6,9 +6,7 @@ import {getUserInfo} from "@/utils/utils";
 export default function access() {
   return {
     isNormal: getUserInfo().profile,
-    hadAccept: getUserInfo().profile && getUserInfo().profile.progress !== 0,
-    isIcpper: getUserInfo().profile?.status === 2,
-    isPreIcpper: getUserInfo().profile?.status === 1,
+    hadAccept: getUserInfo().profile?.icppership?.progress !== 0,
     hadMentor: getUserInfo().profile?.progress !== 0 && getUserInfo().profile?.icppership?.mentor?.github_login,
   };
 }
