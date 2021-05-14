@@ -88,7 +88,7 @@ const IcpperList: React.FC = () => {
       key: 'be_mentor_days',
     },
     {
-      title: 'icpper',
+      title: 'Icpper',
       key: 'icpper',
       render: () => <>x</>,
     },
