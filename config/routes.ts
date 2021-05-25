@@ -10,22 +10,27 @@
   },
   {
     path: '/login/auth_callback',
-    component: './Login/AuthCallback'
+    component: './Login/AuthCallback',
   },
   {
     path: '/account/icpper',
     component: './Account/Icpper',
-    access: 'canInviteIcpper'
+    access: 'canInviteIcpper',
   },
   {
     path: '/account/mentor',
     component: './Account/Mentor',
-    access: 'hadMentor'
+    access: 'hadMentor',
   },
   {
     path: '/account/wallet',
     component: './Account/Wallet',
-    access: 'isNormal'
+    access: 'isNormal',
+  },
+  {
+    path: '/dao/create',
+    component: './Dao/Create',
+    access: 'isNormal',
   },
   {
     component: './404',
