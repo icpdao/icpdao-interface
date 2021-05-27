@@ -1,21 +1,11 @@
-
-export const updateTheme = (
-  dark: boolean,
-  color?: string,
-  publicPath = '/theme',
-) => {
-  if (
-    typeof window === 'undefined' ||
-    !(window as any).umi_plugin_ant_themeVar
-  ) {
+export const updateTheme = (dark: boolean, color?: string, publicPath = '/theme') => {
+  if (typeof window === 'undefined' || !(window as any).umi_plugin_ant_themeVar) {
     return;
   }
 
   const href = dark ? `${publicPath}/dark` : `${publicPath}/light`;
   let colorFileName =
-    dark && color
-      ? `-${encodeURIComponent(color)}`
-      : encodeURIComponent(color || '');
+    dark && color ? `-${encodeURIComponent(color)}` : encodeURIComponent(color || '');
   if (color === 'daybreak' && dark) {
     colorFileName = '';
   }
@@ -51,4 +41,3 @@ export const updateTheme = (
   body.className = `body-wrap-${dark ? 'dark' : 'light'}`;
   localStorage.setItem('site-theme', dark ? 'dark' : 'light');
 };
-

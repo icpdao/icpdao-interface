@@ -6,7 +6,11 @@ import defaultSettings from './defaultSettings';
 import proxy from './proxy';
 import routes from './routes';
 
-const { REACT_APP_ENV, REACT_APP_GITHUB_APP_CLIENT_ID, REACT_APP_ICPDAO_BACKEND_BASE_URL } = process.env;
+const {
+  REACT_APP_ENV,
+  REACT_APP_GITHUB_APP_CLIENT_ID,
+  REACT_APP_ICPDAO_BACKEND_BASE_URL,
+} = process.env;
 
 export default defineConfig({
   hash: true,
@@ -16,7 +20,7 @@ export default defineConfig({
   },
   define: {
     REACT_APP_GITHUB_APP_CLIENT_ID,
-    REACT_APP_ICPDAO_BACKEND_BASE_URL: REACT_APP_ICPDAO_BACKEND_BASE_URL || ''
+    REACT_APP_ICPDAO_BACKEND_BASE_URL: REACT_APP_ICPDAO_BACKEND_BASE_URL || '',
   },
   layout: {
     // https://umijs.org/zh-CN/plugins/plugin-layout
@@ -50,6 +54,7 @@ export default defineConfig({
   title: false,
   ignoreMomentLocale: true,
   proxy: proxy[REACT_APP_ENV || 'dev'],
+  plugins: [require.resolve('../src/plugins/theme')],
   manifest: {
     basePath: '/',
   },
@@ -62,6 +67,6 @@ export default defineConfig({
       // schemaPath: "https://gw.alipayobjects.com/os/antfincdn/M%24jrzTTYJN/oneapi.json"
       schemaPath: join(__dirname, 'icpdao-swagger.json'),
       mock: false,
-    }
+    },
   ],
 });

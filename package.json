@@ -49,10 +49,12 @@
     "@ant-design/pro-form": "^1.18.3",
     "@ant-design/pro-layout": "^6.15.3",
     "@ant-design/pro-table": "^2.30.8",
+    "@types/rimraf": "^3.0.0",
     "@umijs/openapi": "^1.1.14",
     "@umijs/plugin-openapi": "^1.2.0",
     "@umijs/route-utils": "^1.0.36",
     "antd": "^4.14.0",
+    "antd-pro-merge-less": "^3.0.11",
     "classnames": "^2.2.6",
     "lodash": "^4.17.11",
     "moment": "^2.29.1",
@@ -61,7 +63,10 @@
     "react-dev-inspector": "^1.1.1",
     "react-dom": "^17.0.0",
     "react-helmet-async": "^1.0.4",
+    "rimraf": "^3.0.2",
+    "serve-static": "^1.14.1",
     "serverless-s3-sync": "^1.17.1",
+    "slash2": "^2.0.0",
     "umi": "^3.4.0",
     "umi-request": "^1.0.8"
   },
@@ -96,8 +101,7 @@
     "prettier": "^2.0.1",
     "puppeteer-core": "^8.0.0",
     "stylelint": "^13.0.0",
-    "typescript": "^4.2.2",
-    "umi-plugin-antd-theme": "^2.1.2"
+    "typescript": "^4.2.2"
   },
   "engines": {
     "node": ">=10.0.0"
