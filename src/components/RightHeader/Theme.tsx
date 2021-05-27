@@ -3,6 +3,12 @@ export const updateTheme = (dark: boolean, color?: string, publicPath = '/theme'
     return;
   }
 
+  if (THEME === 'light') {
+    const body = document.getElementsByTagName('body')[0];
+    body.className = `body-wrap-light`;
+    return;
+  }
+
   const href = dark ? `${publicPath}/dark` : `${publicPath}/light`;
   let colorFileName =
     dark && color ? `-${encodeURIComponent(color)}` : encodeURIComponent(color || '');
