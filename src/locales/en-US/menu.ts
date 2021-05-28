@@ -3,4 +3,5 @@ export default {
   'menu.icpper': 'ICCPER',
   'menu.mentor': 'MENTOR',
   'menu.wallet': 'WALLET',
+  'menu.dao_mine': 'MY DAO',
 };

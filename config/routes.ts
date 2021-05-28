@@ -28,6 +28,11 @@
     access: 'isNormal',
   },
   {
+    path: '/dao/mine',
+    component: './Dao/Mine',
+    access: 'isNormal',
+  },
+  {
     path: '/dao/create',
     component: './Dao/Create',
     access: 'isNormal',
