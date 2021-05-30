@@ -140,6 +140,7 @@ export type Mutations = {
   createDao?: Maybe<CreateDao>;
   updateDaoJobConfig?: Maybe<UpdateDaoJobConfig>;
   updateDaoFollow?: Maybe<UpdateDaoFollow>;
+  updateDaoBaseInfo?: Maybe<UpdateDaoBaseInfo>;
 };
 
 export type MutationsCreateDaoArgs = {
@@ -171,6 +172,12 @@ export type MutationsUpdateDaoFollowArgs = {
   type: DaoFollowTypeEnum;
 };
 
+export type MutationsUpdateDaoBaseInfoArgs = {
+  desc?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
+  logo?: Maybe<Scalars['String']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   daos?: Maybe<DaOs>;
@@ -193,6 +200,11 @@ export type QueryDaoArgs = {
 
 export type QueryDaoJobConfigArgs = {
   daoId: Scalars['String'];
+};
+
+export type UpdateDaoBaseInfo = {
+  __typename?: 'UpdateDAOBaseInfo';
+  dao?: Maybe<DaoSchema>;
 };
 
 export type UpdateDaoFollow = {
@@ -266,6 +278,20 @@ export type FollowDaoMutationVariables = Exact<{
 
 export type FollowDaoMutation = { __typename?: 'Mutations' } & {
   updateDaoFollow?: Maybe<{ __typename?: 'UpdateDAOFollow' } & Pick<UpdateDaoFollow, 'ok'>>;
+};
+
+export type UpdateDaoBaseInfoMutationVariables = Exact<{
+  id: Scalars['String'];
+  desc?: Maybe<Scalars['String']>;
+  logo?: Maybe<Scalars['String']>;
+}>;
+
+export type UpdateDaoBaseInfoMutation = { __typename?: 'Mutations' } & {
+  updateDaoBaseInfo?: Maybe<
+    { __typename?: 'UpdateDAOBaseInfo' } & {
+      dao?: Maybe<{ __typename?: 'DAOSchema' } & Pick<DaoSchema, 'updateAt'>>;
+    }
+  >;
 };
 
 export type DaoQueryVariables = Exact<{
@@ -536,6 +562,57 @@ export type FollowDaoMutationResult = Apollo.MutationResult<FollowDaoMutation>;
 export type FollowDaoMutationOptions = Apollo.BaseMutationOptions<
   FollowDaoMutation,
   FollowDaoMutationVariables
+>;
+export const UpdateDaoBaseInfoDocument = gql`
+  mutation UpdateDAOBaseInfo($id: String!, $desc: String, $logo: String) {
+    updateDaoBaseInfo(id: $id, desc: $desc, logo: $logo) {
+      dao {
+        updateAt
+      }
+    }
+  }
+`;
+export type UpdateDaoBaseInfoMutationFn = Apollo.MutationFunction<
+  UpdateDaoBaseInfoMutation,
+  UpdateDaoBaseInfoMutationVariables
+>;
+
+/**
+ * __useUpdateDaoBaseInfoMutation__
+ *
+ * To run a mutation, you first call `useUpdateDaoBaseInfoMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateDaoBaseInfoMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateDaoBaseInfoMutation, { data, loading, error }] = useUpdateDaoBaseInfoMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      desc: // value for 'desc'
+ *      logo: // value for 'logo'
+ *   },
+ * });
+ */
+export function useUpdateDaoBaseInfoMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateDaoBaseInfoMutation,
+    UpdateDaoBaseInfoMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<UpdateDaoBaseInfoMutation, UpdateDaoBaseInfoMutationVariables>(
+    UpdateDaoBaseInfoDocument,
+    options,
+  );
+}
+export type UpdateDaoBaseInfoMutationHookResult = ReturnType<typeof useUpdateDaoBaseInfoMutation>;
+export type UpdateDaoBaseInfoMutationResult = Apollo.MutationResult<UpdateDaoBaseInfoMutation>;
+export type UpdateDaoBaseInfoMutationOptions = Apollo.BaseMutationOptions<
+  UpdateDaoBaseInfoMutation,
+  UpdateDaoBaseInfoMutationVariables
 >;
 export const DaoDocument = gql`
   query DAO($id: String!) {

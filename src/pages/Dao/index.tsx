@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { PageContainer, PageLoading } from '@ant-design/pro-layout';
-import { Avatar, Button, Col, Row, Space, Tabs, Typography, Tag, Divider } from 'antd';
+import { Avatar, Button, Col, Row, Space, Tabs, Typography, Tag, Divider, message } from 'antd';
 import { FormattedMessage, history, useAccess } from 'umi';
 import styles from './index.less';
 import GlobalBreadcrumb from '@/components/Breadcrumb';
@@ -11,8 +11,10 @@ import {
   DaoFollowTypeEnum,
   useDaoFollowInfoQuery,
   useFollowDaoMutation,
+  useUpdateDaoBaseInfoMutation,
 } from '@/services/dao/generated';
 import { getFormatTime } from '@/utils/utils';
+import { useIntl } from '@@/plugin-locale/localeExports';
 
 const { TabPane } = Tabs;
 const { Paragraph } = Typography;
@@ -38,15 +40,16 @@ const breadcrumb = (daoId: string) => [
 
 const configTab = (
   <>
-    <TabPane tab={<FormattedMessage id={`pages.dao.home.tab.icpper`} />} key="icpper"></TabPane>
-    <TabPane tab={<FormattedMessage id={`pages.dao.home.tab.job`} />} key="job"></TabPane>
-    <TabPane tab={<FormattedMessage id={`pages.dao.home.tab.cycle`} />} key="cycle"></TabPane>
+    <TabPane tab={<FormattedMessage id={`pages.dao.home.tab.icpper`} />} key="icpper" />
+    <TabPane tab={<FormattedMessage id={`pages.dao.home.tab.job`} />} key="job" />
+    <TabPane tab={<FormattedMessage id={`pages.dao.home.tab.cycle`} />} key="cycle" />
   </>
 );
 
 export default (props: { match: { params: { daoId: string } } }): ReactNode => {
   const { initialState } = useModel('@@initialState');
   const access = useAccess();
+  const intl = useIntl();
   const [tab, setTab] = useState<string>('icpper');
   const [followedButtonLoading, setFollowedButtonLoading] = useState(false);
   if (!initialState) {
@@ -58,6 +61,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
     variables: { id: daoId, userId: initialState.currentUser()?.profile?.id },
   });
   const [updateFollowDao] = useFollowDaoMutation();
+  const [updateDaoBaseInfo] = useUpdateDaoBaseInfoMutation();
 
   if (loading || error) {
     return <PageLoading />;
@@ -68,16 +72,6 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
   const followed = follow?.followers?.length && follow?.followers[0]?.createAt;
 
   const isOnwer = access.isDaoOwner(data?.dao?.datum?.ownerId || '');
-  let descEditable: any = false;
-  if (isOnwer) {
-    descEditable = {
-      onEnd: async () => {
-        await refetch();
-      }, // TODO: dao desc update not only local
-      autoSize: { minRows: 3 },
-      tooltip: false,
-    };
-  }
 
   return (
     <>
@@ -143,7 +137,29 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
             </Space>
           </Col>
         </Row>
-        <Paragraph editable={descEditable}>{dao.desc}</Paragraph>
+        <Paragraph
+          editable={
+            isOnwer
+              ? {
+                  onChange: async (value) => {
+                    if (value.length < 50) {
+                      message.error(intl.formatMessage({ id: 'pages.dao.home.desc.error' }));
+                      return;
+                    }
+                    await updateDaoBaseInfo({
+                      variables: { id: daoId, desc: value },
+                    });
+                    await refetch();
+                    message.success(intl.formatMessage({ id: 'pages.dao.home.desc.success' }));
+                  },
+                  autoSize: { minRows: 3 },
+                  tooltip: false,
+                }
+              : false
+          }
+        >
+          {dao.desc}
+        </Paragraph>
         <Space size={10} className={styles.tagSpace}>
           <Tag color="processing">
             {getFormatTime(dao.createAt, 'LL')}
