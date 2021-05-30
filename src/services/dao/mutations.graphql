@@ -49,3 +49,11 @@ mutation FollowDAO($daoId: String!, $followType: DAOFollowTypeEnum!) {
     ok
   }
 }
+
+mutation UpdateDAOBaseInfo($id: String!, $desc: String, $logo: String) {
+  updateDaoBaseInfo(id: $id, desc: $desc, logo: $logo) {
+    dao {
+      updateAt
+    }
+  }
+}
