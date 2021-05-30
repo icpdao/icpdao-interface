@@ -11,6 +11,7 @@ const {
   REACT_APP_GITHUB_APP_CLIENT_ID,
   REACT_APP_ICPDAO_BACKEND_BASE_URL,
   THEME,
+  REACT_APP_ICPDAO_BACKEND_VERSION,
 } = process.env;
 
 export default defineConfig({
@@ -23,6 +24,7 @@ export default defineConfig({
     REACT_APP_GITHUB_APP_CLIENT_ID,
     REACT_APP_ICPDAO_BACKEND_BASE_URL: REACT_APP_ICPDAO_BACKEND_BASE_URL || '',
     THEME: THEME || undefined,
+    REACT_APP_ICPDAO_BACKEND_VERSION: REACT_APP_ICPDAO_BACKEND_VERSION || 'v1',
   },
   layout: {
     // https://umijs.org/zh-CN/plugins/plugin-layout

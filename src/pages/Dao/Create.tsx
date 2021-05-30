@@ -24,7 +24,7 @@ const handleUplaod = (options: any) => {
     ACL: 'public-read',
     ContentType: 'image/png',
   };
-  client.putObject(params, (err, data) => {
+  client.putObject(params, (err: any, data: any) => {
     console.log(err, data);
   });
 };

@@ -13,10 +13,13 @@ body,
 }
 
 :global {
-
   .ant-layout {
     min-height: 100vh;
     background: transparent !important;
+  }
+
+  .ant-layout-content {
+    margin: 0 0;
   }
 
   .ant-layout-footer {
@@ -27,8 +30,12 @@ body,
     background: transparent !important;
   }
 
+  .ant-pro-page-container {
+    margin: 0 0 0 !important;
+  }
+
   .ant-pro-global-header {
-    background: transparent !important;
+    background: var(--header-background-color) !important;
     box-shadow: unset !important;
   }
 
@@ -60,7 +67,6 @@ body,
     color: var(--font-color) !important;
     background-color: var(--tooltip-background-color) !important;
   }
-
 }
 
 canvas {
@@ -68,10 +74,10 @@ canvas {
 }
 
 body {
+  color: var(--font-color);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: var(--font-color);
 }
 
 ul,
@@ -97,19 +103,21 @@ ol {
 }
 
 .body-wrap-light {
-  --background-color: radial-gradient(50% 50% at 50% 50%, rgba(252, 7, 125, 0.063) 0%, rgba(255, 255, 255, 0) 100%);
-  --font-color: rgba(0, 0, 0, .85);
-  --switch-theme-hover-color: #177DDC;
-  --modal-close-button-color: #DBDBDB;
+  --background-color: linear-gradient(180deg, #fff 0%, #fff 100%);
+  --header-background-color: #fff;
+  --font-color: rgba(0, 0, 0, 0.85);
+  --switch-theme-hover-color: #177ddc;
+  --modal-close-button-color: #dbdbdb;
   --tooltip-background-color: #fff;
   --preicpper-invited-background-color: #fff;
 }
 
 .body-wrap-dark {
-  --background-color: linear-gradient(180deg, #0E0F11 0%, #111620 100%);
-  --font-color: rgba(255, 255, 255, .85);
-  --switch-theme-hover-color: #177DDC;
-  --modal-close-button-color: #DBDBDB;
+  --background-color: linear-gradient(180deg, #0e0f11 0%, #111620 100%);
+  --header-background-color: #000;
+  --font-color: rgba(255, 255, 255, 0.85);
+  --switch-theme-hover-color: #177ddc;
+  --modal-close-button-color: #dbdbdb;
   --tooltip-background-color: #141414;
   --preicpper-invited-background-color: #141414;
 }

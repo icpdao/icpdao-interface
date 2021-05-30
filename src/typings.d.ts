@@ -46,3 +46,4 @@ declare const REACT_APP_ENV: 'test' | 'dev' | 'pre' | false;
 declare const REACT_APP_GITHUB_APP_CLIENT_ID: string;
 declare const REACT_APP_ICPDAO_BACKEND_BASE_URL: string;
 declare const THEME: string | undefined;
+declare const REACT_APP_ICPDAO_BACKEND_VERSION: string;
