@@ -41,7 +41,7 @@ const formatJobConfigData = (data: DaoJobConfigQuery | undefined): JobConfigData
 };
 
 const formatSubmitJobConfigData = (data: any) => {
-  return {
+  const config = {
     daoId: '',
     timeZone: momentTZ.tz(data.timeZoneRegion).utcOffset(),
     timeZoneRegion: data.timeZoneRegion,
@@ -56,6 +56,16 @@ const formatSubmitJobConfigData = (data: any) => {
     votingEndDay: data.votingEnd[0],
     votingEndHour: data.votingEnd[1],
   };
+
+  const validPair =
+    config.pairBeginDay < config.pairEndDay ||
+    (config.pairBeginDay === config.pairEndDay && config.pairBeginHour < config.pairEndHour);
+  const validVoting =
+    config.votingBeginDay < config.votingEndDay ||
+    (config.votingBeginDay === config.votingEndDay &&
+      config.votingBeginHour < config.votingEndHour);
+  const valid: boolean = validPair && validVoting;
+  return { valid, config };
 };
 
 const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId }) => {
@@ -81,7 +91,13 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId }) => {
         initialValues={formInitData}
         onFinish={async (values) => {
           setSaveLoading(true);
-          const updateData = formatSubmitJobConfigData(values);
+          const { valid, config: updateData } = formatSubmitJobConfigData(values);
+          if (!valid) {
+            form.resetFields();
+            setSaveLoading(false);
+            message.error(intl.formatMessage({ id: 'pages.dao.config.tab.job.form.error' }));
+            return false;
+          }
           updateData.daoId = daoId;
           await updateDaoJobConfig({
             variables: updateData,
