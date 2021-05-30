@@ -1,16 +1,25 @@
+import React from 'react';
 import type { Settings as LayoutSettings } from '@ant-design/pro-layout';
 import { PageLoading } from '@ant-design/pro-layout';
 import type { RequestConfig, RunTimeLayoutConfig } from 'umi';
-import {history} from 'umi';
+import { history } from 'umi';
 import RightHeader from '@/components/RightHeader';
 import LeftHeader from '@/components/LeftHeader';
 import Footer from '@/components/Footer';
 import { getUserProfile } from './services/icpdao-interface/user';
 import requestConfig from './utils/request';
-import {clearAuthorization, getAuthorization, getTheme, getUserInfo, setUserProfile} from "@/utils/utils";
-import type {MenuTheme} from "antd";
+import {
+  clearAuthorization,
+  getAuthorization,
+  getTheme,
+  getUserInfo,
+  setUserProfile,
+} from '@/utils/utils';
+import type { MenuTheme } from 'antd';
+import { ApolloProvider } from '@apollo/client';
+import client from '@/utils/apolloClient';
 
-const githubCallback = '/login/auth_callback'
+const githubCallback = '/login/auth_callback';
 
 export const initialStateConfig = {
   loading: <PageLoading />,
@@ -19,17 +28,17 @@ export const initialStateConfig = {
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
   fetchUserInfo?: () => Promise<API.UserProfile | undefined>;
-  currentUser?: any
+  currentUser?: any;
 }> {
-  const auth = getAuthorization()
+  const auth = getAuthorization();
   if (!auth) {
-    clearAuthorization()
-    localStorage.removeItem('user_info')
+    clearAuthorization();
+    localStorage.removeItem('user_info');
   }
   const fetchUserInfo = async () => {
     try {
-      const {data: userProfile} = await getUserProfile();
-      if (userProfile) setUserProfile(userProfile)
+      const { data: userProfile } = await getUserProfile();
+      if (userProfile) setUserProfile(userProfile);
       return userProfile;
     } catch (error) {
       return undefined;
@@ -41,11 +50,26 @@ export async function getInitialState(): Promise<{
   return {
     fetchUserInfo,
     currentUser: getUserInfo,
-    settings: {headerTheme: getTheme() as MenuTheme}
+    settings: { headerTheme: getTheme() as MenuTheme },
   };
 }
 
 export const request: RequestConfig = requestConfig;
+
+const ApolloProviderRoot = ({ children, routes }: any) => {
+  return (
+    <ApolloProvider client={client}>
+      {React.cloneElement(children, {
+        ...children.props,
+        routes,
+      })}
+    </ApolloProvider>
+  );
+};
+
+export function rootContainer(container: any) {
+  return React.createElement(ApolloProviderRoot, null, container);
+}
 
 export const layout: RunTimeLayoutConfig = ({ initialState }) => {
   return {

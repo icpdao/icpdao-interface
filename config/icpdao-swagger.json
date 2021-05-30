@@ -15,9 +15,7 @@
   "paths": {
     "/v1/users/github/auth_callback": {
       "get": {
-        "tags": [
-          "login"
-        ],
+        "tags": ["login"],
         "description": "github app callback",
         "operationId": "github_callback",
         "parameters": [
@@ -48,9 +46,7 @@
     },
     "/v1/users/profile": {
       "get": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "description": "查询个人基础信息",
         "operationId": "get_user_profile",
         "responses": {
@@ -72,9 +68,7 @@
         ]
       },
       "put": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "description": "更新用户基础信息",
         "operationId": "update_user_profile",
         "requestBody": {
@@ -108,9 +102,7 @@
     },
     "/v1/users/icpperships/{id}/accept": {
       "put": {
-        "tags": [
-          "icpperships"
-        ],
+        "tags": ["icpperships"],
         "description": "接收邀请",
         "operationId": "accept_icpperships",
         "parameters": [
@@ -157,9 +149,7 @@
     },
     "/v1/users/icpperships": {
       "get": {
-        "tags": [
-          "icpperships"
-        ],
+        "tags": ["icpperships"],
         "description": "查询所有 icpper 邀请",
         "operationId": "get_icpperships",
         "responses": {
@@ -181,9 +171,7 @@
         ]
       },
       "post": {
-        "tags": [
-          "icpperships"
-        ],
+        "tags": ["icpperships"],
         "description": "发送邀请",
         "operationId": "send_icpperships",
         "requestBody": {
@@ -217,9 +205,7 @@
     },
     "/v1/users/icpperships/{id}": {
       "delete": {
-        "tags": [
-          "icpperships"
-        ],
+        "tags": ["icpperships"],
         "description": "删除邀请",
         "operationId": "remove_icpperships",
         "parameters": [
@@ -276,11 +262,7 @@
       },
       "UserStatus": {
         "type": "integer",
-        "enum": [
-          0,
-          1,
-          2
-        ]
+        "enum": [0, 1, 2]
       },
       "IcpperShip": {
         "type": "object",
@@ -290,11 +272,7 @@
           },
           "progress": {
             "type": "integer",
-            "enum": [
-              0,
-              1,
-              2
-            ]
+            "enum": [0, 1, 2]
           },
           "status": {
             "$ref": "#/components/schemas/UserStatus"
@@ -324,6 +302,9 @@
           },
           "erc20_address": {
             "type": "string"
+          },
+          "id": {
+            "type": "string"
           }
         }
       },
@@ -341,11 +322,7 @@
           },
           "progress": {
             "type": "integer",
-            "enum": [
-              0,
-              1,
-              2
-            ]
+            "enum": [0, 1, 2]
           },
           "status": {
             "$ref": "#/components/schemas/UserStatus"
@@ -371,9 +348,7 @@
         }
       },
       "ErrorResponse": {
-        "required": [
-          "errorCode"
-        ],
+        "required": ["errorCode"],
         "type": "object",
         "properties": {
           "errorCode": {
