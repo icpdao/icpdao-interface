@@ -89,6 +89,7 @@ export default {
   'pages.dao.config.tab.job.form.ok': 'OK',
   'pages.dao.config.tab.job.form.save': 'SAVE',
   'pages.dao.config.tab.job.form.success': 'Success, DAO job config updated.',
+  'pages.dao.config.tab.job.form.error': 'Error, DAO job config data format error.',
   'pages.dao.home.view': 'VIEW ON GITHUB',
   'pages.dao.home.followed': 'FOLLOW',
   'pages.dao.home.unfollowed': 'UNFOLLOW',
