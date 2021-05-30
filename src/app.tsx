@@ -27,7 +27,7 @@ export const initialStateConfig = {
 
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
-  fetchUserInfo?: () => Promise<API.UserProfile | undefined>;
+  fetchUserInfo: () => Promise<API.UserProfile | undefined>;
   currentUser?: any;
 }> {
   const auth = getAuthorization();
