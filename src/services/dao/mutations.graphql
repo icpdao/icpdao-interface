@@ -1,0 +1,59 @@
+mutation CreateDAO($name: String!, $desc: String!, $logo: String!, $timeZone: Int!, $timeZoneRegion: String!) {
+  createDao(name: $name, desc: $desc, logo: $logo, timeZone: $timeZone, timeZoneRegion: $timeZoneRegion) {
+    dao {
+      id
+      number
+      createAt
+    }
+  }
+}
+
+mutation UpdateDAOJobConfig(
+  $daoId: String!
+  $deadlineDay: Int
+  $deadlineTime: Int
+  $pairBeginDay: Int
+  $pairBeginHour: Int
+  $pairEndDay: Int
+  $pairEndHour: Int
+  $votingBeginDay: Int
+  $votingBeginHour: Int
+  $votingEndDay: Int
+  $votingEndHour: Int
+  $timeZoneRegion: String
+  $timeZone: Int
+) {
+  updateDaoJobConfig(
+    daoId: $daoId,
+    deadlineDay: $deadlineDay,
+    deadlineTime: $deadlineTime,
+    pairBeginDay: $pairBeginDay,
+    pairBeginHour: $pairBeginHour,
+    pairEndDay: $pairEndDay,
+    pairEndHour: $pairEndHour,
+    votingBeginDay: $votingBeginDay,
+    votingBeginHour: $votingBeginHour,
+    votingEndDay: $votingEndDay,
+    votingEndHour: $votingEndHour,
+    timeZone: $timeZone,
+    timeZoneRegion: $timeZoneRegion
+  ) {
+    jobConfig {
+      updateAt
+    }
+  }
+}
+
+mutation FollowDAO($daoId: String!, $followType: DAOFollowTypeEnum!) {
+  updateDaoFollow(daoId: $daoId, type: $followType) {
+    ok
+  }
+}
+
+mutation UpdateDAOBaseInfo($id: String!, $desc: String, $logo: String) {
+  updateDaoBaseInfo(id: $id, desc: $desc, logo: $logo) {
+    dao {
+      updateAt
+    }
+  }
+}

@@ -7,5 +7,6 @@ module.exports = {
     REACT_APP_GITHUB_APP_CLIENT_ID: 'readonly',
     REACT_APP_ICPDAO_BACKEND_BASE_URL: 'readonly',
     THEME: true,
+    REACT_APP_ICPDAO_BACKEND_VERSION: true,
   },
 };

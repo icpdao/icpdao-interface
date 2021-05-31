@@ -1,0 +1,5 @@
+{
+  "name": "DAO GraphQL Schema",
+  "schemaPath": "graphql.schema.json",
+  "extensions": {}
+}

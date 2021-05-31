@@ -15,7 +15,6 @@
   {
     path: '/account/icpper',
     component: './Account/Icpper',
-    access: 'canInviteIcpper',
   },
   {
     path: '/account/mentor',
@@ -36,6 +35,14 @@
     path: '/dao/create',
     component: './Dao/Create',
     access: 'isNormal',
+  },
+  {
+    path: '/dao/:daoId/config',
+    component: './Dao/Config',
+  },
+  {
+    path: '/dao/:daoId',
+    component: './Dao',
   },
   {
     component: './404',

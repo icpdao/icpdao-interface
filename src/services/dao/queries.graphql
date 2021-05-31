@@ -1,0 +1,59 @@
+query DAO($id: String!) {
+  dao(id: $id) {
+    datum {
+      id
+      number
+      name
+      desc
+      logo
+      ownerId
+      createAt
+      updateAt
+    }
+    following {
+      total
+    }
+  }
+}
+
+query DAOJobConfig($daoId: String!) {
+  daoJobConfig(daoId: $daoId) {
+    id
+    daoId
+    createAt
+    deadlineDay
+    deadlineTime
+    pairBeginDay
+    pairBeginHour
+    pairEndDay
+    pairEndHour
+    timeZone
+    timeZoneRegion
+    updateAt
+    votingBeginDay
+    votingBeginHour
+    votingEndDay
+    votingEndHour
+  }
+}
+
+query DAOFollowInfo($id: String!, $userId: String!) {
+  dao(id: $id) {
+    datum {
+      id
+      number
+      name
+      desc
+      logo
+      ownerId
+      createAt
+      updateAt
+    }
+    following {
+      total
+      followers(userId: $userId) {
+        createAt
+      }
+    }
+  }
+}

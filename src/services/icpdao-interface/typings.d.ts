@@ -22,6 +22,7 @@ declare namespace API {
     status?: UserStatus;
     icppership?: IcpperShip;
     erc20_address?: string;
+    id?: string;
   };
 
   type InviteResults = InviteResult[];
