@@ -58,7 +58,6 @@
     "@umijs/plugin-openapi": "^1.2.0",
     "@umijs/route-utils": "^1.0.36",
     "antd": "^4.14.0",
-    "antd-pro-merge-less": "^3.0.11",
     "apollo-boost": "^0.4.9",
     "classnames": "^2.2.6",
     "graphql": "^15.5.0",
@@ -73,11 +72,10 @@
     "react-dev-inspector": "^1.1.1",
     "react-dom": "^17.0.0",
     "react-helmet-async": "^1.0.4",
-    "rimraf": "^3.0.2",
-    "serve-static": "^1.14.1",
     "serverless-s3-sync": "^1.17.1",
     "slash2": "^2.0.0",
     "umi": "^3.4.0",
+    "umi-plugin-antd-theme": "^2.1.2",
     "umi-request": "^1.0.8"
   },
   "devDependencies": {
