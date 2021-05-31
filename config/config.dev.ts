@@ -3,6 +3,7 @@ import { defineConfig } from 'umi';
 
 export default defineConfig({
   plugins: [
+    require.resolve('../src/plugins/disable-theme-less'),
     // https://github.com/zthxxx/react-dev-inspector
     'react-dev-inspector/plugins/umi/react-inspector',
   ],
@@ -12,6 +13,7 @@ export default defineConfig({
     babelPlugins: [],
     babelOptions: {},
   },
+  devtool: 'eval',
   webpack5: {
     // lazyCompilation: {},
   },
