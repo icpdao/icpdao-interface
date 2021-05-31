@@ -72,6 +72,7 @@ export default {
   'pages.account.wallet.save': 'SAVE',
   'pages.account.wallet.input.placeholder': '0xA23c75e32ae8Ee45cf76Cf23FBCcc0995acaEAEe',
   'pages.account.wallet.save.warning': 'invalid address',
+  'pages.dao.component.dao_list.create_dao': 'CREATE DAO',
   'pages.dao.config.tab.job': 'JOB',
   'pages.dao.config.tab.token': 'TOKEN',
   'pages.dao.config.tab.skip': 'skip',
