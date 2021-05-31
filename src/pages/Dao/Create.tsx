@@ -17,9 +17,15 @@ const AwsS3Bucket = 'dev.files.icpdao';
 const AwsS3region = 'us-east-1';
 const AwsS3FileBucketHost = 'https://s3.amazonaws.com';
 
-const getAwsS3UrlByKey = (key) => {
+const getAwsS3UrlByKey = (key: string) => {
   return `${AwsS3FileBucketHost}/${AwsS3Bucket}/${key}`;
 };
+
+interface AwsCredentials {
+  accessKeyId: string;
+  secretAccessKey: string;
+  sessionToken: string;
+}
 
 export type onUploadSuccessFunType = (url: string) => void;
 export interface AvatarUploadProps {
@@ -38,7 +44,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ onUploadSuccess, initlogoUr
       return;
     }
     if (file.status === 'done') {
-      const reader = new FileReader();
+      const reader: any = new FileReader();
       reader.addEventListener('load', () => {
         setImageUrl(reader.result);
         setUploading(false);
@@ -54,7 +60,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ onUploadSuccess, initlogoUr
     file.fileAwsKey = `avatar/${file.uid}`;
     onProgress(file, 0);
 
-    new Promise((resolve) => {
+    new Promise<AwsCredentials>((resolve) => {
       setTimeout(() => {
         // 从服务取得临时token
         resolve({
@@ -63,7 +69,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ onUploadSuccess, initlogoUr
           sessionToken: 'xxx',
         });
       }, 1000);
-    }).then((credentials) => {
+    }).then((credentials: AwsCredentials) => {
       const client = new AWS.S3({
         region: AwsS3region,
         // 从后端拿到临时凭证 credentials
@@ -82,7 +88,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ onUploadSuccess, initlogoUr
         ContentType: file.type,
       };
 
-      client.putObject(params, (err, data) => {
+      client.putObject(params, (err: any, data: any) => {
         onSuccess(file, data);
       });
     });
@@ -119,7 +125,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ onUploadSuccess, initlogoUr
   );
 };
 
-const getOrgNameByUrl = (url) => {
+const getOrgNameByUrl = (url: string) => {
   if (!url) {
     return null;
   }
@@ -156,7 +162,7 @@ export default (): ReactNode => {
     useState<string | undefined>(undefined);
   const [githubOrgHelp, setGithubOrgHelp] = useState<string | undefined>();
   const [submitDisabled, setSubmitDisabled] = useState(true);
-  const [appCheckSstatus, setAppCheckSstatus] = useState([orgName, GithubAppCheckStatus.Null]);
+  const [appCheckSstatus, setAppCheckSstatus] = useState<any>([orgName, GithubAppCheckStatus.Null]);
 
   console.log('render', orgName, appCheckSstatus[0], appCheckSstatus[1]);
   const updateSubmitStatus = () => {
@@ -293,7 +299,7 @@ export default (): ReactNode => {
             label="GITHUB ORG"
             name="githubOrg"
             tooltip="tip"
-            validateStatus={githubOrgValidateStatus}
+            validateStatus={githubOrgValidateStatus as any}
             help={githubOrgHelp}
           >
             <Input
@@ -305,14 +311,17 @@ export default (): ReactNode => {
           <Form.Item
             label="ORGANIZATION DESCRIPTION"
             name="desc"
-            onChange={handleOtherChange}
             rules={[
               {
                 min: 50,
               },
             ]}
           >
-            <Input.TextArea showCount placeholder="No less than 50 words of project description" />
+            <Input.TextArea
+              showCount
+              onChange={handleOtherChange}
+              placeholder="No less than 50 words of project description"
+            />
           </Form.Item>
 
           <div className={styles.appStatus}>{appStatusNode(appCheckSstatus[1])}</div>
