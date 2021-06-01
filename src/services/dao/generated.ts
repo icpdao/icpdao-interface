@@ -42,12 +42,21 @@ export enum DaoFollowTypeEnum {
 
 export type DaoFollowUdSchema = {
   __typename?: 'DAOFollowUDSchema';
+  daoId: Scalars['String'];
   followers?: Maybe<Array<Maybe<DaoFollowSchema>>>;
   total: Scalars['Int'];
 };
 
 export type DaoFollowUdSchemaFollowersArgs = {
   userId?: Maybe<Scalars['String']>;
+};
+
+export type DaoGithubAppStatus = {
+  __typename?: 'DAOGithubAppStatus';
+  githubOrgId?: Maybe<Scalars['Int']>;
+  isExists?: Maybe<Scalars['Boolean']>;
+  isGithubOrgOwner?: Maybe<Scalars['Boolean']>;
+  isIcpAppInstalled?: Maybe<Scalars['Boolean']>;
 };
 
 export type DaoItem = {
@@ -183,6 +192,7 @@ export type Query = {
   daos?: Maybe<DaOs>;
   dao?: Maybe<Dao>;
   daoJobConfig?: Maybe<DaoJobConfigSchema>;
+  daoGithubAppStatus?: Maybe<DaoGithubAppStatus>;
 };
 
 export type QueryDaosArgs = {
@@ -200,6 +210,10 @@ export type QueryDaoArgs = {
 
 export type QueryDaoJobConfigArgs = {
   daoId: Scalars['String'];
+};
+
+export type QueryDaoGithubAppStatusArgs = {
+  name: Scalars['String'];
 };
 
 export type UpdateDaoBaseInfo = {
@@ -362,6 +376,19 @@ export type DaoFollowInfoQuery = { __typename?: 'Query' } & {
           }
       >;
     }
+  >;
+};
+
+export type DaoGithubAppStatusQueryVariables = Exact<{
+  name: Scalars['String'];
+}>;
+
+export type DaoGithubAppStatusQuery = { __typename?: 'Query' } & {
+  daoGithubAppStatus?: Maybe<
+    { __typename?: 'DAOGithubAppStatus' } & Pick<
+      DaoGithubAppStatus,
+      'githubOrgId' | 'isExists' | 'isGithubOrgOwner' | 'isIcpAppInstalled'
+    >
   >;
 };
 
@@ -789,4 +816,60 @@ export type DaoFollowInfoLazyQueryHookResult = ReturnType<typeof useDaoFollowInf
 export type DaoFollowInfoQueryResult = Apollo.QueryResult<
   DaoFollowInfoQuery,
   DaoFollowInfoQueryVariables
+>;
+export const DaoGithubAppStatusDocument = gql`
+  query DAOGithubAppStatus($name: String!) {
+    daoGithubAppStatus(name: $name) {
+      githubOrgId
+      isExists
+      isGithubOrgOwner
+      isIcpAppInstalled
+    }
+  }
+`;
+
+/**
+ * __useDaoGithubAppStatusQuery__
+ *
+ * To run a query within a React component, call `useDaoGithubAppStatusQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDaoGithubAppStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDaoGithubAppStatusQuery({
+ *   variables: {
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useDaoGithubAppStatusQuery(
+  baseOptions: Apollo.QueryHookOptions<DaoGithubAppStatusQuery, DaoGithubAppStatusQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<DaoGithubAppStatusQuery, DaoGithubAppStatusQueryVariables>(
+    DaoGithubAppStatusDocument,
+    options,
+  );
+}
+export function useDaoGithubAppStatusLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    DaoGithubAppStatusQuery,
+    DaoGithubAppStatusQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<DaoGithubAppStatusQuery, DaoGithubAppStatusQueryVariables>(
+    DaoGithubAppStatusDocument,
+    options,
+  );
+}
+export type DaoGithubAppStatusQueryHookResult = ReturnType<typeof useDaoGithubAppStatusQuery>;
+export type DaoGithubAppStatusLazyQueryHookResult = ReturnType<
+  typeof useDaoGithubAppStatusLazyQuery
+>;
+export type DaoGithubAppStatusQueryResult = Apollo.QueryResult<
+  DaoGithubAppStatusQuery,
+  DaoGithubAppStatusQueryVariables
 >;
