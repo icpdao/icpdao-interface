@@ -17,7 +17,7 @@ export default (): ReactNode => {
   const breadcrumb = useMemo(() => {
     return [
       { icon: <HomeOutlined />, path: '/', breadcrumbName: 'HOME', menuId: 'home' },
-      { path: '/dao/mine', breadcrumbName: 'DAO', menuId: 'dao_mine' },
+      { path: '/dao/explore', breadcrumbName: 'EXPLORE DAO', menuId: 'dao.explore' },
     ];
   }, []);
 
@@ -25,7 +25,7 @@ export default (): ReactNode => {
     if (access.canInviteIcpper()) {
       return [
         {
-          key: 'following_and_owner',
+          key: 'all',
           title: 'All',
         },
         {
@@ -33,14 +33,14 @@ export default (): ReactNode => {
           title: 'Following',
         },
         {
-          key: 'owner',
-          title: 'owner',
+          key: 'following_and_owner',
+          title: 'My dao',
         },
       ];
     }
     return [
       {
-        key: 'following_and_owner',
+        key: 'all',
         title: 'All',
       },
       {

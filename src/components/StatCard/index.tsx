@@ -18,7 +18,7 @@ const StatCard: React.FC<StatCardProps> = ({ data }) => {
   const nodeList: ReactNode[] = [];
   data.forEach((item) => {
     nodeList.push(
-      <Card.Grid hoverable={false} className={styles.statCard}>
+      <Card.Grid hoverable={false} className={styles.statCard} key={item.title}>
         <div>
           <div className={styles.statCardNumber}>{item.number}</div>
           <div className={styles.statCardName}>{item.title}</div>

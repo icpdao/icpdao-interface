@@ -32,6 +32,11 @@
     access: 'isNormal',
   },
   {
+    path: '/dao/explore',
+    component: './Dao/Explore',
+    access: 'isNormal',
+  },
+  {
     path: '/dao/create',
     component: './Dao/Create',
     access: 'isNormal',
