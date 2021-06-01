@@ -248,6 +248,30 @@
           }
         ]
       }
+    },
+    "/v1/users/aws/sts/upload_s3_assume_role": {
+      "get": {
+        "tags": ["aws"],
+        "description": "获取上传文件到S3的临时token",
+        "operationId": "upload_s3_assume_role",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_5"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTKeyAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -285,6 +309,9 @@
       "UserProfile": {
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string"
+          },
           "nickname": {
             "type": "string"
           },
@@ -302,8 +329,19 @@
           },
           "erc20_address": {
             "type": "string"
+          }
+        }
+      },
+      "AwsSts": {
+        "type": "object",
+        "properties": {
+          "access_key_id": {
+            "type": "string"
           },
-          "id": {
+          "secret_access_key": {
+            "type": "string"
+          },
+          "session_token": {
             "type": "string"
           }
         }
@@ -438,6 +476,18 @@
           },
           "data": {
             "type": "object"
+          }
+        }
+      },
+      "inline_response_200_5": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "default": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/AwsSts"
           }
         }
       },
