@@ -1,100 +1,98 @@
-import type { ReactNode } from 'react';
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 
 import { Upload, Form, Input, Button, Space } from 'antd';
-
+import { history } from 'umi';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 
 import * as AWS from '@aws-sdk/client-s3';
 
 import styles from './Create.less';
-
 import GlobalTooltip from '@/components/Tooltip';
+import { useDaoGithubAppStatusLazyQuery, useCreateDaoMutation } from '@/services/dao/generated';
+import { uploadS3AssumeRole } from '@/services/icpdao-interface/aws';
+import { getTimeZone, getTimeZoneOffset } from '@/utils/utils';
 
 const { Dragger } = Upload;
+
+type onUploadSuccessFunType = (url: string) => void;
+interface AvatarUploadProps {
+  onUploadSuccess: onUploadSuccessFunType;
+  initlogoUrl: string;
+}
 
 const AwsS3Bucket = 'dev.files.icpdao';
 const AwsS3region = 'us-east-1';
 const AwsS3FileBucketHost = 'https://s3.amazonaws.com';
+const GithubAppName = 'icpdao-test';
+
+const getGithubAppInstallUrl = (orgId: any) => {
+  return `//github.com/apps/${GithubAppName}/installations/new/permissions?target_id=${orgId}`;
+};
 
 const getAwsS3UrlByKey = (key: string) => {
   return `${AwsS3FileBucketHost}/${AwsS3Bucket}/${key}`;
 };
 
-interface AwsCredentials {
-  accessKeyId: string;
-  secretAccessKey: string;
-  sessionToken: string;
-}
-
-export type onUploadSuccessFunType = (url: string) => void;
-export interface AvatarUploadProps {
-  onUploadSuccess: onUploadSuccessFunType;
-  initlogoUrl: string;
-}
-
 const AvatarUpload: React.FC<AvatarUploadProps> = ({ onUploadSuccess, initlogoUrl }) => {
   const [uploading, setUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-  const handleChange = (info: any) => {
-    const { file } = info;
-    if (file.status === 'uploading') {
-      setUploading(true);
-      return;
-    }
-    if (file.status === 'done') {
-      const reader: any = new FileReader();
-      reader.addEventListener('load', () => {
-        setImageUrl(reader.result);
-        setUploading(false);
-      });
-      reader.readAsDataURL(file.originFileObj);
-      onUploadSuccess(getAwsS3UrlByKey(file.fileAwsKey));
-    }
-  };
+  const handleChange = useCallback(
+    (info: any) => {
+      const { file } = info;
+      if (file.status === 'uploading') {
+        setUploading(true);
+        return;
+      }
+      if (file.status === 'done') {
+        const reader: any = new FileReader();
+        reader.addEventListener('load', () => {
+          setImageUrl(reader.result);
+          setUploading(false);
+        });
+        reader.readAsDataURL(file.originFileObj);
+        onUploadSuccess(getAwsS3UrlByKey(file.fileAwsKey));
+      }
+    },
+    [setUploading, setImageUrl, onUploadSuccess],
+  );
 
-  const handleUplaod = (options: any) => {
+  const handleCustomRequest = useCallback(async (options: any) => {
     const { file, onProgress, onSuccess } = options;
 
     file.fileAwsKey = `avatar/${file.uid}`;
     onProgress(file, 0);
 
-    new Promise<AwsCredentials>((resolve) => {
-      setTimeout(() => {
-        // 从服务取得临时token
-        resolve({
-          accessKeyId: 'xxx',
-          secretAccessKey: 'xxx',
-          sessionToken: 'xxx',
-        });
-      }, 1000);
-    }).then((credentials: AwsCredentials) => {
-      const client = new AWS.S3({
-        region: AwsS3region,
-        // 从后端拿到临时凭证 credentials
-        credentials: {
-          accessKeyId: credentials.accessKeyId,
-          secretAccessKey: credentials.secretAccessKey,
-          sessionToken: credentials.sessionToken,
-        },
-      });
+    const { data: credentials }: { success?: boolean; data?: API.AwsSts } =
+      await uploadS3AssumeRole();
 
-      const params = {
-        Bucket: AwsS3Bucket,
-        Key: file.fileAwsKey,
-        Body: file,
-        ACL: 'public-read',
-        ContentType: file.type,
-      };
+    if (credentials === undefined) {
+      return;
+    }
 
-      client.putObject(params, (err: any, data: any) => {
-        onSuccess(file, data);
-      });
+    const client = new AWS.S3({
+      region: AwsS3region,
+      // 从后端拿到临时凭证 credentials
+      credentials: {
+        accessKeyId: credentials.access_key_id || '',
+        secretAccessKey: credentials.secret_access_key || '',
+        sessionToken: credentials.session_token || '',
+      },
     });
-  };
 
-  const renderUploadButton = () => {
+    const params = {
+      Bucket: AwsS3Bucket,
+      Key: file.fileAwsKey,
+      Body: file,
+      ACL: 'public-read',
+      ContentType: file.type,
+    };
+
+    const data = await client.putObject(params);
+    onSuccess(file, data);
+  }, []);
+
+  const renderUploadButton = useCallback(() => {
     if (imageUrl) {
       return <img src={imageUrl} alt="avatar" style={{ height: 100, width: 100 }} />;
     }
@@ -108,7 +106,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ onUploadSuccess, initlogoUr
         <p>Drag & Click</p>
       </div>
     );
-  };
+  }, [imageUrl, initlogoUrl, uploading]);
 
   return (
     <div style={{ height: 100, width: 100 }}>
@@ -117,7 +115,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ onUploadSuccess, initlogoUr
         showUploadList={false}
         name="logo"
         onChange={handleChange}
-        customRequest={handleUplaod}
+        customRequest={handleCustomRequest}
       >
         {renderUploadButton()}
       </Dragger>
@@ -137,14 +135,7 @@ const getOrgNameByUrl = (url: string) => {
   return result[2];
 };
 
-enum GithubAppCheckStatus {
-  Null,
-  Checking,
-  UnInstall,
-  Installed,
-}
-
-export default (): ReactNode => {
+export default (): React.ReactNode => {
   const draftValue = useMemo(() => {
     const value = localStorage.getItem('dao.create.draft');
     if (value) {
@@ -157,15 +148,84 @@ export default (): ReactNode => {
   const initOrgName = getOrgNameByUrl(initialValues?.githubOrg);
 
   const formRef = useRef<any>(undefined);
-  const [orgName, setOrgName] = useState<string | null>(initOrgName);
-  const [githubOrgValidateStatus, setGithubOrgValidateStatus] =
-    useState<string | undefined>(undefined);
-  const [githubOrgHelp, setGithubOrgHelp] = useState<string | undefined>();
   const [submitDisabled, setSubmitDisabled] = useState(true);
-  const [appCheckSstatus, setAppCheckSstatus] = useState<any>([orgName, GithubAppCheckStatus.Null]);
 
-  console.log('render', orgName, appCheckSstatus[0], appCheckSstatus[1]);
-  const updateSubmitStatus = () => {
+  const [queryDaoGithubAppStatus, daoGithubAppStatusResult] = useDaoGithubAppStatusLazyQuery({
+    fetchPolicy: 'no-cache',
+  });
+  const daoGithubAppStatusResultLoading = daoGithubAppStatusResult?.loading;
+  const daoGithubAppStatusResultData = daoGithubAppStatusResult?.data;
+  const daoGithubAppStatusResultVariables = daoGithubAppStatusResult.variables;
+
+  const [createDaoMutation, createDaoMutationResult] = useCreateDaoMutation();
+  const createDaoMutationResultLoading = createDaoMutationResult.loading;
+
+  const appStatusNode = useCallback(() => {
+    const orgUrl = formRef.current?.getFieldValue('githubOrg') || '';
+    const name = getOrgNameByUrl(orgUrl);
+    const checkName = daoGithubAppStatusResultVariables?.name;
+    if (
+      !daoGithubAppStatusResultLoading &&
+      daoGithubAppStatusResultData?.daoGithubAppStatus &&
+      name &&
+      name === checkName
+    ) {
+      if (daoGithubAppStatusResultData.daoGithubAppStatus.isExists) {
+        return <div>Dao is exists</div>;
+      }
+      if (
+        daoGithubAppStatusResultData.daoGithubAppStatus.isIcpAppInstalled &&
+        !daoGithubAppStatusResultData.daoGithubAppStatus.isGithubOrgOwner
+      ) {
+        return <div>your must is github org owner</div>;
+      }
+      if (
+        daoGithubAppStatusResultData &&
+        daoGithubAppStatusResultData.daoGithubAppStatus.githubOrgId === null
+      ) {
+        return <div>github org not exists</div>;
+      }
+      if (!daoGithubAppStatusResultData.daoGithubAppStatus.isIcpAppInstalled) {
+        const orgId = daoGithubAppStatusResultData.daoGithubAppStatus?.githubOrgId;
+        const url = getGithubAppInstallUrl(orgId);
+        const onClick = (evt: any) => {
+          evt.preventDefault();
+          const values = formRef.current.getFieldsValue();
+          localStorage.setItem('dao.create.draft', JSON.stringify(values));
+          window.location.href = url;
+        };
+        return (
+          <Space>
+            <a onClick={onClick}>INSTALL THE ICPAPP</a>
+            <GlobalTooltip
+              title="You need to install ICPAPP on GitHub in order to associate with ICPDAO"
+              key={'install.tooltip'}
+            />
+          </Space>
+        );
+      }
+      if (
+        daoGithubAppStatusResultData.daoGithubAppStatus.isIcpAppInstalled &&
+        daoGithubAppStatusResultData.daoGithubAppStatus.isGithubOrgOwner
+      ) {
+        return <div>ICPAPP IS INSTALLED</div>;
+      }
+    }
+    if (daoGithubAppStatusResultLoading) {
+      return <div>checking</div>;
+    }
+    return <div></div>;
+  }, [
+    daoGithubAppStatusResultVariables,
+    daoGithubAppStatusResultData,
+    daoGithubAppStatusResultLoading,
+  ]);
+
+  const updateSubmitStatus = useCallback(() => {
+    if (daoGithubAppStatusResultLoading) {
+      setSubmitDisabled(true);
+      return;
+    }
     const orgUrl = formRef.current.getFieldValue('githubOrg') || '';
     const logo = formRef.current.getFieldValue('logo') || '';
     const desc = formRef.current.getFieldValue('desc') || '';
@@ -174,8 +234,14 @@ export default (): ReactNode => {
     const bool1 =
       name &&
       name !== '' &&
-      appCheckSstatus[0] === name &&
-      appCheckSstatus[1] === GithubAppCheckStatus.Installed;
+      daoGithubAppStatusResultVariables &&
+      name === daoGithubAppStatusResultVariables.name &&
+      daoGithubAppStatusResultData &&
+      daoGithubAppStatusResultData.daoGithubAppStatus &&
+      daoGithubAppStatusResultData?.daoGithubAppStatus.isIcpAppInstalled &&
+      daoGithubAppStatusResultData?.daoGithubAppStatus.isGithubOrgOwner &&
+      !daoGithubAppStatusResultData?.daoGithubAppStatus.isExists;
+
     const bool2 = logo && logo !== '';
     const bool3 = desc && desc.length >= 50;
 
@@ -184,103 +250,59 @@ export default (): ReactNode => {
     } else {
       setSubmitDisabled(true);
     }
-  };
+  }, [
+    daoGithubAppStatusResultVariables,
+    daoGithubAppStatusResultData,
+    daoGithubAppStatusResultLoading,
+  ]);
 
-  useEffect(() => {
-    if (orgName === null) {
-      return;
-    }
-    if (orgName === '') {
-      setAppCheckSstatus([null, GithubAppCheckStatus.Null]);
-      setSubmitDisabled(true);
-      return;
-    }
-
-    new Promise<any>((resolve) => {
-      setAppCheckSstatus([orgName, GithubAppCheckStatus.Checking]);
-      setSubmitDisabled(true);
-      setTimeout(() => {
-        resolve(true);
-      }, 2000);
-    }).then((data: any) => {
-      console.log(data);
-      const orgUrl = formRef.current.getFieldValue('githubOrg');
-      const name = getOrgNameByUrl(orgUrl);
-      if (name !== orgName) {
-        return;
-      }
-      if (orgName === 'a') {
-        setAppCheckSstatus([orgName, GithubAppCheckStatus.Installed]);
-      } else {
-        setAppCheckSstatus([orgName, GithubAppCheckStatus.UnInstall]);
-      }
-    });
-  }, [orgName]);
-
-  useEffect(() => {
-    console.log('appCheckSstatus eff 1');
-    if (appCheckSstatus[0] === null) {
-      return;
-    }
-    console.log('appCheckSstatus eff 2');
+  const handleDescChange = useCallback(() => {
     updateSubmitStatus();
-  }, [appCheckSstatus]);
+  }, [updateSubmitStatus]);
 
-  useEffect(() => {
-    if (initialValues) {
+  const onUploadSuccess = useCallback(
+    (url: string) => {
+      formRef.current.setFieldsValue({ logo: url });
       updateSubmitStatus();
-    }
-  }, [initialValues]);
+    },
+    [updateSubmitStatus],
+  );
 
-  const appStatusNode = (_appCheckSstatus: GithubAppCheckStatus) => {
-    if (GithubAppCheckStatus.Checking === _appCheckSstatus) {
-      return <div>checking</div>;
-    }
-    if (GithubAppCheckStatus.UnInstall === _appCheckSstatus) {
-      return (
-        <Space>
-          <a href="//www.baidu.com">INSTALL THE ICPAPP</a>
-          <GlobalTooltip
-            title="You need to install ICPAPP on GitHub in order to associate with ICPDAO"
-            key={'install.tooltip'}
-          />
-        </Space>
-      );
-    }
-    if (GithubAppCheckStatus.Installed === _appCheckSstatus) {
-      return <div>ICPAPP IS INSTALLED</div>;
-    }
-    return <div></div>;
-  };
+  const onFinish = useCallback(async () => {
+    localStorage.removeItem('dao.create.draft');
 
-  const onFinish = (values: any) => {
-    console.log(values);
-    localStorage.setItem('dao.create.draft', JSON.stringify(values));
-  };
+    const githubOrg = formRef.current.getFieldValue('githubOrg') || '';
+    const logo = formRef.current.getFieldValue('logo') || '';
+    const desc = formRef.current.getFieldValue('desc') || '';
+    const name: any = getOrgNameByUrl(githubOrg);
 
-  const handleOtherChange = () => {
+    const data = await createDaoMutation({
+      variables: {
+        name,
+        desc,
+        logo,
+        timeZone: getTimeZoneOffset(),
+        timeZoneRegion: getTimeZone(),
+      },
+    });
+    if (!data.errors) {
+      history.push(`/dao/${data.data?.createDao?.dao?.id}/config?status=job`);
+    }
+  }, [createDaoMutation]);
+
+  useEffect(() => {
+    if (initOrgName) {
+      queryDaoGithubAppStatus({
+        variables: {
+          name: initOrgName,
+        },
+      });
+    }
+  }, [initOrgName, queryDaoGithubAppStatus]);
+
+  useEffect(() => {
     updateSubmitStatus();
-  };
-
-  const onUploadSuccess = (url: string) => {
-    formRef.current.setFieldsValue({ logo: url });
-    handleOtherChange();
-  };
-
-  const handleGithubOrgChange = () => {
-    console.log('handleGithubOrghandleChange');
-    const orgUrl = formRef.current.getFieldValue('githubOrg');
-    const name = getOrgNameByUrl(orgUrl);
-    if (name === null) {
-      setGithubOrgValidateStatus('error');
-      setGithubOrgHelp('example: https://github.com/orgname');
-      setOrgName('');
-      return;
-    }
-    setGithubOrgValidateStatus(undefined);
-    setGithubOrgHelp(undefined);
-    setOrgName(name);
-  };
+  }, [updateSubmitStatus]);
 
   return (
     <div className={styles.container}>
@@ -290,7 +312,7 @@ export default (): ReactNode => {
           <div className={styles.titleDesc}>We're excited to learn about your organization.</div>
         </div>
 
-        <Form ref={formRef} layout="vertical" initialValues={initialValues} onFinish={onFinish}>
+        <Form ref={formRef} layout="vertical" initialValues={initialValues}>
           <Form.Item label="ORGANIZATION LOGO" name="logo">
             <AvatarUpload initlogoUrl={initlogoUrl} onUploadSuccess={onUploadSuccess} />
           </Form.Item>
@@ -299,13 +321,27 @@ export default (): ReactNode => {
             label="GITHUB ORG"
             name="githubOrg"
             tooltip="tip"
-            validateStatus={githubOrgValidateStatus as any}
-            help={githubOrgHelp}
+            rules={[
+              {
+                validator(_, value) {
+                  const name: string | null = getOrgNameByUrl(value);
+                  if (name === null) {
+                    return Promise.reject(new Error('example: https://github.com/orgnam'));
+                  }
+                  if (name !== '') {
+                    setSubmitDisabled(true);
+                    queryDaoGithubAppStatus({
+                      variables: {
+                        name,
+                      },
+                    });
+                  }
+                  return Promise.resolve();
+                },
+              },
+            ]}
           >
-            <Input
-              onChange={handleGithubOrgChange}
-              placeholder="Please enter the GitHub org address"
-            />
+            <Input placeholder="Please enter the GitHub org address" />
           </Form.Item>
 
           <Form.Item
@@ -319,19 +355,20 @@ export default (): ReactNode => {
           >
             <Input.TextArea
               showCount
-              onChange={handleOtherChange}
+              onChange={handleDescChange}
               placeholder="No less than 50 words of project description"
             />
           </Form.Item>
 
-          <div className={styles.appStatus}>{appStatusNode(appCheckSstatus[1])}</div>
+          <div className={styles.appStatus}>{appStatusNode()}</div>
 
           <Form.Item>
             <Button
+              loading={createDaoMutationResultLoading}
               disabled={submitDisabled}
               size="large"
               type="primary"
-              htmlType="submit"
+              onClick={onFinish}
               style={{ width: '100%' }}
             >
               CREATE

@@ -1,6 +1,7 @@
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 import type { MenuTheme } from 'antd';
 import moment from 'moment';
+import momentTZ from 'moment-timezone';
 
 moment.locale('en');
 
@@ -74,7 +75,7 @@ export const getTimeZoneOffset = () => {
 };
 
 export const getTimeZone = () => {
-  return moment.tz.guess();
+  return momentTZ.tz.guess();
 };
 
 export const getHourStr = (hour: number) => {
