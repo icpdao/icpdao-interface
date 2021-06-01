@@ -191,7 +191,7 @@ export default (): React.ReactNode => {
                 <FormattedMessage id={'pages.home.p2'} />
               </p>
               <Space size={10} className={styles.p1Button}>
-                <Button size={'large'} type="primary">
+                <Button size={'large'} type="primary" onClick={() => history.push('/dao/explore')}>
                   <FormattedMessage id={'pages.home.button1'} />
                 </Button>
                 <Button size={'large'} type="primary">

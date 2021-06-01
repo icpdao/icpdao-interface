@@ -379,6 +379,43 @@ export type DaoFollowInfoQuery = { __typename?: 'Query' } & {
   >;
 };
 
+export type DaoListQueryVariables = Exact<{
+  filter?: Maybe<DaOsFilterEnum>;
+  sorted?: Maybe<DaOsSortedEnum>;
+  sortedType?: Maybe<DaOsSortedTypeEnum>;
+  search?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+}>;
+
+export type DaoListQuery = { __typename?: 'Query' } & {
+  daos?: Maybe<
+    { __typename?: 'DAOs' } & Pick<DaOs, 'total'> & {
+        dao?: Maybe<
+          Array<
+            Maybe<
+              { __typename?: 'DAOItem' } & Pick<DaoItem, 'isFollowing' | 'isOwner'> & {
+                  datum?: Maybe<
+                    { __typename?: 'DAOSchema' } & Pick<
+                      DaoSchema,
+                      'createAt' | 'desc' | 'id' | 'logo' | 'name' | 'ownerId' | 'updateAt'
+                    >
+                  >;
+                  stat?: Maybe<
+                    { __typename?: 'DAOStat' } & Pick<
+                      DaoStat,
+                      'following' | 'job' | 'size' | 'token'
+                    >
+                  >;
+                }
+            >
+          >
+        >;
+        stat?: Maybe<{ __typename?: 'DAOsStat' } & Pick<DaOsStat, 'icpper' | 'size' | 'income'>>;
+      }
+  >;
+};
+
 export type DaoGithubAppStatusQueryVariables = Exact<{
   name: Scalars['String'];
 }>;
@@ -817,6 +854,88 @@ export type DaoFollowInfoQueryResult = Apollo.QueryResult<
   DaoFollowInfoQuery,
   DaoFollowInfoQueryVariables
 >;
+export const DaoListDocument = gql`
+  query DAOList(
+    $filter: DAOsFilterEnum
+    $sorted: DAOsSortedEnum
+    $sortedType: DAOsSortedTypeEnum
+    $search: String
+    $first: Int
+    $offset: Int
+  ) {
+    daos(
+      filter: $filter
+      sorted: $sorted
+      sortedType: $sortedType
+      search: $search
+      offset: $offset
+      first: $first
+    ) {
+      dao {
+        datum {
+          createAt
+          desc
+          id
+          logo
+          name
+          ownerId
+          updateAt
+        }
+        stat {
+          following
+          job
+          size
+          token
+        }
+        isFollowing
+        isOwner
+      }
+      stat {
+        icpper
+        size
+        income
+      }
+      total
+    }
+  }
+`;
+
+/**
+ * __useDaoListQuery__
+ *
+ * To run a query within a React component, call `useDaoListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDaoListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDaoListQuery({
+ *   variables: {
+ *      filter: // value for 'filter'
+ *      sorted: // value for 'sorted'
+ *      sortedType: // value for 'sortedType'
+ *      search: // value for 'search'
+ *      first: // value for 'first'
+ *      offset: // value for 'offset'
+ *   },
+ * });
+ */
+export function useDaoListQuery(
+  baseOptions?: Apollo.QueryHookOptions<DaoListQuery, DaoListQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<DaoListQuery, DaoListQueryVariables>(DaoListDocument, options);
+}
+export function useDaoListLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<DaoListQuery, DaoListQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<DaoListQuery, DaoListQueryVariables>(DaoListDocument, options);
+}
+export type DaoListQueryHookResult = ReturnType<typeof useDaoListQuery>;
+export type DaoListLazyQueryHookResult = ReturnType<typeof useDaoListLazyQuery>;
+export type DaoListQueryResult = Apollo.QueryResult<DaoListQuery, DaoListQueryVariables>;
 export const DaoGithubAppStatusDocument = gql`
   query DAOGithubAppStatus($name: String!) {
     daoGithubAppStatus(name: $name) {

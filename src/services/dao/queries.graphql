@@ -58,8 +58,38 @@ query DAOFollowInfo($id: String!, $userId: String!) {
   }
 }
 
+query DAOList($filter: DAOsFilterEnum, $sorted: DAOsSortedEnum, $sortedType: DAOsSortedTypeEnum, $search: String, $first: Int, $offset: Int) {
+  daos(filter: $filter, sorted: $sorted, sortedType: $sortedType, search: $search, offset: $offset, first: $first){
+    dao{
+      datum{
+        createAt
+        desc
+        id
+        logo
+        name
+        ownerId
+        updateAt
+      }
+      stat{
+        following
+        job
+        size
+        token
+      }
+      isFollowing
+      isOwner
+    }
+    stat{
+      icpper
+      size
+      income
+    }
+    total
+  }
+}
+
 query DAOGithubAppStatus($name: String!) {
-  daoGithubAppStatus(name: $name) { 
+  daoGithubAppStatus(name: $name) {
     githubOrgId
     isExists
     isGithubOrgOwner

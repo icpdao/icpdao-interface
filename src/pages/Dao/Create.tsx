@@ -11,6 +11,8 @@ import GlobalTooltip from '@/components/Tooltip';
 import { useDaoGithubAppStatusLazyQuery, useCreateDaoMutation } from '@/services/dao/generated';
 import { uploadS3AssumeRole } from '@/services/icpdao-interface/aws';
 import { getTimeZone, getTimeZoneOffset } from '@/utils/utils';
+import { useModel } from '@@/plugin-model/useModel';
+import { PageLoading } from '@ant-design/pro-layout';
 
 const { Dragger } = Upload;
 
@@ -136,6 +138,11 @@ const getOrgNameByUrl = (url: string) => {
 };
 
 export default (): React.ReactNode => {
+  const { initialState } = useModel('@@initialState');
+  if (!initialState) {
+    return <PageLoading />;
+  }
+
   const draftValue = useMemo(() => {
     const value = localStorage.getItem('dao.create.draft');
     if (value) {
@@ -320,7 +327,11 @@ export default (): React.ReactNode => {
           <Form.Item
             label="GITHUB ORG"
             name="githubOrg"
-            tooltip="tip"
+            tooltip={{
+              title:
+                'You need to create an organization on GitHub and you are the Owner of the organization.',
+              placement: 'right',
+            }}
             rules={[
               {
                 validator(_, value) {
