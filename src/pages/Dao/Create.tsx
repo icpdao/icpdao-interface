@@ -22,22 +22,24 @@ interface AvatarUploadProps {
   initlogoUrl: string;
 }
 
-const AwsS3Bucket = 'dev.files.icpdao';
-const AwsS3region = 'us-east-1';
-const AwsS3FileBucketHost = 'https://s3.amazonaws.com';
-const GithubAppName = 'icpdao-test';
-
-const getGithubAppInstallUrl = (orgId: any) => {
-  return `//github.com/apps/${GithubAppName}/installations/new/permissions?target_id=${orgId}`;
-};
-
-const getAwsS3UrlByKey = (key: string) => {
-  return `${AwsS3FileBucketHost}/${AwsS3Bucket}/${key}`;
+const getGithubAppInstallUrl = (orgId: any, githubAppName: any) => {
+  return `//github.com/apps/${githubAppName}/installations/new/permissions?target_id=${orgId}`;
 };
 
 const AvatarUpload: React.FC<AvatarUploadProps> = ({ onUploadSuccess, initlogoUrl }) => {
   const [uploading, setUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  const fileS3PathPrefix = useMemo(() => {
+    return 'avatar';
+  }, []);
+
+  const getFileS3Path = useCallback(
+    (name) => {
+      return `${fileS3PathPrefix}/${name}`;
+    },
+    [fileS3PathPrefix],
+  );
 
   const handleChange = useCallback(
     (info: any) => {
@@ -47,52 +49,64 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ onUploadSuccess, initlogoUr
         return;
       }
       if (file.status === 'done') {
+        const { originFileObj } = file;
+        const { awsInfo } = originFileObj;
+        const fileUrl = `${awsInfo.bucketHost}/${awsInfo.bucket}/${awsInfo.key}`;
         const reader: any = new FileReader();
         reader.addEventListener('load', () => {
           setImageUrl(reader.result);
           setUploading(false);
         });
-        reader.readAsDataURL(file.originFileObj);
-        onUploadSuccess(getAwsS3UrlByKey(file.fileAwsKey));
+        reader.readAsDataURL(originFileObj);
+        onUploadSuccess(fileUrl);
       }
     },
     [setUploading, setImageUrl, onUploadSuccess],
   );
 
-  const handleCustomRequest = useCallback(async (options: any) => {
-    const { file, onProgress, onSuccess } = options;
+  const handleCustomRequest = useCallback(
+    async (options: any) => {
+      const { file, onProgress, onSuccess } = options;
 
-    file.fileAwsKey = `avatar/${file.uid}`;
-    onProgress(file, 0);
+      onProgress(file, 0);
 
-    const { data: credentials }: { success?: boolean; data?: API.AwsSts } =
-      await uploadS3AssumeRole();
+      const {
+        data: credentials,
+      }: { success?: boolean; data?: API.AwsSts } = await uploadS3AssumeRole();
 
-    if (credentials === undefined) {
-      return;
-    }
+      if (credentials === undefined) {
+        return;
+      }
 
-    const client = new AWS.S3({
-      region: AwsS3region,
-      // 从后端拿到临时凭证 credentials
-      credentials: {
-        accessKeyId: credentials.access_key_id || '',
-        secretAccessKey: credentials.secret_access_key || '',
-        sessionToken: credentials.session_token || '',
-      },
-    });
+      const client = new AWS.S3({
+        region: credentials.region,
+        // 从后端拿到临时凭证 credentials
+        credentials: {
+          accessKeyId: credentials.access_key_id || '',
+          secretAccessKey: credentials.secret_access_key || '',
+          sessionToken: credentials.session_token || '',
+        },
+      });
 
-    const params = {
-      Bucket: AwsS3Bucket,
-      Key: file.fileAwsKey,
-      Body: file,
-      ACL: 'public-read',
-      ContentType: file.type,
-    };
+      const params = {
+        Bucket: credentials.bucket,
+        Key: getFileS3Path(file.uid),
+        Body: file,
+        ACL: 'public-read',
+        ContentType: file.type,
+      };
 
-    const data = await client.putObject(params);
-    onSuccess(file, data);
-  }, []);
+      const data = await client.putObject(params);
+      file.awsInfo = {
+        key: getFileS3Path(file.uid),
+        bucket: credentials.bucket,
+        bucketHost: credentials.bucket_host,
+        region: credentials.region,
+      };
+      onSuccess(file, data);
+    },
+    [getFileS3Path],
+  );
 
   const renderUploadButton = useCallback(() => {
     if (imageUrl) {
@@ -194,7 +208,8 @@ export default (): React.ReactNode => {
       }
       if (!daoGithubAppStatusResultData.daoGithubAppStatus.isIcpAppInstalled) {
         const orgId = daoGithubAppStatusResultData.daoGithubAppStatus?.githubOrgId;
-        const url = getGithubAppInstallUrl(orgId);
+        const githubAppName = daoGithubAppStatusResultData.daoGithubAppStatus?.githubAppName;
+        const url = getGithubAppInstallUrl(orgId, githubAppName);
         const onClick = (evt: any) => {
           evt.preventDefault();
           const values = formRef.current.getFieldsValue();

@@ -90,6 +90,7 @@ query DAOList($filter: DAOsFilterEnum, $sorted: DAOsSortedEnum, $sortedType: DAO
 
 query DAOGithubAppStatus($name: String!) {
   daoGithubAppStatus(name: $name) {
+    githubAppName
     githubOrgId
     isExists
     isGithubOrgOwner
