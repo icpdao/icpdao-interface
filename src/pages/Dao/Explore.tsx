@@ -6,6 +6,7 @@ import DaoList, { SelectDropdownMenu } from './components/DaoList';
 import { useMemo } from 'react';
 import { useModel } from '@@/plugin-model/useModel';
 import { useAccess } from '@@/plugin-access/access';
+import { useIntl } from 'umi';
 
 export default (): ReactNode => {
   const access = useAccess();
@@ -14,6 +15,7 @@ export default (): ReactNode => {
     return <PageLoading />;
   }
 
+  const intl = useIntl();
   const breadcrumb = useMemo(() => {
     return [
       { icon: <HomeOutlined />, path: '/', breadcrumbName: 'HOME', menuId: 'home' },
@@ -26,29 +28,29 @@ export default (): ReactNode => {
       return [
         {
           key: 'all',
-          title: 'All',
+          title: intl.formatMessage({ id: 'pages.dao.explore.table.filter.all' }),
         },
         {
           key: 'following',
-          title: 'Following',
+          title: intl.formatMessage({ id: 'pages.dao.explore.table.filter.following' }),
         },
         {
           key: 'following_and_owner',
-          title: 'My dao',
+          title: intl.formatMessage({ id: 'pages.dao.explore.table.filter.following_and_owner' }),
         },
       ];
     }
     return [
       {
         key: 'all',
-        title: 'All',
+        title: intl.formatMessage({ id: 'pages.dao.explore.table.filter.all' }),
       },
       {
         key: 'following',
-        title: 'Following',
+        title: intl.formatMessage({ id: 'pages.dao.explore.table.filter.following' }),
       },
     ];
-  }, [access]);
+  }, [intl, access]);
 
   return (
     <PageContainer
