@@ -335,6 +335,15 @@
       "AwsSts": {
         "type": "object",
         "properties": {
+          "bucket": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "bucket_host": {
+            "type": "string"
+          },
           "access_key_id": {
             "type": "string"
           },

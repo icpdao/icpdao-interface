@@ -8,7 +8,7 @@ import { DownOutlined, UserOutlined } from '@ant-design/icons';
 import StatCard from '@/components/StatCard';
 
 import styles from '@/pages/Dao/components/DaoList.less';
-import { useIntl, history } from 'umi';
+import { FormattedMessage, useIntl, history } from 'umi';
 import { useDaoListQuery } from '@/services/dao/generated';
 import { useAccess } from '@@/plugin-access/access';
 
@@ -53,36 +53,45 @@ export type DaoListProps = {
 
 const columns = [
   {
-    title: 'Dao name',
+    title: <FormattedMessage id="pages.dao.component.dao_list.table.head.dao_name" />,
     dataIndex: 'name',
     key: 'name',
     render: (_: any, record: any) => (
       <Space size="middle">
         <Avatar size="small" icon={<UserOutlined />} />
-        <span>{record.name}</span>
+        <span>
+          <a
+            onClick={(event) => {
+              event.preventDefault();
+              history.push(`/dao/${record.id}`);
+            }}
+          >
+            {record.name}
+          </a>
+        </span>
       </Space>
     ),
   },
   {
-    title: 'Following',
+    title: <FormattedMessage id="pages.dao.component.dao_list.table.head.following" />,
     dataIndex: 'following',
     key: 'following',
     sorter: true,
   },
   {
-    title: 'Job',
+    title: <FormattedMessage id="pages.dao.component.dao_list.table.head.job" />,
     dataIndex: 'job',
     key: 'job',
     sorter: true,
   },
   {
-    title: 'Size',
+    title: <FormattedMessage id="pages.dao.component.dao_list.table.head.size" />,
     dataIndex: 'size',
     key: 'size',
     sorter: true,
   },
   {
-    title: 'Token',
+    title: <FormattedMessage id="pages.dao.component.dao_list.table.head.token" />,
     dataIndex: 'token',
     key: 'token',
     sorter: true,
@@ -92,9 +101,20 @@ const columns = [
     key: 'action',
     render: (_: any, record: any) => {
       if (record.isFollowing) {
-        return <span>following</span>;
+        return (
+          <span>
+            <FormattedMessage id="pages.dao.component.dao_list.table.aciton.following" />
+          </span>
+        );
       }
-      return null;
+      if (record.isOwner) {
+        return (
+          <span>
+            <FormattedMessage id="pages.dao.component.dao_list.table.aciton.owner" />
+          </span>
+        );
+      }
+      return <span></span>;
     },
   },
 ];
@@ -121,6 +141,7 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({ selectKey, menuList, on
 
 const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
   const pageSize = 10;
+  const intl = useIntl();
   const [daoTableParams, setDaoTableParams] = useState<DaoTableParams>({
     filter: menuList[0].key,
     current: 1,
@@ -137,9 +158,6 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
     }
     return tmp;
   }, [daoTableParams]);
-
-  console.log('daoQueryParams', daoQueryParams);
-  console.log('daoTableParams', daoTableParams);
 
   const onMenuClick = useCallback((e: any) => {
     setDaoTableParams((oldParams) => {
@@ -212,12 +230,14 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
     }
     return data.daos.dao.map((item) => {
       return {
+        id: item?.datum?.id,
         name: item?.datum?.name,
         following: item?.stat?.following,
         job: item?.stat?.job,
         size: item?.stat?.size,
         token: item?.stat?.token,
         isFollowing: item?.isFollowing,
+        isOwner: item?.isOwner,
       };
     });
   }, [data]);
@@ -226,42 +246,42 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
     if (!data?.daos?.dao) {
       return [
         {
-          title: 'Dao',
+          title: intl.formatMessage({ id: 'pages.dao.component.dao_list.stat.card.dao' }),
           number: 0,
         },
         {
-          title: 'icpper',
+          title: intl.formatMessage({ id: 'pages.dao.component.dao_list.stat.card.icpper' }),
           number: 0,
         },
         {
-          title: 'size',
+          title: intl.formatMessage({ id: 'pages.dao.component.dao_list.stat.card.size' }),
           number: 0,
         },
         {
-          title: 'income',
+          title: intl.formatMessage({ id: 'pages.dao.component.dao_list.stat.card.income' }),
           number: 0,
         },
       ];
     }
     return [
       {
-        title: 'Dao',
+        title: intl.formatMessage({ id: 'pages.dao.component.dao_list.stat.card.dao' }),
         number: data.daos.total,
       },
       {
-        title: 'icpper',
+        title: intl.formatMessage({ id: 'pages.dao.component.dao_list.stat.card.icpper' }),
         number: data.daos.stat?.icpper,
       },
       {
-        title: 'size',
+        title: intl.formatMessage({ id: 'pages.dao.component.dao_list.stat.card.size' }),
         number: data.daos.stat?.size,
       },
       {
-        title: 'income',
+        title: intl.formatMessage({ id: 'pages.dao.component.dao_list.stat.card.income' }),
         number: data.daos.stat?.income,
       },
     ];
-  }, [data]);
+  }, [data, intl]);
 
   return (
     <>
@@ -271,7 +291,13 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
 
       <div className={styles.tableToolbar}>
         <Space>
-          <Search placeholder="input search text" onSearch={onSearch} size="large" />
+          <Search
+            placeholder={intl.formatMessage({
+              id: 'pages.dao.component.dao_list.input.search.placeholder',
+            })}
+            onSearch={onSearch}
+            size="large"
+          />
           <SelectDropdown
             selectKey={daoTableParams.filter}
             menuList={menuList}

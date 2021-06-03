@@ -26,6 +26,9 @@ declare namespace API {
   };
 
   type AwsSts = {
+    bucket?: string;
+    region?: string;
+    bucket_host?: string;
     access_key_id?: string;
     secret_access_key?: string;
     session_token?: string;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 
-import { Upload, Form, Input, Button, Space } from 'antd';
-import { history } from 'umi';
+import { Alert, Upload, Form, Input, Button, Space } from 'antd';
+import { useIntl, history } from 'umi';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 
 import * as AWS from '@aws-sdk/client-s3';
@@ -22,22 +22,25 @@ interface AvatarUploadProps {
   initlogoUrl: string;
 }
 
-const AwsS3Bucket = 'dev.files.icpdao';
-const AwsS3region = 'us-east-1';
-const AwsS3FileBucketHost = 'https://s3.amazonaws.com';
-const GithubAppName = 'icpdao-test';
-
-const getGithubAppInstallUrl = (orgId: any) => {
-  return `//github.com/apps/${GithubAppName}/installations/new/permissions?target_id=${orgId}`;
-};
-
-const getAwsS3UrlByKey = (key: string) => {
-  return `${AwsS3FileBucketHost}/${AwsS3Bucket}/${key}`;
+const getGithubAppInstallUrl = (orgId: any, githubAppName: any) => {
+  return `//github.com/apps/${githubAppName}/installations/new/permissions?target_id=${orgId}`;
 };
 
 const AvatarUpload: React.FC<AvatarUploadProps> = ({ onUploadSuccess, initlogoUrl }) => {
+  const intl = useIntl();
   const [uploading, setUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  const fileS3PathPrefix = useMemo(() => {
+    return 'avatar';
+  }, []);
+
+  const getFileS3Path = useCallback(
+    (name) => {
+      return `${fileS3PathPrefix}/${name}`;
+    },
+    [fileS3PathPrefix],
+  );
 
   const handleChange = useCallback(
     (info: any) => {
@@ -47,52 +50,64 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ onUploadSuccess, initlogoUr
         return;
       }
       if (file.status === 'done') {
+        const { originFileObj } = file;
+        const { awsInfo } = originFileObj;
+        const fileUrl = `${awsInfo.bucketHost}/${awsInfo.bucket}/${awsInfo.key}`;
         const reader: any = new FileReader();
         reader.addEventListener('load', () => {
           setImageUrl(reader.result);
           setUploading(false);
         });
-        reader.readAsDataURL(file.originFileObj);
-        onUploadSuccess(getAwsS3UrlByKey(file.fileAwsKey));
+        reader.readAsDataURL(originFileObj);
+        onUploadSuccess(fileUrl);
       }
     },
     [setUploading, setImageUrl, onUploadSuccess],
   );
 
-  const handleCustomRequest = useCallback(async (options: any) => {
-    const { file, onProgress, onSuccess } = options;
+  const handleCustomRequest = useCallback(
+    async (options: any) => {
+      const { file, onProgress, onSuccess } = options;
 
-    file.fileAwsKey = `avatar/${file.uid}`;
-    onProgress(file, 0);
+      onProgress(file, 0);
 
-    const { data: credentials }: { success?: boolean; data?: API.AwsSts } =
-      await uploadS3AssumeRole();
+      const {
+        data: credentials,
+      }: { success?: boolean; data?: API.AwsSts } = await uploadS3AssumeRole();
 
-    if (credentials === undefined) {
-      return;
-    }
+      if (credentials === undefined) {
+        return;
+      }
 
-    const client = new AWS.S3({
-      region: AwsS3region,
-      // 从后端拿到临时凭证 credentials
-      credentials: {
-        accessKeyId: credentials.access_key_id || '',
-        secretAccessKey: credentials.secret_access_key || '',
-        sessionToken: credentials.session_token || '',
-      },
-    });
+      const client = new AWS.S3({
+        region: credentials.region,
+        // 从后端拿到临时凭证 credentials
+        credentials: {
+          accessKeyId: credentials.access_key_id || '',
+          secretAccessKey: credentials.secret_access_key || '',
+          sessionToken: credentials.session_token || '',
+        },
+      });
 
-    const params = {
-      Bucket: AwsS3Bucket,
-      Key: file.fileAwsKey,
-      Body: file,
-      ACL: 'public-read',
-      ContentType: file.type,
-    };
+      const params = {
+        Bucket: credentials.bucket,
+        Key: getFileS3Path(file.uid),
+        Body: file,
+        ACL: 'public-read',
+        ContentType: file.type,
+      };
 
-    const data = await client.putObject(params);
-    onSuccess(file, data);
-  }, []);
+      const data = await client.putObject(params);
+      file.awsInfo = {
+        key: getFileS3Path(file.uid),
+        bucket: credentials.bucket,
+        bucketHost: credentials.bucket_host,
+        region: credentials.region,
+      };
+      onSuccess(file, data);
+    },
+    [getFileS3Path],
+  );
 
   const renderUploadButton = useCallback(() => {
     if (imageUrl) {
@@ -105,10 +120,10 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ onUploadSuccess, initlogoUr
     return (
       <div>
         {uploading ? <LoadingOutlined /> : <PlusOutlined />}
-        <p>Drag & Click</p>
+        <p>{intl.formatMessage({ id: 'pages.dao.create.form.item.logo.placeholder' })}</p>
       </div>
     );
-  }, [imageUrl, initlogoUrl, uploading]);
+  }, [imageUrl, initlogoUrl, uploading, intl]);
 
   return (
     <div style={{ height: 100, width: 100 }}>
@@ -143,6 +158,7 @@ export default (): React.ReactNode => {
     return <PageLoading />;
   }
 
+  const intl = useIntl();
   const draftValue = useMemo(() => {
     const value = localStorage.getItem('dao.create.draft');
     if (value) {
@@ -167,7 +183,7 @@ export default (): React.ReactNode => {
   const [createDaoMutation, createDaoMutationResult] = useCreateDaoMutation();
   const createDaoMutationResultLoading = createDaoMutationResult.loading;
 
-  const appStatusNode = useCallback(() => {
+  const appStatusNode = useMemo(() => {
     const orgUrl = formRef.current?.getFieldValue('githubOrg') || '';
     const name = getOrgNameByUrl(orgUrl);
     const checkName = daoGithubAppStatusResultVariables?.name;
@@ -178,23 +194,24 @@ export default (): React.ReactNode => {
       name === checkName
     ) {
       if (daoGithubAppStatusResultData.daoGithubAppStatus.isExists) {
-        return <div>Dao is exists</div>;
+        return null;
       }
       if (
         daoGithubAppStatusResultData.daoGithubAppStatus.isIcpAppInstalled &&
         !daoGithubAppStatusResultData.daoGithubAppStatus.isGithubOrgOwner
       ) {
-        return <div>your must is github org owner</div>;
+        return null;
       }
       if (
         daoGithubAppStatusResultData &&
         daoGithubAppStatusResultData.daoGithubAppStatus.githubOrgId === null
       ) {
-        return <div>github org not exists</div>;
+        return null;
       }
       if (!daoGithubAppStatusResultData.daoGithubAppStatus.isIcpAppInstalled) {
         const orgId = daoGithubAppStatusResultData.daoGithubAppStatus?.githubOrgId;
-        const url = getGithubAppInstallUrl(orgId);
+        const githubAppName = daoGithubAppStatusResultData.daoGithubAppStatus?.githubAppName;
+        const url = getGithubAppInstallUrl(orgId, githubAppName);
         const onClick = (evt: any) => {
           evt.preventDefault();
           const values = formRef.current.getFieldsValue();
@@ -203,9 +220,15 @@ export default (): React.ReactNode => {
         };
         return (
           <Space>
-            <a onClick={onClick}>INSTALL THE ICPAPP</a>
+            <a onClick={onClick}>
+              {intl.formatMessage({
+                id: 'pages.dao.create.form.item.app_install_status.un_install.text',
+              })}
+            </a>
             <GlobalTooltip
-              title="You need to install ICPAPP on GitHub in order to associate with ICPDAO"
+              title={intl.formatMessage({
+                id: 'pages.dao.create.form.item.app_install_status.un_install.tooltip',
+              })}
               key={'install.tooltip'}
             />
           </Space>
@@ -215,17 +238,26 @@ export default (): React.ReactNode => {
         daoGithubAppStatusResultData.daoGithubAppStatus.isIcpAppInstalled &&
         daoGithubAppStatusResultData.daoGithubAppStatus.isGithubOrgOwner
       ) {
-        return <div>ICPAPP IS INSTALLED</div>;
+        return (
+          <div>
+            {intl.formatMessage({ id: 'pages.dao.create.form.item.app_install_status.installed' })}
+          </div>
+        );
       }
     }
     if (daoGithubAppStatusResultLoading) {
-      return <div>checking</div>;
+      return (
+        <div>
+          {intl.formatMessage({ id: 'pages.dao.create.form.item.app_install_status.checking' })}
+        </div>
+      );
     }
-    return <div></div>;
+    return null;
   }, [
     daoGithubAppStatusResultVariables,
     daoGithubAppStatusResultData,
     daoGithubAppStatusResultLoading,
+    intl,
   ]);
 
   const updateSubmitStatus = useCallback(() => {
@@ -307,29 +339,88 @@ export default (): React.ReactNode => {
     }
   }, [initOrgName, queryDaoGithubAppStatus]);
 
+  const errorAlert = useMemo(() => {
+    const orgUrl = formRef.current?.getFieldValue('githubOrg') || '';
+    const name = getOrgNameByUrl(orgUrl);
+    const checkName = daoGithubAppStatusResultVariables?.name;
+    if (
+      !daoGithubAppStatusResultLoading &&
+      daoGithubAppStatusResultData?.daoGithubAppStatus &&
+      name &&
+      name === checkName
+    ) {
+      if (daoGithubAppStatusResultData.daoGithubAppStatus.isExists) {
+        const error = intl.formatMessage({ id: 'pages.dao.create.form.item.error.dao_is_exists' });
+        return (
+          <div className={styles.alert}>
+            <Alert message={error} type="error" showIcon />
+          </div>
+        );
+      }
+      if (
+        daoGithubAppStatusResultData.daoGithubAppStatus.isIcpAppInstalled &&
+        !daoGithubAppStatusResultData.daoGithubAppStatus.isGithubOrgOwner
+      ) {
+        const error = intl.formatMessage({ id: 'pages.dao.create.form.item.error.must_is_owner' });
+        return (
+          <div className={styles.alert}>
+            <Alert message={error} type="error" showIcon />
+          </div>
+        );
+      }
+      if (
+        daoGithubAppStatusResultData &&
+        daoGithubAppStatusResultData.daoGithubAppStatus.githubOrgId === null
+      ) {
+        const error = intl.formatMessage({
+          id: 'pages.dao.create.form.item.error.github_org_not_exists',
+        });
+        return (
+          <div className={styles.alert}>
+            <Alert message={error} type="error" showIcon />
+          </div>
+        );
+      }
+    }
+    return null;
+  }, [
+    daoGithubAppStatusResultData,
+    daoGithubAppStatusResultLoading,
+    daoGithubAppStatusResultVariables,
+    intl,
+  ]);
+
   useEffect(() => {
     updateSubmitStatus();
   }, [updateSubmitStatus]);
 
   return (
     <div className={styles.container}>
+      {errorAlert}
+
       <div className={styles.box}>
         <div className={styles.titleBox}>
-          <div className={styles.title}>CREATE DAO</div>
-          <div className={styles.titleDesc}>We're excited to learn about your organization.</div>
+          <div className={styles.title}>
+            {intl.formatMessage({ id: 'pages.dao.create.form.title' })}
+          </div>
+          <div className={styles.titleDesc}>
+            {intl.formatMessage({ id: 'pages.dao.create.form.desc' })}
+          </div>
         </div>
 
         <Form ref={formRef} layout="vertical" initialValues={initialValues}>
-          <Form.Item label="ORGANIZATION LOGO" name="logo">
+          <Form.Item
+            label={intl.formatMessage({ id: 'pages.dao.create.form.item.logo.title' })}
+            name="logo"
+          >
             <AvatarUpload initlogoUrl={initlogoUrl} onUploadSuccess={onUploadSuccess} />
           </Form.Item>
 
           <Form.Item
-            label="GITHUB ORG"
+            label={intl.formatMessage({ id: 'pages.dao.create.form.item.org_url.title' })}
             name="githubOrg"
             tooltip={{
-              title:
-                'You need to create an organization on GitHub and you are the Owner of the organization.',
+              title: intl.formatMessage({ id: 'pages.dao.create.form.item.org_url.tooltip' }),
               placement: 'right',
             }}
             rules={[
@@ -337,7 +428,10 @@ export default (): React.ReactNode => {
                 validator(_, value) {
                   const name: string | null = getOrgNameByUrl(value);
                   if (name === null) {
-                    return Promise.reject(new Error('example: https://github.com/orgnam'));
+                    const text = intl.formatMessage({
+                      id: 'pages.dao.create.form.item.error.org_url_invalid',
+                    });
+                    return Promise.reject(new Error(text));
                   }
                   if (name !== '') {
                     setSubmitDisabled(true);
@@ -352,11 +446,15 @@ export default (): React.ReactNode => {
               },
             ]}
           >
-            <Input placeholder="Please enter the GitHub org address" />
+            <Input
+              placeholder={intl.formatMessage({
+                id: 'pages.dao.create.form.item.org_url.placeholder',
+              })}
+            />
           </Form.Item>
 
           <Form.Item
-            label="ORGANIZATION DESCRIPTION"
+            label={intl.formatMessage({ id: 'pages.dao.create.form.item.desc.title' })}
             name="desc"
             rules={[
               {
@@ -367,11 +465,13 @@ export default (): React.ReactNode => {
             <Input.TextArea
               showCount
               onChange={handleDescChange}
-              placeholder="No less than 50 words of project description"
+              placeholder={intl.formatMessage({
+                id: 'pages.dao.create.form.item.desc.placeholder',
+              })}
             />
           </Form.Item>
 
-          <div className={styles.appStatus}>{appStatusNode()}</div>
+          <div className={styles.appStatus}>{appStatusNode}</div>
 
           <Form.Item>
             <Button
@@ -382,7 +482,7 @@ export default (): React.ReactNode => {
               onClick={onFinish}
               style={{ width: '100%' }}
             >
-              CREATE
+              {intl.formatMessage({ id: 'pages.dao.create.form.submit' })}
             </Button>
           </Form.Item>
         </Form>

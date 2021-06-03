@@ -268,6 +268,18 @@
         "description": null,
         "fields": [
           {
+            "name": "githubAppName",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "githubOrgId",
             "description": null,
             "args": [],

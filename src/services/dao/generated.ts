@@ -53,6 +53,7 @@ export type DaoFollowUdSchemaFollowersArgs = {
 
 export type DaoGithubAppStatus = {
   __typename?: 'DAOGithubAppStatus';
+  githubAppName?: Maybe<Scalars['String']>;
   githubOrgId?: Maybe<Scalars['Int']>;
   isExists?: Maybe<Scalars['Boolean']>;
   isGithubOrgOwner?: Maybe<Scalars['Boolean']>;
@@ -424,7 +425,7 @@ export type DaoGithubAppStatusQuery = { __typename?: 'Query' } & {
   daoGithubAppStatus?: Maybe<
     { __typename?: 'DAOGithubAppStatus' } & Pick<
       DaoGithubAppStatus,
-      'githubOrgId' | 'isExists' | 'isGithubOrgOwner' | 'isIcpAppInstalled'
+      'githubAppName' | 'githubOrgId' | 'isExists' | 'isGithubOrgOwner' | 'isIcpAppInstalled'
     >
   >;
 };
@@ -939,6 +940,7 @@ export type DaoListQueryResult = Apollo.QueryResult<DaoListQuery, DaoListQueryVa
 export const DaoGithubAppStatusDocument = gql`
   query DAOGithubAppStatus($name: String!) {
     daoGithubAppStatus(name: $name) {
+      githubAppName
       githubOrgId
       isExists
       isGithubOrgOwner
