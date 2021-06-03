@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { PageContainer, PageLoading } from '@ant-design/pro-layout';
-import { Avatar, Button, Col, Row, Space, Tabs, Typography, Tag, Divider, message } from 'antd';
+import { Avatar, Button, Col, Row, Space, Typography, Tag, Divider, message } from 'antd';
 import { FormattedMessage, history, useAccess } from 'umi';
 import styles from './index.less';
 import GlobalBreadcrumb from '@/components/Breadcrumb';
@@ -15,8 +15,8 @@ import {
 } from '@/services/dao/generated';
 import { getFormatTime } from '@/utils/utils';
 import { useIntl } from '@@/plugin-locale/localeExports';
+import DaoTabs from '@/pages/Dao/components/DaoTabs';
 
-const { TabPane } = Tabs;
 const { Paragraph } = Typography;
 
 const breadcrumb = (daoId: string) => [
@@ -38,19 +38,10 @@ const breadcrumb = (daoId: string) => [
   },
 ];
 
-const configTab = (
-  <>
-    <TabPane tab={<FormattedMessage id={`pages.dao.home.tab.icpper`} />} key="icpper" />
-    <TabPane tab={<FormattedMessage id={`pages.dao.home.tab.job`} />} key="job" />
-    <TabPane tab={<FormattedMessage id={`pages.dao.home.tab.cycle`} />} key="cycle" />
-  </>
-);
-
 export default (props: { match: { params: { daoId: string } } }): ReactNode => {
   const { initialState } = useModel('@@initialState');
   const access = useAccess();
   const intl = useIntl();
-  const [tab, setTab] = useState<string>('icpper');
   const [followedButtonLoading, setFollowedButtonLoading] = useState(false);
   if (!initialState) {
     return <PageLoading />;
@@ -179,9 +170,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
             <FormattedMessage id={`pages.dao.home.button.vote`} />
           </Button>
         </Space>
-        <Tabs defaultActiveKey={tab} onChange={setTab}>
-          {configTab}
-        </Tabs>
+        <DaoTabs daoId={daoId} />
       </PageContainer>
     </>
   );
