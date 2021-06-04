@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { PageContainer, PageLoading } from '@ant-design/pro-layout';
-import { Avatar, Button, Col, Row, Space, Typography, Tag, Divider, message } from 'antd';
+import { Avatar, Button, Col, Row, Space, Typography, Tag, Divider, message, Tabs } from 'antd';
 import { FormattedMessage, history, useAccess } from 'umi';
 import styles from './index.less';
 import GlobalBreadcrumb from '@/components/Breadcrumb';
@@ -15,7 +15,12 @@ import {
 } from '@/services/dao/generated';
 import { getFormatTime } from '@/utils/utils';
 import { useIntl } from '@@/plugin-locale/localeExports';
-import DaoTabs from '@/pages/Dao/components/DaoTabs';
+
+import DaoIcpperStat from '@/pages/Dao/components/DaoIcpperStat';
+import DaoJobStat from '@/pages/Dao/components/DaoJobStat';
+import DaoCycle from '@/pages/Dao/components/DaoCycle';
+
+const { TabPane } = Tabs;
 
 const { Paragraph } = Typography;
 
@@ -64,6 +69,8 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
 
   const isOnwer = access.isDaoOwner(data?.dao?.datum?.ownerId || '');
 
+  const defaultActiveKey = 'icpperStat';
+
   return (
     <>
       <PageContainer
@@ -93,7 +100,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
                   style={{ width: 40 }}
                   onClick={() => history.push(`/dao/${daoId}/config`)}
                   icon={<SettingOutlined style={{ fontSize: 17 }} />}
-                ></Button>
+                />
               )}
               {!isOnwer && followed && (
                 <Button
@@ -170,7 +177,20 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
             <FormattedMessage id={`pages.dao.home.button.vote`} />
           </Button>
         </Space>
-        <DaoTabs daoId={daoId} />
+
+        <Tabs defaultActiveKey={defaultActiveKey}>
+          <TabPane tab={<FormattedMessage id={'pages.dao.home.tab.icpperStat'} />} key="icpperStat">
+            <DaoIcpperStat daoId={daoId} />
+          </TabPane>
+
+          <TabPane tab={<FormattedMessage id={'pages.dao.home.tab.jobStat'} />} key="jobStat">
+            <DaoJobStat daoId={daoId} />
+          </TabPane>
+
+          <TabPane tab={<FormattedMessage id={'pages.dao.home.tab.cycle'} />} key="cycle">
+            <DaoCycle daoId={daoId} />
+          </TabPane>
+        </Tabs>
       </PageContainer>
     </>
   );
