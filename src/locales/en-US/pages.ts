@@ -103,4 +103,6 @@ export default {
   'pages.dao.home.tab.icpper': 'Icpper',
   'pages.dao.home.tab.job': 'Job',
   'pages.dao.home.tab.cycle': 'Cycle',
+  'pages.job.tab.job': 'Job',
+  'pages.job.tab.cycle': 'Cycle',
 };

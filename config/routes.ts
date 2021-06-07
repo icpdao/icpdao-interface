@@ -45,6 +45,10 @@
     component: './Dao',
   },
   {
+    path: '/job',
+    component: './Job',
+  },
+  {
     component: './404',
   },
 ];

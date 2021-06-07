@@ -7,4 +7,5 @@ export default {
   'menu.dao.explore': 'EXPLORE DAO',
   'menu.dao.home': 'HOMEPAGE',
   'menu.dao.config': 'DAO CONFIGURATION',
+  'menu.job': 'MY JOB',
 };

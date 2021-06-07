@@ -20,6 +20,11 @@ export type CreateDao = {
   dao?: Maybe<DaoSchema>;
 };
 
+export type CreateJob = {
+  __typename?: 'CreateJob';
+  job?: Maybe<Job>;
+};
+
 export type Dao = {
   __typename?: 'DAO';
   datum?: Maybe<DaoSchema>;
@@ -42,12 +47,22 @@ export enum DaoFollowTypeEnum {
 
 export type DaoFollowUdSchema = {
   __typename?: 'DAOFollowUDSchema';
+  daoId: Scalars['String'];
   followers?: Maybe<Array<Maybe<DaoFollowSchema>>>;
   total: Scalars['Int'];
 };
 
 export type DaoFollowUdSchemaFollowersArgs = {
   userId?: Maybe<Scalars['String']>;
+};
+
+export type DaoGithubAppStatus = {
+  __typename?: 'DAOGithubAppStatus';
+  githubAppName?: Maybe<Scalars['String']>;
+  githubOrgId?: Maybe<Scalars['Int']>;
+  isExists?: Maybe<Scalars['Boolean']>;
+  isGithubOrgOwner?: Maybe<Scalars['Boolean']>;
+  isIcpAppInstalled?: Maybe<Scalars['Boolean']>;
 };
 
 export type DaoItem = {
@@ -112,6 +127,7 @@ export enum DaOsFilterEnum {
   Owner = 'owner',
   Following = 'following',
   FollowingAndOwner = 'following_and_owner',
+  Member = 'member',
 }
 
 export enum DaOsSortedEnum {
@@ -134,6 +150,70 @@ export type DaOsStat = {
   income?: Maybe<Scalars['Float']>;
 };
 
+export type Job = {
+  __typename?: 'Job';
+  node?: Maybe<JobSchema>;
+  prs?: Maybe<Array<Maybe<JobPrSchema>>>;
+};
+
+export type JobPrSchema = {
+  __typename?: 'JobPRSchema';
+  createAt: Scalars['Int'];
+  githubPrNumber: Scalars['Int'];
+  githubRepoId: Scalars['Int'];
+  githubRepoName: Scalars['String'];
+  githubRepoOwner: Scalars['String'];
+  /** _id */
+  id?: Maybe<Scalars['ID']>;
+  jobId: Scalars['String'];
+  mergedAt?: Maybe<Scalars['Int']>;
+  mergedUserGithubLogin?: Maybe<Scalars['String']>;
+  status: Scalars['Int'];
+  title: Scalars['String'];
+  userId: Scalars['String'];
+};
+
+export type JobSchema = {
+  __typename?: 'JobSchema';
+  bodyText?: Maybe<Scalars['String']>;
+  botCommentDatabaseId: Scalars['Int'];
+  createAt: Scalars['Int'];
+  cycleId?: Maybe<Scalars['String']>;
+  daoId: Scalars['String'];
+  githubIssueNumber: Scalars['Int'];
+  githubRepoId: Scalars['Int'];
+  githubRepoName: Scalars['String'];
+  githubRepoOwner: Scalars['String'];
+  /** _id */
+  id?: Maybe<Scalars['ID']>;
+  income: Scalars['Int'];
+  pairType: Scalars['Int'];
+  size: Scalars['Float'];
+  status: Scalars['Int'];
+  title: Scalars['String'];
+  updateAt: Scalars['Int'];
+  userId: Scalars['String'];
+};
+
+export enum JobSortedEnum {
+  Size = 'size',
+  Income = 'income',
+}
+
+export type Jobs = {
+  __typename?: 'Jobs';
+  job?: Maybe<Array<Maybe<Job>>>;
+  stat?: Maybe<JobsStat>;
+  total?: Maybe<Scalars['Int']>;
+};
+
+export type JobsStat = {
+  __typename?: 'JobsStat';
+  size?: Maybe<Scalars['Float']>;
+  tokenName?: Maybe<Scalars['String']>;
+  tokenCount?: Maybe<Scalars['Float']>;
+};
+
 export type Mutations = {
   __typename?: 'Mutations';
   /** example: https://docs.graphene-python.org/en/latest/types/mutations/ */
@@ -141,6 +221,8 @@ export type Mutations = {
   updateDaoJobConfig?: Maybe<UpdateDaoJobConfig>;
   updateDaoFollow?: Maybe<UpdateDaoFollow>;
   updateDaoBaseInfo?: Maybe<UpdateDaoBaseInfo>;
+  createJob?: Maybe<CreateJob>;
+  updateJob?: Maybe<UpdateJob>;
 };
 
 export type MutationsCreateDaoArgs = {
@@ -178,11 +260,26 @@ export type MutationsUpdateDaoBaseInfoArgs = {
   logo?: Maybe<Scalars['String']>;
 };
 
+export type MutationsCreateJobArgs = {
+  daoId: Scalars['String'];
+  issueLink: Scalars['String'];
+  size: Scalars['Float'];
+};
+
+export type MutationsUpdateJobArgs = {
+  addPr?: Maybe<Scalars['String']>;
+  deletePr?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
+  size?: Maybe<Scalars['Float']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   daos?: Maybe<DaOs>;
   dao?: Maybe<Dao>;
   daoJobConfig?: Maybe<DaoJobConfigSchema>;
+  daoGithubAppStatus?: Maybe<DaoGithubAppStatus>;
+  jobs?: Maybe<Jobs>;
 };
 
 export type QueryDaosArgs = {
@@ -195,12 +292,32 @@ export type QueryDaosArgs = {
 };
 
 export type QueryDaoArgs = {
-  id: Scalars['String'];
+  id?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
 };
 
 export type QueryDaoJobConfigArgs = {
   daoId: Scalars['String'];
 };
+
+export type QueryDaoGithubAppStatusArgs = {
+  name: Scalars['String'];
+};
+
+export type QueryJobsArgs = {
+  daoName?: Maybe<Scalars['String']>;
+  beginTime?: Maybe<Scalars['Int']>;
+  endTime?: Maybe<Scalars['Int']>;
+  sorted?: Maybe<JobSortedEnum>;
+  sortedType?: Maybe<SortedTypeEnum>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+export enum SortedTypeEnum {
+  Asc = 'asc',
+  Desc = 'desc',
+}
 
 export type UpdateDaoBaseInfo = {
   __typename?: 'UpdateDAOBaseInfo';
@@ -215,6 +332,11 @@ export type UpdateDaoFollow = {
 export type UpdateDaoJobConfig = {
   __typename?: 'UpdateDAOJobConfig';
   jobConfig?: Maybe<DaoJobConfigSchema>;
+};
+
+export type UpdateJob = {
+  __typename?: 'UpdateJob';
+  job?: Maybe<Job>;
 };
 
 export type UserSchema = {
