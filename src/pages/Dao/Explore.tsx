@@ -1,4 +1,4 @@
-import React from 'react';
+import type { ReactNode } from 'react';
 import { PageContainer, PageLoading } from '@ant-design/pro-layout';
 import GlobalBreadcrumb from '@/components/Breadcrumb';
 import { HomeOutlined } from '@ant-design/icons';
@@ -8,7 +8,7 @@ import { useModel } from '@@/plugin-model/useModel';
 import { useAccess } from '@@/plugin-access/access';
 import { useIntl } from 'umi';
 
-export default (): React.ReactNode => {
+export default (): ReactNode => {
   const access = useAccess();
   const { initialState } = useModel('@@initialState');
   if (!initialState) {
@@ -19,7 +19,7 @@ export default (): React.ReactNode => {
   const breadcrumb = useMemo(() => {
     return [
       { icon: <HomeOutlined />, path: '/', breadcrumbName: 'HOME', menuId: 'home' },
-      { path: '/dao/mine', breadcrumbName: 'DAO', menuId: 'dao.mine' },
+      { path: '/dao/explore', breadcrumbName: 'EXPLORE DAO', menuId: 'dao.explore' },
     ];
   }, []);
 
@@ -27,27 +27,27 @@ export default (): React.ReactNode => {
     if (access.canInviteIcpper()) {
       return [
         {
-          key: 'following_and_owner',
-          title: intl.formatMessage({ id: 'pages.dao.mine.table.filter.following_and_owner' }),
+          key: 'all',
+          title: intl.formatMessage({ id: 'pages.dao.explore.table.filter.all' }),
         },
         {
           key: 'following',
-          title: intl.formatMessage({ id: 'pages.dao.mine.table.filter.following' }),
+          title: intl.formatMessage({ id: 'pages.dao.explore.table.filter.following' }),
         },
         {
-          key: 'owner',
-          title: intl.formatMessage({ id: 'pages.dao.mine.table.filter.owner' }),
+          key: 'following_and_owner',
+          title: intl.formatMessage({ id: 'pages.dao.explore.table.filter.following_and_owner' }),
         },
       ];
     }
     return [
       {
-        key: 'following_and_owner',
-        title: intl.formatMessage({ id: 'pages.dao.mine.table.filter.following_and_owner' }),
+        key: 'all',
+        title: intl.formatMessage({ id: 'pages.dao.explore.table.filter.all' }),
       },
       {
         key: 'following',
-        title: intl.formatMessage({ id: 'pages.dao.mine.table.filter.following' }),
+        title: intl.formatMessage({ id: 'pages.dao.explore.table.filter.following' }),
       },
     ];
   }, [intl, access]);
@@ -55,7 +55,7 @@ export default (): React.ReactNode => {
   return (
     <PageContainer
       ghost
-      header={{ breadcrumbRender: (): React.ReactNode => <GlobalBreadcrumb routes={breadcrumb} /> }}
+      header={{ breadcrumbRender: (): ReactNode => <GlobalBreadcrumb routes={breadcrumb} /> }}
     >
       <DaoList menuList={menuList} />
     </PageContainer>

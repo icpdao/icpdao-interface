@@ -16,13 +16,22 @@ declare namespace API {
   };
 
   type UserProfile = {
+    id?: string;
     nickname?: string;
     avatar?: string;
     github_login?: string;
     status?: UserStatus;
     icppership?: IcpperShip;
     erc20_address?: string;
-    id?: string;
+  };
+
+  type AwsSts = {
+    bucket?: string;
+    region?: string;
+    bucket_host?: string;
+    access_key_id?: string;
+    secret_access_key?: string;
+    session_token?: string;
   };
 
   type InviteResults = InviteResult[];
@@ -78,6 +87,11 @@ declare namespace API {
   type inlineResponse2004 = {
     success?: boolean;
     data?: Record<string, any>;
+  };
+
+  type inlineResponse2005 = {
+    success?: boolean;
+    data?: AwsSts;
   };
 
   type IcpperShipMentor = {

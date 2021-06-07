@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import { Button, Table, Space, Avatar, Input, Dropdown, Menu } from 'antd';
 
@@ -8,49 +8,90 @@ import { DownOutlined, UserOutlined } from '@ant-design/icons';
 import StatCard from '@/components/StatCard';
 
 import styles from '@/pages/Dao/components/DaoList.less';
-import { useIntl, history } from 'umi';
+import { FormattedMessage, useIntl, history } from 'umi';
+import { useDaoListQuery } from '@/services/dao/generated';
+import { useAccess } from '@@/plugin-access/access';
 
 const { Search } = Input;
 
+export type SelectDropdownMenu = {
+  key: string;
+  title: string;
+};
+
+type SelectDropdownProps = {
+  selectKey: string;
+  menuList: SelectDropdownMenu[];
+  onMenuClick: any;
+};
+
+type DaoTableParams = {
+  filter: string;
+  sorted?: string;
+  sortedType?: string;
+  search?: string;
+  pageSize?: number;
+  current?: number;
+};
+
+type DaoQueryParams = {
+  filter: string;
+  sorted?: string;
+  sortedType?: string;
+  search?: string;
+  first?: number;
+  offset?: number;
+};
+
+type DaoTableProps = {
+  menuList: SelectDropdownMenu[];
+};
+
+export type DaoListProps = {
+  menuList: SelectDropdownMenu[];
+};
+
 const columns = [
   {
-    title: 'No.',
-    dataIndex: 'number',
-    key: 'number',
-    sorter: true,
-  },
-  {
-    title: 'Dao name',
+    title: <FormattedMessage id="pages.dao.component.dao_list.table.head.dao_name" />,
     dataIndex: 'name',
     key: 'name',
-    sorter: true,
-    render: (_, record) => (
+    render: (_: any, record: any) => (
       <Space size="middle">
         <Avatar size="small" icon={<UserOutlined />} />
-        <span>{record.name}</span>
+        <span>
+          <a
+            onClick={(event) => {
+              event.preventDefault();
+              history.push(`/dao/${record.id}`);
+            }}
+          >
+            {record.name}
+          </a>
+        </span>
       </Space>
     ),
   },
   {
-    title: 'Following',
+    title: <FormattedMessage id="pages.dao.component.dao_list.table.head.following" />,
     dataIndex: 'following',
     key: 'following',
     sorter: true,
   },
   {
-    title: 'Job',
+    title: <FormattedMessage id="pages.dao.component.dao_list.table.head.job" />,
     dataIndex: 'job',
     key: 'job',
     sorter: true,
   },
   {
-    title: 'Size',
+    title: <FormattedMessage id="pages.dao.component.dao_list.table.head.size" />,
     dataIndex: 'size',
     key: 'size',
     sorter: true,
   },
   {
-    title: 'Token',
+    title: <FormattedMessage id="pages.dao.component.dao_list.table.head.token" />,
     dataIndex: 'token',
     key: 'token',
     sorter: true,
@@ -58,47 +99,25 @@ const columns = [
   {
     title: '',
     key: 'action',
-    render: () => <span>following</span>,
+    render: (_: any, record: any) => {
+      if (record.isFollowing) {
+        return (
+          <span>
+            <FormattedMessage id="pages.dao.component.dao_list.table.aciton.following" />
+          </span>
+        );
+      }
+      if (record.isOwner) {
+        return (
+          <span>
+            <FormattedMessage id="pages.dao.component.dao_list.table.aciton.owner" />
+          </span>
+        );
+      }
+      return <span></span>;
+    },
   },
 ];
-
-const data = [
-  {
-    number: 1,
-    name: 'icpdao',
-    following: '6',
-    job: '666',
-    size: '1001',
-    token: '123ID/$1231',
-  },
-  {
-    number: 2,
-    name: 'icpdao1',
-    following: '6',
-    job: '666',
-    size: '1001',
-    token: '123ID/$1231',
-  },
-  {
-    number: 3,
-    name: 'icpdao222',
-    following: '6',
-    job: '666',
-    size: '1001',
-    token: '123ID/$1231',
-  },
-];
-
-export type SelectDropdownMenu = {
-  key: string;
-  title: string;
-};
-
-export type SelectDropdownProps = {
-  selectKey: string;
-  menuList: SelectDropdownMenu[];
-  onMenuClick: any;
-};
 
 const SelectDropdown: React.FC<SelectDropdownProps> = ({ selectKey, menuList, onMenuClick }) => {
   let buttonTitle: string = menuList[0].title;
@@ -120,74 +139,149 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({ selectKey, menuList, on
   );
 };
 
-const DaoTable: React.FC = () => {
-  const [daoData, setDaoData] = useState(data);
-  const [loading, setLoading] = useState(false);
-  const [filterSelectKey, sefilterSelectKey] = useState('all');
-  const [searchText, setSearchText] = useState(null);
+const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
+  const pageSize = 10;
+  const intl = useIntl();
+  const [daoTableParams, setDaoTableParams] = useState<DaoTableParams>({
+    filter: menuList[0].key,
+    current: 1,
+    pageSize,
+  });
 
-  console.log('searchText', searchText);
-  const onChange = (pagination, filters, sorter, extra) => {
-    console.log('onchange', extra);
-    console.log(sorter);
-    console.log(pagination);
-    setLoading(true);
-    setDaoData((oldData) => {
-      return oldData.concat([
-        {
-          number: 4,
-          name: 'icpdao33',
-          following: '6',
-          job: '666',
-          size: '1001',
-          token: '123ID/$1231',
-        },
-      ]);
+  const daoQueryParams = useMemo<DaoQueryParams>(() => {
+    const tmp: any = { ...daoTableParams };
+    if (daoTableParams.current && daoTableParams.pageSize) {
+      tmp.first = daoTableParams.pageSize;
+      tmp.offset = daoTableParams.pageSize * (daoTableParams.current - 1);
+      delete tmp.current;
+      delete tmp.pageSize;
+    }
+    return tmp;
+  }, [daoTableParams]);
+
+  const onMenuClick = useCallback((e: any) => {
+    setDaoTableParams((oldParams) => {
+      const updateValues: DaoQueryParams = {
+        filter: e.key,
+      };
+      const res = { ...oldParams, ...updateValues };
+      res.current = 1;
+      res.pageSize = pageSize;
+      return res;
     });
-    setLoading(false);
-  };
+  }, []);
 
-  const onSearch = (value) => {
-    setSearchText(value);
-  };
+  const onChange = useCallback((pagination: any, filters: any, sorter: any, extra: any) => {
+    setDaoTableParams((oldParams) => {
+      const updateValues: DaoTableParams = {
+        filter: oldParams.filter,
+        pageSize: pagination.pageSize,
+        current: pagination.current,
+        sorted: sorter.field,
+        sortedType: 'asc',
+      };
+      if (sorter.order === 'ascend') {
+        updateValues.sortedType = 'asc';
+      }
+      if (sorter.order === 'descend') {
+        updateValues.sortedType = 'desc';
+      }
+      const res = { ...oldParams, ...updateValues };
+      if (!sorter.order) {
+        delete res.sorted;
+        delete res.sortedType;
+      }
+      if (extra.action === 'sort') {
+        res.current = 1;
+        res.pageSize = pageSize;
+      }
+      return res;
+    });
+  }, []);
 
-  const menuList: SelectDropdownMenu[] = [
-    {
-      key: 'all',
-      title: 'All',
-    },
-    {
-      key: 'following',
-      title: 'Following',
-    },
-    {
-      key: 'my_dao',
-      title: 'My dao',
-    },
-  ];
+  const onSearch = useCallback((value: string) => {
+    setDaoTableParams((oldParams) => {
+      const updateValues: DaoTableParams = {
+        filter: oldParams.filter,
+        search: value,
+      };
+      const res = { ...oldParams, ...updateValues };
+      res.current = 1;
+      res.pageSize = pageSize;
+      if (value === '') {
+        delete res.search;
+      }
+      return res;
+    });
+  }, []);
 
-  const statCardData = [
-    {
-      number: 123,
-      title: 'Dao',
-    },
-    {
-      number: 123,
-      title: 'Dao',
-    },
-    {
-      number: 123,
-      title: 'Dao',
-    },
-    {
-      number: 123,
-      title: 'Dao',
-    },
-  ];
+  const { data, loading } = useDaoListQuery({
+    variables: daoQueryParams as any,
+    fetchPolicy: 'no-cache',
+  });
 
-  const onMenuClick = (e) => {
-    sefilterSelectKey(e.key);
-  };
+  const daoDataTotalCount: number = useMemo(() => {
+    return data?.daos?.total || 0;
+  }, [data]);
+
+  const daoData: any[] = useMemo(() => {
+    if (!data?.daos?.dao) {
+      return [];
+    }
+    return data.daos.dao.map((item) => {
+      return {
+        id: item?.datum?.id,
+        name: item?.datum?.name,
+        following: item?.stat?.following,
+        job: item?.stat?.job,
+        size: item?.stat?.size,
+        token: item?.stat?.token,
+        isFollowing: item?.isFollowing,
+        isOwner: item?.isOwner,
+      };
+    });
+  }, [data]);
+
+  const statCardData: any[] = useMemo(() => {
+    if (!data?.daos?.dao) {
+      return [
+        {
+          title: intl.formatMessage({ id: 'pages.dao.component.dao_list.stat.card.dao' }),
+          number: 0,
+        },
+        {
+          title: intl.formatMessage({ id: 'pages.dao.component.dao_list.stat.card.icpper' }),
+          number: 0,
+        },
+        {
+          title: intl.formatMessage({ id: 'pages.dao.component.dao_list.stat.card.size' }),
+          number: 0,
+        },
+        {
+          title: intl.formatMessage({ id: 'pages.dao.component.dao_list.stat.card.income' }),
+          number: 0,
+        },
+      ];
+    }
+    return [
+      {
+        title: intl.formatMessage({ id: 'pages.dao.component.dao_list.stat.card.dao' }),
+        number: data.daos.total,
+      },
+      {
+        title: intl.formatMessage({ id: 'pages.dao.component.dao_list.stat.card.icpper' }),
+        number: data.daos.stat?.icpper,
+      },
+      {
+        title: intl.formatMessage({ id: 'pages.dao.component.dao_list.stat.card.size' }),
+        number: data.daos.stat?.size,
+      },
+      {
+        title: intl.formatMessage({ id: 'pages.dao.component.dao_list.stat.card.income' }),
+        number: data.daos.stat?.income,
+      },
+    ];
+  }, [data, intl]);
 
   return (
     <>
@@ -197,9 +291,15 @@ const DaoTable: React.FC = () => {
 
       <div className={styles.tableToolbar}>
         <Space>
-          <Search placeholder="input search text" onSearch={onSearch} size="large" />
+          <Search
+            placeholder={intl.formatMessage({
+              id: 'pages.dao.component.dao_list.input.search.placeholder',
+            })}
+            onSearch={onSearch}
+            size="large"
+          />
           <SelectDropdown
-            selectKey={filterSelectKey}
+            selectKey={daoTableParams.filter}
             menuList={menuList}
             onMenuClick={onMenuClick}
           />
@@ -209,28 +309,45 @@ const DaoTable: React.FC = () => {
       <Table
         columns={columns}
         loading={loading}
-        rowKey="number"
+        rowKey="name"
         dataSource={daoData}
         onChange={onChange}
+        pagination={{
+          pageSize,
+          total: daoDataTotalCount,
+          current: daoTableParams.current,
+        }}
       />
     </>
   );
 };
 
-const DaoList: React.FC = () => {
+const DaoList: React.FC<DaoListProps> = ({ menuList }) => {
+  const access = useAccess();
   const intl = useIntl();
 
-  const onClick = () => {
+  const onClick = useCallback(() => {
     history.push('/dao/create');
-  };
+  }, []);
+
+  const canInviteIcpper = access.canInviteIcpper();
+
+  const createButton = useMemo(() => {
+    if (canInviteIcpper) {
+      return (
+        <Button type="primary" size="large" onClick={onClick}>
+          {intl.formatMessage({ id: 'pages.dao.component.dao_list.create_dao' })}
+        </Button>
+      );
+    }
+    return null;
+  }, [canInviteIcpper, intl, onClick]);
 
   return (
     <div className={styles.container}>
-      <Button type="primary" size="large" onClick={onClick}>
-        {intl.formatMessage({ id: 'pages.dao.component.dao_list.create_dao' })}
-      </Button>
+      {createButton}
 
-      <DaoTable />
+      <DaoTable menuList={menuList} />
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { PageContainer, PageLoading } from '@ant-design/pro-layout';
-import { Avatar, Button, Col, Row, Space, Tabs, Typography, Tag, Divider, message } from 'antd';
+import { Avatar, Button, Col, Row, Space, Typography, Tag, Divider, message, Tabs } from 'antd';
 import { FormattedMessage, history, useAccess } from 'umi';
 import styles from './index.less';
 import GlobalBreadcrumb from '@/components/Breadcrumb';
@@ -16,7 +16,12 @@ import {
 import { getFormatTime } from '@/utils/utils';
 import { useIntl } from '@@/plugin-locale/localeExports';
 
+import DaoIcpperStat from '@/pages/Dao/components/DaoIcpperStat';
+import DaoJobStat from '@/pages/Dao/components/DaoJobStat';
+import DaoCycle from '@/pages/Dao/components/DaoCycle';
+
 const { TabPane } = Tabs;
+
 const { Paragraph } = Typography;
 
 const breadcrumb = (daoId: string) => [
@@ -38,19 +43,10 @@ const breadcrumb = (daoId: string) => [
   },
 ];
 
-const configTab = (
-  <>
-    <TabPane tab={<FormattedMessage id={`pages.dao.home.tab.icpper`} />} key="icpper" />
-    <TabPane tab={<FormattedMessage id={`pages.dao.home.tab.job`} />} key="job" />
-    <TabPane tab={<FormattedMessage id={`pages.dao.home.tab.cycle`} />} key="cycle" />
-  </>
-);
-
 export default (props: { match: { params: { daoId: string } } }): ReactNode => {
   const { initialState } = useModel('@@initialState');
   const access = useAccess();
   const intl = useIntl();
-  const [tab, setTab] = useState<string>('icpper');
   const [followedButtonLoading, setFollowedButtonLoading] = useState(false);
   if (!initialState) {
     return <PageLoading />;
@@ -72,6 +68,8 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
   const followed = follow?.followers?.length && follow?.followers[0]?.createAt;
 
   const isOnwer = access.isDaoOwner(data?.dao?.datum?.ownerId || '');
+
+  const defaultActiveKey = 'icpperStat';
 
   return (
     <>
@@ -102,7 +100,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
                   style={{ width: 40 }}
                   onClick={() => history.push(`/dao/${daoId}/config`)}
                   icon={<SettingOutlined style={{ fontSize: 17 }} />}
-                ></Button>
+                />
               )}
               {!isOnwer && followed && (
                 <Button
@@ -179,8 +177,19 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
             <FormattedMessage id={`pages.dao.home.button.vote`} />
           </Button>
         </Space>
-        <Tabs defaultActiveKey={tab} onChange={setTab}>
-          {configTab}
+
+        <Tabs defaultActiveKey={defaultActiveKey}>
+          <TabPane tab={<FormattedMessage id={'pages.dao.home.tab.icpperStat'} />} key="icpperStat">
+            <DaoIcpperStat daoId={daoId} />
+          </TabPane>
+
+          <TabPane tab={<FormattedMessage id={'pages.dao.home.tab.jobStat'} />} key="jobStat">
+            <DaoJobStat daoId={daoId} />
+          </TabPane>
+
+          <TabPane tab={<FormattedMessage id={'pages.dao.home.tab.cycle'} />} key="cycle">
+            <DaoCycle daoId={daoId} />
+          </TabPane>
         </Tabs>
       </PageContainer>
     </>
