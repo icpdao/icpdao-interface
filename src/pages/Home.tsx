@@ -194,7 +194,7 @@ export default (): React.ReactNode => {
                 <Button size={'large'} type="primary" onClick={() => history.push('/dao/explore')}>
                   <FormattedMessage id={'pages.home.button1'} />
                 </Button>
-                <Button size={'large'} type="primary">
+                <Button size={'large'} type="primary" onClick={() => history.push('/job')}>
                   <FormattedMessage id={'pages.home.button2'} />
                 </Button>
               </Space>

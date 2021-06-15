@@ -6,6 +6,9 @@ const customFetch = (uri: string, options: any) => {
   const { service } = options.headers;
   const { headers } = options;
   delete headers.service;
+  if (REACT_APP_ICPDAO_MOCK_URL) {
+    return fetch(REACT_APP_ICPDAO_MOCK_URL, options);
+  }
   return fetch(
     `${REACT_APP_ICPDAO_BACKEND_BASE_URL}/${REACT_APP_ICPDAO_BACKEND_VERSION}/${service}/graph`,
     options,

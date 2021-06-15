@@ -67,8 +67,12 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
   const follow = data?.dao?.following;
   const followed = follow?.followers?.length && follow?.followers[0]?.createAt;
 
-  const isOnwer = access.isDaoOwner(data?.dao?.datum?.ownerId || '');
-
+  let userRole: 'normal' | 'icpper' | 'owner' = 'normal';
+  if (access.isDaoOwner(data?.dao?.datum?.ownerId || '')) {
+    userRole = 'owner';
+  } else if (access.isIcpper()) {
+    userRole = 'icpper';
+  }
   const defaultActiveKey = 'icpperStat';
 
   return (
@@ -78,7 +82,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
         header={{ breadcrumbRender: () => <GlobalBreadcrumb routes={breadcrumb(daoId)} /> }}
       >
         <Row className={styles.headerRow}>
-          <Col span={6}>
+          <Col span={12}>
             <Space size={30} className={styles.headerSpace}>
               <Avatar size={106} alt={dao.name} src={dao.logo}>
                 {dao.name}
@@ -86,7 +90,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
               <span className={styles.headerTitle}>{dao.name}</span>
             </Space>
           </Col>
-          <Col span={6} offset={12} className={styles.headerCol}>
+          <Col span={12} className={styles.headerCol}>
             <Space size={10} className={styles.headerSpaceRight}>
               <Button
                 href={`https://github.com/${dao.name}`}
@@ -95,14 +99,14 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
               >
                 <FormattedMessage id={`pages.dao.home.view`} />
               </Button>
-              {isOnwer && (
+              {userRole === 'owner' && (
                 <Button
                   style={{ width: 40 }}
                   onClick={() => history.push(`/dao/${daoId}/config`)}
                   icon={<SettingOutlined style={{ fontSize: 17 }} />}
                 />
               )}
-              {!isOnwer && followed && (
+              {userRole !== 'owner' && followed && (
                 <Button
                   onClick={async () => {
                     setFollowedButtonLoading(true);
@@ -117,7 +121,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
                   <FormattedMessage id={`pages.dao.home.unfollowed`} />
                 </Button>
               )}
-              {!isOnwer && !followed && (
+              {userRole !== 'owner' && !followed && (
                 <Button
                   onClick={async () => {
                     setFollowedButtonLoading(true);
@@ -137,7 +141,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
         </Row>
         <Paragraph
           editable={
-            isOnwer
+            userRole === 'owner'
               ? {
                   onChange: async (value) => {
                     if (value.length < 50) {
@@ -170,7 +174,11 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
         </Space>
         <Divider />
         <Space size={22} className={styles.buttonSpace}>
-          <Button size={'large'} type={'primary'}>
+          <Button
+            size={'large'}
+            type={'primary'}
+            onClick={() => history.push(`/job?daoId=${daoId}`)}
+          >
             <FormattedMessage id={`pages.dao.home.button.mark`} />
           </Button>
           <Button size={'large'} type={'primary'}>
@@ -188,7 +196,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
           </TabPane>
 
           <TabPane tab={<FormattedMessage id={'pages.dao.home.tab.cycle'} />} key="cycle">
-            <DaoCycle daoId={daoId} />
+            <DaoCycle daoId={daoId} userRole={userRole} />
           </TabPane>
         </Tabs>
       </PageContainer>

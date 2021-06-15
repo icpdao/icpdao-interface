@@ -57,3 +57,85 @@ mutation UpdateDAOBaseInfo($id: String!, $desc: String, $logo: String) {
     }
   }
 }
+
+mutation CreateJob($issueLink: String!, $size: Float!) {
+  createJob(issueLink: $issueLink, size: $size) {
+    job {
+      node {
+        id
+        daoId
+        githubRepoOwner
+      }
+    }
+  }
+}
+
+mutation UpdateJobSize($id: String!, $size: Float!) {
+  updateJob(id: $id, size: $size) {
+    job {
+      node {
+        id
+      }
+    }
+  }
+}
+
+mutation UpdateCycleJobVoteTypeByOwner($jobId: String!, $voteType: UpdateJobVoteTypeByOwnerArgumentPairTypeEnum) {
+  updateJobVoteTypeByOwner(id: $jobId, voteType: $voteType) {
+    ok
+  }
+}
+
+mutation AddJobPR($id: String!, $addPr: String!) {
+  updateJob(id: $id, addPr: $addPr) {
+    job {
+      node {
+        id
+      }
+      prs {
+        id
+        title
+        githubRepoOwner
+        githubRepoName
+        githubPrNumber
+      }
+    }
+  }
+}
+
+mutation DeleteJobPR($id: String!, $deletePr: String!) {
+  updateJob(id: $id, deletePr: $deletePr) {
+    job {
+      node {
+        id
+      }
+      prs {
+        id
+        title
+        githubRepoOwner
+        githubRepoName
+        githubPrNumber
+      }
+    }
+  }
+}
+
+mutation UpdateAllVote($voteId: String!, $vote: Boolean!) {
+  updateAllVote(id: $voteId, vote: $vote) {
+    ok
+  }
+}
+
+mutation UpdatePairVote($voteId: String!, $voteJobId: String!) {
+  updatePairVote(id: $voteId, voteJobId: $voteJobId) {
+    ok
+  }
+}
+
+mutation UpdateOwnerEI($statId: String!, $ownerEi: Decimal!) {
+  updateIcpperStatOwnerEi(id: $statId, ownerEi: $ownerEi) {
+    ei
+    ownerEi
+    voteEi
+  }
+}

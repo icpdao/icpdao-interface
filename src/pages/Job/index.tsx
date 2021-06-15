@@ -7,7 +7,7 @@ import GlobalBreadcrumb from '@/components/Breadcrumb';
 import { HomeOutlined } from '@ant-design/icons';
 import { useModel } from '@@/plugin-model/useModel';
 
-import TabJob from './components/Job';
+import TabJob from './components/TabJob';
 import PermissionErrorPage from '@/pages/403';
 import styles from './index.less';
 
@@ -27,7 +27,9 @@ const breadcrumb = [
   },
 ];
 
-export default (): ReactNode => {
+export default (props: {
+  location: { query: { userName: string | undefined; daoId: string | undefined } };
+}): ReactNode => {
   const { initialState } = useModel('@@initialState');
   const access = useAccess();
   const [tab, setTab] = useState<string>('job');
@@ -40,6 +42,7 @@ export default (): ReactNode => {
     return <PermissionErrorPage />;
   }
 
+  const userName = props.location.query.userName || initialState.currentUser().profile.github_login;
   return (
     <>
       <PageContainer
@@ -49,7 +52,7 @@ export default (): ReactNode => {
         <div className={styles.first}>
           <Tabs defaultActiveKey={tab} onChange={setTab}>
             <TabPane tab={<FormattedMessage id={`pages.job.tab.job`} />} key="job">
-              <TabJob />
+              <TabJob userName={userName} daoId={props.location.query.daoId} />
             </TabPane>
             <TabPane tab={<FormattedMessage id={`pages.job.tab.cycle`} />} key="cycle"></TabPane>
           </Tabs>
