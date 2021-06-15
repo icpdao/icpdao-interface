@@ -16,9 +16,15 @@ export type StatCardProps = {
 
 const StatCard: React.FC<StatCardProps> = ({ data }) => {
   const nodeList: ReactNode[] = [];
-  data.forEach((item) => {
+
+  data.forEach((item, index) => {
     nodeList.push(
-      <Card.Grid hoverable={false} className={styles.statCard} key={item.title}>
+      <Card.Grid
+        key={index.toString()}
+        hoverable={false}
+        className={styles.statCard}
+        style={{ width: `calc(100% / ${data.length})` }}
+      >
         <div>
           <div className={styles.statCardNumber}>{item.number}</div>
           <div className={styles.statCardName}>{item.title}</div>

@@ -1,83 +1,52 @@
-import { Select, Tabs } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
-import StatCard from '@/components/StatCard';
-import { useIntl } from '@@/plugin-locale/localeExports';
-import { FormattedMessage } from 'umi';
-import DaoCycleIcpper from '@/pages/Dao/components/DaoCycleIcpper';
-import DaoCycleJob from '@/pages/Dao/components/DaoCycleJob';
-import DaoCycleVote from '@/pages/Dao/components/DaoCycleVote';
+import { Select } from 'antd';
+import React, { useEffect, useState } from 'react';
+import DaoCycleIndex from './cycle/index';
+import styles from './index.less';
+import { useDaoCycleQuery } from '@/services/dao/generated';
+import { PageLoading } from '@ant-design/pro-layout';
+import { getFormatTimeByZone } from '@/utils/utils';
 
-const { TabPane } = Tabs;
-
-const mockOptions: any = [
-  {
-    label: 'luxi',
-    value: 'lucy',
-  },
-];
-
-type DaoCycleProps = {
+export type DaoCycleProps = {
   daoId: string;
+  userRole: 'owner' | 'icpper' | 'normal';
 };
 
-const DaoCycle: React.FC<DaoCycleProps> = ({ daoId }) => {
+const DaoCycle: React.FC<DaoCycleProps> = ({ daoId, userRole }) => {
   const defaultActiveKey = 'icpper';
-  const [loading, setLoading] = useState<boolean>(true);
   const [options, setOptions] = useState([]);
-  const intl = useIntl();
-
+  const [cycleId, setCycleId] = useState('');
+  const { data, loading, error } = useDaoCycleQuery({ variables: { daoId } });
   useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      setOptions(mockOptions);
-      setLoading(false);
-    }, 1000);
-  }, []);
-
-  const statCardData = useMemo(() => {
-    return [
-      {
-        title: intl.formatMessage({ id: 'pages.dao.component.dao_cycle.stat.icpper' }),
-        number: 1,
-      },
-      {
-        title: intl.formatMessage({ id: 'pages.dao.component.dao_cycle.stat.job' }),
-        number: 2,
-      },
-      {
-        title: intl.formatMessage({ id: 'pages.dao.component.dao_cycle.stat.size' }),
-        number: 3,
-      },
-      {
-        title: '/SHT',
-        number: 4,
-      },
-    ];
-  }, [intl]);
+    const ops = data?.dao?.cycles?.nodes?.map((c) => {
+      const begin_time = getFormatTimeByZone(c?.datum?.beginAt || 0, c?.datum?.timeZone || 0, 'LL');
+      const end_time = getFormatTimeByZone(c?.datum?.endAt || 0, c?.datum?.timeZone || 0, 'LL');
+      return {
+        id: c?.datum?.id || '',
+        value: c?.datum?.id || '',
+        label: `${begin_time} - ${end_time}`,
+      };
+    });
+    setOptions(ops as any);
+  }, [data]);
+  if (loading || error) {
+    return <PageLoading />;
+  }
 
   return (
     <div>
-      <Select style={{ width: 250 }} loading={loading} options={options} />
-      <StatCard data={statCardData} />
-      <Tabs defaultActiveKey={defaultActiveKey} type="card">
-        <TabPane
-          tab={<FormattedMessage id={'pages.dao.component.dao_cycle.tab.icpper'} />}
-          key="icpper"
-        >
-          <DaoCycleIcpper daoId={daoId} />
-        </TabPane>
-
-        <TabPane tab={<FormattedMessage id={'pages.dao.component.dao_cycle.tab.job'} />} key="job">
-          <DaoCycleJob daoId={daoId} />
-        </TabPane>
-
-        <TabPane
-          tab={<FormattedMessage id={'pages.dao.component.dao_cycle.tab.vote'} />}
-          key="vote"
-        >
-          <DaoCycleVote daoId={daoId} />
-        </TabPane>
-      </Tabs>
+      <Select
+        className={styles.tabSelect}
+        style={{ width: 250 }}
+        onChange={(value) => setCycleId(value as string)}
+        loading={loading}
+        options={options}
+      />
+      <DaoCycleIndex
+        daoId={daoId}
+        cycleId={cycleId}
+        userRole={userRole}
+        activeTab={defaultActiveKey}
+      />
     </div>
   );
 };

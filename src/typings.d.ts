@@ -47,3 +47,4 @@ declare const REACT_APP_GITHUB_APP_CLIENT_ID: string;
 declare const REACT_APP_ICPDAO_BACKEND_BASE_URL: string;
 declare const THEME: string | undefined;
 declare const REACT_APP_ICPDAO_BACKEND_VERSION: string;
+declare const REACT_APP_ICPDAO_MOCK_URL: string | undefined;

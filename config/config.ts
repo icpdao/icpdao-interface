@@ -12,6 +12,7 @@ const {
   REACT_APP_ICPDAO_BACKEND_BASE_URL,
   THEME,
   REACT_APP_ICPDAO_BACKEND_VERSION,
+  REACT_APP_ICPDAO_MOCK_URL,
 } = process.env;
 
 export default defineConfig({
@@ -25,6 +26,7 @@ export default defineConfig({
     REACT_APP_ICPDAO_BACKEND_BASE_URL: REACT_APP_ICPDAO_BACKEND_BASE_URL || '',
     THEME: THEME || undefined,
     REACT_APP_ICPDAO_BACKEND_VERSION: REACT_APP_ICPDAO_BACKEND_VERSION || 'v1',
+    REACT_APP_ICPDAO_MOCK_URL: REACT_APP_ICPDAO_MOCK_URL || undefined,
   },
   layout: {
     // https://umijs.org/zh-CN/plugins/plugin-layout

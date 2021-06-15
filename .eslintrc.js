@@ -8,5 +8,6 @@ module.exports = {
     REACT_APP_ICPDAO_BACKEND_BASE_URL: 'readonly',
     THEME: true,
     REACT_APP_ICPDAO_BACKEND_VERSION: true,
+    REACT_APP_ICPDAO_MOCK_URL: true,
   },
 };

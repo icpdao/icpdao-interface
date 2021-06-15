@@ -5,8 +5,7 @@ import momentTZ from 'moment-timezone';
 
 moment.locale('en');
 
-const reg =
-  /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
+const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
 
 export const isUrl = (path: string): boolean => reg.test(path);
 
@@ -70,6 +69,10 @@ export const getFormatTime = (time: number, format: string): string => {
   return moment.unix(time).format(format);
 };
 
+export const getFormatTimeByZone = (time: number, timeZone: number, format: string): string => {
+  return moment.unix(time).utcOffset(timeZone).format(format);
+};
+
 export const getTimeZoneOffset = () => {
   return moment().utcOffset();
 };
@@ -113,6 +116,22 @@ export const getDaysHours = () => {
     });
   }
   return ops;
+};
+
+export const getEIColor = (ei: number) => {
+  let voteEIColor: string = '#262626';
+  if (ei <= 0.4) {
+    voteEIColor = '#ED6C6C';
+  } else if (ei <= 0.8) {
+    voteEIColor = '#F1C84C';
+  } else if (ei >= 1.2) {
+    voteEIColor = '#2CA103';
+  }
+  return voteEIColor;
+};
+
+export const getCurrentPage = (offset: number, pageSize: number) => {
+  return Math.ceil(offset / pageSize) + 1;
 };
 
 export const githubCallback = '/login/auth_callback';

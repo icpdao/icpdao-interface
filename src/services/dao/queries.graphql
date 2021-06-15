@@ -88,6 +88,17 @@ query DAOList($filter: DAOsFilterEnum, $sorted: DAOsSortedEnum, $sortedType: DAO
   }
 }
 
+query UserJobDAOList {
+  daos(filter: member, offset: 0, first: 100) {
+    dao {
+      datum {
+        id
+        name
+      }
+    }
+  }
+}
+
 query DAOGithubAppStatus($name: String!) {
   daoGithubAppStatus(name: $name) {
     githubAppName
@@ -95,5 +106,226 @@ query DAOGithubAppStatus($name: String!) {
     isExists
     isGithubOrgOwner
     isIcpAppInstalled
+  }
+}
+
+query JobList($beginTime: Int, $endTime: Int, $daoName: String!, $first: Int, $offset: Int, $sorted: JobSortedEnum, $sortedType: SortedTypeEnum) {
+  jobs(beginTime: $beginTime, daoName: $daoName, endTime: $endTime, first: $first, offset: $offset, sorted: $sorted, sortedType: $sortedType) {
+    job {
+      node {
+        id
+        title
+        size
+        status
+        githubRepoOwner
+        githubRepoName
+        githubIssueNumber
+        income
+      }
+      prs {
+        id
+        title
+        githubRepoOwner
+        githubRepoName
+        githubPrNumber
+      }
+    }
+    stat {
+      size
+      tokenCount
+      tokenName
+    }
+    total
+  }
+}
+
+query CycleJobList($cycleId: String!, $first: Int, $offset: Int, $pairType: JobsQueryPairTypeEnum, $sorted: JobsQuerySortedEnum, $sortedType: JobsQuerySortedTypeEnum) {
+  cycle(id: $cycleId) {
+    jobs(
+      first: $first,
+      offset: $offset,
+      pairType: $pairType,
+      sorted: $sorted,
+      sortedType: $sortedType) {
+      nodes {
+        datum {
+          id
+          githubRepoOwner
+          githubRepoName
+          githubIssueNumber
+          title
+          size
+          income
+          pairType
+        }
+        user {
+          id
+          avatar
+          nickname
+          githubLogin
+        }
+      }
+      total
+    }
+  }
+}
+
+
+query CycleIcpperList($cycleId: String!, $first: Int, $offset: Int, $sorted: CycleIcpperStatSortedEnum, $sortedType: CycleIcpperStatSortedTypeEnum) {
+  cycle(id: $cycleId) {
+    icpperStats(
+      first: $first,
+      offset: $offset,
+      sorted: $sorted,
+      sortedType: $sortedType) {
+      nodes {
+        datum {
+          id
+          jobCount
+          size
+          income
+          ei
+        }
+        icpper {
+          id
+          avatar
+          nickname
+          githubLogin
+        }
+        lastEi
+      }
+      total
+    }
+  }
+}
+
+
+query OwnerCycleIcpperList($cycleId: String!, $first: Int, $offset: Int, $sorted: CycleIcpperStatSortedEnum, $sortedType: CycleIcpperStatSortedTypeEnum) {
+  cycle(id: $cycleId) {
+    icpperStats(
+      first: $first,
+      offset: $offset,
+      sorted: $sorted,
+      sortedType: $sortedType) {
+      nodes {
+        datum {
+          id
+          jobCount
+          size
+          income
+          ei
+          ownerEi
+          voteEi
+        }
+        icpper {
+          id
+          avatar
+          nickname
+          githubLogin
+        }
+        lastEi
+      }
+      total
+    }
+  }
+}
+
+query CycleVoteList($cycleId: String!, $first: Int, $offset: Int, $isMyself: Boolean, $isPublic: Boolean) {
+  cycle(id: $cycleId) {
+    votes(first: $first, offset: $offset, isMyself: $isMyself, isPublic: $isPublic) {
+      total
+      nodes {
+        datum {
+          id
+          isResultPublic
+          voteJobId
+          voteResultStatTypeAll
+          voteType
+          voterId
+        }
+        leftJob {
+          datum {
+            title
+            githubRepoOwner
+            githubRepoName
+            githubIssueNumber
+            id
+          }
+          user {
+            id
+            githubLogin
+          }
+        }
+        rightJob {
+          datum {
+            title
+            githubRepoOwner
+            githubRepoName
+            githubIssueNumber
+            id
+          }
+          user {
+            id
+            githubLogin
+          }
+        }
+        voteJob {
+          datum {
+            id
+          }
+        }
+        voter {
+          id
+          githubLogin
+        }
+      }
+    }
+  }
+}
+
+query DAOVotingCycleList($daoId: String!) {
+  dao(id: $daoId) {
+    cycles(filter: voting) {
+      nodes {
+        datum {
+          id
+          voteBeginAt
+          voteEndAt
+          pairedAt
+        }
+      }
+    }
+  }
+}
+
+query DAOCycle($daoId: String!) {
+  dao(id: $daoId) {
+    cycles {
+      nodes {
+        datum {
+          id
+          timeZone
+          beginAt
+          endAt
+          pairBeginAt
+          pairEndAt
+          voteBeginAt
+          voteEndAt
+          pairedAt
+          voteResultPublishedAt
+          voteResultStatAt
+        }
+      }
+    }
+  }
+}
+
+query CycleStatData($cycleId: String!) {
+  cycle(id: $cycleId) {
+    stat {
+      icpperCount
+      jobCount
+      size
+    }
   }
 }

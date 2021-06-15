@@ -1,9 +1,9 @@
 /** Request 网络请求工具 更详细的 api 文档: https://github.com/umijs/umi-request */
-import type {RequestOptionsInit} from 'umi-request';
+import type { RequestOptionsInit } from 'umi-request';
 import { notification } from 'antd';
 import type { RequestConfig } from 'umi';
-import {history} from 'umi';
-import {clearAuthorization, getAuthorization, getProfile} from "@/utils/utils";
+import { history } from 'umi';
+import { clearAuthorization, getAuthorization, getProfile } from '@/utils/utils';
 
 const codeMessage: Record<number, string> = {
   200: '服务器成功返回请求的数据。',
@@ -27,9 +27,17 @@ const codeMessage: Record<number, string> = {
  * @zh-CN 异常处理程序
  * @en-US Exception handler
  */
-const errorHandler = (error: { response: Response, name: string, data: any, request: any }): Response => {
+const errorHandler = (error: {
+  response: Response;
+  name: string;
+  data: any;
+  request: any;
+}): Response => {
   const { response, name, data, request } = error;
-  if ((name === 'BizError' && data.errorMessage === 'UNAUTHError') || request.url.endsWith(getProfile)) {
+  if (
+    (name === 'BizError' && data.errorMessage === 'UNAUTHError') ||
+    request.url.endsWith(getProfile)
+  ) {
     clearAuthorization();
     history.replace('/');
     return response;
@@ -60,14 +68,15 @@ const errorHandler = (error: { response: Response, name: string, data: any, requ
 
 const authHeaderInterceptor = (url: string, options: RequestOptionsInit) => {
   const auth = getAuthorization();
+  const prefix = url.startsWith('http') ? '' : REACT_APP_ICPDAO_BACKEND_BASE_URL;
   if (auth) {
     return {
-      url: `${REACT_APP_ICPDAO_BACKEND_BASE_URL}${url}`,
-      options: {...options, interceptors: true, headers: {Authorization: `${auth}`}}
-    }
+      url: `${prefix}${url}`,
+      options: { ...options, interceptors: true, headers: { Authorization: `${auth}` } },
+    };
   }
-  return {url: `${REACT_APP_ICPDAO_BACKEND_BASE_URL}${url}`, options}
-}
+  return { url: `${prefix}${url}`, options };
+};
 
 /**
  * @en-US Configure the default parameters for request
@@ -76,7 +85,7 @@ const authHeaderInterceptor = (url: string, options: RequestOptionsInit) => {
 const request: RequestConfig = {
   errorHandler, // default error handling
   credentials: 'same-origin', // Does the default request bring cookies
-  requestInterceptors: [authHeaderInterceptor]
+  requestInterceptors: [authHeaderInterceptor],
 };
 
 export default request;

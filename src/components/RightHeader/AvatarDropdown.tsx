@@ -4,7 +4,6 @@ import {
   TransactionOutlined,
   TeamOutlined,
   DeploymentUnitOutlined,
-  HeartOutlined,
   UnlockOutlined,
   DownOutlined,
   GithubOutlined,
@@ -112,10 +111,12 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = () => {
           <DeploymentUnitOutlined />
           {intl.formatMessage({ id: 'component.globalHeader.avatar.dropdown.dao' })}
         </Menu.Item>
-        <Menu.Item key="/account/following">
-          <HeartOutlined />
-          {intl.formatMessage({ id: 'component.globalHeader.avatar.dropdown.following' })}
-        </Menu.Item>
+        {access.isIcpper() && (
+          <Menu.Item key="/job">
+            <DeploymentUnitOutlined />
+            {intl.formatMessage({ id: 'component.globalHeader.avatar.dropdown.job' })}
+          </Menu.Item>
+        )}
         <Menu.Item key="/account/logout">
           <UnlockOutlined />
           {intl.formatMessage({ id: 'component.globalHeader.avatar.dropdown.logout' })}
