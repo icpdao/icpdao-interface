@@ -1,25 +1,32 @@
 import React, { useCallback, useState } from 'react';
 import type { TablePaginationConfig } from 'antd';
-import { Avatar, Button, message, Select, Space, Table } from 'antd';
+import { Avatar, Button, message, Select, Space, Table, Progress } from 'antd';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { FormattedMessage } from 'umi';
 import type { DaoCycleProps } from './index';
 import type { CycleJobListQueryVariables, JobQuery } from '@/services/dao/generated';
 import {
+  CycleVotePairTaskStatusEnum,
   JobsQueryPairTypeEnum,
   JobsQuerySortedEnum,
   JobsQuerySortedTypeEnum,
   UpdateJobVoteTypeByOwnerArgumentPairTypeEnum,
+  useBeginCyclePairTaskMutation,
   useCycleJobListQuery,
+  useCyclePairStatusQuery,
   useUpdateCycleJobVoteTypeByOwnerMutation,
 } from '@/services/dao/generated';
 import { PageLoading } from '@ant-design/pro-layout';
 import { getCurrentPage } from '@/utils/utils';
 import { UserOutlined } from '@ant-design/icons';
 import { history } from '@@/core/history';
+import styles from './index.less';
+import GlobalModal from '@/components/Modal';
+import moment from 'moment';
 
 const ownerColumns = (
   daoId: string,
+  pairTypeFilter: number[] | undefined,
   updateJobPairType: (recordId: string, pairType: number) => void,
 ) => {
   return [
@@ -75,16 +82,16 @@ const ownerColumns = (
       dataIndex: ['datum', 'pairType'],
       key: 'pairType',
       filters: [
-        { text: 'All Vote', value: 0 },
-        { text: 'Pair Vote', value: 1 },
+        { text: 'All Vote', value: 1 },
+        { text: 'Pair Vote', value: 0 },
       ],
       filterMultiple: false,
-      filteredValue: [0],
+      filteredValue: pairTypeFilter,
       render: (_: any, record: JobQuery) => (
         <Select
-          defaultValue={record.datum?.pairType}
+          value={record.datum?.pairType}
           options={[
-            { value: 0, label: 'All Vote' },
+            { value: 1, label: 'All Vote' },
             { value: 0, label: 'Pair Vote' },
           ]}
           style={{ width: 110 }}
@@ -147,17 +154,31 @@ const columns = (daoId: string) => {
   ];
 };
 
-export const OwnerDaoCycleJob: React.FC<DaoCycleProps> = ({ cycleId, daoId }) => {
+const convertFilterDefault = (pairType: JobsQueryPairTypeEnum | undefined | null) => {
+  if (pairType === JobsQueryPairTypeEnum.Pair) return [0];
+  if (pairType === JobsQueryPairTypeEnum.All) return [1];
+  return undefined;
+};
+
+export const OwnerDaoCycleJob: React.FC<DaoCycleProps> = ({ cycleId, cycle, daoId }) => {
   const intl = useIntl();
   const [queryVariables, setQueryVariables] = useState<CycleJobListQueryVariables>({
     cycleId,
     first: 10,
     offset: 0,
-    pairType: JobsQueryPairTypeEnum.Pair,
   });
-
+  const [pairingModalVisible, setPairingModalVisible] = useState(false);
+  const [pairing, setPairing] = useState<Record<string, any>>({});
+  const [statusProps, setStatusProps] = useState<Record<string, any>>({});
+  const [pairingPercent, setPairingPercent] = useState<number>(0);
+  const {
+    data: pairStatusData,
+    loading: pairStatusLoading,
+    refetch: pairStatusRefetch,
+  } = useCyclePairStatusQuery({ variables: { cycleId } });
   const { data, loading, error, refetch } = useCycleJobListQuery({ variables: queryVariables });
   const [updateCycleJobVoteTypeByOwnerMutation] = useUpdateCycleJobVoteTypeByOwnerMutation();
+  const [beginCyclePairTaskMutation] = useBeginCyclePairTaskMutation();
   const tableChange = useCallback(
     (pagination: TablePaginationConfig, filters: any, sorter: any) => {
       let sorted: JobsQuerySortedEnum | undefined;
@@ -174,13 +195,20 @@ export const OwnerDaoCycleJob: React.FC<DaoCycleProps> = ({ cycleId, daoId }) =>
       if (sorter && sorter.order === 'descend') {
         sortedType = JobsQuerySortedTypeEnum.Desc;
       }
-      console.log(filters);
+      let pairType: JobsQueryPairTypeEnum | undefined;
+      if (filters.pairType && filters.pairType.includes(1)) {
+        pairType = JobsQueryPairTypeEnum.All;
+      }
+      if (filters.pairType && filters.pairType.includes(0)) {
+        pairType = JobsQueryPairTypeEnum.Pair;
+      }
       setQueryVariables((old) => ({
         ...old,
         first: pagination.pageSize,
         offset: ((pagination.current || 1) - 1) * (pagination.pageSize || 10),
         sorted,
         sortedType,
+        pairType,
       }));
     },
     [],
@@ -196,23 +224,115 @@ export const OwnerDaoCycleJob: React.FC<DaoCycleProps> = ({ cycleId, daoId }) =>
           variables: { jobId: recordId, voteType: updPairType },
         });
         await refetch();
+        message.info('Update Job Pair Type Success');
       } catch (e) {
         message.error('Update Job Pair Type Failed');
       }
     },
     [refetch, updateCycleJobVoteTypeByOwnerMutation],
   );
-  if (loading || error) {
+  const beginPairing = useCallback(
+    async (percent: number) => {
+      try {
+        setPairing({ footer: null });
+        const ps = await pairStatusRefetch();
+        if (ps.data.cycle?.pairTask?.status === CycleVotePairTaskStatusEnum.Success) {
+          setPairingPercent(100);
+          setStatusProps({ status: 'success' });
+        } else if (ps.data.cycle?.pairTask?.status === CycleVotePairTaskStatusEnum.Fail) {
+          setPairingPercent(100);
+          setStatusProps({ status: 'exception' });
+        } else {
+          setPairingPercent(percent);
+          setTimeout(async () => await beginPairing(percent + 6), 2000);
+        }
+      } catch (e) {
+        setPairingPercent(0);
+        setStatusProps({ status: 'exception' });
+      }
+    },
+    [pairStatusRefetch],
+  );
+  if (pairStatusLoading || loading || error) {
     return <PageLoading />;
   }
-
+  const pairStatus = pairStatusData?.cycle?.pairTask?.status;
+  const disablePairingButton =
+    parseInt(moment.utc().format('X'), 10) < (cycle?.pairBeginAt || 0) ||
+    parseInt(moment.utc().format('X'), 10) > (cycle?.pairEndAt || 0);
   return (
     <>
-      <Button type="primary" size="large">
-        {intl.formatMessage({ id: 'pages.dao.component.dao_cycle_job.button.pair' })}
-      </Button>
+      {(pairStatus == null || false) && (
+        <Button
+          type="primary"
+          size="large"
+          disabled={disablePairingButton}
+          onClick={() => setPairingModalVisible(true)}
+          className={styles.ownerButton}
+        >
+          {intl.formatMessage({ id: 'pages.dao.component.dao_cycle_job.button.pair' })}
+        </Button>
+      )}
+      {(pairStatus === CycleVotePairTaskStatusEnum.Init ||
+        pairStatus === CycleVotePairTaskStatusEnum.Pairing) && (
+        <Button
+          type="primary"
+          loading={true}
+          size="large"
+          disabled={disablePairingButton}
+          className={styles.ownerButton}
+        >
+          {intl.formatMessage({ id: 'pages.dao.component.dao_cycle_job.button.pair' })}
+        </Button>
+      )}
+      {(pairStatus === CycleVotePairTaskStatusEnum.Success ||
+        pairStatus === CycleVotePairTaskStatusEnum.Fail) && (
+        <Button
+          type="primary"
+          size="large"
+          disabled={disablePairingButton}
+          onClick={() => setPairingModalVisible(true)}
+          className={styles.ownerButton}
+        >
+          {intl.formatMessage({ id: 'pages.dao.component.dao_cycle_job.button.repair' })}
+        </Button>
+      )}
+
+      <GlobalModal
+        key={'pairingModal'}
+        onOk={async () => {
+          beginPairing(0);
+          await beginCyclePairTaskMutation({ variables: { cycleId } });
+        }}
+        destroyOnClose={true}
+        onCancel={() => {
+          setPairingModalVisible(false);
+          setPairing({});
+          setStatusProps({});
+        }}
+        okText={intl.formatMessage({ id: 'pages.dao.component.dao_cycle_job.modal.ok' })}
+        cancelText={intl.formatMessage({ id: 'pages.dao.component.dao_cycle_job.modal.cancel' })}
+        visible={pairingModalVisible}
+        {...pairing}
+      >
+        {pairing.footer !== null && (
+          <div className={styles.modalDesc}>
+            {intl.formatMessage({ id: 'pages.dao.component.dao_cycle_job.modal.desc' })}
+          </div>
+        )}
+        {pairing.footer === null && (
+          <div className={styles.modalProgress}>
+            <Progress type="circle" percent={pairingPercent} {...statusProps} />
+          </div>
+        )}
+      </GlobalModal>
+
       <Table<JobQuery>
-        columns={ownerColumns(daoId || '', updateJobPairType)}
+        columns={ownerColumns(
+          daoId || '',
+          convertFilterDefault(queryVariables.pairType),
+          updateJobPairType,
+        )}
         loading={loading}
         rowKey={(record) => record?.datum?.id || ''}
         dataSource={data?.cycle?.jobs?.nodes as any}

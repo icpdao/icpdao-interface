@@ -139,3 +139,27 @@ mutation UpdateOwnerEI($statId: String!, $ownerEi: Decimal!) {
     voteEi
   }
 }
+
+mutation BeginCyclePairTask($cycleId: String!) {
+  createCycleVotePairTaskByOwner(cycleId: $cycleId) {
+    status
+  }
+}
+
+mutation BeginCycleVoteResultTask($cycleId: String!) {
+  createCycleVoteResultStatTaskByOwner(cycleId: $cycleId) {
+    status
+  }
+}
+
+mutation PublishCycle($cycleId: String!) {
+  publishCycleVoteResultByOwner(cycleId: $cycleId) {
+    ok
+  }
+}
+
+mutation UpdateVotePairPublic($voteId: String!, $isPublic: Boolean!) {
+  changeVoteResultPublic(id: $voteId, public: $isPublic) {
+    ok
+  }
+}

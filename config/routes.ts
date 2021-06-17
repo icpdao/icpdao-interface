@@ -54,6 +54,10 @@
     component: './Job',
   },
   {
+    path: '/dao/:daoId/:cycleId/vote',
+    component: './Dao/Vote',
+  },
+  {
     component: './404',
   },
 ];
