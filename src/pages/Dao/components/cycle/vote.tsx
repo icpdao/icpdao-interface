@@ -309,9 +309,7 @@ const DaoCycleVote: React.FC<DaoCycleProps> = ({ cycleId, cycle, userRole }) => 
     return <PageLoading />;
   }
 
-  const isCycleVoting =
-    parseInt(moment.utc().format('X'), 10) <= (cycle?.voteEndAt || 0) &&
-    parseInt(moment.utc().format('X'), 10) >= (cycle?.voteBeginAt || 0);
+  const isCycleVoting = parseInt(moment.utc().format('X'), 10) <= (cycle?.voteEndAt || 0);
   return (
     <>
       <Table<CycleVoteQuery>

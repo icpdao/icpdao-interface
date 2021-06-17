@@ -27,6 +27,7 @@ import moment from 'moment';
 const ownerColumns = (
   daoId: string,
   pairTypeFilter: number[] | undefined,
+  disableUpdateJobPairType: boolean,
   updateJobPairType: (recordId: string, pairType: number) => void,
 ) => {
   return [
@@ -94,6 +95,7 @@ const ownerColumns = (
             { value: 1, label: 'All Vote' },
             { value: 0, label: 'Pair Vote' },
           ]}
+          disabled={disableUpdateJobPairType}
           style={{ width: 110 }}
           onChange={(value) => updateJobPairType(record.datum?.id || '', value)}
         />
@@ -331,6 +333,7 @@ export const OwnerDaoCycleJob: React.FC<DaoCycleProps> = ({ cycleId, cycle, daoI
         columns={ownerColumns(
           daoId || '',
           convertFilterDefault(queryVariables.pairType),
+          disablePairingButton,
           updateJobPairType,
         )}
         loading={loading}

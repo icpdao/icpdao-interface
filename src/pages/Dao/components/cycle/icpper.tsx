@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import type { TablePaginationConfig } from 'antd';
 import { Avatar, Button, Space, Table, InputNumber, message, Progress } from 'antd';
 import { useIntl } from '@@/plugin-locale/localeExports';
@@ -31,6 +31,7 @@ import GlobalModal from '@/components/Modal';
 const ownerColumns = (
   daoId: string,
   currentEditing: string,
+  canUpdateOwnerEI: boolean,
   updateOwnerEI: (ownerEI: number) => void,
   beginOrEndEditing: (recordId: string) => void,
 ) => {
@@ -102,9 +103,11 @@ const ownerColumns = (
           <>
             <span style={{ color: getEIColor(record.datum.voteEi) }}>{record.datum?.voteEi}</span>
             {ownerEI}
-            <span style={{ marginLeft: 20 }}>
-              <ControlTwoTone onClick={() => beginOrEndEditing(record.datum?.id || '')} />
-            </span>
+            {canUpdateOwnerEI && (
+              <span style={{ marginLeft: 20 }}>
+                <ControlTwoTone onClick={() => beginOrEndEditing(record.datum?.id || '')} />
+              </span>
+            )}
           </>
         );
       },
@@ -210,7 +213,7 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
   });
   const [editingRow, setEditingRow] = useState<string>();
   const [editingOwnerEI, setEditingOwnerEI] = useState<number | undefined>();
-
+  const [canUpdateOwnerEI, setCanUpdateOwnerEI] = useState<boolean>(false);
   const [resultModalVisible, setResultModalVisible] = useState(false);
   const [resultStating, setResultStating] = useState<Record<string, any>>({});
   const [statusProps, setStatusProps] = useState<Record<string, any>>({});
@@ -235,6 +238,7 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
         ) {
           setResultPercent(100);
           setStatusProps({ status: 'success' });
+          setCanUpdateOwnerEI(true);
         } else if (
           ps.data.cycle?.voteResultStatTask?.status === CycleVoteResultStatTaskStatusEnum.Fail
         ) {
@@ -303,6 +307,9 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
     setEditingRow('');
     setEditingOwnerEI(undefined);
   }, []);
+  useEffect(() => {
+    setCanUpdateOwnerEI(!!cycle && !!cycle.voteResultStatAt && !cycle.voteResultPublishedAt);
+  }, [cycle]);
   if (loading || error) {
     return <PageLoading />;
   }
@@ -325,7 +332,7 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
             try {
               const pcm = await publishCycleMutation({ variables: { cycleId } });
               if (pcm.data?.publishCycleVoteResultByOwner?.ok)
-                message.info('Publish Cycle EI Success');
+                message.success('Publish Cycle EI Success');
               else message.error('Publish Cycle EI Success');
             } catch (e) {
               message.error('Publish Cycle EI Failed');
@@ -382,6 +389,7 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
         columns={ownerColumns(
           daoId || '',
           editingRow || '',
+          canUpdateOwnerEI,
           changeEditingOwnerEI,
           beginOrEndEditing,
         )}
