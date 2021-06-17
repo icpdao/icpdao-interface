@@ -7,6 +7,7 @@ import { DaoCycleIcpper, OwnerDaoCycleIcpper } from './icpper';
 import { DaoCycleJob, OwnerDaoCycleJob } from './job';
 import DaoCycleVote from './vote';
 import styles from './index.less';
+import type { CycleSchema } from '@/services/dao/generated';
 import { useCycleStatDataQuery } from '@/services/dao/generated';
 import { PageLoading } from '@ant-design/pro-layout';
 
@@ -14,12 +15,13 @@ const { TabPane } = Tabs;
 
 export type DaoCycleProps = {
   cycleId: string;
+  cycle?: CycleSchema;
   userRole?: 'owner' | 'icpper' | 'normal';
   activeTab?: 'icpper' | 'job' | 'vote';
   daoId?: string;
 };
 
-const DaoCycleIndex: React.FC<DaoCycleProps> = ({ cycleId, daoId, userRole, activeTab }) => {
+const DaoCycleIndex: React.FC<DaoCycleProps> = ({ cycleId, cycle, daoId, userRole, activeTab }) => {
   const intl = useIntl();
   const { data, loading, error } = useCycleStatDataQuery({ variables: { cycleId } });
 
@@ -41,7 +43,7 @@ const DaoCycleIndex: React.FC<DaoCycleProps> = ({ cycleId, daoId, userRole, acti
       number: data?.cycle?.stat?.size || 0,
     },
     {
-      title: '/SHT',
+      title: 'SHT',
       number: 0,
     },
   ];
@@ -54,20 +56,24 @@ const DaoCycleIndex: React.FC<DaoCycleProps> = ({ cycleId, daoId, userRole, acti
           tab={<FormattedMessage id={'pages.dao.component.dao_cycle.tab.icpper'} />}
           key="icpper"
         >
-          {userRole === 'owner' && <OwnerDaoCycleIcpper cycleId={cycleId} daoId={daoId} />}
+          {userRole === 'owner' && (
+            <OwnerDaoCycleIcpper cycle={cycle} cycleId={cycleId} daoId={daoId} />
+          )}
           {userRole !== 'owner' && <DaoCycleIcpper cycleId={cycleId} daoId={daoId} />}
         </TabPane>
 
         <TabPane tab={<FormattedMessage id={'pages.dao.component.dao_cycle.tab.job'} />} key="job">
-          {userRole === 'owner' && <DaoCycleJob cycleId={cycleId} daoId={daoId} />}
-          {userRole !== 'owner' && <OwnerDaoCycleJob cycleId={cycleId} daoId={daoId} />}
+          {userRole === 'owner' && (
+            <OwnerDaoCycleJob cycle={cycle} cycleId={cycleId} daoId={daoId} />
+          )}
+          {userRole !== 'owner' && <DaoCycleJob cycleId={cycleId} daoId={daoId} />}
         </TabPane>
 
         <TabPane
           tab={<FormattedMessage id={'pages.dao.component.dao_cycle.tab.vote'} />}
           key="vote"
         >
-          <DaoCycleVote cycleId={cycleId} userRole={userRole} />
+          <DaoCycleVote cycleId={cycleId} cycle={cycle} userRole={userRole} />
         </TabPane>
       </Tabs>
     </>

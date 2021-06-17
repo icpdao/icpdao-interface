@@ -65,6 +65,12 @@ export const getTimeDistanceDays = (timeA: number, timeB: number): number => {
   return Math.round(moment.duration(a.diff(b, 'seconds'), 'seconds').asDays());
 };
 
+export const getTimeDistanceHumanize = (time: number): string => {
+  const a = moment.utc();
+  const b = moment.unix(time);
+  return moment.duration(b.diff(a)).humanize();
+};
+
 export const getFormatTime = (time: number, format: string): string => {
   return moment.unix(time).format(format);
 };
