@@ -125,10 +125,10 @@ export const getDaysHours = () => {
 };
 
 export const getEIColor = (ei: number) => {
-  let voteEIColor: string = '#262626';
-  if (ei <= 0.4) {
+  let voteEIColor: string = 'inherit';
+  if (ei < 0.4) {
     voteEIColor = '#ED6C6C';
-  } else if (ei <= 0.8) {
+  } else if (ei < 0.8) {
     voteEIColor = '#F1C84C';
   } else if (ei >= 1.2) {
     voteEIColor = '#2CA103';

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import type { TablePaginationConfig } from 'antd';
-import { Avatar, Button, Space, Table, InputNumber, message, Progress } from 'antd';
+import { Avatar, Button, Space, Table, InputNumber, message, Progress, Tooltip } from 'antd';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { FormattedMessage } from 'umi';
 import type { DaoCycleProps } from '@/pages/Dao/components/cycle/index';
@@ -12,23 +12,57 @@ import type {
 import {
   CycleIcpperStatSortedEnum,
   CycleIcpperStatSortedTypeEnum,
+  CycleVoteResultPublishTaskStatusEnum,
   CycleVoteResultStatTaskStatusEnum,
   useBeginCycleVoteResultTaskMutation,
+  useBeginPublishCycleTaskMutation,
   useCycleIcpperListQuery,
+  useCyclePublishStatusQuery,
   useCycleVoteResultStatusQuery,
   useOwnerCycleIcpperListQuery,
-  usePublishCycleMutation,
   useUpdateOwnerEiMutation,
 } from '@/services/dao/generated';
 import { PageLoading } from '@ant-design/pro-layout';
-import { UserOutlined, ControlTwoTone, ExclamationCircleTwoTone } from '@ant-design/icons';
+import { UserOutlined, ControlTwoTone, ExclamationCircleFilled } from '@ant-design/icons';
 import { history } from '@@/core/history';
 import { getCurrentPage, getEIColor } from '@/utils/utils';
 import styles from './index.less';
 import moment from 'moment';
 import GlobalModal from '@/components/Modal';
 
+const colorTooltip = (color: string, tipsText: string) => {
+  if (tipsText === '') return <></>;
+  return (
+    <Tooltip placement="right" title={tipsText}>
+      <ExclamationCircleFilled style={{ color, fontSize: 18, marginLeft: 10 }} />
+    </Tooltip>
+  );
+};
+
+const renderSize = (intl: any, record: IcpperStatQuery) => {
+  if (!record?.datum?.size) return <>-</>;
+  let color = '#262626';
+  const tips: string[] = [];
+  if (record.datum.haveTwoTimesLt08)
+    tips.push(intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.tips.1' }));
+  if (record.datum.haveTwoTimesLt04)
+    tips.push(intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.tips.2' }));
+  if (record.datum.beDeductedSizeByReview && record.datum.beDeductedSizeByReview > 0)
+    tips.push(intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.tips.3' }));
+  if (record.datum.unVotedAllVote)
+    tips.push(intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.tips.4' }));
+  const tipsText = tips.join(' ');
+  if (tips.length > 0) color = '#ED6C6C';
+  return (
+    <>
+      <span style={{ color }}>{record.datum?.size}</span>
+      {colorTooltip(color, tipsText)}
+    </>
+  );
+};
+
 const ownerColumns = (
+  intl: any,
   daoId: string,
   currentEditing: string,
   canUpdateOwnerEI: boolean,
@@ -64,6 +98,7 @@ const ownerColumns = (
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.size" />,
       dataIndex: ['datum', 'size'],
       sorter: true,
+      render: (_: any, record: IcpperStatQuery) => renderSize(intl, record),
     },
     {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.income" />,
@@ -75,7 +110,30 @@ const ownerColumns = (
       dataIndex: ['datum', 'ei'],
       render: (_: any, record: IcpperStatQuery) => {
         if (!record?.datum?.voteEi) return <></>;
+        const tips: string[] = [];
+        let color: string = 'inherit';
+        if (record.datum.ei < 0.4) {
+          color = '#ED6C6C';
+          tips.push(intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.tips.7' }));
+        } else if (record.datum.ei < 0.8) {
+          color = '#F1C84C';
+          tips.push(intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.tips.6' }));
+        } else if (record.datum.ei >= 1.2) {
+          color = '#2CA103';
+          tips.push(intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.tips.5' }));
+        }
 
+        if (record.beReviewerHasWarningUsers && record.beReviewerHasWarningUsers.length > 0) {
+          color = '#ED6C6C';
+          tips.push(
+            intl.formatMessage(
+              { id: 'pages.dao.component.dao_cycle_icpper.tips.8' },
+              { nicknames: record.beReviewerHasWarningUsers.map((d) => d?.nickname).join(' @') },
+            ),
+          );
+        }
+
+        const tipsText = tips.join(' ');
         let ownerEI;
         if (currentEditing === record.datum.id) {
           ownerEI = (
@@ -93,21 +151,22 @@ const ownerColumns = (
           );
         } else {
           if (record.datum.ownerEi && record.datum.ownerEi > 0) {
-            ownerEI = <span style={{ color: '#2CA103' }}>+{record.datum?.ownerEi}</span>;
+            ownerEI = <span style={{ color }}>+{record.datum?.ownerEi}</span>;
           }
           if (record.datum.ownerEi && record.datum.ownerEi < 0) {
-            ownerEI = <span style={{ color: '#ED6C6C' }}>-{-record.datum?.ownerEi}</span>;
+            ownerEI = <span style={{ color }}>-{-record.datum?.ownerEi}</span>;
           }
         }
         return (
           <>
-            <span style={{ color: getEIColor(record.datum.voteEi) }}>{record.datum?.voteEi}</span>
+            <span style={{ color }}>{record.datum?.voteEi}</span>
             {ownerEI}
             {canUpdateOwnerEI && (
               <span style={{ marginLeft: 20 }}>
                 <ControlTwoTone onClick={() => beginOrEndEditing(record.datum?.id || '')} />
               </span>
             )}
+            {!canUpdateOwnerEI && tips.length > 0 && colorTooltip(color, tipsText)}
           </>
         );
       },
@@ -127,7 +186,7 @@ const ownerColumns = (
   ];
 };
 
-const columns = (daoId: string) => {
+const columns = (intl: any, daoId: string) => {
   return [
     {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.icpper" />,
@@ -156,21 +215,8 @@ const columns = (daoId: string) => {
     {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.size" />,
       dataIndex: ['datum', 'size'],
-      render: (_: any, record: IcpperStatQuery) => (
-        <>
-          {record.datum?.size}
-          {record.datum?.size && record.datum?.size >= 1.2 && (
-            <ExclamationCircleTwoTone twoToneColor={'#2CA103'} />
-          )}
-          {record.datum?.size && record.datum?.size <= 0.8 && record.datum?.size > 0.4 && (
-            <ExclamationCircleTwoTone twoToneColor={'#F1C84C'} />
-          )}
-          {record.datum?.size && record.datum?.size <= 0.4 && (
-            <ExclamationCircleTwoTone twoToneColor={'#ED6C6C'} />
-          )}
-        </>
-      ),
       sorter: true,
+      render: (_: any, record: IcpperStatQuery) => renderSize(intl, record),
     },
     {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.income" />,
@@ -182,9 +228,34 @@ const columns = (daoId: string) => {
       dataIndex: ['datum', 'ei'],
       render: (_: any, record: IcpperStatQuery) => {
         if (!record?.datum?.ei) return <>-</>;
+        const tips: string[] = [];
+        let color: string = 'inherit';
+        if (record.datum.ei < 0.4) {
+          color = '#ED6C6C';
+          tips.push(intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.tips.7' }));
+        } else if (record.datum.ei < 0.8) {
+          color = '#F1C84C';
+          tips.push(intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.tips.6' }));
+        } else if (record.datum.ei >= 1.2) {
+          color = '#2CA103';
+          tips.push(intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.tips.5' }));
+        }
+
+        if (record.beReviewerHasWarningUsers && record.beReviewerHasWarningUsers.length > 0) {
+          color = '#ED6C6C';
+          tips.push(
+            intl.formatMessage(
+              { id: 'pages.dao.component.dao_cycle_icpper.tips.8' },
+              { nicknames: record.beReviewerHasWarningUsers.map((d) => d?.nickname).join(' @') },
+            ),
+          );
+        }
+
+        const tipsText = tips.join(' ');
         return (
           <>
             <span style={{ color: getEIColor(record.datum.ei) }}>{record.datum?.ei}</span>
+            {tips.length > 0 && colorTooltip(color, tipsText)}
           </>
         );
       },
@@ -215,9 +286,13 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
   const [editingOwnerEI, setEditingOwnerEI] = useState<number | undefined>();
   const [canUpdateOwnerEI, setCanUpdateOwnerEI] = useState<boolean>(false);
   const [resultModalVisible, setResultModalVisible] = useState(false);
+  const [publishModalVisible, setPublishModalVisible] = useState(false);
   const [resultStating, setResultStating] = useState<Record<string, any>>({});
+  const [publishStating, setPublishStating] = useState<Record<string, any>>({});
   const [statusProps, setStatusProps] = useState<Record<string, any>>({});
+  const [publishStatusProps, setPublishStatusProps] = useState<Record<string, any>>({});
   const [resultPercent, setResultPercent] = useState<number>(0);
+  const [publishResultPercent, setPublishResultPercent] = useState<number>(0);
 
   const { data, loading, error, refetch } = useOwnerCycleIcpperListQuery({
     variables: queryVariable,
@@ -225,9 +300,14 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
   const { data: voteResultData, refetch: voteResultDataRefetch } = useCycleVoteResultStatusQuery({
     variables: { cycleId },
   });
+  const { data: publishResultData, refetch: publishResultDataRefetch } = useCyclePublishStatusQuery(
+    {
+      variables: { cycleId },
+    },
+  );
   const [beginCycleVoteResultTaskMutation] = useBeginCycleVoteResultTaskMutation();
+  const [beginPublishCycleTaskMutation] = useBeginPublishCycleTaskMutation();
   const [updateOwnerEiMutation] = useUpdateOwnerEiMutation();
-  const [publishCycleMutation] = usePublishCycleMutation();
   const beginVoteResultStat = useCallback(
     async (percent: number) => {
       try {
@@ -255,13 +335,41 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
     },
     [voteResultDataRefetch],
   );
+  const beginPublishResultStat = useCallback(
+    async (percent: number) => {
+      try {
+        setPublishStating({ footer: null });
+        const ps = await publishResultDataRefetch();
+        if (
+          ps.data.cycle?.voteResultPublishTask?.status ===
+          CycleVoteResultPublishTaskStatusEnum.Success
+        ) {
+          setPublishResultPercent(100);
+          setPublishStatusProps({ status: 'success' });
+          setCanUpdateOwnerEI(false);
+        } else if (
+          ps.data.cycle?.voteResultPublishTask?.status === CycleVoteResultPublishTaskStatusEnum.Fail
+        ) {
+          setPublishResultPercent(100);
+          setPublishStatusProps({ status: 'exception' });
+        } else {
+          setPublishResultPercent(percent);
+          setTimeout(async () => await beginPublishResultStat(percent + 6), 2000);
+        }
+      } catch (e) {
+        setPublishResultPercent(0);
+        setPublishStatusProps({ status: 'exception' });
+      }
+    },
+    [publishResultDataRefetch],
+  );
   const beginOrEndEditing = useCallback(
     async (recordId: string) => {
       if (editingRow === recordId) {
         if (editingOwnerEI !== undefined) {
           try {
             await updateOwnerEiMutation({
-              variables: { statId: recordId, ownerEi: editingOwnerEI },
+              variables: { statId: recordId, ownerEi: editingOwnerEI.toString() },
             });
             await refetch();
           } catch (e) {
@@ -315,7 +423,10 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
   }
 
   const voteResultStatus = voteResultData?.cycle?.voteResultStatTask?.status;
-  const disablePublishButton = !!cycle?.voteResultPublishedAt && cycle?.voteResultPublishedAt > 0;
+  const publishResultStatus = publishResultData?.cycle?.voteResultPublishTask?.status;
+  const disablePublishButton =
+    (!!cycle?.voteResultPublishedAt && cycle?.voteResultPublishedAt > 0) ||
+    (!!publishResultStatus && publishResultStatus !== CycleVoteResultPublishTaskStatusEnum.Fail);
   const disableCountEIButton = parseInt(moment.utc().format('X'), 10) < (cycle?.voteEndAt || 0);
   const loadingCountEIButton =
     voteResultStatus === CycleVoteResultStatTaskStatusEnum.Init ||
@@ -328,16 +439,7 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
           size="large"
           disabled={disablePublishButton}
           className={styles.ownerButton}
-          onClick={async () => {
-            try {
-              const pcm = await publishCycleMutation({ variables: { cycleId } });
-              if (pcm.data?.publishCycleVoteResultByOwner?.ok)
-                message.success('Publish Cycle EI Success');
-              else message.error('Publish Cycle EI Success');
-            } catch (e) {
-              message.error('Publish Cycle EI Failed');
-            }
-          }}
+          onClick={() => setPublishModalVisible(true)}
         >
           {intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.button.publish' })}
         </Button>
@@ -357,7 +459,7 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
       )}
 
       <GlobalModal
-        key={'pairingModal'}
+        key={'voteResultModal'}
         onOk={async () => {
           beginVoteResultStat(0);
           await beginCycleVoteResultTaskMutation({ variables: { cycleId } });
@@ -375,7 +477,9 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
       >
         {resultStating.footer !== null && (
           <div className={styles.modalDesc}>
-            {intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.modal.desc' })}
+            {intl.formatMessage({
+              id: 'pages.dao.component.dao_cycle_icpper.vote_result.modal.desc',
+            })}
           </div>
         )}
         {resultStating.footer === null && (
@@ -385,8 +489,38 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
         )}
       </GlobalModal>
 
+      <GlobalModal
+        key={'publishModal'}
+        onOk={async () => {
+          beginPublishResultStat(0);
+          await beginPublishCycleTaskMutation({ variables: { cycleId } });
+        }}
+        destroyOnClose={true}
+        onCancel={() => {
+          setPublishModalVisible(false);
+          setPublishStating({});
+          setPublishStatusProps({});
+        }}
+        okText={intl.formatMessage({ id: 'pages.dao.component.dao_cycle_job.modal.ok' })}
+        cancelText={intl.formatMessage({ id: 'pages.dao.component.dao_cycle_job.modal.cancel' })}
+        visible={publishModalVisible}
+        {...publishStating}
+      >
+        {publishStating.footer !== null && (
+          <div className={styles.modalDesc}>
+            {intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.publish.modal.desc' })}
+          </div>
+        )}
+        {publishStating.footer === null && (
+          <div className={styles.modalProgress}>
+            <Progress type="circle" percent={publishResultPercent} {...publishStatusProps} />
+          </div>
+        )}
+      </GlobalModal>
+
       <Table<IcpperStatQuery>
         columns={ownerColumns(
+          intl,
           daoId || '',
           editingRow || '',
           canUpdateOwnerEI,
@@ -410,7 +544,7 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
 };
 
 export const DaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycleId, daoId }) => {
-  // const intl = useIntl();
+  const intl = useIntl();
   const [queryVariable, setQueryVariable] = useState<CycleIcpperListQueryVariables>({
     cycleId,
     first: 20,
@@ -452,7 +586,7 @@ export const DaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycleId, daoId }) => {
   return (
     <>
       <Table<IcpperStatQuery>
-        columns={columns(daoId || '')}
+        columns={columns(intl, daoId || '')}
         loading={loading}
         rowKey={(record) => record?.datum?.id || ''}
         dataSource={data?.cycle?.icpperStats?.nodes as any}

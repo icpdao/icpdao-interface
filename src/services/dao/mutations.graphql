@@ -152,9 +152,9 @@ mutation BeginCycleVoteResultTask($cycleId: String!) {
   }
 }
 
-mutation PublishCycle($cycleId: String!) {
-  publishCycleVoteResultByOwner(cycleId: $cycleId) {
-    ok
+mutation BeginPublishCycleTask($cycleId: String!) {
+  createCycleVoteResultPublishTaskByOwner(cycleId: $cycleId) {
+    status
   }
 }
 
