@@ -26,6 +26,18 @@ export type CreateCycleVotePairTaskByOwner = {
   status?: Maybe<CreateCycleVoteResultStatTaskByOwnerStatusEnum>;
 };
 
+export type CreateCycleVoteResultPublishTaskByOwner = {
+  __typename?: 'CreateCycleVoteResultPublishTaskByOwner';
+  status?: Maybe<CreateCycleVoteResultPublishTaskByOwnerStatusEnum>;
+};
+
+export enum CreateCycleVoteResultPublishTaskByOwnerStatusEnum {
+  Init = 'INIT',
+  Running = 'RUNNING',
+  Success = 'SUCCESS',
+  Fail = 'FAIL',
+}
+
 export type CreateCycleVoteResultStatTaskByOwner = {
   __typename?: 'CreateCycleVoteResultStatTaskByOwner';
   status?: Maybe<CreateCycleVoteResultStatTaskByOwnerStatusEnum>;
@@ -62,15 +74,19 @@ export enum CycleFilterEnum {
 
 export type CycleIcpperStatSchema = {
   __typename?: 'CycleIcpperStatSchema';
+  beDeductedSizeByReview?: Maybe<Scalars['Float']>;
   createAt: Scalars['Int'];
   cycleId: Scalars['String'];
   daoId: Scalars['String'];
   ei: Scalars['Float'];
+  haveTwoTimesLt04?: Maybe<Scalars['Boolean']>;
+  haveTwoTimesLt08?: Maybe<Scalars['Boolean']>;
   /** _id */
   id?: Maybe<Scalars['ID']>;
   income: Scalars['Int'];
   jobCount: Scalars['Int'];
   jobSize: Scalars['Float'];
+  lastId?: Maybe<Scalars['String']>;
   ownerEi: Scalars['Float'];
   size: Scalars['Float'];
   unVotedAllVote?: Maybe<Scalars['Boolean']>;
@@ -99,6 +115,7 @@ export type CycleQuery = {
   votes?: Maybe<CycleVotesQuery>;
   pairTask?: Maybe<CycleVotePairTaskQuery>;
   voteResultStatTask?: Maybe<CycleVoteResultStatTaskQuery>;
+  voteResultPublishTask?: Maybe<CycleVoteResultPublishTaskQuery>;
 };
 
 export type CycleQueryIcpperStatsArgs = {
@@ -170,6 +187,18 @@ export type CycleVoteQuery = {
   voter?: Maybe<UserSchema>;
   selfVoteResultTypeAll?: Maybe<CycleVoteResultTypeAllResultTypeEnum>;
 };
+
+export type CycleVoteResultPublishTaskQuery = {
+  __typename?: 'CycleVoteResultPublishTaskQuery';
+  status?: Maybe<CycleVoteResultPublishTaskStatusEnum>;
+};
+
+export enum CycleVoteResultPublishTaskStatusEnum {
+  Init = 'INIT',
+  Running = 'RUNNING',
+  Success = 'SUCCESS',
+  Fail = 'FAIL',
+}
 
 export type CycleVoteResultStatTaskQuery = {
   __typename?: 'CycleVoteResultStatTaskQuery';
@@ -351,6 +380,7 @@ export type IcpperStatQuery = {
   datum?: Maybe<CycleIcpperStatSchema>;
   lastEi?: Maybe<Scalars['Decimal']>;
   icpper?: Maybe<UserSchema>;
+  beReviewerHasWarningUsers?: Maybe<Array<Maybe<UserSchema>>>;
 };
 
 export type IcpperStatsQuery = {
@@ -468,13 +498,13 @@ export type Mutations = {
   updateJob?: Maybe<UpdateJob>;
   updateJobVoteTypeByOwner?: Maybe<UpdateJobVoteTypeByOwner>;
   updateIcpperStatOwnerEi?: Maybe<UpdateIcpperStatOwnerEi>;
-  publishCycleVoteResultByOwner?: Maybe<PublishCycleVoteResultByOwner>;
   updatePairVote?: Maybe<UpdatePairVote>;
   updateAllVote?: Maybe<UpdateAllVote>;
   createCycleVotePairTaskByOwner?: Maybe<CreateCycleVotePairTaskByOwner>;
   changeVoteResultPublic?: Maybe<ChangeVoteResultPublic>;
   createMock?: Maybe<CreateMock>;
   createCycleVoteResultStatTaskByOwner?: Maybe<CreateCycleVoteResultStatTaskByOwner>;
+  createCycleVoteResultPublishTaskByOwner?: Maybe<CreateCycleVoteResultPublishTaskByOwner>;
 };
 
 export type MutationsCreateDaoArgs = {
@@ -534,10 +564,6 @@ export type MutationsUpdateIcpperStatOwnerEiArgs = {
   ownerEi?: Maybe<Scalars['Decimal']>;
 };
 
-export type MutationsPublishCycleVoteResultByOwnerArgs = {
-  cycleId: Scalars['String'];
-};
-
 export type MutationsUpdatePairVoteArgs = {
   id: Scalars['String'];
   voteJobId: Scalars['String'];
@@ -566,9 +592,8 @@ export type MutationsCreateCycleVoteResultStatTaskByOwnerArgs = {
   cycleId: Scalars['String'];
 };
 
-export type PublishCycleVoteResultByOwner = {
-  __typename?: 'PublishCycleVoteResultByOwner';
-  ok?: Maybe<Scalars['Boolean']>;
+export type MutationsCreateCycleVoteResultPublishTaskByOwnerArgs = {
+  cycleId: Scalars['String'];
 };
 
 export type Query = {
@@ -906,13 +931,16 @@ export type BeginCycleVoteResultTaskMutation = { __typename?: 'Mutations' } & {
   >;
 };
 
-export type PublishCycleMutationVariables = Exact<{
+export type BeginPublishCycleTaskMutationVariables = Exact<{
   cycleId: Scalars['String'];
 }>;
 
-export type PublishCycleMutation = { __typename?: 'Mutations' } & {
-  publishCycleVoteResultByOwner?: Maybe<
-    { __typename?: 'PublishCycleVoteResultByOwner' } & Pick<PublishCycleVoteResultByOwner, 'ok'>
+export type BeginPublishCycleTaskMutation = { __typename?: 'Mutations' } & {
+  createCycleVoteResultPublishTaskByOwner?: Maybe<
+    { __typename?: 'CreateCycleVoteResultPublishTaskByOwner' } & Pick<
+      CreateCycleVoteResultPublishTaskByOwner,
+      'status'
+    >
   >;
 };
 
@@ -1184,13 +1212,26 @@ export type CycleIcpperListQuery = { __typename?: 'Query' } & {
                       datum?: Maybe<
                         { __typename?: 'CycleIcpperStatSchema' } & Pick<
                           CycleIcpperStatSchema,
-                          'id' | 'jobCount' | 'size' | 'income' | 'ei'
+                          | 'id'
+                          | 'jobCount'
+                          | 'size'
+                          | 'income'
+                          | 'ei'
+                          | 'beDeductedSizeByReview'
+                          | 'haveTwoTimesLt04'
+                          | 'haveTwoTimesLt08'
+                          | 'unVotedAllVote'
                         >
                       >;
                       icpper?: Maybe<
                         { __typename?: 'UserSchema' } & Pick<
                           UserSchema,
                           'id' | 'avatar' | 'nickname' | 'githubLogin'
+                        >
+                      >;
+                      beReviewerHasWarningUsers?: Maybe<
+                        Array<
+                          Maybe<{ __typename?: 'UserSchema' } & Pick<UserSchema, 'id' | 'nickname'>>
                         >
                       >;
                     }
@@ -1223,13 +1264,28 @@ export type OwnerCycleIcpperListQuery = { __typename?: 'Query' } & {
                       datum?: Maybe<
                         { __typename?: 'CycleIcpperStatSchema' } & Pick<
                           CycleIcpperStatSchema,
-                          'id' | 'jobCount' | 'size' | 'income' | 'ei' | 'ownerEi' | 'voteEi'
+                          | 'id'
+                          | 'jobCount'
+                          | 'size'
+                          | 'income'
+                          | 'ei'
+                          | 'ownerEi'
+                          | 'voteEi'
+                          | 'beDeductedSizeByReview'
+                          | 'haveTwoTimesLt04'
+                          | 'haveTwoTimesLt08'
+                          | 'unVotedAllVote'
                         >
                       >;
                       icpper?: Maybe<
                         { __typename?: 'UserSchema' } & Pick<
                           UserSchema,
                           'id' | 'avatar' | 'nickname' | 'githubLogin'
+                        >
+                      >;
+                      beReviewerHasWarningUsers?: Maybe<
+                        Array<
+                          Maybe<{ __typename?: 'UserSchema' } & Pick<UserSchema, 'id' | 'nickname'>>
                         >
                       >;
                     }
@@ -1421,6 +1477,23 @@ export type CycleVoteResultStatusQuery = { __typename?: 'Query' } & {
       voteResultStatTask?: Maybe<
         { __typename?: 'CycleVoteResultStatTaskQuery' } & Pick<
           CycleVoteResultStatTaskQuery,
+          'status'
+        >
+      >;
+    }
+  >;
+};
+
+export type CyclePublishStatusQueryVariables = Exact<{
+  cycleId: Scalars['String'];
+}>;
+
+export type CyclePublishStatusQuery = { __typename?: 'Query' } & {
+  cycle?: Maybe<
+    { __typename?: 'CycleQuery' } & {
+      voteResultPublishTask?: Maybe<
+        { __typename?: 'CycleVoteResultPublishTaskQuery' } & Pick<
+          CycleVoteResultPublishTaskQuery,
           'status'
         >
       >;
@@ -2301,49 +2374,54 @@ export type BeginCycleVoteResultTaskMutationOptions = Apollo.BaseMutationOptions
   BeginCycleVoteResultTaskMutation,
   BeginCycleVoteResultTaskMutationVariables
 >;
-export const PublishCycleDocument = gql`
-  mutation PublishCycle($cycleId: String!) {
-    publishCycleVoteResultByOwner(cycleId: $cycleId) {
-      ok
+export const BeginPublishCycleTaskDocument = gql`
+  mutation BeginPublishCycleTask($cycleId: String!) {
+    createCycleVoteResultPublishTaskByOwner(cycleId: $cycleId) {
+      status
     }
   }
 `;
-export type PublishCycleMutationFn = Apollo.MutationFunction<
-  PublishCycleMutation,
-  PublishCycleMutationVariables
+export type BeginPublishCycleTaskMutationFn = Apollo.MutationFunction<
+  BeginPublishCycleTaskMutation,
+  BeginPublishCycleTaskMutationVariables
 >;
 
 /**
- * __usePublishCycleMutation__
+ * __useBeginPublishCycleTaskMutation__
  *
- * To run a mutation, you first call `usePublishCycleMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePublishCycleMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useBeginPublishCycleTaskMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useBeginPublishCycleTaskMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [publishCycleMutation, { data, loading, error }] = usePublishCycleMutation({
+ * const [beginPublishCycleTaskMutation, { data, loading, error }] = useBeginPublishCycleTaskMutation({
  *   variables: {
  *      cycleId: // value for 'cycleId'
  *   },
  * });
  */
-export function usePublishCycleMutation(
-  baseOptions?: Apollo.MutationHookOptions<PublishCycleMutation, PublishCycleMutationVariables>,
+export function useBeginPublishCycleTaskMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    BeginPublishCycleTaskMutation,
+    BeginPublishCycleTaskMutationVariables
+  >,
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<PublishCycleMutation, PublishCycleMutationVariables>(
-    PublishCycleDocument,
+  return Apollo.useMutation<BeginPublishCycleTaskMutation, BeginPublishCycleTaskMutationVariables>(
+    BeginPublishCycleTaskDocument,
     options,
   );
 }
-export type PublishCycleMutationHookResult = ReturnType<typeof usePublishCycleMutation>;
-export type PublishCycleMutationResult = Apollo.MutationResult<PublishCycleMutation>;
-export type PublishCycleMutationOptions = Apollo.BaseMutationOptions<
-  PublishCycleMutation,
-  PublishCycleMutationVariables
+export type BeginPublishCycleTaskMutationHookResult = ReturnType<
+  typeof useBeginPublishCycleTaskMutation
+>;
+export type BeginPublishCycleTaskMutationResult = Apollo.MutationResult<BeginPublishCycleTaskMutation>;
+export type BeginPublishCycleTaskMutationOptions = Apollo.BaseMutationOptions<
+  BeginPublishCycleTaskMutation,
+  BeginPublishCycleTaskMutationVariables
 >;
 export const UpdateVotePairPublicDocument = gql`
   mutation UpdateVotePairPublic($voteId: String!, $isPublic: Boolean!) {
@@ -2950,6 +3028,10 @@ export const CycleIcpperListDocument = gql`
             size
             income
             ei
+            beDeductedSizeByReview
+            haveTwoTimesLt04
+            haveTwoTimesLt08
+            unVotedAllVote
           }
           icpper {
             id
@@ -2958,6 +3040,10 @@ export const CycleIcpperListDocument = gql`
             githubLogin
           }
           lastEi
+          beReviewerHasWarningUsers {
+            id
+            nickname
+          }
         }
         total
       }
@@ -3028,6 +3114,10 @@ export const OwnerCycleIcpperListDocument = gql`
             ei
             ownerEi
             voteEi
+            beDeductedSizeByReview
+            haveTwoTimesLt04
+            haveTwoTimesLt08
+            unVotedAllVote
           }
           icpper {
             id
@@ -3036,6 +3126,10 @@ export const OwnerCycleIcpperListDocument = gql`
             githubLogin
           }
           lastEi
+          beReviewerHasWarningUsers {
+            id
+            nickname
+          }
         }
         total
       }
@@ -3427,6 +3521,61 @@ export type CycleVoteResultStatusLazyQueryHookResult = ReturnType<
 export type CycleVoteResultStatusQueryResult = Apollo.QueryResult<
   CycleVoteResultStatusQuery,
   CycleVoteResultStatusQueryVariables
+>;
+export const CyclePublishStatusDocument = gql`
+  query CyclePublishStatus($cycleId: String!) {
+    cycle(id: $cycleId) {
+      voteResultPublishTask {
+        status
+      }
+    }
+  }
+`;
+
+/**
+ * __useCyclePublishStatusQuery__
+ *
+ * To run a query within a React component, call `useCyclePublishStatusQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCyclePublishStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCyclePublishStatusQuery({
+ *   variables: {
+ *      cycleId: // value for 'cycleId'
+ *   },
+ * });
+ */
+export function useCyclePublishStatusQuery(
+  baseOptions: Apollo.QueryHookOptions<CyclePublishStatusQuery, CyclePublishStatusQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<CyclePublishStatusQuery, CyclePublishStatusQueryVariables>(
+    CyclePublishStatusDocument,
+    options,
+  );
+}
+export function useCyclePublishStatusLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    CyclePublishStatusQuery,
+    CyclePublishStatusQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<CyclePublishStatusQuery, CyclePublishStatusQueryVariables>(
+    CyclePublishStatusDocument,
+    options,
+  );
+}
+export type CyclePublishStatusQueryHookResult = ReturnType<typeof useCyclePublishStatusQuery>;
+export type CyclePublishStatusLazyQueryHookResult = ReturnType<
+  typeof useCyclePublishStatusLazyQuery
+>;
+export type CyclePublishStatusQueryResult = Apollo.QueryResult<
+  CyclePublishStatusQuery,
+  CyclePublishStatusQueryVariables
 >;
 export const DaoVotingCycleDocument = gql`
   query DAOVotingCycle($daoId: String!) {

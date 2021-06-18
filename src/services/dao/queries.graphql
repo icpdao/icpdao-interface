@@ -185,6 +185,10 @@ query CycleIcpperList($cycleId: String!, $first: Int, $offset: Int, $sorted: Cyc
           size
           income
           ei
+          beDeductedSizeByReview
+          haveTwoTimesLt04
+          haveTwoTimesLt08
+          unVotedAllVote
         }
         icpper {
           id
@@ -193,6 +197,10 @@ query CycleIcpperList($cycleId: String!, $first: Int, $offset: Int, $sorted: Cyc
           githubLogin
         }
         lastEi
+        beReviewerHasWarningUsers {
+          id
+          nickname
+        }
       }
       total
     }
@@ -216,6 +224,10 @@ query OwnerCycleIcpperList($cycleId: String!, $first: Int, $offset: Int, $sorted
           ei
           ownerEi
           voteEi
+          beDeductedSizeByReview
+          haveTwoTimesLt04
+          haveTwoTimesLt08
+          unVotedAllVote
         }
         icpper {
           id
@@ -224,6 +236,10 @@ query OwnerCycleIcpperList($cycleId: String!, $first: Int, $offset: Int, $sorted
           githubLogin
         }
         lastEi
+        beReviewerHasWarningUsers {
+          id
+          nickname
+        }
       }
       total
     }
@@ -339,6 +355,14 @@ query CyclePairStatus($cycleId: String!) {
 query CycleVoteResultStatus($cycleId: String!) {
   cycle(id: $cycleId) {
     voteResultStatTask {
+      status
+    }
+  }
+}
+
+query CyclePublishStatus($cycleId: String!) {
+  cycle(id: $cycleId) {
+    voteResultPublishTask {
       status
     }
   }

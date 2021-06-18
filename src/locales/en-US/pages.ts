@@ -129,7 +129,24 @@ export default {
   'pages.dao.component.dao_cycle_icpper.table.head.income': 'Income',
   'pages.dao.component.dao_cycle_icpper.table.head.ie': 'EI for this month',
   'pages.dao.component.dao_cycle_icpper.table.head.last_ie': 'EI for last month',
-  'pages.dao.component.dao_cycle_icpper.modal.desc': 'Are you sure to start count EI?',
+  'pages.dao.component.dao_cycle_icpper.vote_result.modal.desc': 'Are you sure to start count EI?',
+  'pages.dao.component.dao_cycle_icpper.publish.modal.desc': 'Are you sure to start publish?',
+  'pages.dao.component.dao_cycle_icpper.tips.1':
+    'As the EI is below 0.8 for 2 times, the total size will be reduced by half.',
+  'pages.dao.component.dao_cycle_icpper.tips.2':
+    'As the EI is below 0.4 for 2 times, the total size will be reduced by half.',
+  'pages.dao.component.dao_cycle_icpper.tips.3':
+    "As the EI is below 0.4 for 2 times,  the review's size is deducted by half of the total size of his merge jobs.",
+  'pages.dao.component.dao_cycle_icpper.tips.4':
+    'As the voting in this cycle not completed on time, the total size will be reduced by half.',
+  'pages.dao.component.dao_cycle_icpper.tips.5':
+    'The community thinks the SIZE is too high and suggests lowering it next time. If the size is below 0.8 for 2 times, the total size will be reduced by half.',
+  'pages.dao.component.dao_cycle_icpper.tips.6':
+    'The community thinks the SIZE is too low and suggests raising it next time.',
+  'pages.dao.component.dao_cycle_icpper.tips.7':
+    "The community thinks the SIZE is too high and suggests lowering it next time. If the size is below 0.4 for 2 times, the total size will be reduced by half，and the review's reward is deducted by half of the total size of his merge jobs.",
+  'pages.dao.component.dao_cycle_icpper.tips.8':
+    "Please note your merged job about @{nicknames} next time. If the EI is below 0.4 for 2 times, the review's size is deducted by half of the total size of his merge jobs.",
   'pages.dao.component.dao_cycle_job.button.pair': 'Make pair',
   'pages.dao.component.dao_cycle_job.button.repair': 'Re-pairing',
   'pages.dao.component.dao_cycle_job.modal.desc': 'Are you sure to start pairing?',
