@@ -58,10 +58,10 @@ const errorHandler = (error: {
       description: errorText,
     });
   } else if (!response) {
-    notification.error({
-      description: 'Your network is abnormal and cannot connect to the server',
-      message: 'Network anomaly',
-    });
+    // notification.error({
+    //   description: 'Your network is abnormal and cannot connect to the server',
+    //   message: 'Network anomaly',
+    // });
   }
   return response;
 };

@@ -74,4 +74,5 @@ export default defineConfig({
       mock: false,
     },
   ],
+  mfsu: {},
 });

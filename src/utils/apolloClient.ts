@@ -1,5 +1,9 @@
-import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client';
+import { ApolloClient, HttpLink, InMemoryCache, from } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
+import { onError } from '@apollo/client/link/error';
+
+import { message } from 'antd';
+
 import { getAuthorization } from '@/utils/utils';
 
 const customFetch = (uri: string, options: any) => {
@@ -30,8 +34,22 @@ const authLink = setContext((_, context) => {
   };
 });
 
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors) {
+    graphQLErrors.forEach(({ message: msg, locations, path }) =>
+      // message.error(`[GraphQL error]: Message: ${msg}, Location: ${locations}, Path: ${path}`,)
+      console.log(`[GraphQL error]: Message: ${msg}, Location: ${locations}, Path: ${path}`),
+    );
+    console.warn(`warning`);
+  }
+
+  if (networkError) {
+    message.error(`[Network error]: ${networkError}`);
+  }
+});
+
 const client = new ApolloClient({
-  link: authLink.concat(httpLink),
+  link: from([errorLink, authLink, httpLink]),
   cache: new InMemoryCache(),
 });
 

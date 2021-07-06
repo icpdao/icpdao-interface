@@ -74,7 +74,7 @@
     "react-helmet-async": "^1.0.4",
     "serverless-s3-sync": "^1.17.1",
     "slash2": "^2.0.0",
-    "umi": "^3.4.0",
+    "umi": "^3.5.0",
     "umi-plugin-antd-theme": "^2.1.2",
     "umi-request": "^1.0.8"
   },
@@ -98,7 +98,7 @@
     "@umijs/plugin-esbuild": "^1.0.1",
     "@umijs/preset-ant-design-pro": "^1.2.0",
     "@umijs/preset-dumi": "^1.1.7",
-    "@umijs/preset-react": "^1.7.4",
+    "@umijs/preset-react": "^1.8.10",
     "@umijs/yorkie": "^2.0.3",
     "carlo": "^0.9.46",
     "cross-env": "^7.0.0",
