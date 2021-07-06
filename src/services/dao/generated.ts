@@ -298,6 +298,12 @@ export type DaoItem = {
   isOwner: Scalars['Boolean'];
 };
 
+export type DaoJobConfig = {
+  __typename?: 'DAOJobConfig';
+  datum?: Maybe<DaoJobConfigSchema>;
+  thisCycle?: Maybe<DaoJobThisCycle>;
+};
+
 export type DaoJobConfigSchema = {
   __typename?: 'DAOJobConfigSchema';
   createAt: Scalars['Int'];
@@ -317,6 +323,17 @@ export type DaoJobConfigSchema = {
   votingBeginHour: Scalars['Int'];
   votingEndDay: Scalars['Int'];
   votingEndHour: Scalars['Int'];
+};
+
+export type DaoJobThisCycle = {
+  __typename?: 'DAOJobThisCycle';
+  timeZone?: Maybe<Scalars['Int']>;
+  beginAt?: Maybe<Scalars['Int']>;
+  endAt?: Maybe<Scalars['Int']>;
+  pairBeginAt?: Maybe<Scalars['Int']>;
+  pairEndAt?: Maybe<Scalars['Int']>;
+  voteBeginAt?: Maybe<Scalars['Int']>;
+  voteEndAt?: Maybe<Scalars['Int']>;
 };
 
 export type DaoSchema = {
@@ -375,6 +392,11 @@ export type DaOsStat = {
   income?: Maybe<Scalars['Float']>;
 };
 
+export type DeleteJob = {
+  __typename?: 'DeleteJob';
+  ok?: Maybe<Scalars['Boolean']>;
+};
+
 export type IcpperStatQuery = {
   __typename?: 'IcpperStatQuery';
   datum?: Maybe<CycleIcpperStatSchema>;
@@ -408,11 +430,12 @@ export type JobPrSchema = {
   githubRepoId: Scalars['Int'];
   githubRepoName: Scalars['String'];
   githubRepoOwner: Scalars['String'];
+  githubRepoOwnerId: Scalars['Int'];
   /** _id */
   id?: Maybe<Scalars['ID']>;
   jobId: Scalars['String'];
   mergedAt?: Maybe<Scalars['Int']>;
-  mergedUserGithubLogin?: Maybe<Scalars['String']>;
+  mergedUserGithubUserId?: Maybe<Scalars['Int']>;
   status: Scalars['Int'];
   title: Scalars['String'];
   userId: Scalars['String'];
@@ -435,6 +458,7 @@ export type JobSchema = {
   githubRepoId: Scalars['Int'];
   githubRepoName: Scalars['String'];
   githubRepoOwner: Scalars['String'];
+  githubRepoOwnerId: Scalars['Int'];
   /** _id */
   id?: Maybe<Scalars['ID']>;
   income: Scalars['Int'];
@@ -496,6 +520,7 @@ export type Mutations = {
   updateDaoBaseInfo?: Maybe<UpdateDaoBaseInfo>;
   createJob?: Maybe<CreateJob>;
   updateJob?: Maybe<UpdateJob>;
+  deleteJob?: Maybe<DeleteJob>;
   updateJobVoteTypeByOwner?: Maybe<UpdateJobVoteTypeByOwner>;
   updateIcpperStatOwnerEi?: Maybe<UpdateIcpperStatOwnerEi>;
   updatePairVote?: Maybe<UpdatePairVote>;
@@ -554,6 +579,10 @@ export type MutationsUpdateJobArgs = {
   size?: Maybe<Scalars['Float']>;
 };
 
+export type MutationsDeleteJobArgs = {
+  id: Scalars['String'];
+};
+
 export type MutationsUpdateJobVoteTypeByOwnerArgs = {
   id: Scalars['String'];
   voteType?: Maybe<UpdateJobVoteTypeByOwnerArgumentPairTypeEnum>;
@@ -600,7 +629,7 @@ export type Query = {
   __typename?: 'Query';
   daos?: Maybe<DaOs>;
   dao?: Maybe<Dao>;
-  daoJobConfig?: Maybe<DaoJobConfigSchema>;
+  daoJobConfig?: Maybe<DaoJobConfig>;
   daoGithubAppStatus?: Maybe<DaoGithubAppStatus>;
   cycle?: Maybe<CycleQuery>;
   jobs?: Maybe<Jobs>;
@@ -665,7 +694,7 @@ export type UpdateDaoFollow = {
 
 export type UpdateDaoJobConfig = {
   __typename?: 'UpdateDAOJobConfig';
-  jobConfig?: Maybe<DaoJobConfigSchema>;
+  ok?: Maybe<Scalars['Boolean']>;
 };
 
 export type UpdateIcpperStatOwnerEi = {
@@ -701,6 +730,7 @@ export type UserSchema = {
   createAt: Scalars['Int'];
   erc20Address?: Maybe<Scalars['String']>;
   githubLogin: Scalars['String'];
+  githubUserId: Scalars['Int'];
   /** _id */
   id?: Maybe<Scalars['ID']>;
   nickname: Scalars['String'];
@@ -741,11 +771,7 @@ export type UpdateDaoJobConfigMutationVariables = Exact<{
 
 export type UpdateDaoJobConfigMutation = { __typename?: 'Mutations' } & {
   updateDaoJobConfig?: Maybe<
-    { __typename?: 'UpdateDAOJobConfig' } & {
-      jobConfig?: Maybe<
-        { __typename?: 'DAOJobConfigSchema' } & Pick<DaoJobConfigSchema, 'updateAt'>
-      >;
-    }
+    { __typename?: 'UpdateDAOJobConfig' } & Pick<UpdateDaoJobConfig, 'ok'>
   >;
 };
 
@@ -806,6 +832,14 @@ export type UpdateJobSizeMutation = { __typename?: 'Mutations' } & {
       >;
     }
   >;
+};
+
+export type DeleteJobMutationVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+export type DeleteJobMutation = { __typename?: 'Mutations' } & {
+  deleteJob?: Maybe<{ __typename?: 'DeleteJob' } & Pick<DeleteJob, 'ok'>>;
 };
 
 export type UpdateCycleJobVoteTypeByOwnerMutationVariables = Exact<{
@@ -979,25 +1013,41 @@ export type DaoJobConfigQueryVariables = Exact<{
 
 export type DaoJobConfigQuery = { __typename?: 'Query' } & {
   daoJobConfig?: Maybe<
-    { __typename?: 'DAOJobConfigSchema' } & Pick<
-      DaoJobConfigSchema,
-      | 'id'
-      | 'daoId'
-      | 'createAt'
-      | 'deadlineDay'
-      | 'deadlineTime'
-      | 'pairBeginDay'
-      | 'pairBeginHour'
-      | 'pairEndDay'
-      | 'pairEndHour'
-      | 'timeZone'
-      | 'timeZoneRegion'
-      | 'updateAt'
-      | 'votingBeginDay'
-      | 'votingBeginHour'
-      | 'votingEndDay'
-      | 'votingEndHour'
-    >
+    { __typename?: 'DAOJobConfig' } & {
+      datum?: Maybe<
+        { __typename?: 'DAOJobConfigSchema' } & Pick<
+          DaoJobConfigSchema,
+          | 'id'
+          | 'daoId'
+          | 'createAt'
+          | 'deadlineDay'
+          | 'deadlineTime'
+          | 'pairBeginDay'
+          | 'pairBeginHour'
+          | 'pairEndDay'
+          | 'pairEndHour'
+          | 'timeZone'
+          | 'timeZoneRegion'
+          | 'updateAt'
+          | 'votingBeginDay'
+          | 'votingBeginHour'
+          | 'votingEndDay'
+          | 'votingEndHour'
+        >
+      >;
+      thisCycle?: Maybe<
+        { __typename?: 'DAOJobThisCycle' } & Pick<
+          DaoJobThisCycle,
+          | 'timeZone'
+          | 'beginAt'
+          | 'endAt'
+          | 'pairBeginAt'
+          | 'pairEndAt'
+          | 'voteBeginAt'
+          | 'voteEndAt'
+        >
+      >;
+    }
   >;
 };
 
@@ -1530,6 +1580,32 @@ export type DaoVotingCycleQuery = { __typename?: 'Query' } & {
   >;
 };
 
+export type DaoProcessingCycleQueryVariables = Exact<{
+  daoId: Scalars['String'];
+}>;
+
+export type DaoProcessingCycleQuery = { __typename?: 'Query' } & {
+  dao?: Maybe<
+    { __typename?: 'DAO' } & {
+      cycles?: Maybe<
+        { __typename?: 'CyclesQuery' } & {
+          nodes?: Maybe<
+            Array<
+              Maybe<
+                { __typename?: 'CycleQuery' } & {
+                  datum?: Maybe<
+                    { __typename?: 'CycleSchema' } & Pick<CycleSchema, 'id' | 'beginAt' | 'endAt'>
+                  >;
+                }
+              >
+            >
+          >;
+        }
+      >;
+    }
+  >;
+};
+
 export type DaoCycleVoteListQueryVariables = Exact<{
   cycleId: Scalars['String'];
   first?: Maybe<Scalars['Int']>;
@@ -1725,9 +1801,7 @@ export const UpdateDaoJobConfigDocument = gql`
       timeZone: $timeZone
       timeZoneRegion: $timeZoneRegion
     ) {
-      jobConfig {
-        updateAt
-      }
+      ok
     }
   }
 `;
@@ -1978,6 +2052,50 @@ export type UpdateJobSizeMutationResult = Apollo.MutationResult<UpdateJobSizeMut
 export type UpdateJobSizeMutationOptions = Apollo.BaseMutationOptions<
   UpdateJobSizeMutation,
   UpdateJobSizeMutationVariables
+>;
+export const DeleteJobDocument = gql`
+  mutation DeleteJob($id: String!) {
+    deleteJob(id: $id) {
+      ok
+    }
+  }
+`;
+export type DeleteJobMutationFn = Apollo.MutationFunction<
+  DeleteJobMutation,
+  DeleteJobMutationVariables
+>;
+
+/**
+ * __useDeleteJobMutation__
+ *
+ * To run a mutation, you first call `useDeleteJobMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteJobMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteJobMutation, { data, loading, error }] = useDeleteJobMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteJobMutation(
+  baseOptions?: Apollo.MutationHookOptions<DeleteJobMutation, DeleteJobMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<DeleteJobMutation, DeleteJobMutationVariables>(
+    DeleteJobDocument,
+    options,
+  );
+}
+export type DeleteJobMutationHookResult = ReturnType<typeof useDeleteJobMutation>;
+export type DeleteJobMutationResult = Apollo.MutationResult<DeleteJobMutation>;
+export type DeleteJobMutationOptions = Apollo.BaseMutationOptions<
+  DeleteJobMutation,
+  DeleteJobMutationVariables
 >;
 export const UpdateCycleJobVoteTypeByOwnerDocument = gql`
   mutation UpdateCycleJobVoteTypeByOwner(
@@ -2525,22 +2643,33 @@ export type DaoQueryResult = Apollo.QueryResult<DaoQuery, DaoQueryVariables>;
 export const DaoJobConfigDocument = gql`
   query DAOJobConfig($daoId: String!) {
     daoJobConfig(daoId: $daoId) {
-      id
-      daoId
-      createAt
-      deadlineDay
-      deadlineTime
-      pairBeginDay
-      pairBeginHour
-      pairEndDay
-      pairEndHour
-      timeZone
-      timeZoneRegion
-      updateAt
-      votingBeginDay
-      votingBeginHour
-      votingEndDay
-      votingEndHour
+      datum {
+        id
+        daoId
+        createAt
+        deadlineDay
+        deadlineTime
+        pairBeginDay
+        pairBeginHour
+        pairEndDay
+        pairEndHour
+        timeZone
+        timeZoneRegion
+        updateAt
+        votingBeginDay
+        votingBeginHour
+        votingEndDay
+        votingEndHour
+      }
+      thisCycle {
+        timeZone
+        beginAt
+        endAt
+        pairBeginAt
+        pairEndAt
+        voteBeginAt
+        voteEndAt
+      }
     }
   }
 `;
@@ -3634,6 +3763,67 @@ export type DaoVotingCycleLazyQueryHookResult = ReturnType<typeof useDaoVotingCy
 export type DaoVotingCycleQueryResult = Apollo.QueryResult<
   DaoVotingCycleQuery,
   DaoVotingCycleQueryVariables
+>;
+export const DaoProcessingCycleDocument = gql`
+  query DAOProcessingCycle($daoId: String!) {
+    dao(id: $daoId) {
+      cycles(filter: processing) {
+        nodes {
+          datum {
+            id
+            beginAt
+            endAt
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useDaoProcessingCycleQuery__
+ *
+ * To run a query within a React component, call `useDaoProcessingCycleQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDaoProcessingCycleQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDaoProcessingCycleQuery({
+ *   variables: {
+ *      daoId: // value for 'daoId'
+ *   },
+ * });
+ */
+export function useDaoProcessingCycleQuery(
+  baseOptions: Apollo.QueryHookOptions<DaoProcessingCycleQuery, DaoProcessingCycleQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<DaoProcessingCycleQuery, DaoProcessingCycleQueryVariables>(
+    DaoProcessingCycleDocument,
+    options,
+  );
+}
+export function useDaoProcessingCycleLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    DaoProcessingCycleQuery,
+    DaoProcessingCycleQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<DaoProcessingCycleQuery, DaoProcessingCycleQueryVariables>(
+    DaoProcessingCycleDocument,
+    options,
+  );
+}
+export type DaoProcessingCycleQueryHookResult = ReturnType<typeof useDaoProcessingCycleQuery>;
+export type DaoProcessingCycleLazyQueryHookResult = ReturnType<
+  typeof useDaoProcessingCycleLazyQuery
+>;
+export type DaoProcessingCycleQueryResult = Apollo.QueryResult<
+  DaoProcessingCycleQuery,
+  DaoProcessingCycleQueryVariables
 >;
 export const DaoCycleVoteListDocument = gql`
   query DAOCycleVoteList($cycleId: String!, $first: Int, $offset: Int) {

@@ -18,22 +18,33 @@ query DAO($id: String!) {
 
 query DAOJobConfig($daoId: String!) {
   daoJobConfig(daoId: $daoId) {
-    id
-    daoId
-    createAt
-    deadlineDay
-    deadlineTime
-    pairBeginDay
-    pairBeginHour
-    pairEndDay
-    pairEndHour
-    timeZone
-    timeZoneRegion
-    updateAt
-    votingBeginDay
-    votingBeginHour
-    votingEndDay
-    votingEndHour
+    datum {
+      id
+      daoId
+      createAt
+      deadlineDay
+      deadlineTime
+      pairBeginDay
+      pairBeginHour
+      pairEndDay
+      pairEndHour
+      timeZone
+      timeZoneRegion
+      updateAt
+      votingBeginDay
+      votingBeginHour
+      votingEndDay
+      votingEndHour
+    }
+    thisCycle {
+      timeZone
+      beginAt
+      endAt
+      pairBeginAt
+      pairEndAt
+      voteBeginAt
+      voteEndAt
+    }
   }
 }
 
@@ -384,6 +395,19 @@ query DAOVotingCycle($daoId: String!) {
   }
 }
 
+query DAOProcessingCycle($daoId: String!) {
+  dao(id: $daoId) {
+    cycles(filter: processing) {
+      nodes {
+        datum {
+          id
+          beginAt
+          endAt
+        }
+      }
+    }
+  }
+}
 
 query DAOCycleVoteList($cycleId: String!, $first: Int, $offset: Int) {
   cycle(id: $cycleId) {

@@ -4,6 +4,7 @@ import menu from './en-US/menu';
 import pages from './en-US/pages';
 import pwa from './en-US/pwa';
 import request from './en-US/request';
+import errorMsg from './en-US/errorMsg';
 
 export default {
   'navBar.lang': 'Languages',
@@ -20,4 +21,5 @@ export default {
   ...component,
   ...pages,
   ...request,
+  ...errorMsg,
 };

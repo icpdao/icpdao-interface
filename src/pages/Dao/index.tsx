@@ -1,7 +1,19 @@
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import { PageContainer, PageLoading } from '@ant-design/pro-layout';
-import { Avatar, Button, Col, Row, Space, Typography, Tag, Divider, message, Tabs } from 'antd';
+import {
+  Avatar,
+  Button,
+  Col,
+  Row,
+  Space,
+  Typography,
+  Tag,
+  Divider,
+  message,
+  Tabs,
+  Tooltip,
+} from 'antd';
 import { FormattedMessage, history, useAccess } from 'umi';
 import styles from './index.less';
 import GlobalBreadcrumb from '@/components/Breadcrumb';
@@ -11,11 +23,12 @@ import type { CycleSchema } from '@/services/dao/generated';
 import {
   DaoFollowTypeEnum,
   useDaoFollowInfoQuery,
+  useDaoProcessingCycleQuery,
   useDaoVotingCycleQuery,
   useFollowDaoMutation,
   useUpdateDaoBaseInfoMutation,
 } from '@/services/dao/generated';
-import { getFormatTime } from '@/utils/utils';
+import { getFormatTime, getTimeDistanceHumanize } from '@/utils/utils';
 import { useIntl } from '@@/plugin-locale/localeExports';
 
 import DaoIcpperStat from '@/pages/Dao/components/DaoIcpperStat';
@@ -51,6 +64,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
   const intl = useIntl();
   const [followedButtonLoading, setFollowedButtonLoading] = useState(false);
   const [votingCycle, setVotingCycle] = useState<CycleSchema>();
+  const [processingCycle, setProcessingCycle] = useState<CycleSchema>();
   if (!initialState) {
     return <PageLoading />;
   }
@@ -60,13 +74,17 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
     variables: { id: daoId, userId: initialState.currentUser()?.profile?.id },
   });
   const { data: votingCycleData } = useDaoVotingCycleQuery({ variables: { daoId } });
+  const { data: processingCycleData } = useDaoProcessingCycleQuery({ variables: { daoId } });
   const [updateFollowDao] = useFollowDaoMutation();
   const [updateDaoBaseInfo] = useUpdateDaoBaseInfoMutation();
   useEffect(() => {
     votingCycleData?.dao?.cycles?.nodes?.forEach((v) => {
       setVotingCycle(v?.datum as CycleSchema);
     });
-  }, [votingCycleData]);
+    processingCycleData?.dao?.cycles?.nodes?.forEach((v) => {
+      setProcessingCycle(v?.datum as CycleSchema);
+    });
+  }, [votingCycleData, processingCycleData]);
 
   if (loading || error) {
     return <PageLoading />;
@@ -183,22 +201,46 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
         </Space>
         <Divider />
         <Space size={22} className={styles.buttonSpace}>
-          <Button
-            size={'large'}
-            type={'primary'}
-            onClick={() => history.push(`/job?daoId=${daoId}`)}
+          <Tooltip
+            placement="right"
+            title={
+              processingCycle?.endAt
+                ? intl.formatMessage(
+                    { id: 'pages.dao.home.button.mark.tips' },
+                    { date_string: getFormatTime(processingCycle.endAt, 'LL') },
+                  )
+                : ''
+            }
           >
-            <FormattedMessage id={`pages.dao.home.button.mark`} />
-          </Button>
-          <Button
-            size={'large'}
-            type={'primary'}
-            danger
-            disabled={!votingCycle}
-            onClick={() => history.push(`/dao/${daoId}/${votingCycle?.id}/vote`)}
+            <Button
+              size={'large'}
+              type={'primary'}
+              onClick={() => history.push(`/job?daoId=${daoId}`)}
+            >
+              <FormattedMessage id={`pages.dao.home.button.mark`} />
+            </Button>
+          </Tooltip>
+          <Tooltip
+            placement="right"
+            title={
+              votingCycle?.endAt
+                ? intl.formatMessage(
+                    { id: 'pages.dao.home.button.vote.tips' },
+                    { date_string: getTimeDistanceHumanize(votingCycle.endAt) },
+                  )
+                : ''
+            }
           >
-            <FormattedMessage id={`pages.dao.home.button.vote`} />
-          </Button>
+            <Button
+              size={'large'}
+              type={'primary'}
+              danger
+              disabled={!votingCycle}
+              onClick={() => history.push(`/dao/${daoId}/${votingCycle?.id}/vote`)}
+            >
+              <FormattedMessage id={`pages.dao.home.button.vote`} />
+            </Button>
+          </Tooltip>
         </Space>
 
         <Tabs defaultActiveKey={defaultActiveKey}>

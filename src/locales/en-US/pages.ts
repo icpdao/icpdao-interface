@@ -90,6 +90,10 @@ export default {
   'pages.dao.config.tab.job.form.save': 'SAVE',
   'pages.dao.config.tab.job.form.success': 'Success, DAO job config updated.',
   'pages.dao.config.tab.job.form.error': 'Error, DAO job config data format error.',
+  'pages.dao.config.tab.job.cycle.title': 'TIME OF THIS CYCLE',
+  'pages.dao.config.tab.job.cycle.deadline': 'Deadline for mark job: ',
+  'pages.dao.config.tab.job.cycle.pairing': 'Pairing time: ',
+  'pages.dao.config.tab.job.cycle.voting': 'Voting time: ',
   'pages.dao.home.view': 'VIEW ON GITHUB',
   'pages.dao.home.followed': 'FOLLOW',
   'pages.dao.home.unfollowed': 'UNFOLLOW',
@@ -98,7 +102,9 @@ export default {
   'pages.dao.home.created': ' Created',
   'pages.dao.home.following': ' following',
   'pages.dao.home.button.mark': 'Mark Job',
+  'pages.dao.home.button.mark.tips': 'Deadline for mark job: {date_string}',
   'pages.dao.home.button.vote': 'Go Vote',
+  'pages.dao.home.button.vote.tips': 'Time left to vote: {date_string}',
   'pages.dao.home.tab.icpperStat': 'Icpper',
   'pages.dao.home.tab.jobStat': 'Job',
   'pages.dao.home.tab.cycle': 'Cycle',
@@ -131,6 +137,8 @@ export default {
   'pages.dao.component.dao_cycle_icpper.table.head.last_ie': 'EI for last month',
   'pages.dao.component.dao_cycle_icpper.vote_result.modal.desc': 'Are you sure to start count EI?',
   'pages.dao.component.dao_cycle_icpper.publish.modal.desc': 'Are you sure to start publish?',
+  'pages.dao.component.dao_cycle_icpper.update_ei.tips':
+    'owner has the right to increase or decrease the EI vote by 0.2 per person each time',
   'pages.dao.component.dao_cycle_icpper.tips.1':
     'As the EI is below 0.8 for 2 times, the total size will be reduced by half.',
   'pages.dao.component.dao_cycle_icpper.tips.2':

@@ -3,20 +3,32 @@ import { history } from 'umi';
 import styles from './index.less';
 import StatCard from '@/components/StatCard';
 import type { TablePaginationConfig } from 'antd';
-import { Button, Form, Input, InputNumber, message, Select, Table, Tag, Typography } from 'antd';
+import {
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  message,
+  Select,
+  Space,
+  Table,
+  Tag,
+  Typography,
+} from 'antd';
 import type { Job, JobListQueryVariables, JobPrSchema } from '@/services/dao/generated';
 import {
   JobSortedEnum,
   SortedTypeEnum,
   useAddJobPrMutation,
   useCreateJobMutation,
+  useDeleteJobMutation,
   useDeleteJobPrMutation,
   useJobListQuery,
   useUpdateJobSizeMutation,
 } from '@/services/dao/generated';
 import { PageLoading } from '@ant-design/pro-layout';
 import { useIntl } from '@@/plugin-locale/localeExports';
-import { EditFilled } from '@ant-design/icons';
+import { DeleteFilled, EditFilled } from '@ant-design/icons';
 import { request } from '@@/plugin-request/request';
 import { useModel } from '@@/plugin-model/useModel';
 
@@ -100,6 +112,10 @@ const JobTable: React.FC<JobTableProps> = ({ queryVariables, userName }) => {
   const [addJobPR] = useAddJobPrMutation();
   const [deleteJobPR] = useDeleteJobPrMutation();
   const [updateJobSize] = useUpdateJobSizeMutation();
+  const [deleteJob] = useDeleteJobMutation();
+  useMemo(() => {
+    setJobQueryVar(queryVariables);
+  }, [queryVariables]);
   const { data, loading, error, refetch } = useJobListQuery({
     variables: jobQueryVar,
     fetchPolicy: 'no-cache',
@@ -192,6 +208,15 @@ const JobTable: React.FC<JobTableProps> = ({ queryVariables, userName }) => {
     }));
     setEditingRowId('');
   }, []);
+  const remove = useCallback(
+    async (record: Partial<Job>) => {
+      await deleteJob({
+        variables: { id: record.node?.id || '' },
+      });
+      await refetch();
+    },
+    [deleteJob, refetch],
+  );
   if (!initialState || loading || error) {
     return <PageLoading />;
   }
@@ -300,7 +325,7 @@ const JobTable: React.FC<JobTableProps> = ({ queryVariables, userName }) => {
               option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0 ||
               option?.value?.indexOf(input) >= 0
             }
-          ></Select>
+          />
         );
       },
     },
@@ -312,13 +337,13 @@ const JobTable: React.FC<JobTableProps> = ({ queryVariables, userName }) => {
           case 0:
             return <Tag color="magenta">Awaiting merger</Tag>;
           case 1:
-            return <Tag color="magenta">Merged</Tag>;
+            return <Tag color="orange">Merged</Tag>;
           case 2:
-            return <Tag color="magenta">Awaiting Voting</Tag>;
+            return <Tag color="green">Awaiting Voting</Tag>;
           case 3:
-            return <Tag color="magenta">Waiting for token</Tag>;
+            return <Tag color="blue">Waiting for token</Tag>;
           case 4:
-            return <Tag color="magenta">token released</Tag>;
+            return <Tag color="purple">Token released</Tag>;
           default:
             return <Tag color="magenta" />;
         }
@@ -351,9 +376,16 @@ const JobTable: React.FC<JobTableProps> = ({ queryVariables, userName }) => {
             </a>
           </span>
         ) : (
-          <Typography.Link disabled={editingRowId !== ''} onClick={() => edit(record)}>
-            <EditFilled />
-          </Typography.Link>
+          <Space>
+            <Typography.Link disabled={editingRowId !== ''} onClick={() => edit(record)}>
+              <EditFilled />
+            </Typography.Link>
+            {record.node?.status === 0 && (
+              <Typography.Link disabled={editingRowId !== ''} onClick={() => remove(record)}>
+                <DeleteFilled />
+              </Typography.Link>
+            )}
+          </Space>
         );
       },
     },

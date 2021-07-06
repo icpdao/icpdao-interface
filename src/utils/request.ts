@@ -53,15 +53,15 @@ const errorHandler = (error: {
     const errorText = codeMessage[response.status] || response.statusText;
     const { status, url } = response;
 
-    notification.error({
+    console.warn({
       message: `Request error ${status}: ${url}`,
       description: errorText,
     });
   } else if (!response) {
-    notification.error({
-      description: 'Your network is abnormal and cannot connect to the server',
-      message: 'Network anomaly',
-    });
+    // notification.error({
+    //   description: 'Your network is abnormal and cannot connect to the server',
+    //   message: 'Network anomaly',
+    // });
   }
   return response;
 };
