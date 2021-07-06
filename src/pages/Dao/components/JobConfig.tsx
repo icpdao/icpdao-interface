@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import type { DaoJobConfigQuery } from '@/services/dao/generated';
 import { useDaoJobConfigQuery, useUpdateDaoJobConfigMutation } from '@/services/dao/generated';
 import { PageLoading } from '@ant-design/pro-layout';
-import { Form, Button, Select, Row, Col, message } from 'antd';
+import { Form, Button, Select, Row, Col, message, Space } from 'antd';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import momentTZ from 'moment-timezone';
 import styles from './index.less';
 import DayHourCascader from '@/pages/Dao/components/DayHourCascader';
+import { getFormatTime } from '@/utils/utils';
 
 type JobConfigProps = {
   daoId: string;
@@ -31,12 +32,15 @@ const timeZoneOptions = momentTZ.tz.names().map((v) => {
 const formatJobConfigData = (data: DaoJobConfigQuery | undefined): JobConfigData => {
   if (!data) return {};
   return {
-    timeZoneRegion: data.daoJobConfig?.timeZoneRegion,
-    deadline: [data.daoJobConfig?.deadlineDay, data.daoJobConfig?.deadlineTime],
-    pairBegin: [data.daoJobConfig?.pairBeginDay, data.daoJobConfig?.pairBeginHour],
-    pairEnd: [data.daoJobConfig?.pairEndDay, data.daoJobConfig?.pairEndHour],
-    votingBegin: [data.daoJobConfig?.votingBeginDay, data.daoJobConfig?.votingBeginHour],
-    votingEnd: [data.daoJobConfig?.votingEndDay, data.daoJobConfig?.votingEndHour],
+    timeZoneRegion: data.daoJobConfig?.datum?.timeZoneRegion,
+    deadline: [data.daoJobConfig?.datum?.deadlineDay, data.daoJobConfig?.datum?.deadlineTime],
+    pairBegin: [data.daoJobConfig?.datum?.pairBeginDay, data.daoJobConfig?.datum?.pairBeginHour],
+    pairEnd: [data.daoJobConfig?.datum?.pairEndDay, data.daoJobConfig?.datum?.pairEndHour],
+    votingBegin: [
+      data.daoJobConfig?.datum?.votingBeginDay,
+      data.daoJobConfig?.datum?.votingBeginHour,
+    ],
+    votingEnd: [data.daoJobConfig?.datum?.votingEndDay, data.daoJobConfig?.datum?.votingEndHour],
   };
 };
 
@@ -73,7 +77,7 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId }) => {
   const [form] = Form.useForm();
   const [updateDaoJobConfig] = useUpdateDaoJobConfigMutation();
   const [saveLoading, setSaveLoading] = useState(false);
-  const { data, loading, error } = useDaoJobConfigQuery({
+  const { data, loading, error, refetch } = useDaoJobConfigQuery({
     variables: { daoId },
   });
   if (loading || error) {
@@ -98,12 +102,16 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId }) => {
             message.error(intl.formatMessage({ id: 'pages.dao.config.tab.job.form.error' }));
             return false;
           }
-          updateData.daoId = daoId;
-          await updateDaoJobConfig({
-            variables: updateData,
-          });
-          message.success(intl.formatMessage({ id: 'pages.dao.config.tab.job.form.success' }));
-          setSaveLoading(false);
+          try {
+            updateData.daoId = daoId;
+            await updateDaoJobConfig({
+              variables: updateData,
+            });
+            await refetch();
+            message.success(intl.formatMessage({ id: 'pages.dao.config.tab.job.form.success' }));
+          } finally {
+            setSaveLoading(false);
+          }
           return true;
         }}
       >
@@ -174,6 +182,35 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId }) => {
           </Button>
         </Form.Item>
       </Form>
+      <Space style={{ marginTop: 65 }} direction={'vertical'}>
+        <Space style={{ marginBottom: 35 }}>
+          {intl.formatMessage({ id: 'pages.dao.config.tab.job.cycle.title' })}
+        </Space>
+        <Space>
+          <span style={{ fontWeight: 700 }}>
+            {intl.formatMessage({ id: 'pages.dao.config.tab.job.cycle.deadline' })}
+          </span>
+          {getFormatTime(data?.daoJobConfig?.thisCycle?.beginAt || 0, 'LLL')}
+          <span>-</span>
+          {getFormatTime(data?.daoJobConfig?.thisCycle?.endAt || 0, 'LLL')}
+        </Space>
+        <Space>
+          <span style={{ fontWeight: 700 }}>
+            {intl.formatMessage({ id: 'pages.dao.config.tab.job.cycle.pairing' })}
+          </span>
+          {getFormatTime(data?.daoJobConfig?.thisCycle?.pairBeginAt || 0, 'LLL')}
+          <span>-</span>
+          {getFormatTime(data?.daoJobConfig?.thisCycle?.pairEndAt || 0, 'LLL')}
+        </Space>
+        <Space>
+          <span style={{ fontWeight: 700 }}>
+            {intl.formatMessage({ id: 'pages.dao.config.tab.job.cycle.voting' })}
+          </span>
+          {getFormatTime(data?.daoJobConfig?.thisCycle?.voteBeginAt || 0, 'LLL')}
+          <span>-</span>
+          {getFormatTime(data?.daoJobConfig?.thisCycle?.voteEndAt || 0, 'LLL')}
+        </Space>
+      </Space>
     </>
   );
 };

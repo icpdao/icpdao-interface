@@ -310,6 +310,7 @@ export const OwnerDaoCycleJob: React.FC<DaoCycleProps> = ({ cycleId, cycle, daoI
         onCancel={() => {
           setPairingModalVisible(false);
           setPairing({});
+          setPairingPercent(0);
           setStatusProps({});
         }}
         okText={intl.formatMessage({ id: 'pages.dao.component.dao_cycle_job.modal.ok' })}

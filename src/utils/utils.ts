@@ -102,7 +102,7 @@ export const getDayStr = (day: number | undefined) => {
 
 export const getHours = () => {
   const hours = [];
-  for (let i = 1; i < 24; i += 1) {
+  for (let i = 0; i < 24; i += 1) {
     hours.push({
       value: i,
       label: getHourStr(i),

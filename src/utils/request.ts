@@ -53,7 +53,7 @@ const errorHandler = (error: {
     const errorText = codeMessage[response.status] || response.statusText;
     const { status, url } = response;
 
-    notification.error({
+    console.warn({
       message: `Request error ${status}: ${url}`,
       description: errorText,
     });

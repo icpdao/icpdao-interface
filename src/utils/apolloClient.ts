@@ -3,6 +3,7 @@ import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 
 import { message } from 'antd';
+import { getLocale } from 'umi';
 
 import { getAuthorization } from '@/utils/utils';
 
@@ -34,23 +35,32 @@ const authLink = setContext((_, context) => {
   };
 });
 
-const errorLink = onError(({ graphQLErrors, networkError }) => {
-  if (graphQLErrors) {
-    graphQLErrors.forEach(({ message: msg, locations, path }) =>
-      // message.error(`[GraphQL error]: Message: ${msg}, Location: ${locations}, Path: ${path}`,)
-      console.log(`[GraphQL error]: Message: ${msg}, Location: ${locations}, Path: ${path}`),
-    );
-    console.warn(`warning`);
-  }
-
-  if (networkError) {
-    message.error(`[Network error]: ${networkError}`);
-  }
+const errorLink = onError(({ graphQLErrors, networkError, response }) => {
+  if (response === undefined) return;
+  const intl = getLocale();
+  import(`../locales/${intl}`).then((locales) => {
+    if (graphQLErrors) {
+      graphQLErrors.forEach(({ message: msg, locations, path }) => {
+        console.warn(`[GraphQL error]: Message: ${msg}, Location: ${locations}, Path: ${path}`);
+        message.error(locales.default[msg] || msg);
+      });
+    } else if (networkError) {
+      message.error(`[Network error]: ${networkError}`);
+    }
+  });
 });
 
 const client = new ApolloClient({
   link: from([errorLink, authLink, httpLink]),
   cache: new InMemoryCache(),
+  defaultOptions: {
+    query: {
+      errorPolicy: 'none',
+    },
+    mutate: {
+      errorPolicy: 'none',
+    },
+  },
 });
 
 export default client;

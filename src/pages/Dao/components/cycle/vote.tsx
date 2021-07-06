@@ -238,10 +238,14 @@ const DaoCycleVote: React.FC<DaoCycleProps> = ({ cycleId, cycle, userRole }) => 
     first: 20,
     offset: 0,
   });
+
   const { data, loading, error, refetch } = useCycleVoteListQuery({
     variables: queryVariables,
     fetchPolicy: 'no-cache',
   });
+  useMemo(() => {
+    refetch();
+  }, [refetch]);
   const [updateVotePairPublicMutation] = useUpdateVotePairPublicMutation();
   const userId = useMemo(() => {
     return initialState?.currentUser()?.profile?.id || '';

@@ -41,6 +41,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
       if (searchDateType === 'month') et = moment(date).utc().startOf('day').add(1, 'M').unix();
       if (searchDateType === 'quarter') et = moment(date).utc().startOf('day').add(1, 'Q').unix();
       if (searchDateType === 'year') et = moment(date).utc().startOf('day').add(1, 'y').unix();
+      console.log(et, bt);
       setJobQueryVar((old) => ({
         ...old,
         beginTime: bt,

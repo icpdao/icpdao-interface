@@ -162,9 +162,16 @@ const ownerColumns = (
             <span style={{ color }}>{record.datum?.voteEi}</span>
             {ownerEI}
             {canUpdateOwnerEI && (
-              <span style={{ marginLeft: 20 }}>
-                <ControlTwoTone onClick={() => beginOrEndEditing(record.datum?.id || '')} />
-              </span>
+              <Tooltip
+                placement={'right'}
+                title={intl.formatMessage({
+                  id: 'pages.dao.component.dao_cycle_icpper.update_ei.tips',
+                })}
+              >
+                <span style={{ marginLeft: 20 }}>
+                  <ControlTwoTone onClick={() => beginOrEndEditing(record.datum?.id || '')} />
+                </span>
+              </Tooltip>
             )}
             {!canUpdateOwnerEI && tips.length > 0 && colorTooltip(color, tipsText)}
           </>
@@ -467,6 +474,7 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
         destroyOnClose={true}
         onCancel={() => {
           setResultModalVisible(false);
+          setResultPercent(0);
           setResultStating({});
           setStatusProps({});
         }}
@@ -498,6 +506,7 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
         destroyOnClose={true}
         onCancel={() => {
           setPublishModalVisible(false);
+          setPublishResultPercent(0);
           setPublishStating({});
           setPublishStatusProps({});
         }}
