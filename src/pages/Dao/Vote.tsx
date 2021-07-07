@@ -62,7 +62,7 @@ const allTypeVote = (
         <Row>{pair?.user?.nickname}</Row>
         <Row>
           <a
-            href={`https://github.com/${pair?.datum?.githubRepoOwner}/${pair?.datum?.githubRepoName}/${pair?.datum?.githubIssueNumber}`}
+            href={`https://github.com/${pair?.datum?.githubRepoOwner}/${pair?.datum?.githubRepoName}/issues/${pair?.datum?.githubIssueNumber}`}
             target="_blank"
           >
             {pair?.datum?.title}
@@ -106,7 +106,7 @@ const pairTypeVote = (
           <Row>{leftPair?.user?.nickname}</Row>
           <Row>
             <a
-              href={`https://github.com/${leftPair?.datum?.githubRepoOwner}/${leftPair?.datum?.githubRepoName}/${leftPair?.datum?.githubIssueNumber}`}
+              href={`https://github.com/${leftPair?.datum?.githubRepoOwner}/${leftPair?.datum?.githubRepoName}/issues/${leftPair?.datum?.githubIssueNumber}`}
               target="_blank"
             >
               {leftPair?.datum?.title}
@@ -129,7 +129,7 @@ const pairTypeVote = (
           <Row>{rightPair?.user?.nickname}</Row>
           <Row>
             <a
-              href={`https://github.com/${rightPair?.datum?.githubRepoOwner}/${rightPair?.datum?.githubRepoName}/${rightPair?.datum?.githubIssueNumber}`}
+              href={`https://github.com/${rightPair?.datum?.githubRepoOwner}/${rightPair?.datum?.githubRepoName}/issues/${rightPair?.datum?.githubIssueNumber}`}
               target="_blank"
             >
               {rightPair?.datum?.title}
