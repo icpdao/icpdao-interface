@@ -236,7 +236,6 @@ export const OwnerDaoCycleJob: React.FC<DaoCycleProps> = ({ cycleId, cycle, daoI
   const beginPairing = useCallback(
     async (percent: number) => {
       try {
-        setPairing({ footer: null });
         const ps = await pairStatusRefetch();
         if (ps.data.cycle?.pairTask?.status === CycleVotePairTaskStatusEnum.Success) {
           setPairingPercent(100);
@@ -303,8 +302,9 @@ export const OwnerDaoCycleJob: React.FC<DaoCycleProps> = ({ cycleId, cycle, daoI
       <GlobalModal
         key={'pairingModal'}
         onOk={async () => {
-          beginPairing(0);
+          setPairing({ footer: null });
           await beginCyclePairTaskMutation({ variables: { cycleId } });
+          beginPairing(0);
         }}
         destroyOnClose={true}
         onCancel={() => {
