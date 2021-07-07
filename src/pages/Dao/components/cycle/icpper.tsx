@@ -318,7 +318,6 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
   const beginVoteResultStat = useCallback(
     async (percent: number) => {
       try {
-        setResultStating({ footer: null });
         const ps = await voteResultDataRefetch();
         if (
           ps.data.cycle?.voteResultStatTask?.status === CycleVoteResultStatTaskStatusEnum.Success
@@ -345,7 +344,6 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
   const beginPublishResultStat = useCallback(
     async (percent: number) => {
       try {
-        setPublishStating({ footer: null });
         const ps = await publishResultDataRefetch();
         if (
           ps.data.cycle?.voteResultPublishTask?.status ===
@@ -468,8 +466,9 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
       <GlobalModal
         key={'voteResultModal'}
         onOk={async () => {
-          beginVoteResultStat(0);
+          setResultStating({ footer: null });
           await beginCycleVoteResultTaskMutation({ variables: { cycleId } });
+          beginVoteResultStat(0);
         }}
         destroyOnClose={true}
         onCancel={() => {
@@ -500,8 +499,9 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
       <GlobalModal
         key={'publishModal'}
         onOk={async () => {
-          beginPublishResultStat(0);
+          setPublishStating({ footer: null });
           await beginPublishCycleTaskMutation({ variables: { cycleId } });
+          beginPublishResultStat(0);
         }}
         destroyOnClose={true}
         onCancel={() => {
