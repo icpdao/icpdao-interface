@@ -23,7 +23,7 @@ function PickerWithType({ type, onChange }: any) {
 const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
   const [form] = Form.useForm();
   const [searchDateType, setSearchDateType] = useState<string>('date');
-
+  const [defaultDaoId, setDefaultDaoId] = useState(daoId || '');
   const [jobQueryVar, setJobQueryVar] = useState<JobListQueryVariables>({
     daoName: '',
     offset: 0,
@@ -41,7 +41,6 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
       if (searchDateType === 'month') et = moment(date).utc().startOf('day').add(1, 'M').unix();
       if (searchDateType === 'quarter') et = moment(date).utc().startOf('day').add(1, 'Q').unix();
       if (searchDateType === 'year') et = moment(date).utc().startOf('day').add(1, 'y').unix();
-      console.log(et, bt);
       setJobQueryVar((old) => ({
         ...old,
         beginTime: bt,
@@ -51,7 +50,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
     [setJobQueryVar, searchDateType],
   );
 
-  const { data, loading, error } = useUserJobDaoListQuery();
+  const { data, loading, error, refetch } = useUserJobDaoListQuery();
   useMemo(async () => {
     if (data?.daos?.dao && data?.daos?.dao.length > 0) {
       let defaultDao: any;
@@ -61,12 +60,13 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
         }
       });
       const defaultDaoName = defaultDao?.name || data.daos.dao[0]?.datum?.name || '';
+      setDefaultDaoId(defaultDao?.id || data.daos.dao[0]?.datum?.id || '');
       setJobQueryVar((old) => ({
         ...old,
         daoName: defaultDaoName,
       }));
     }
-  }, [data]);
+  }, [daoId, data]);
 
   if (loading || error) {
     return <PageLoading />;
@@ -117,7 +117,13 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
           <PickerWithType type={searchDateType} onChange={(value: any) => parseTime(value)} />
         </Form.Item>
       </Form>
-      <JobTable queryVariables={jobQueryVar} userName={userName || ''} />
+      <JobTable
+        jobQueryVar={jobQueryVar}
+        userName={userName || ''}
+        daoId={defaultDaoId}
+        refetchSelect={refetch}
+        setJobQueryVar={setJobQueryVar}
+      />
     </>
   );
 };

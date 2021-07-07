@@ -101,7 +101,9 @@ export default (props: {
               {configTab}
             </Tabs>
           )}
-          {tab === 'job' && <DAOJobConfig daoId={daoId} />}
+          {tab === 'job' && (
+            <DAOJobConfig daoId={daoId} nextStep={status ? skipClick : undefined} />
+          )}
         </div>
       </PageContainer>
     </>

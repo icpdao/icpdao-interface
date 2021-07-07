@@ -1,5 +1,6 @@
+import type { Dispatch, SetStateAction } from 'react';
 import React, { useCallback, useMemo, useState } from 'react';
-import { history } from 'umi';
+// import { history } from 'umi';
 import styles from './index.less';
 import StatCard from '@/components/StatCard';
 import type { TablePaginationConfig } from 'antd';
@@ -33,8 +34,11 @@ import { request } from '@@/plugin-request/request';
 import { useModel } from '@@/plugin-model/useModel';
 
 interface JobTableProps {
-  queryVariables: JobListQueryVariables;
+  jobQueryVar: JobListQueryVariables;
+  daoId: string;
   userName: string;
+  refetchSelect: any;
+  setJobQueryVar: Dispatch<SetStateAction<JobListQueryVariables>>;
 }
 
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
@@ -97,7 +101,13 @@ async function getGithubPRList(daoName: string, user: string) {
   });
 }
 
-const JobTable: React.FC<JobTableProps> = ({ queryVariables, userName }) => {
+const JobTable: React.FC<JobTableProps> = ({
+  jobQueryVar,
+  userName,
+  daoId,
+  refetchSelect,
+  setJobQueryVar,
+}) => {
   const intl = useIntl();
   const { initialState } = useModel('@@initialState');
   const [form] = Form.useForm();
@@ -106,16 +116,16 @@ const JobTable: React.FC<JobTableProps> = ({ queryVariables, userName }) => {
   const [markButtonLoading, setMarkButtonLoading] = useState<boolean>(false);
   const [jobPRsSelectOptions, setJobPRsSelectOptions] = useState({});
   const [jobPRsSelectDefault, setJobPRsSelectDefault] = useState({});
-  const [jobQueryVar, setJobQueryVar] = useState<JobListQueryVariables>(queryVariables);
+  // const [jobQueryVar, setJobQueryVar] = useState<JobListQueryVariables>(queryVariables);
   const isEditing = useCallback((record: Job) => record.node?.id === editingRowId, [editingRowId]);
   const [createJobMutation] = useCreateJobMutation();
   const [addJobPR] = useAddJobPrMutation();
   const [deleteJobPR] = useDeleteJobPrMutation();
   const [updateJobSize] = useUpdateJobSizeMutation();
   const [deleteJob] = useDeleteJobMutation();
-  useMemo(() => {
-    setJobQueryVar(queryVariables);
-  }, [queryVariables]);
+  // useMemo(() => {
+  //   setJobQueryVar(queryVariables);
+  // }, [queryVariables]);
   const { data, loading, error, refetch } = useJobListQuery({
     variables: jobQueryVar,
     fetchPolicy: 'no-cache',
@@ -405,9 +415,16 @@ const JobTable: React.FC<JobTableProps> = ({ queryVariables, userName }) => {
             setMarkButtonLoading(true);
             try {
               const created = await createJobMutation({ variables: { issueLink, size } });
-              if (created.data?.createJob?.job?.node?.githubRepoOwner === queryVariables.daoName)
-                await refetch();
-              else history.push(`/job?daoId=${created.data?.createJob?.job?.node?.daoId}`);
+              await refetchSelect();
+              await refetch();
+              if (created.data?.createJob?.job?.node?.daoId !== daoId) {
+                setJobQueryVar((old) => ({
+                  ...old,
+                  daoName: created.data?.createJob?.job?.node?.githubRepoOwner || '',
+                }));
+              }
+            } catch (e) {
+              console.error(e);
             } finally {
               setMarkButtonLoading(false);
             }
