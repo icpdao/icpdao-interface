@@ -1,4 +1,4 @@
-import { Select } from 'antd';
+import { Select, Empty } from 'antd';
 import React, { useEffect, useState } from 'react';
 import DaoCycleIndex from './cycle/index';
 import styles from './cycle/index.less';
@@ -40,20 +40,26 @@ const DaoCycle: React.FC<DaoCycleProps> = ({ daoId, userRole }) => {
 
   return (
     <div>
-      <Select
-        className={styles.tabSelect}
-        value={cycleId}
-        style={{ width: 250 }}
-        onChange={(value) => setCycleId(value as string)}
-        options={options}
-      />
-      <DaoCycleIndex
-        daoId={daoId}
-        cycleId={cycleId}
-        cycle={currentCycle}
-        userRole={userRole}
-        activeTab={defaultActiveKey}
-      />
+      {cycleId ? (
+        <>
+          <Select
+            className={styles.tabSelect}
+            value={cycleId}
+            style={{ width: 250 }}
+            onChange={(value) => setCycleId(value as string)}
+            options={options}
+          />
+          <DaoCycleIndex
+            daoId={daoId}
+            cycleId={cycleId}
+            cycle={currentCycle}
+            userRole={userRole}
+            activeTab={defaultActiveKey}
+          />
+        </>
+      ) : (
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+      )}
     </div>
   );
 };

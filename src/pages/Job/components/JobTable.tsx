@@ -407,8 +407,7 @@ const JobTable: React.FC<JobTableProps> = ({ queryVariables, userName }) => {
               const created = await createJobMutation({ variables: { issueLink, size } });
               if (created.data?.createJob?.job?.node?.githubRepoOwner === queryVariables.daoName)
                 await refetch();
-              else
-                history.push(`/job?daoId=${created.data?.createJob?.job?.node?.githubRepoOwner}`);
+              else history.push(`/job?daoId=${created.data?.createJob?.job?.node?.daoId}`);
             } finally {
               setMarkButtonLoading(false);
             }
