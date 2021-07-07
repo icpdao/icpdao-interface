@@ -11,6 +11,7 @@ import { getFormatTime } from '@/utils/utils';
 
 type JobConfigProps = {
   daoId: string;
+  nextStep?: () => void;
 };
 
 type JobConfigData = {
@@ -72,7 +73,7 @@ const formatSubmitJobConfigData = (data: any) => {
   return { valid, config };
 };
 
-const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId }) => {
+const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
   const intl = useIntl();
   const [form] = Form.useForm();
   const [updateDaoJobConfig] = useUpdateDaoJobConfigMutation();
@@ -109,6 +110,7 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId }) => {
             });
             await refetch();
             message.success(intl.formatMessage({ id: 'pages.dao.config.tab.job.form.success' }));
+            if (nextStep) nextStep();
           } finally {
             setSaveLoading(false);
           }
