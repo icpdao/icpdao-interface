@@ -409,8 +409,6 @@ const JobTable: React.FC<JobTableProps> = ({ queryVariables, userName }) => {
                 await refetch();
               else
                 history.push(`/job?daoId=${created.data?.createJob?.job?.node?.githubRepoOwner}`);
-            } catch (e) {
-              message.error('Mark Job Error');
             } finally {
               setMarkButtonLoading(false);
             }
