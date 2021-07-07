@@ -10,6 +10,8 @@ import {
   Input,
   InputNumber,
   message,
+  Popconfirm,
+  Spin,
   Select,
   Space,
   Table,
@@ -29,7 +31,7 @@ import {
 } from '@/services/dao/generated';
 import { PageLoading } from '@ant-design/pro-layout';
 import { useIntl } from '@@/plugin-locale/localeExports';
-import { DeleteFilled, EditFilled } from '@ant-design/icons';
+import { DeleteFilled, EditFilled, LoadingOutlined } from '@ant-design/icons';
 import { request } from '@@/plugin-request/request';
 import { useModel } from '@@/plugin-model/useModel';
 
@@ -116,6 +118,9 @@ const JobTable: React.FC<JobTableProps> = ({
   const [markButtonLoading, setMarkButtonLoading] = useState<boolean>(false);
   const [jobPRsSelectOptions, setJobPRsSelectOptions] = useState({});
   const [jobPRsSelectDefault, setJobPRsSelectDefault] = useState({});
+  const [jobPRsSelectLoading, setJobPRsSelectLoading] = useState<Record<string, boolean>>({});
+  const [jobDeleteLoading, setJobDeleteLoading] = useState<Record<string, boolean>>({});
+  const [jobDeleteVisible, setJobDeleteVisible] = useState<Record<string, boolean>>({});
   // const [jobQueryVar, setJobQueryVar] = useState<JobListQueryVariables>(queryVariables);
   const isEditing = useCallback((record: Job) => record.node?.id === editingRowId, [editingRowId]);
   const [createJobMutation] = useCreateJobMutation();
@@ -194,30 +199,33 @@ const JobTable: React.FC<JobTableProps> = ({
     },
     [form, refetch, updateJobSize],
   );
-  const tableChange = useCallback((pagination: TablePaginationConfig, sorter: any) => {
-    let sorted: JobSortedEnum | undefined;
-    if (sorter && sorter.field && sorter.field.includes('size')) {
-      sorted = JobSortedEnum.Size;
-    }
-    if (sorter && sorter.field && sorter.field.includes('income')) {
-      sorted = JobSortedEnum.Income;
-    }
-    let sortedType: SortedTypeEnum | undefined;
-    if (sorter && sorter.order === 'ascend') {
-      sortedType = SortedTypeEnum.Asc;
-    }
-    if (sorter && sorter.order === 'descend') {
-      sortedType = SortedTypeEnum.Desc;
-    }
-    setJobQueryVar((old) => ({
-      ...old,
-      first: pagination.pageSize,
-      offset: ((pagination.current || 1) - 1) * (pagination.pageSize || 10),
-      sorted,
-      sortedType,
-    }));
-    setEditingRowId('');
-  }, []);
+  const tableChange = useCallback(
+    (pagination: TablePaginationConfig, sorter: any) => {
+      let sorted: JobSortedEnum | undefined;
+      if (sorter && sorter.field && sorter.field.includes('size')) {
+        sorted = JobSortedEnum.Size;
+      }
+      if (sorter && sorter.field && sorter.field.includes('income')) {
+        sorted = JobSortedEnum.Income;
+      }
+      let sortedType: SortedTypeEnum | undefined;
+      if (sorter && sorter.order === 'ascend') {
+        sortedType = SortedTypeEnum.Asc;
+      }
+      if (sorter && sorter.order === 'descend') {
+        sortedType = SortedTypeEnum.Desc;
+      }
+      setJobQueryVar((old) => ({
+        ...old,
+        first: pagination.pageSize,
+        offset: ((pagination.current || 1) - 1) * (pagination.pageSize || 10),
+        sorted,
+        sortedType,
+      }));
+      setEditingRowId('');
+    },
+    [setJobQueryVar],
+  );
   const remove = useCallback(
     async (record: Partial<Job>) => {
       await deleteJob({
@@ -294,48 +302,66 @@ const JobTable: React.FC<JobTableProps> = ({
       width: '300px',
       render: (_: any, record: Job) => {
         return (
-          <Select
-            showSearch
-            mode={'tags'}
-            maxTagCount={1}
-            maxTagTextLength={15}
-            maxTagPlaceholder={'...'}
-            size={'small'}
-            style={{ width: '100%' }}
-            value={jobPRsSelectDefault[record.node?.id || '']}
-            optionFilterProp="children"
-            options={jobPRsSelectOptions[record.node?.id || '']}
-            onSelect={async (value) => {
-              try {
-                const tmpJobPR = await addJobPR({
-                  variables: { id: record.node?.id || '', addPr: value },
-                });
-                const ret = await getGithubPRList(jobQueryVar.daoName, userName || '');
-                setOptionsPRs(ret?.items || []);
-                await updateJobPR(record.node?.id || '', tmpJobPR.data?.updateJob?.job?.prs as any);
-                message.success('Job Linked PR');
-              } catch (e) {
-                message.error('Job Linked Failed');
+          <Spin
+            spinning={jobPRsSelectLoading[record.node?.id || ''] || false}
+            indicator={<LoadingOutlined style={{ fontSize: 20 }} />}
+          >
+            <Select
+              showSearch
+              loading={jobPRsSelectLoading[record.node?.id || ''] || false}
+              mode={'tags'}
+              maxTagCount={1}
+              maxTagTextLength={15}
+              maxTagPlaceholder={'...'}
+              size={'small'}
+              style={{ width: '100%' }}
+              value={jobPRsSelectDefault[record.node?.id || '']}
+              optionFilterProp="children"
+              options={jobPRsSelectOptions[record.node?.id || '']}
+              onSelect={async (value) => {
+                try {
+                  setJobPRsSelectLoading((old) => ({ ...old, [record.node?.id || '']: true }));
+                  const tmpJobPR = await addJobPR({
+                    variables: { id: record.node?.id || '', addPr: value },
+                  });
+                  const ret = await getGithubPRList(jobQueryVar.daoName, userName || '');
+                  setOptionsPRs(ret?.items || []);
+                  await updateJobPR(
+                    record.node?.id || '',
+                    tmpJobPR.data?.updateJob?.job?.prs as any,
+                  );
+                  message.success('Job Linked PR');
+                } catch (e) {
+                  console.error('Job Linked Failed');
+                } finally {
+                  setJobPRsSelectLoading((old) => ({ ...old, [record.node?.id || '']: false }));
+                }
+              }}
+              onDeselect={async (value) => {
+                try {
+                  setJobPRsSelectLoading((old) => ({ ...old, [record.node?.id || '']: true }));
+                  const tmpJobPR = await deleteJobPR({
+                    variables: { id: record.node?.id || '', deletePr: value },
+                  });
+                  const ret = await getGithubPRList(jobQueryVar.daoName, userName || '');
+                  setOptionsPRs(ret?.items || []);
+                  await updateJobPR(
+                    record.node?.id || '',
+                    tmpJobPR.data?.updateJob?.job?.prs as any,
+                  );
+                  message.success('Job Unlinked PR');
+                } catch (e) {
+                  console.error('Job Unlinked Failed');
+                } finally {
+                  setJobPRsSelectLoading((old) => ({ ...old, [record.node?.id || '']: false }));
+                }
+              }}
+              filterOption={(input, option) =>
+                option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0 ||
+                option?.value?.indexOf(input) >= 0
               }
-            }}
-            onDeselect={async (value) => {
-              try {
-                const tmpJobPR = await deleteJobPR({
-                  variables: { id: record.node?.id || '', deletePr: value },
-                });
-                const ret = await getGithubPRList(jobQueryVar.daoName, userName || '');
-                setOptionsPRs(ret?.items || []);
-                await updateJobPR(record.node?.id || '', tmpJobPR.data?.updateJob?.job?.prs as any);
-                message.success('Job Unlinked PR');
-              } catch (e) {
-                message.error('Job Unlinked Failed');
-              }
-            }}
-            filterOption={(input, option) =>
-              option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0 ||
-              option?.value?.indexOf(input) >= 0
-            }
-          />
+            ></Select>
+          </Spin>
         );
       },
     },
@@ -391,9 +417,32 @@ const JobTable: React.FC<JobTableProps> = ({
               <EditFilled />
             </Typography.Link>
             {record.node?.status === 0 && (
-              <Typography.Link disabled={editingRowId !== ''} onClick={() => remove(record)}>
-                <DeleteFilled />
-              </Typography.Link>
+              <Popconfirm
+                placement={'right'}
+                title="Are you sure？"
+                okText="Yes"
+                cancelText="No"
+                visible={jobDeleteVisible[record.node?.id || ''] || false}
+                okButtonProps={{ loading: jobDeleteLoading[record.node?.id || ''] || false }}
+                onConfirm={async () => {
+                  try {
+                    setJobDeleteLoading((old) => ({ ...old, [record.node?.id || '']: true }));
+                    await remove(record);
+                  } finally {
+                    setJobDeleteLoading((old) => ({ ...old, [record.node?.id || '']: false }));
+                    setJobDeleteVisible((old) => ({ ...old, [record.node?.id || '']: false }));
+                  }
+                }}
+              >
+                <Typography.Link
+                  disabled={editingRowId !== ''}
+                  onClick={() =>
+                    setJobDeleteVisible((old) => ({ ...old, [record.node?.id || '']: true }))
+                  }
+                >
+                  <DeleteFilled />
+                </Typography.Link>
+              </Popconfirm>
             )}
           </Space>
         );
