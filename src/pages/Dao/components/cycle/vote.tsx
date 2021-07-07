@@ -34,7 +34,7 @@ const voteRender = (data: JobItemQuery | null | undefined, voted: boolean | unde
         <Row>{data?.user?.nickname}</Row>
         <Row>
           <a
-            href={`https://github.com/${data?.datum?.githubRepoOwner}/${data?.datum?.githubRepoName}/${data?.datum?.githubIssueNumber}`}
+            href={`https://github.com/${data?.datum?.githubRepoOwner}/${data?.datum?.githubRepoName}/issues/${data?.datum?.githubIssueNumber}`}
             target="_blank"
           >
             {data?.datum?.title}
@@ -68,7 +68,7 @@ const allVoteRender = (data: JobItemQuery | null | undefined, voted: number | nu
         <Row>{data?.user?.nickname}</Row>
         <Row>
           <a
-            href={`https://github.com/${data?.datum?.githubRepoOwner}/${data?.datum?.githubRepoName}/${data?.datum?.githubIssueNumber}`}
+            href={`https://github.com/${data?.datum?.githubRepoOwner}/${data?.datum?.githubRepoName}/issues/${data?.datum?.githubIssueNumber}`}
             target="_blank"
           >
             {data?.datum?.title}

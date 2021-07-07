@@ -58,7 +58,7 @@ const ownerColumns = (
       sorter: true,
       render: (_: any, record: JobQuery) => (
         <a
-          href={`https://github.com/${record.datum?.githubRepoOwner}/${record.datum?.githubRepoName}/${record.datum?.githubIssueNumber}`}
+          href={`https://github.com/${record.datum?.githubRepoOwner}/${record.datum?.githubRepoName}/issues/${record.datum?.githubIssueNumber}`}
           target={'_blank'}
         >
           {record.datum?.title}
@@ -133,7 +133,7 @@ const columns = (daoId: string) => {
       sorter: true,
       render: (_: any, record: JobQuery) => (
         <a
-          href={`https://github.com/${record.datum?.githubRepoOwner}/${record.datum?.githubRepoName}/${record.datum?.githubIssueNumber}`}
+          href={`https://github.com/${record.datum?.githubRepoOwner}/${record.datum?.githubRepoName}/issues/${record.datum?.githubIssueNumber}`}
           target={'_blank'}
         >
           {record.datum?.title}
