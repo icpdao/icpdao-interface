@@ -96,7 +96,7 @@ export default {
   'pages.dao.config.tab.job.cycle.voting': 'Voting time: ',
   'pages.dao.home.view': 'VIEW ON GITHUB',
   'pages.dao.home.followed': 'FOLLOW',
-  'pages.dao.home.unfollowed': 'UNFOLLOW',
+  'pages.dao.home.unfollowed': 'FOLLOWING',
   'pages.dao.home.desc.success': 'Success, DAO description updated.',
   'pages.dao.home.desc.error': 'Error, DAO description length should be longer than 50 characters.',
   'pages.dao.home.created': ' Created',
