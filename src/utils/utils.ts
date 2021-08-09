@@ -5,9 +5,22 @@ import momentTZ from 'moment-timezone';
 
 moment.locale('en');
 
-const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
+const reg =
+  /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
 
 export const isUrl = (path: string): boolean => reg.test(path);
+
+export const setMetamaskDisconnect = () => {
+  return window.localStorage.setItem('metamask', 'disconnect');
+};
+
+export const setMetamaskConnect = () => {
+  return window.localStorage.setItem('metamask', 'connect');
+};
+
+export const getMetamask = () => {
+  return window.localStorage.getItem('metamask');
+};
 
 export const getAuthorization = () => {
   // 可能存在格式转换

@@ -51,12 +51,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = () => {
   const { pathname } = useLocation();
 
   const onMenuClick = useCallback(
-    (event: {
-      key: React.Key;
-      keyPath: React.Key[];
-      item: React.ReactInstance;
-      domEvent: React.MouseEvent<HTMLElement>;
-    }) => {
+    (event: { key: string; keyPath: string[] }) => {
       const { key } = event;
       if (key === '/account/logout' && initialState) {
         loginOut();
