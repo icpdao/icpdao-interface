@@ -10,6 +10,18 @@ const reg =
 
 export const isUrl = (path: string): boolean => reg.test(path);
 
+export const setMetamaskDisconnect = () => {
+  return window.localStorage.setItem('metamask', 'disconnect');
+};
+
+export const setMetamaskConnect = () => {
+  return window.localStorage.setItem('metamask', 'connect');
+};
+
+export const getMetamask = () => {
+  return window.localStorage.getItem('metamask');
+};
+
 export const getAuthorization = () => {
   // 可能存在格式转换
   return window.localStorage.getItem('authorization');

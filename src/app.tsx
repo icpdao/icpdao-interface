@@ -18,6 +18,7 @@ import {
 import type { MenuTheme } from 'antd';
 import { ApolloProvider } from '@apollo/client';
 import client from '@/utils/apolloClient';
+import detectEthereumProvider from '@metamask/detect-provider';
 
 const githubCallback = '/login/auth_callback';
 
@@ -29,6 +30,7 @@ export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
   fetchUserInfo: () => Promise<API.UserProfile | undefined>;
   currentUser?: any;
+  provider?: any;
 }> {
   const auth = getAuthorization();
   if (!auth) {
@@ -44,6 +46,7 @@ export async function getInitialState(): Promise<{
       return undefined;
     }
   };
+  const provider: any = await detectEthereumProvider({ mustBeMetaMask: true });
   if (history.location.pathname !== githubCallback && auth) {
     await fetchUserInfo();
   }
@@ -51,6 +54,7 @@ export async function getInitialState(): Promise<{
     fetchUserInfo,
     currentUser: getUserInfo,
     settings: { headerTheme: getTheme() as MenuTheme },
+    provider,
   };
 }
 
