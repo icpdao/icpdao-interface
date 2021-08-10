@@ -24,7 +24,7 @@ export default (): ReactNode => {
   }, []);
 
   const menuList: SelectDropdownMenu[] = useMemo(() => {
-    if (access.canInviteIcpper()) {
+    if (access.isIcpper()) {
       return [
         {
           key: 'all',

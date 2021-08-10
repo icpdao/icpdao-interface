@@ -14,7 +14,4 @@ export default defineConfig({
     babelOptions: {},
   },
   devtool: 'eval',
-  webpack5: {
-    // lazyCompilation: {},
-  },
 });
