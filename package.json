@@ -77,7 +77,9 @@
     "slash2": "^2.0.0",
     "umi": "^3.5.0",
     "umi-plugin-antd-theme": "^2.1.2",
-    "umi-request": "^1.0.8"
+    "umi-request": "^1.0.8",
+    "web3": "^1.5.1",
+    "xlsx": "^0.17.0"
   },
   "devDependencies": {
     "@ant-design/pro-cli": "^2.0.2",
