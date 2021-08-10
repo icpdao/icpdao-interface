@@ -8,7 +8,7 @@ import PermissionErrorPage from '@/pages/403';
 
 export default (): ReactNode => {
   const access = useAccess();
-  if (!access.canInviteIcpper()) {
+  if (!access.isPreIcpperOrIcpper()) {
     return <PermissionErrorPage />;
   }
 

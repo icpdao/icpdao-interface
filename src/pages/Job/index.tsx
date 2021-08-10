@@ -38,7 +38,7 @@ export default (props: {
     return <PageLoading />;
   }
 
-  if (!access.isIcpper()) {
+  if (!access.isPreIcpperOrIcpper()) {
     return <PermissionErrorPage />;
   }
 

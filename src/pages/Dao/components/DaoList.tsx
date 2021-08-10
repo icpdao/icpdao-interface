@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { Button, Table, Space, Avatar, Input, Dropdown, Menu } from 'antd';
+import { Button, Table, Space, Avatar, Input, Dropdown, Menu, Alert } from 'antd';
 
 import { DownOutlined, UserOutlined } from '@ant-design/icons';
 
@@ -325,26 +325,42 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
 const DaoList: React.FC<DaoListProps> = ({ menuList }) => {
   const access = useAccess();
   const intl = useIntl();
+  const [showAlertInfo, setShowAlertInfo] = useState(false);
+
+  const isPreIcpperOrIcpper = access.isPreIcpperOrIcpper();
 
   const onClick = useCallback(() => {
-    history.push('/dao/create');
-  }, []);
+    if (isPreIcpperOrIcpper) {
+      history.push('/dao/create');
+    } else {
+      setShowAlertInfo(true);
+    }
+  }, [isPreIcpperOrIcpper]);
 
-  const canInviteIcpper = access.canInviteIcpper();
-
-  const createButton = useMemo(() => {
-    if (canInviteIcpper) {
+  const alertInfo = useMemo(() => {
+    if (showAlertInfo) {
       return (
-        <Button type="primary" size="large" onClick={onClick}>
-          {intl.formatMessage({ id: 'pages.dao.component.dao_list.create_dao' })}
-        </Button>
+        <Alert
+          message={intl.formatMessage({ id: 'pages.dao.component.dao_list.no_role_alert_info' })}
+          type="error"
+          showIcon
+        />
       );
     }
     return null;
-  }, [canInviteIcpper, intl, onClick]);
+  }, [showAlertInfo]);
+
+  const createButton = useMemo(() => {
+    return (
+      <Button className={styles.createDao} type="primary" size="large" onClick={onClick}>
+        {intl.formatMessage({ id: 'pages.dao.component.dao_list.create_dao' })}
+      </Button>
+    );
+  }, [intl, onClick]);
 
   return (
     <div className={styles.container}>
+      {alertInfo}
       {createButton}
 
       <DaoTable menuList={menuList} />

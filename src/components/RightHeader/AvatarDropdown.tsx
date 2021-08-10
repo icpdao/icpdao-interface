@@ -101,7 +101,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = () => {
             {intl.formatMessage({ id: 'component.globalHeader.avatar.dropdown.mentor' })}
           </Menu.Item>
         )}
-        {access.canInviteIcpper() && (
+        {access.isPreIcpperOrIcpper() && (
           <Menu.Item key="/account/icpper">
             <TeamOutlined />
             {intl.formatMessage({ id: 'component.globalHeader.avatar.dropdown.icpper' })}
@@ -111,7 +111,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = () => {
           <DeploymentUnitOutlined />
           {intl.formatMessage({ id: 'component.globalHeader.avatar.dropdown.dao' })}
         </Menu.Item>
-        {access.isIcpper() && (
+        {access.isPreIcpperOrIcpper() && (
           <Menu.Item key="/job">
             <DeploymentUnitOutlined />
             {intl.formatMessage({ id: 'component.globalHeader.avatar.dropdown.job' })}
