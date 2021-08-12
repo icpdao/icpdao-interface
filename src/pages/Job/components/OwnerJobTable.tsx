@@ -38,7 +38,7 @@ import { useModel } from '@@/plugin-model/useModel';
 interface JobTableProps {
   jobQueryVar: JobListQueryVariables;
   daoId: string;
-  userName: string;
+  userName: string | undefined;
   refetchSelect: any;
   setJobQueryVar: Dispatch<SetStateAction<JobListQueryVariables>>;
 }
@@ -103,7 +103,7 @@ async function getGithubPRList(daoName: string, user: string) {
   });
 }
 
-const JobTable: React.FC<JobTableProps> = ({
+const OwnerJobTable: React.FC<JobTableProps> = ({
   jobQueryVar,
   userName,
   daoId,
@@ -360,7 +360,7 @@ const JobTable: React.FC<JobTableProps> = ({
                 option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0 ||
                 option?.value?.indexOf(input) >= 0
               }
-            ></Select>
+            />
           </Spin>
         );
       },
@@ -540,4 +540,4 @@ const JobTable: React.FC<JobTableProps> = ({
   );
 };
 
-export default JobTable;
+export default OwnerJobTable;

@@ -9,7 +9,10 @@ import styles from './index.less';
 function itemRender(route: any, params: any, routes: any) {
   const last = routes.indexOf(route) === routes.length - 1;
   if (last) {
-    return <FormattedMessage id={`menu.${route.menuId}`} />;
+    if (route.menuId) {
+      return <FormattedMessage id={`menu.${route.menuId}`} />;
+    }
+    return route.name;
   }
   let name = route.breadcrumbName;
   if (route.menuId) {
@@ -29,6 +32,7 @@ function itemRender(route: any, params: any, routes: any) {
 export type IconRoute = {
   icon?: React.ReactNode;
   menuId?: string;
+  name?: string;
 } & Route;
 
 export type GlobalBreadcrumbProps = {
