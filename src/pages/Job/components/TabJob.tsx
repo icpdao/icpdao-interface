@@ -5,7 +5,9 @@ import type { JobListQueryVariables } from '@/services/dao/generated';
 import { useUserJobDaoListQuery } from '@/services/dao/generated';
 import moment from 'moment';
 import { PageLoading } from '@ant-design/pro-layout';
-import JobTable from '@/pages/Job/components/JobTable';
+import OwnerJobTable from '@/pages/Job/components/OwnerJobTable';
+import OtherUserJobTable from '@/pages/Job/components/OtherUserJobTable';
+import { useModel } from '@@/plugin-model/useModel';
 
 type TabJobProps = {
   daoId?: string;
@@ -21,6 +23,8 @@ function PickerWithType({ type, onChange }: any) {
 }
 
 const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
+  const { initialState } = useModel('@@initialState');
+
   const [form] = Form.useForm();
   const [searchDateType, setSearchDateType] = useState<string>('date');
   const [defaultDaoId, setDefaultDaoId] = useState(daoId || '');
@@ -50,23 +54,48 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
     [setJobQueryVar, searchDateType],
   );
 
-  const { data, loading, error, refetch } = useUserJobDaoListQuery();
+  const { data, loading, error, refetch } = useUserJobDaoListQuery({
+    variables: { userName },
+  });
   useMemo(async () => {
     if (data?.daos?.dao && data?.daos?.dao.length > 0) {
       let defaultDao: any;
       data?.daos?.dao.forEach((d) => {
-        if (daoId && d?.datum?.id === daoId) {
+        if (defaultDaoId && d?.datum?.id === defaultDaoId) {
           defaultDao = d.datum;
         }
       });
-      const defaultDaoName = defaultDao?.name || data.daos.dao[0]?.datum?.name || '';
       setDefaultDaoId(defaultDao?.id || data.daos.dao[0]?.datum?.id || '');
+      const daoNameParam = defaultDao?.name || data?.daos?.dao[0]?.datum?.name || null;
       setJobQueryVar((old) => ({
         ...old,
-        daoName: defaultDaoName,
+        daoName: daoNameParam,
+        userName,
       }));
     }
-  }, [daoId, data]);
+  }, [data, defaultDaoId, userName]);
+
+  const isMy = initialState && userName === initialState.currentUser().profile.github_login;
+  const jobTable = useMemo(() => {
+    if (isMy) {
+      return (
+        <OwnerJobTable
+          jobQueryVar={jobQueryVar}
+          userName={userName}
+          daoId={defaultDaoId}
+          refetchSelect={refetch}
+          setJobQueryVar={setJobQueryVar}
+        />
+      );
+    }
+    return (
+      <OtherUserJobTable
+        jobQueryVar={jobQueryVar}
+        userName={userName}
+        setJobQueryVar={setJobQueryVar}
+      />
+    );
+  }, [defaultDaoId, isMy, jobQueryVar, refetch, userName]);
 
   if (loading || error) {
     return <PageLoading />;
@@ -117,13 +146,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
           <PickerWithType type={searchDateType} onChange={(value: any) => parseTime(value)} />
         </Form.Item>
       </Form>
-      <JobTable
-        jobQueryVar={jobQueryVar}
-        userName={userName || ''}
-        daoId={defaultDaoId}
-        refetchSelect={refetch}
-        setJobQueryVar={setJobQueryVar}
-      />
+      {jobTable}
     </>
   );
 };

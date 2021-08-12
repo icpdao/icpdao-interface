@@ -340,6 +340,8 @@ export type DaoSchema = {
   __typename?: 'DAOSchema';
   createAt: Scalars['Int'];
   desc?: Maybe<Scalars['String']>;
+  githubOwnerId: Scalars['Int'];
+  githubOwnerName: Scalars['String'];
   /** _id */
   id?: Maybe<Scalars['ID']>;
   logo?: Maybe<Scalars['String']>;
@@ -355,6 +357,11 @@ export type DaoStat = {
   job?: Maybe<Scalars['Int']>;
   size?: Maybe<Scalars['Float']>;
   token?: Maybe<Scalars['String']>;
+};
+
+export type DaoTokenConfig = {
+  __typename?: 'DAOTokenConfig';
+  ethDaoId?: Maybe<Scalars['String']>;
 };
 
 export type DaOs = {
@@ -630,6 +637,7 @@ export type Query = {
   daos?: Maybe<DaOs>;
   dao?: Maybe<Dao>;
   daoJobConfig?: Maybe<DaoJobConfig>;
+  daoTokenConfig?: Maybe<DaoTokenConfig>;
   daoGithubAppStatus?: Maybe<DaoGithubAppStatus>;
   cycle?: Maybe<CycleQuery>;
   jobs?: Maybe<Jobs>;
@@ -642,6 +650,7 @@ export type QueryDaosArgs = {
   search?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
+  userName?: Maybe<Scalars['String']>;
 };
 
 export type QueryDaoArgs = {
@@ -650,6 +659,10 @@ export type QueryDaoArgs = {
 };
 
 export type QueryDaoJobConfigArgs = {
+  daoId: Scalars['String'];
+};
+
+export type QueryDaoTokenConfigArgs = {
   daoId: Scalars['String'];
 };
 
@@ -1113,7 +1126,9 @@ export type DaoListQuery = { __typename?: 'Query' } & {
   >;
 };
 
-export type UserJobDaoListQueryVariables = Exact<{ [key: string]: never }>;
+export type UserJobDaoListQueryVariables = Exact<{
+  userName?: Maybe<Scalars['String']>;
+}>;
 
 export type UserJobDaoListQuery = { __typename?: 'Query' } & {
   daos?: Maybe<
@@ -1152,6 +1167,7 @@ export type JobListQueryVariables = Exact<{
   offset?: Maybe<Scalars['Int']>;
   sorted?: Maybe<JobSortedEnum>;
   sortedType?: Maybe<SortedTypeEnum>;
+  userName?: Maybe<Scalars['String']>;
 }>;
 
 export type JobListQuery = { __typename?: 'Query' } & {
@@ -2145,7 +2161,8 @@ export function useUpdateCycleJobVoteTypeByOwnerMutation(
 export type UpdateCycleJobVoteTypeByOwnerMutationHookResult = ReturnType<
   typeof useUpdateCycleJobVoteTypeByOwnerMutation
 >;
-export type UpdateCycleJobVoteTypeByOwnerMutationResult = Apollo.MutationResult<UpdateCycleJobVoteTypeByOwnerMutation>;
+export type UpdateCycleJobVoteTypeByOwnerMutationResult =
+  Apollo.MutationResult<UpdateCycleJobVoteTypeByOwnerMutation>;
 export type UpdateCycleJobVoteTypeByOwnerMutationOptions = Apollo.BaseMutationOptions<
   UpdateCycleJobVoteTypeByOwnerMutation,
   UpdateCycleJobVoteTypeByOwnerMutationVariables
@@ -2487,7 +2504,8 @@ export function useBeginCycleVoteResultTaskMutation(
 export type BeginCycleVoteResultTaskMutationHookResult = ReturnType<
   typeof useBeginCycleVoteResultTaskMutation
 >;
-export type BeginCycleVoteResultTaskMutationResult = Apollo.MutationResult<BeginCycleVoteResultTaskMutation>;
+export type BeginCycleVoteResultTaskMutationResult =
+  Apollo.MutationResult<BeginCycleVoteResultTaskMutation>;
 export type BeginCycleVoteResultTaskMutationOptions = Apollo.BaseMutationOptions<
   BeginCycleVoteResultTaskMutation,
   BeginCycleVoteResultTaskMutationVariables
@@ -2536,7 +2554,8 @@ export function useBeginPublishCycleTaskMutation(
 export type BeginPublishCycleTaskMutationHookResult = ReturnType<
   typeof useBeginPublishCycleTaskMutation
 >;
-export type BeginPublishCycleTaskMutationResult = Apollo.MutationResult<BeginPublishCycleTaskMutation>;
+export type BeginPublishCycleTaskMutationResult =
+  Apollo.MutationResult<BeginPublishCycleTaskMutation>;
 export type BeginPublishCycleTaskMutationOptions = Apollo.BaseMutationOptions<
   BeginPublishCycleTaskMutation,
   BeginPublishCycleTaskMutationVariables
@@ -2586,7 +2605,8 @@ export function useUpdateVotePairPublicMutation(
 export type UpdateVotePairPublicMutationHookResult = ReturnType<
   typeof useUpdateVotePairPublicMutation
 >;
-export type UpdateVotePairPublicMutationResult = Apollo.MutationResult<UpdateVotePairPublicMutation>;
+export type UpdateVotePairPublicMutationResult =
+  Apollo.MutationResult<UpdateVotePairPublicMutation>;
 export type UpdateVotePairPublicMutationOptions = Apollo.BaseMutationOptions<
   UpdateVotePairPublicMutation,
   UpdateVotePairPublicMutationVariables
@@ -2861,8 +2881,8 @@ export type DaoListQueryHookResult = ReturnType<typeof useDaoListQuery>;
 export type DaoListLazyQueryHookResult = ReturnType<typeof useDaoListLazyQuery>;
 export type DaoListQueryResult = Apollo.QueryResult<DaoListQuery, DaoListQueryVariables>;
 export const UserJobDaoListDocument = gql`
-  query UserJobDAOList {
-    daos(filter: member, offset: 0, first: 100) {
+  query UserJobDAOList($userName: String) {
+    daos(filter: member, offset: 0, first: 100, userName: $userName) {
       dao {
         datum {
           id
@@ -2885,6 +2905,7 @@ export const UserJobDaoListDocument = gql`
  * @example
  * const { data, loading, error } = useUserJobDaoListQuery({
  *   variables: {
+ *      userName: // value for 'userName'
  *   },
  * });
  */
@@ -2978,6 +2999,7 @@ export const JobListDocument = gql`
     $offset: Int
     $sorted: JobSortedEnum
     $sortedType: SortedTypeEnum
+    $userName: String
   ) {
     jobs(
       beginTime: $beginTime
@@ -2987,6 +3009,7 @@ export const JobListDocument = gql`
       offset: $offset
       sorted: $sorted
       sortedType: $sortedType
+      userName: $userName
     ) {
       job {
         node {
@@ -3036,6 +3059,7 @@ export const JobListDocument = gql`
  *      offset: // value for 'offset'
  *      sorted: // value for 'sorted'
  *      sortedType: // value for 'sortedType'
+ *      userName: // value for 'userName'
  *   },
  * });
  */
