@@ -99,8 +99,8 @@ query DAOList($filter: DAOsFilterEnum, $sorted: DAOsSortedEnum, $sortedType: DAO
   }
 }
 
-query UserJobDAOList {
-  daos(filter: member, offset: 0, first: 100) {
+query UserJobDAOList($userName: String) {
+  daos(filter: member, offset: 0, first: 100, userName: $userName) {
     dao {
       datum {
         id
@@ -120,8 +120,8 @@ query DAOGithubAppStatus($name: String!) {
   }
 }
 
-query JobList($beginTime: Int, $endTime: Int, $daoName: String!, $first: Int, $offset: Int, $sorted: JobSortedEnum, $sortedType: SortedTypeEnum) {
-  jobs(beginTime: $beginTime, daoName: $daoName, endTime: $endTime, first: $first, offset: $offset, sorted: $sorted, sortedType: $sortedType) {
+query JobList($beginTime: Int, $endTime: Int, $daoName: String!, $first: Int, $offset: Int, $sorted: JobSortedEnum, $sortedType: SortedTypeEnum, $userName: String) {
+  jobs(beginTime: $beginTime, daoName: $daoName, endTime: $endTime, first: $first, offset: $offset, sorted: $sorted, sortedType: $sortedType, userName: $userName) {
     job {
       node {
         id

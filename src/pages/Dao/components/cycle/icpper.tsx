@@ -61,6 +61,10 @@ const renderSize = (intl: any, record: IcpperStatQuery) => {
   );
 };
 
+const getJobListUrl = (record: any, daoId: string) => {
+  return `/job?userName=${record.icpper?.githubLogin}&daoId=${daoId}`;
+};
+
 const ownerColumns = (
   intl: any,
   daoId: string,
@@ -80,7 +84,7 @@ const ownerColumns = (
             <a
               onClick={(event) => {
                 event.preventDefault();
-                history.push(`/job?userName=${record.icpper?.githubLogin}&daoId=${daoId}`);
+                history.push(getJobListUrl(record, daoId));
               }}
             >
               {record.icpper?.nickname}
@@ -205,7 +209,7 @@ const columns = (intl: any, daoId: string) => {
             <a
               onClick={(event) => {
                 event.preventDefault();
-                history.push(`/job?userName=${record.icpper?.githubLogin}&daoId=${daoId}`);
+                history.push(getJobListUrl(record, daoId));
               }}
             >
               {record.icpper?.nickname}
