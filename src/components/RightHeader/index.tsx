@@ -19,6 +19,7 @@ const GlobalHeaderRight: React.FC = () => {
   if (!initialState || !initialState.settings) {
     return null;
   }
+
   setLocale('en-US', false);
   return (
     <Space size={23} className={styles.right}>

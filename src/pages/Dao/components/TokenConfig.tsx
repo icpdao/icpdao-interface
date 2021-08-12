@@ -6,32 +6,29 @@ import styles from './index.less';
 import TokenCreate from '@/pages/Dao/components/token/Create';
 import { useDaoTokenConfigQuery } from '@/services/dao/generated';
 import { PageLoading } from '@ant-design/pro-layout';
-import type { ETHConnect } from '@/services/ethereum-connect/typings';
 import { useRequest } from '@@/plugin-request/request';
 import { ZeroAddress } from '@/services/ethereum-connect';
+import { useModel } from '@@/plugin-model/useModel';
 
 const { TabPane } = Tabs;
 
 type TokenConfigProps = {
   daoId: string;
-  connect: ETHConnect;
 };
 
 export type TokenConfigComponentsProps = {
   ethDAOId: string;
-  connect: ETHConnect;
   tokenAddress?: string;
 };
 
-const TokenConfig: React.FC<TokenConfigProps> = ({ daoId, connect }) => {
+const TokenConfig: React.FC<TokenConfigProps> = ({ daoId }) => {
   const intl = useIntl();
   const { data, loading, error } = useDaoTokenConfigQuery({ variables: { daoId } });
   const [tokenAddress, setTokenAddress] = useState<string>(ZeroAddress);
+  const { contract } = useModel('useWalletModel');
   useRequest(
     async () => {
-      const ta = await connect.contract.daoFactory.getTokenAddress(
-        data?.daoTokenConfig?.ethDaoId || '',
-      );
+      const ta = await contract.daoFactory.getTokenAddress(data?.daoTokenConfig?.ethDaoId || '');
       setTokenAddress(ta);
       return ta;
     },
@@ -40,14 +37,12 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId, connect }) => {
     },
   );
   if (loading || error) return <PageLoading />;
-
   return (
     <>
       <Tabs className={styles.tokenConfigTabs} defaultActiveKey="create" tabPosition={'left'}>
         <TabPane tab={intl.formatMessage({ id: 'pages.dao.config.tab.token.create' })} key="create">
           <TokenCreate
             ethDAOId={data?.daoTokenConfig?.ethDaoId || ''}
-            connect={connect}
             tokenAddress={tokenAddress || ZeroAddress}
           />
         </TabPane>

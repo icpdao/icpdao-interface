@@ -9,64 +9,39 @@ import {
 import { Modal, Card, Space, Menu } from 'antd';
 import HeaderDropdown from '../HeaderDropdown';
 import IconFont from '@/components/IconFont';
-import { FormattedMessage, history } from 'umi';
+import { FormattedMessage } from 'umi';
 import { useModel } from '@@/plugin-model/useModel';
-import {
-  EthereumNetwork,
-  getMetamask,
-  setMetamaskConnect,
-  setMetamaskDisconnect,
-} from '@/utils/utils';
-
-type memamaskInfo =
-  | undefined
-  | {
-      account?: string;
-      network?: string;
-    };
+import { EthereumNetwork, setMetamaskConnect, setMetamaskDisconnect } from '@/utils/utils';
+import { history } from '@@/core/history';
 
 const Wallet: React.FC = () => {
   const [connectWalletModal, setConnectWalletModal] = useState<boolean>(false);
-  const [connectedMetamaskInfo, setConnectedMetamaskInfo] = useState<memamaskInfo>(undefined);
   const { initialState } = useModel('@@initialState');
+  const {
+    event$,
+    network,
+    metamaskProvider,
+    isConnected,
+    setIsConnected,
+    setNetwork,
+    accounts,
+    setAccounts,
+  } = useModel('useWalletModel');
 
   const connectMetamask = useCallback(async () => {
-    const provider: any = initialState?.provider;
-    if (!provider) {
+    if (!metamaskProvider) {
       history.push('https://metamask.io/');
       return;
     }
-    const accounts: string[] = await provider.request({ method: 'eth_requestAccounts' });
-    const chainId: string = await provider.request({ method: 'eth_chainId' });
+    setAccounts(await metamaskProvider.request({ method: 'eth_requestAccounts' }));
+    setNetwork(EthereumNetwork[await metamaskProvider.request({ method: 'eth_chainId' })]);
     console.log(accounts);
     if (accounts.length > 0) {
-      setConnectedMetamaskInfo({ account: accounts[0], network: EthereumNetwork[chainId] });
       setMetamaskConnect();
+      setIsConnected(true);
       setConnectWalletModal(false);
     }
-  }, [initialState]);
-
-  useMemo(async () => {
-    const provider: any = initialState?.provider;
-    if (!provider) return;
-    if (!provider.isConnected()) return;
-    const accounts: string[] = await provider.request({ method: 'eth_accounts' });
-    const chainId: string = await provider.request({ method: 'eth_chainId' });
-    if (accounts.length > 0 && chainId && getMetamask() !== 'disconnect')
-      setConnectedMetamaskInfo({ account: accounts[0], network: EthereumNetwork[chainId] });
-    provider.on('accountsChanged', (acs: string[]) => {
-      setConnectedMetamaskInfo((old) => ({
-        ...old,
-        account: acs[0],
-      }));
-    });
-    provider.on('chainChanged', (cid: string) => {
-      setConnectedMetamaskInfo((old) => ({
-        ...old,
-        network: EthereumNetwork[cid],
-      }));
-    });
-  }, [initialState]);
+  }, [accounts, metamaskProvider, setAccounts, setIsConnected, setNetwork]);
 
   const getConnectWalletBody = useCallback(() => {
     return (
@@ -95,17 +70,24 @@ const Wallet: React.FC = () => {
     );
   }, [connectMetamask]);
 
-  const handlerClickMenu = useCallback((event: { key: string; keyPath: string[] }) => {
-    const { key } = event;
-    if (key === 'disconnect') {
-      setConnectedMetamaskInfo(undefined);
-      setMetamaskDisconnect();
-    }
-  }, []);
+  const handlerClickMenu = useCallback(
+    (event: { key: string; keyPath: string[] }) => {
+      const { key } = event;
+      if (key === 'disconnect') {
+        setIsConnected(false);
+        setMetamaskDisconnect();
+      }
+    },
+    [setIsConnected],
+  );
+  const account = useMemo(() => (accounts.length > 0 ? accounts[0] : ''), [accounts]);
 
   if (!initialState?.currentUser().profile || !initialState?.currentUser().profile.nickname) {
     return <></>;
   }
+  event$.useSubscription(() => {
+    setConnectWalletModal(true);
+  });
 
   return (
     <>
@@ -128,23 +110,21 @@ const Wallet: React.FC = () => {
       >
         {getConnectWalletBody()}
       </Modal>
-      {!connectedMetamaskInfo && (
+      {!isConnected && (
         <WalletOutlined onClick={() => setConnectWalletModal(true)} className={styles.walletIcon} />
       )}
-      {!!connectedMetamaskInfo && (
+      {isConnected && (
         <HeaderDropdown
           overlay={
             <Menu className={styles.menu} onClick={handlerClickMenu}>
               <Menu.Item key={'network'}>
                 <ApartmentOutlined />
-                {connectedMetamaskInfo.network === 'homestead'
-                  ? 'mainnet'
-                  : connectedMetamaskInfo.network}
+                {network === 'homestead' ? 'mainnet' : network}
               </Menu.Item>
               <Menu.Item key={'account'}>
                 <AimOutlined />
-                {connectedMetamaskInfo.account?.substr(0, 6)}...
-                {connectedMetamaskInfo.account?.substr(-4)}
+                {account?.substr(0, 6)}...
+                {account?.substr(-4)}
               </Menu.Item>
               <Menu.Item key={'disconnect'}>
                 <DisconnectOutlined />

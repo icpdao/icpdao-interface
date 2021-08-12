@@ -138,6 +138,7 @@ export default {
   'pages.dao.config.tab.token.create.recreate.input': 'confirm to recreate',
   'pages.dao.config.tab.token.create.modal.ok': "Yes, I'm sure",
   'pages.dao.config.tab.token.create.modal.cancel': 'Let me think again',
+  'pages.dao.config.tab.token.create.loading': 'Waiting for the transaction to complete...',
   'pages.dao.config.tab.token.create_pool': 'Create Pool',
   'pages.dao.config.tab.token.add_lp': 'Add LP',
   'pages.dao.config.tab.token.manager': 'Manager',
