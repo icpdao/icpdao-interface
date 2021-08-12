@@ -58,6 +58,7 @@
     "@umijs/openapi": "^1.1.14",
     "@umijs/plugin-openapi": "^1.2.0",
     "@umijs/route-utils": "^1.0.36",
+    "ahooks": "^2.10.9",
     "antd": "^4.14.0",
     "apollo-boost": "^0.4.9",
     "classnames": "^2.2.6",

@@ -12,6 +12,7 @@ import {
   Table,
   Col,
   Descriptions,
+  Spin,
 } from 'antd';
 import { UploadOutlined, ZoomInOutlined } from '@ant-design/icons';
 import { FormattedMessage } from 'umi';
@@ -19,10 +20,11 @@ import * as XLSX from 'xlsx';
 import Web3 from 'web3';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import GlobalModal from '@/components/Modal';
-import { TokenConfigComponentsProps } from '@/pages/Dao/components/TokenConfig';
+import type { TokenConfigComponentsProps } from '@/pages/Dao/components/TokenConfig';
 import { ZeroAddress } from '@/services/ethereum-connect';
-import { ETH_CONNECT } from '@/services/ethereum-connect/typings';
+import type { ETH_CONNECT } from '@/services/ethereum-connect/typings';
 import { useRequest } from '@@/plugin-request/request';
+import { useModel } from '@@/plugin-model/useModel';
 
 type ValidateStatus = Parameters<typeof Form.Item>[0]['validateStatus'];
 
@@ -37,8 +39,10 @@ type validate = {
   help?: string;
 };
 
-const TokenCreate: React.FC<TokenConfigComponentsProps> = ({ ethDAOId, connect, tokenAddress }) => {
+const TokenCreate: React.FC<TokenConfigComponentsProps> = ({ ethDAOId, tokenAddress }) => {
   const intl = useIntl();
+  const { isConnected, contract, event$ } = useModel('useWalletModel');
+
   const [createFormData, setCreateFormData] = useState<ETH_CONNECT.CreateToken>({
     ethDAOId,
     genesis: [],
@@ -65,16 +69,21 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({ ethDAOId, connect, 
   const [previewCreateModal, setPreviewCreateModal] = useState<boolean>(false);
   const [noticeReCreateModal, setNoticeReCreateModal] = useState<boolean>(false);
   const [confirmReCreateModal, setConfirmReCreateModal] = useState<boolean>(false);
+  const [loadingDeployComplete, setLoadingDeployComplete] = useState<boolean>(false);
   const [disableConfirmReCreateButton, setDisableConfirmReCreateButton] = useState<boolean>(true);
   const { loading, run } = useRequest(
     async () => {
-      return await connect.contract.daoFactory.createToken(createFormData);
+      console.log('createData', createFormData);
+      const tx = await contract.daoFactory.createToken(createFormData);
+      setPreviewCreateModal(false);
+      setLoadingDeployComplete(true);
+      const receipt = await tx.wait();
+      const deployEvent = receipt.events.pop();
+      setLoadingDeployComplete(false);
+      console.log(deployEvent.args);
     },
     {
       manual: true,
-      onSuccess: (result) => {
-        console.log(result);
-      },
     },
   );
   const readUploadExcel = useCallback((file) => {
@@ -162,403 +171,412 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({ ethDAOId, connect, 
   }, [handlerCreate, handlerReCreate, tokenAddress]);
   return (
     <>
-      <Form labelCol={{ span: 4 }} wrapperCol={{ span: 16 }} name={'tokenCreate'}>
-        <Form.Item
-          label={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.form.genesis' })}
-          tooltip={intl.formatMessage({
-            id: 'pages.dao.config.tab.token.create.form.genesis.desc',
-          })}
-          validateStatus={createFormValidMsg?.genesis?.validateStatus}
-          help={createFormValidMsg?.genesis?.help}
-        >
-          <Upload
-            maxCount={1}
-            beforeUpload={(file) => {
-              return readUploadExcel(file);
-            }}
-            showUploadList={{
-              showDownloadIcon: true,
-              showRemoveIcon: true,
-              downloadIcon: <ZoomInOutlined onClick={() => setPreviewGenesis(true)} />,
-            }}
-            accept={allowUploadGenesisFileType.join(',')}
-          >
-            <Button icon={<UploadOutlined />}>
-              &nbsp;
-              <FormattedMessage id={'pages.dao.config.tab.token.create.form.upload'} />
-            </Button>
-          </Upload>
-          <a href="/token_gensis.xlsx" target={'_blank'}>
-            template
-          </a>
-        </Form.Item>
-        <Form.Item
-          label={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.form.lp_ratio' })}
-          tooltip={intl.formatMessage({
-            id: 'pages.dao.config.tab.token.create.form.lp_ratio.desc',
-          })}
-          validateStatus={createFormValidMsg?.lpRatio?.validateStatus}
-          help={createFormValidMsg?.lpRatio?.help}
-        >
-          <InputNumber
-            min={0}
-            max={100}
-            defaultValue={createFormData.lpRatio}
-            formatter={(value) => `${value} %`}
-            parser={(value) => value?.replace(' %', '') as any}
-            onChange={(value) => {
-              setCreateFormData((old) => ({
-                ...old,
-                lpRatio: value,
-              }));
-            }}
-          />
-        </Form.Item>
-        <Form.Item
-          label={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.form.owner_address' })}
-          tooltip={intl.formatMessage({
-            id: 'pages.dao.config.tab.token.create.form.owner_address.desc',
-          })}
-          validateStatus={createFormValidMsg?.ownerAddress?.validateStatus}
-          help={createFormValidMsg?.ownerAddress?.help}
-        >
-          <Input
-            value={createFormData.ownerAddress}
-            style={{ width: 400 }}
-            onChange={(e) => {
-              if (e.target.value === '' || !Web3.utils.isAddress(e.target.value))
-                setCreateFormValidMsg((old) => ({
-                  ...old,
-                  ownerAddress: {
-                    validateStatus: 'error',
-                    help: 'The owner address must be an Ethereum address.',
-                  },
-                }));
-              else
-                setCreateFormValidMsg((old) => ({
-                  ...old,
-                  ownerAddress: {
-                    validateStatus: 'success',
-                  },
-                }));
-              setCreateFormData((old) => ({
-                ...old,
-                ownerAddress: e.target.value,
-              }));
-            }}
-          />
-        </Form.Item>
-        <Form.Item
-          label={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.form.token_name' })}
-          tooltip={intl.formatMessage({
-            id: 'pages.dao.config.tab.token.create.form.token_name.desc',
-          })}
-          validateStatus={createFormValidMsg?.tokenName?.validateStatus}
-          help={createFormValidMsg?.tokenName?.help}
-        >
-          <Input
-            value={createFormData.tokenName}
-            style={{ width: 400 }}
-            onChange={(e) => {
-              if (e.target.value === '')
-                setCreateFormValidMsg((old) => ({
-                  ...old,
-                  tokenName: {
-                    validateStatus: 'error',
-                    help: 'The token name cannot be empty.',
-                  },
-                }));
-              else
-                setCreateFormValidMsg((old) => ({
-                  ...old,
-                  tokenName: {
-                    validateStatus: 'success',
-                  },
-                }));
-              setCreateFormData((old) => ({
-                ...old,
-                tokenName: e.target.value,
-              }));
-            }}
-          />
-        </Form.Item>
-        <Form.Item
-          label={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.form.token_symbol' })}
-          tooltip={intl.formatMessage({
-            id: 'pages.dao.config.tab.token.create.form.token_symbol.desc',
-          })}
-          validateStatus={createFormValidMsg?.tokenSymbol?.validateStatus}
-          help={createFormValidMsg?.tokenSymbol?.help}
-        >
-          <Input
-            value={createFormData.tokenSymbol}
-            style={{ width: 400 }}
-            onChange={(e) => {
-              if (e.target.value === '')
-                setCreateFormValidMsg((old) => ({
-                  ...old,
-                  tokenSymbol: {
-                    validateStatus: 'error',
-                    help: 'The token symbol cannot be empty.',
-                  },
-                }));
-              else
-                setCreateFormValidMsg((old) => ({
-                  ...old,
-                  tokenSymbol: {
-                    validateStatus: 'success',
-                  },
-                }));
-              setCreateFormData((old) => ({
-                ...old,
-                tokenSymbol: e.target.value,
-              }));
-            }}
-          />
-        </Form.Item>
-        <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
-          <Radio.Group
-            defaultValue={'normal'}
-            buttonStyle="solid"
-            onChange={(v) =>
-              setCreateFormData((old) => ({
-                ...old,
-                mode: v.target.value,
-              }))
-            }
-          >
-            <Radio.Button value="normal">
-              <FormattedMessage id={`pages.dao.config.tab.token.create.form.normal`} />
-            </Radio.Button>
-            <Radio.Button value="expert">
-              <FormattedMessage id={`pages.dao.config.tab.token.create.form.expert`} />
-            </Radio.Button>
-          </Radio.Group>
-        </Form.Item>
-        {createFormData.mode === 'normal' && (
-          <>
-            <Form.Item
-              label={intl.formatMessage({
-                id: 'pages.dao.config.tab.token.create.form.mint_value',
-              })}
-              tooltip={intl.formatMessage({
-                id: 'pages.dao.config.tab.token.create.form.mint_value.desc',
-              })}
-              validateStatus={createFormValidMsg?.mintValue?.validateStatus}
-              help={createFormValidMsg?.mintValue?.help}
-            >
-              <InputNumber
-                value={createFormData.mintValue}
-                min={0}
-                step={'1'}
-                onChange={(value) =>
-                  setCreateFormData((old) => ({
-                    ...old,
-                    mintValue: value,
-                  }))
-                }
-              />
-            </Form.Item>
-            <Form.Item
-              label={intl.formatMessage({
-                id: 'pages.dao.config.tab.token.create.form.mint_change_days',
-              })}
-              tooltip={intl.formatMessage({
-                id: 'pages.dao.config.tab.token.create.form.mint_change_days.desc',
-              })}
-              validateStatus={createFormValidMsg?.mintChangeDays?.validateStatus}
-              help={createFormValidMsg?.mintChangeDays?.help}
-            >
-              <InputNumber
-                value={createFormData.mintChangeDays}
-                min={1}
-                step={'1'}
-                onChange={(value) =>
-                  setCreateFormData((old) => ({
-                    ...old,
-                    mintChangeDays: value,
-                  }))
-                }
-              />
-            </Form.Item>
-            <Form.Item
-              label={intl.formatMessage({
-                id: 'pages.dao.config.tab.token.create.form.mint_change_value',
-              })}
-              tooltip={intl.formatMessage({
-                id: 'pages.dao.config.tab.token.create.form.mint_change_value.desc',
-              })}
-              validateStatus={createFormValidMsg?.mintChangeValue?.validateStatus}
-              help={createFormValidMsg?.mintChangeValue?.help}
-            >
-              <InputNumber
-                value={createFormData.mintChangeValue}
-                min={0.1}
-                step={'0.1'}
-                onChange={(value) =>
-                  setCreateFormData((old) => ({
-                    ...old,
-                    mintChangeValue: value,
-                  }))
-                }
-              />
-            </Form.Item>
-          </>
-        )}
-        {createFormData.mode === 'expert' && (
+      <Spin
+        tip={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.loading' })}
+        spinning={loadingDeployComplete}
+      >
+        <Form labelCol={{ span: 4 }} wrapperCol={{ span: 16 }} name={'tokenCreate'}>
           <Form.Item
-            label={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.form.mint_args' })}
+            label={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.form.genesis' })}
             tooltip={intl.formatMessage({
-              id: 'pages.dao.config.tab.token.create.form.mint_args.desc',
+              id: 'pages.dao.config.tab.token.create.form.genesis.desc',
             })}
-            validateStatus={createFormValidMsg?.mintArgs?.validateStatus}
-            help={createFormValidMsg?.mintArgs?.help}
+            validateStatus={createFormValidMsg?.genesis?.validateStatus}
+            help={createFormValidMsg?.genesis?.help}
           >
-            <Row style={{ marginBottom: 30 }}>
-              <Space style={{ width: 200 }}>
-                <div style={{ width: 90, textAlign: 'right' }}>
-                  <FormattedMessage id={`pages.dao.config.tab.token.create.form.mint_args.a_m`} />
-                </div>
-                <InputNumber
-                  value={createFormData.mintArgs?.aNumerator}
-                  min={0}
-                  step={'1'}
-                  onChange={(value) =>
-                    setCreateFormData((old) => ({
-                      ...old,
-                      mintArgs: {
-                        ...old.mintArgs,
-                        aMolecular: value,
-                      },
-                    }))
-                  }
-                />
-              </Space>
-              <Space style={{ width: 220 }}>
-                <div style={{ width: 110, textAlign: 'right' }}>
-                  <FormattedMessage id={`pages.dao.config.tab.token.create.form.mint_args.a_d`} />
-                </div>
-                <InputNumber
-                  value={createFormData.mintArgs?.aDenominator}
-                  min={1}
-                  step={'1'}
-                  onChange={(value) =>
-                    setCreateFormData((old) => ({
-                      ...old,
-                      mintArgs: {
-                        ...old.mintArgs,
-                        aDenominator: value,
-                      },
-                    }))
-                  }
-                />
-              </Space>
-            </Row>
-            <Row style={{ marginBottom: 30 }}>
-              <Space style={{ width: 200 }}>
-                <div style={{ width: 90, textAlign: 'right' }}>
-                  <FormattedMessage id={`pages.dao.config.tab.token.create.form.mint_args.b_m`} />
-                </div>
-                <InputNumber
-                  value={createFormData.mintArgs?.bNumerator}
-                  min={0}
-                  step={'1'}
-                  onChange={(value) =>
-                    setCreateFormData((old) => ({
-                      ...old,
-                      mintArgs: {
-                        ...old.mintArgs,
-                        bMolecular: value,
-                      },
-                    }))
-                  }
-                />
-              </Space>
-              <Space style={{ width: 220 }}>
-                <div style={{ width: 110, textAlign: 'right' }}>
-                  <FormattedMessage id={`pages.dao.config.tab.token.create.form.mint_args.b_d`} />
-                </div>
-                <InputNumber
-                  value={createFormData.mintArgs?.bDenominator}
-                  min={1}
-                  step={'1'}
-                  onChange={(value) =>
-                    setCreateFormData((old) => ({
-                      ...old,
-                      mintArgs: {
-                        ...old.mintArgs,
-                        bDenominator: value,
-                      },
-                    }))
-                  }
-                />
-              </Space>
-            </Row>
-            <Row style={{ marginBottom: 30 }}>
-              <Space style={{ width: 200 }}>
-                <div style={{ width: 90, textAlign: 'right' }}>
-                  <FormattedMessage id={`pages.dao.config.tab.token.create.form.mint_args.c`} />
-                </div>
-                <InputNumber
-                  value={createFormData.mintArgs?.c}
-                  min={0}
-                  step={'1'}
-                  onChange={(value) =>
-                    setCreateFormData((old) => ({
-                      ...old,
-                      mintArgs: {
-                        ...old.mintArgs,
-                        c: value,
-                      },
-                    }))
-                  }
-                />
-              </Space>
-              <Space style={{ width: 220 }}>
-                <div style={{ width: 110, textAlign: 'right' }}>
-                  <FormattedMessage id={`pages.dao.config.tab.token.create.form.mint_args.p`} />
-                </div>
-                <InputNumber
-                  value={createFormData.mintArgs?.p}
-                  min={0}
-                  step={'1'}
-                  onChange={(value) =>
-                    setCreateFormData((old) => ({
-                      ...old,
-                      mintArgs: {
-                        ...old.mintArgs,
-                        p: value,
-                      },
-                    }))
-                  }
-                />
-              </Space>
-            </Row>
-            <Row>
-              <Space style={{ width: 200 }}>
-                <div style={{ width: 90, textAlign: 'right' }}>
-                  <FormattedMessage id={`pages.dao.config.tab.token.create.form.mint_args.d`} />
-                </div>
-                <InputNumber
-                  value={createFormData.mintArgs?.d}
-                  min={0}
-                  step={'1'}
-                  onChange={(value) =>
-                    setCreateFormData((old) => ({
-                      ...old,
-                      mintArgs: {
-                        ...old.mintArgs,
-                        d: value,
-                      },
-                    }))
-                  }
-                />
-              </Space>
-            </Row>
+            <Upload
+              maxCount={1}
+              beforeUpload={(file) => {
+                return readUploadExcel(file);
+              }}
+              showUploadList={{
+                showDownloadIcon: true,
+                showRemoveIcon: true,
+                downloadIcon: <ZoomInOutlined onClick={() => setPreviewGenesis(true)} />,
+              }}
+              accept={allowUploadGenesisFileType.join(',')}
+            >
+              <Button icon={<UploadOutlined />}>
+                &nbsp;
+                <FormattedMessage id={'pages.dao.config.tab.token.create.form.upload'} />
+              </Button>
+            </Upload>
+            <a href="/token_gensis.xlsx" target={'_blank'}>
+              template
+            </a>
           </Form.Item>
-        )}
-        <Form.Item wrapperCol={{ offset: 4, span: 16 }}>{formButton}</Form.Item>
-      </Form>
+          <Form.Item
+            label={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.form.lp_ratio' })}
+            tooltip={intl.formatMessage({
+              id: 'pages.dao.config.tab.token.create.form.lp_ratio.desc',
+            })}
+            validateStatus={createFormValidMsg?.lpRatio?.validateStatus}
+            help={createFormValidMsg?.lpRatio?.help}
+          >
+            <InputNumber
+              min={0}
+              max={100}
+              defaultValue={createFormData.lpRatio}
+              formatter={(value) => `${value} %`}
+              parser={(value) => value?.replace(' %', '') as any}
+              onChange={(value) => {
+                setCreateFormData((old) => ({
+                  ...old,
+                  lpRatio: value,
+                }));
+              }}
+            />
+          </Form.Item>
+          <Form.Item
+            label={intl.formatMessage({
+              id: 'pages.dao.config.tab.token.create.form.owner_address',
+            })}
+            tooltip={intl.formatMessage({
+              id: 'pages.dao.config.tab.token.create.form.owner_address.desc',
+            })}
+            validateStatus={createFormValidMsg?.ownerAddress?.validateStatus}
+            help={createFormValidMsg?.ownerAddress?.help}
+          >
+            <Input
+              value={createFormData.ownerAddress}
+              style={{ width: 400 }}
+              onChange={(e) => {
+                if (e.target.value === '' || !Web3.utils.isAddress(e.target.value))
+                  setCreateFormValidMsg((old) => ({
+                    ...old,
+                    ownerAddress: {
+                      validateStatus: 'error',
+                      help: 'The owner address must be an Ethereum address.',
+                    },
+                  }));
+                else
+                  setCreateFormValidMsg((old) => ({
+                    ...old,
+                    ownerAddress: {
+                      validateStatus: 'success',
+                    },
+                  }));
+                setCreateFormData((old) => ({
+                  ...old,
+                  ownerAddress: e.target.value,
+                }));
+              }}
+            />
+          </Form.Item>
+          <Form.Item
+            label={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.form.token_name' })}
+            tooltip={intl.formatMessage({
+              id: 'pages.dao.config.tab.token.create.form.token_name.desc',
+            })}
+            validateStatus={createFormValidMsg?.tokenName?.validateStatus}
+            help={createFormValidMsg?.tokenName?.help}
+          >
+            <Input
+              value={createFormData.tokenName}
+              style={{ width: 400 }}
+              onChange={(e) => {
+                if (e.target.value === '')
+                  setCreateFormValidMsg((old) => ({
+                    ...old,
+                    tokenName: {
+                      validateStatus: 'error',
+                      help: 'The token name cannot be empty.',
+                    },
+                  }));
+                else
+                  setCreateFormValidMsg((old) => ({
+                    ...old,
+                    tokenName: {
+                      validateStatus: 'success',
+                    },
+                  }));
+                setCreateFormData((old) => ({
+                  ...old,
+                  tokenName: e.target.value,
+                }));
+              }}
+            />
+          </Form.Item>
+          <Form.Item
+            label={intl.formatMessage({
+              id: 'pages.dao.config.tab.token.create.form.token_symbol',
+            })}
+            tooltip={intl.formatMessage({
+              id: 'pages.dao.config.tab.token.create.form.token_symbol.desc',
+            })}
+            validateStatus={createFormValidMsg?.tokenSymbol?.validateStatus}
+            help={createFormValidMsg?.tokenSymbol?.help}
+          >
+            <Input
+              value={createFormData.tokenSymbol}
+              style={{ width: 400 }}
+              onChange={(e) => {
+                if (e.target.value === '')
+                  setCreateFormValidMsg((old) => ({
+                    ...old,
+                    tokenSymbol: {
+                      validateStatus: 'error',
+                      help: 'The token symbol cannot be empty.',
+                    },
+                  }));
+                else
+                  setCreateFormValidMsg((old) => ({
+                    ...old,
+                    tokenSymbol: {
+                      validateStatus: 'success',
+                    },
+                  }));
+                setCreateFormData((old) => ({
+                  ...old,
+                  tokenSymbol: e.target.value,
+                }));
+              }}
+            />
+          </Form.Item>
+          <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
+            <Radio.Group
+              defaultValue={'normal'}
+              buttonStyle="solid"
+              onChange={(v) =>
+                setCreateFormData((old) => ({
+                  ...old,
+                  mode: v.target.value,
+                }))
+              }
+            >
+              <Radio.Button value="normal">
+                <FormattedMessage id={`pages.dao.config.tab.token.create.form.normal`} />
+              </Radio.Button>
+              <Radio.Button value="expert">
+                <FormattedMessage id={`pages.dao.config.tab.token.create.form.expert`} />
+              </Radio.Button>
+            </Radio.Group>
+          </Form.Item>
+          {createFormData.mode === 'normal' && (
+            <>
+              <Form.Item
+                label={intl.formatMessage({
+                  id: 'pages.dao.config.tab.token.create.form.mint_value',
+                })}
+                tooltip={intl.formatMessage({
+                  id: 'pages.dao.config.tab.token.create.form.mint_value.desc',
+                })}
+                validateStatus={createFormValidMsg?.mintValue?.validateStatus}
+                help={createFormValidMsg?.mintValue?.help}
+              >
+                <InputNumber
+                  value={createFormData.mintValue}
+                  min={0}
+                  step={'1'}
+                  onChange={(value) =>
+                    setCreateFormData((old) => ({
+                      ...old,
+                      mintValue: value,
+                    }))
+                  }
+                />
+              </Form.Item>
+              <Form.Item
+                label={intl.formatMessage({
+                  id: 'pages.dao.config.tab.token.create.form.mint_change_days',
+                })}
+                tooltip={intl.formatMessage({
+                  id: 'pages.dao.config.tab.token.create.form.mint_change_days.desc',
+                })}
+                validateStatus={createFormValidMsg?.mintChangeDays?.validateStatus}
+                help={createFormValidMsg?.mintChangeDays?.help}
+              >
+                <InputNumber
+                  value={createFormData.mintChangeDays}
+                  min={1}
+                  step={'1'}
+                  onChange={(value) =>
+                    setCreateFormData((old) => ({
+                      ...old,
+                      mintChangeDays: value,
+                    }))
+                  }
+                />
+              </Form.Item>
+              <Form.Item
+                label={intl.formatMessage({
+                  id: 'pages.dao.config.tab.token.create.form.mint_change_value',
+                })}
+                tooltip={intl.formatMessage({
+                  id: 'pages.dao.config.tab.token.create.form.mint_change_value.desc',
+                })}
+                validateStatus={createFormValidMsg?.mintChangeValue?.validateStatus}
+                help={createFormValidMsg?.mintChangeValue?.help}
+              >
+                <InputNumber
+                  value={createFormData.mintChangeValue}
+                  min={0.1}
+                  step={'0.1'}
+                  onChange={(value) =>
+                    setCreateFormData((old) => ({
+                      ...old,
+                      mintChangeValue: value,
+                    }))
+                  }
+                />
+              </Form.Item>
+            </>
+          )}
+          {createFormData.mode === 'expert' && (
+            <Form.Item
+              label={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.form.mint_args' })}
+              tooltip={intl.formatMessage({
+                id: 'pages.dao.config.tab.token.create.form.mint_args.desc',
+              })}
+              validateStatus={createFormValidMsg?.mintArgs?.validateStatus}
+              help={createFormValidMsg?.mintArgs?.help}
+            >
+              <Row style={{ marginBottom: 30 }}>
+                <Space style={{ width: 200 }}>
+                  <div style={{ width: 90, textAlign: 'right' }}>
+                    <FormattedMessage id={`pages.dao.config.tab.token.create.form.mint_args.a_m`} />
+                  </div>
+                  <InputNumber
+                    value={createFormData.mintArgs?.aNumerator}
+                    min={0}
+                    step={'1'}
+                    onChange={(value) =>
+                      setCreateFormData((old) => ({
+                        ...old,
+                        mintArgs: {
+                          ...old.mintArgs,
+                          aMolecular: value,
+                        },
+                      }))
+                    }
+                  />
+                </Space>
+                <Space style={{ width: 220 }}>
+                  <div style={{ width: 110, textAlign: 'right' }}>
+                    <FormattedMessage id={`pages.dao.config.tab.token.create.form.mint_args.a_d`} />
+                  </div>
+                  <InputNumber
+                    value={createFormData.mintArgs?.aDenominator}
+                    min={1}
+                    step={'1'}
+                    onChange={(value) =>
+                      setCreateFormData((old) => ({
+                        ...old,
+                        mintArgs: {
+                          ...old.mintArgs,
+                          aDenominator: value,
+                        },
+                      }))
+                    }
+                  />
+                </Space>
+              </Row>
+              <Row style={{ marginBottom: 30 }}>
+                <Space style={{ width: 200 }}>
+                  <div style={{ width: 90, textAlign: 'right' }}>
+                    <FormattedMessage id={`pages.dao.config.tab.token.create.form.mint_args.b_m`} />
+                  </div>
+                  <InputNumber
+                    value={createFormData.mintArgs?.bNumerator}
+                    min={0}
+                    step={'1'}
+                    onChange={(value) =>
+                      setCreateFormData((old) => ({
+                        ...old,
+                        mintArgs: {
+                          ...old.mintArgs,
+                          bMolecular: value,
+                        },
+                      }))
+                    }
+                  />
+                </Space>
+                <Space style={{ width: 220 }}>
+                  <div style={{ width: 110, textAlign: 'right' }}>
+                    <FormattedMessage id={`pages.dao.config.tab.token.create.form.mint_args.b_d`} />
+                  </div>
+                  <InputNumber
+                    value={createFormData.mintArgs?.bDenominator}
+                    min={1}
+                    step={'1'}
+                    onChange={(value) =>
+                      setCreateFormData((old) => ({
+                        ...old,
+                        mintArgs: {
+                          ...old.mintArgs,
+                          bDenominator: value,
+                        },
+                      }))
+                    }
+                  />
+                </Space>
+              </Row>
+              <Row style={{ marginBottom: 30 }}>
+                <Space style={{ width: 200 }}>
+                  <div style={{ width: 90, textAlign: 'right' }}>
+                    <FormattedMessage id={`pages.dao.config.tab.token.create.form.mint_args.c`} />
+                  </div>
+                  <InputNumber
+                    value={createFormData.mintArgs?.c}
+                    min={0}
+                    step={'1'}
+                    onChange={(value) =>
+                      setCreateFormData((old) => ({
+                        ...old,
+                        mintArgs: {
+                          ...old.mintArgs,
+                          c: value,
+                        },
+                      }))
+                    }
+                  />
+                </Space>
+                <Space style={{ width: 220 }}>
+                  <div style={{ width: 110, textAlign: 'right' }}>
+                    <FormattedMessage id={`pages.dao.config.tab.token.create.form.mint_args.p`} />
+                  </div>
+                  <InputNumber
+                    value={createFormData.mintArgs?.p}
+                    min={0}
+                    step={'1'}
+                    onChange={(value) =>
+                      setCreateFormData((old) => ({
+                        ...old,
+                        mintArgs: {
+                          ...old.mintArgs,
+                          p: value,
+                        },
+                      }))
+                    }
+                  />
+                </Space>
+              </Row>
+              <Row>
+                <Space style={{ width: 200 }}>
+                  <div style={{ width: 90, textAlign: 'right' }}>
+                    <FormattedMessage id={`pages.dao.config.tab.token.create.form.mint_args.d`} />
+                  </div>
+                  <InputNumber
+                    value={createFormData.mintArgs?.d}
+                    min={0}
+                    step={'1'}
+                    onChange={(value) =>
+                      setCreateFormData((old) => ({
+                        ...old,
+                        mintArgs: {
+                          ...old.mintArgs,
+                          d: value,
+                        },
+                      }))
+                    }
+                  />
+                </Space>
+              </Row>
+            </Form.Item>
+          )}
+          <Form.Item wrapperCol={{ offset: 4, span: 16 }}>{formButton}</Form.Item>
+        </Form>
+      </Spin>
       <Modal
         key={'previewGenesis'}
         visible={previewGenesis}
@@ -609,7 +627,12 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({ ethDAOId, connect, 
         key={'previewCreate'}
         visible={previewCreateModal}
         onOk={async () => {
+          if (!isConnected) {
+            event$?.emit();
+            return true;
+          }
           await run();
+          return true;
         }}
         confirmLoading={loading}
         width={800}
