@@ -302,6 +302,23 @@ export type DaoJobConfig = {
   __typename?: 'DAOJobConfig';
   datum?: Maybe<DaoJobConfigSchema>;
   thisCycle?: Maybe<DaoJobThisCycle>;
+  existedLastCycle?: Maybe<DaoJobCycle>;
+  previewNextCycle?: Maybe<DaoJobCycle>;
+  getNextCycle?: Maybe<DaoJobCycle>;
+};
+
+export type DaoJobConfigPreviewNextCycleArgs = {
+  timeZone?: Maybe<Scalars['Int']>;
+  deadlineDay?: Maybe<Scalars['Int']>;
+  deadlineTime?: Maybe<Scalars['Int']>;
+  pairBeginDay?: Maybe<Scalars['Int']>;
+  pairBeginHour?: Maybe<Scalars['Int']>;
+  pairEndDay?: Maybe<Scalars['Int']>;
+  pairEndHour?: Maybe<Scalars['Int']>;
+  votingBeginDay?: Maybe<Scalars['Int']>;
+  votingBeginHour?: Maybe<Scalars['Int']>;
+  votingEndDay?: Maybe<Scalars['Int']>;
+  votingEndHour?: Maybe<Scalars['Int']>;
 };
 
 export type DaoJobConfigSchema = {
@@ -323,6 +340,17 @@ export type DaoJobConfigSchema = {
   votingBeginHour: Scalars['Int'];
   votingEndDay: Scalars['Int'];
   votingEndHour: Scalars['Int'];
+};
+
+export type DaoJobCycle = {
+  __typename?: 'DAOJobCycle';
+  timeZone?: Maybe<Scalars['Int']>;
+  beginAt?: Maybe<Scalars['Int']>;
+  endAt?: Maybe<Scalars['Int']>;
+  pairBeginAt?: Maybe<Scalars['Int']>;
+  pairEndAt?: Maybe<Scalars['Int']>;
+  voteBeginAt?: Maybe<Scalars['Int']>;
+  voteEndAt?: Maybe<Scalars['Int']>;
 };
 
 export type DaoJobThisCycle = {
@@ -1048,9 +1076,55 @@ export type DaoJobConfigQuery = { __typename?: 'Query' } & {
           | 'votingEndHour'
         >
       >;
-      thisCycle?: Maybe<
-        { __typename?: 'DAOJobThisCycle' } & Pick<
-          DaoJobThisCycle,
+      existedLastCycle?: Maybe<
+        { __typename?: 'DAOJobCycle' } & Pick<
+          DaoJobCycle,
+          | 'timeZone'
+          | 'beginAt'
+          | 'endAt'
+          | 'pairBeginAt'
+          | 'pairEndAt'
+          | 'voteBeginAt'
+          | 'voteEndAt'
+        >
+      >;
+      getNextCycle?: Maybe<
+        { __typename?: 'DAOJobCycle' } & Pick<
+          DaoJobCycle,
+          | 'timeZone'
+          | 'beginAt'
+          | 'endAt'
+          | 'pairBeginAt'
+          | 'pairEndAt'
+          | 'voteBeginAt'
+          | 'voteEndAt'
+        >
+      >;
+    }
+  >;
+};
+
+export type DaoJobConfigPreviewNextCycleQueryVariables = Exact<{
+  daoId: Scalars['String'];
+  timeZone?: Maybe<Scalars['Int']>;
+  deadlineDay?: Maybe<Scalars['Int']>;
+  deadlineTime?: Maybe<Scalars['Int']>;
+  pairBeginDay?: Maybe<Scalars['Int']>;
+  pairBeginHour?: Maybe<Scalars['Int']>;
+  pairEndDay?: Maybe<Scalars['Int']>;
+  pairEndHour?: Maybe<Scalars['Int']>;
+  votingBeginDay?: Maybe<Scalars['Int']>;
+  votingBeginHour?: Maybe<Scalars['Int']>;
+  votingEndDay?: Maybe<Scalars['Int']>;
+  votingEndHour?: Maybe<Scalars['Int']>;
+}>;
+
+export type DaoJobConfigPreviewNextCycleQuery = { __typename?: 'Query' } & {
+  daoJobConfig?: Maybe<
+    { __typename?: 'DAOJobConfig' } & {
+      previewNextCycle?: Maybe<
+        { __typename?: 'DAOJobCycle' } & Pick<
+          DaoJobCycle,
           | 'timeZone'
           | 'beginAt'
           | 'endAt'
@@ -2681,7 +2755,16 @@ export const DaoJobConfigDocument = gql`
         votingEndDay
         votingEndHour
       }
-      thisCycle {
+      existedLastCycle {
+        timeZone
+        beginAt
+        endAt
+        pairBeginAt
+        pairEndAt
+        voteBeginAt
+        voteEndAt
+      }
+      getNextCycle {
         timeZone
         beginAt
         endAt
@@ -2733,6 +2816,108 @@ export type DaoJobConfigLazyQueryHookResult = ReturnType<typeof useDaoJobConfigL
 export type DaoJobConfigQueryResult = Apollo.QueryResult<
   DaoJobConfigQuery,
   DaoJobConfigQueryVariables
+>;
+export const DaoJobConfigPreviewNextCycleDocument = gql`
+  query DAOJobConfigPreviewNextCycle(
+    $daoId: String!
+    $timeZone: Int
+    $deadlineDay: Int
+    $deadlineTime: Int
+    $pairBeginDay: Int
+    $pairBeginHour: Int
+    $pairEndDay: Int
+    $pairEndHour: Int
+    $votingBeginDay: Int
+    $votingBeginHour: Int
+    $votingEndDay: Int
+    $votingEndHour: Int
+  ) {
+    daoJobConfig(daoId: $daoId) {
+      previewNextCycle(
+        timeZone: $timeZone
+        deadlineDay: $deadlineDay
+        deadlineTime: $deadlineTime
+        pairBeginDay: $pairBeginDay
+        pairBeginHour: $pairBeginHour
+        pairEndDay: $pairEndDay
+        pairEndHour: $pairEndHour
+        votingBeginDay: $votingBeginDay
+        votingBeginHour: $votingBeginHour
+        votingEndDay: $votingEndDay
+        votingEndHour: $votingEndHour
+      ) {
+        timeZone
+        beginAt
+        endAt
+        pairBeginAt
+        pairEndAt
+        voteBeginAt
+        voteEndAt
+      }
+    }
+  }
+`;
+
+/**
+ * __useDaoJobConfigPreviewNextCycleQuery__
+ *
+ * To run a query within a React component, call `useDaoJobConfigPreviewNextCycleQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDaoJobConfigPreviewNextCycleQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDaoJobConfigPreviewNextCycleQuery({
+ *   variables: {
+ *      daoId: // value for 'daoId'
+ *      timeZone: // value for 'timeZone'
+ *      deadlineDay: // value for 'deadlineDay'
+ *      deadlineTime: // value for 'deadlineTime'
+ *      pairBeginDay: // value for 'pairBeginDay'
+ *      pairBeginHour: // value for 'pairBeginHour'
+ *      pairEndDay: // value for 'pairEndDay'
+ *      pairEndHour: // value for 'pairEndHour'
+ *      votingBeginDay: // value for 'votingBeginDay'
+ *      votingBeginHour: // value for 'votingBeginHour'
+ *      votingEndDay: // value for 'votingEndDay'
+ *      votingEndHour: // value for 'votingEndHour'
+ *   },
+ * });
+ */
+export function useDaoJobConfigPreviewNextCycleQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    DaoJobConfigPreviewNextCycleQuery,
+    DaoJobConfigPreviewNextCycleQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    DaoJobConfigPreviewNextCycleQuery,
+    DaoJobConfigPreviewNextCycleQueryVariables
+  >(DaoJobConfigPreviewNextCycleDocument, options);
+}
+export function useDaoJobConfigPreviewNextCycleLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    DaoJobConfigPreviewNextCycleQuery,
+    DaoJobConfigPreviewNextCycleQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    DaoJobConfigPreviewNextCycleQuery,
+    DaoJobConfigPreviewNextCycleQueryVariables
+  >(DaoJobConfigPreviewNextCycleDocument, options);
+}
+export type DaoJobConfigPreviewNextCycleQueryHookResult = ReturnType<
+  typeof useDaoJobConfigPreviewNextCycleQuery
+>;
+export type DaoJobConfigPreviewNextCycleLazyQueryHookResult = ReturnType<
+  typeof useDaoJobConfigPreviewNextCycleLazyQuery
+>;
+export type DaoJobConfigPreviewNextCycleQueryResult = Apollo.QueryResult<
+  DaoJobConfigPreviewNextCycleQuery,
+  DaoJobConfigPreviewNextCycleQueryVariables
 >;
 export const DaoFollowInfoDocument = gql`
   query DAOFollowInfo($id: String!, $userId: String!) {

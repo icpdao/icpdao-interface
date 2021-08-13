@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import type { DaoJobConfigQuery } from '@/services/dao/generated';
-import { useDaoJobConfigQuery, useUpdateDaoJobConfigMutation } from '@/services/dao/generated';
+import {
+  useDaoJobConfigQuery,
+  useUpdateDaoJobConfigMutation,
+  useDaoJobConfigPreviewNextCycleQuery,
+} from '@/services/dao/generated';
 import { PageLoading } from '@ant-design/pro-layout';
 import { Form, Button, Select, Row, Col, message, Space } from 'antd';
 import { useIntl } from '@@/plugin-locale/localeExports';
@@ -12,6 +16,18 @@ import { getFormatTime } from '@/utils/utils';
 type JobConfigProps = {
   daoId: string;
   nextStep?: () => void;
+};
+
+type CycleInfoProps = {
+  title: string;
+  loading: boolean;
+  hasData: boolean;
+  beginAt: number;
+  endAt: number;
+  pairBeginAt: number;
+  pairEndAt: number;
+  voteBeginAt: number;
+  voteEndAt: number;
 };
 
 type JobConfigData = {
@@ -73,18 +89,144 @@ const formatSubmitJobConfigData = (data: any) => {
   return { valid, config };
 };
 
+const CycleInfo: React.FC<CycleInfoProps> = ({
+  title,
+  loading,
+  hasData,
+  beginAt,
+  endAt,
+  pairBeginAt,
+  pairEndAt,
+  voteBeginAt,
+  voteEndAt,
+}) => {
+  const intl = useIntl();
+
+  if (loading) {
+    return (
+      <div style={{ marginBottom: 65 }}>
+        <Space direction={'vertical'}>
+          <Space>{title}</Space>
+          <Space>LOADING</Space>
+        </Space>
+      </div>
+    );
+  }
+
+  if (hasData) {
+    return (
+      <Space style={{ marginBottom: 65 }} direction={'vertical'}>
+        <Space style={{ marginBottom: 15 }}>{title}</Space>
+        <Space>
+          <span style={{ fontWeight: 700 }}>
+            {intl.formatMessage({ id: 'pages.dao.config.tab.job.cycle.deadline' })}
+          </span>
+          {getFormatTime(beginAt, 'LLL')}
+          <span>-</span>
+          {getFormatTime(endAt, 'LLL')}
+        </Space>
+        <Space>
+          <span style={{ fontWeight: 700 }}>
+            {intl.formatMessage({ id: 'pages.dao.config.tab.job.cycle.pairing' })}
+          </span>
+          {getFormatTime(pairBeginAt, 'LLL')}
+          <span>-</span>
+          {getFormatTime(pairEndAt, 'LLL')}
+        </Space>
+        <Space>
+          <span style={{ fontWeight: 700 }}>
+            {intl.formatMessage({ id: 'pages.dao.config.tab.job.cycle.voting' })}
+          </span>
+          {getFormatTime(voteBeginAt, 'LLL')}
+          <span>-</span>
+          {getFormatTime(voteEndAt, 'LLL')}
+        </Space>
+      </Space>
+    );
+  }
+  return (
+    <div style={{ marginBottom: 65 }}>
+      <Space direction={'vertical'}>
+        <Space>{title}</Space>
+        <Space>NO CYCLE</Space>
+      </Space>
+    </div>
+  );
+};
+
 const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
   const intl = useIntl();
+  const [previewNextCycle, setPreviewNextCycle] = useState<any>(undefined);
+  const [showPreview, setShowPreview] = useState(false);
   const [form] = Form.useForm();
   const [updateDaoJobConfig] = useUpdateDaoJobConfigMutation();
   const [saveLoading, setSaveLoading] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(false);
   const { data, loading, error, refetch } = useDaoJobConfigQuery({
     variables: { daoId },
   });
+
+  const formInitData = formatJobConfigData(data);
+
+  const existedLastCycle = useMemo(() => {
+    return data?.daoJobConfig?.existedLastCycle;
+  }, [data]);
+
+  const nextCycle = useMemo(() => {
+    return data?.daoJobConfig?.getNextCycle;
+  }, [data]);
+
+  const prvewNextCycleQuery = useDaoJobConfigPreviewNextCycleQuery({
+    skip: true,
+    fetchPolicy: 'no-cache',
+  });
+
+  const handlePreviewNextCycle = useCallback(async () => {
+    setPreviewLoading(true);
+    setShowPreview(true);
+    const values = form.getFieldsValue();
+    const { valid, config: updateData } = formatSubmitJobConfigData(values);
+    if (!valid) {
+      form.resetFields();
+      setPreviewLoading(false);
+      setPreviewNextCycle(undefined);
+      setShowPreview(false);
+      message.error(intl.formatMessage({ id: 'pages.dao.config.tab.job.form.error' }));
+      return false;
+    }
+    try {
+      updateData.daoId = daoId;
+      const res = await prvewNextCycleQuery.refetch({
+        daoId: updateData.daoId,
+        timeZone: updateData.timeZone,
+        deadlineDay: updateData.deadlineDay,
+        deadlineTime: updateData.deadlineTime,
+        pairBeginDay: updateData.pairBeginDay,
+        pairBeginHour: updateData.pairBeginHour,
+        pairEndDay: updateData.pairEndDay,
+        pairEndHour: updateData.pairEndHour,
+        votingBeginDay: updateData.votingBeginDay,
+        votingBeginHour: updateData.votingBeginHour,
+        votingEndDay: updateData.votingEndDay,
+        votingEndHour: updateData.votingEndHour,
+      });
+      setPreviewNextCycle(res.data?.daoJobConfig?.previewNextCycle);
+    } finally {
+      setPreviewLoading(false);
+    }
+    return true;
+  }, [daoId, form, intl, prvewNextCycleQuery]);
+
+  const showNextCycle = useMemo(() => {
+    if (showPreview) {
+      return previewNextCycle;
+    }
+    return nextCycle;
+  }, [nextCycle, previewNextCycle, showPreview]);
+
   if (loading || error) {
     return <PageLoading />;
   }
-  const formInitData = formatJobConfigData(data);
   return (
     <>
       <div className={styles.desc}>
@@ -112,6 +254,7 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
             message.success(intl.formatMessage({ id: 'pages.dao.config.tab.job.form.success' }));
             if (nextStep) nextStep();
           } finally {
+            setShowPreview(false);
             setSaveLoading(false);
           }
           return true;
@@ -182,37 +325,40 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
           <Button htmlType="submit" type="primary" loading={saveLoading}>
             {intl.formatMessage({ id: 'pages.dao.config.tab.job.form.save' })}
           </Button>
+          <Button
+            type="primary"
+            style={{ margin: '0 8px' }}
+            loading={previewLoading}
+            onClick={handlePreviewNextCycle}
+          >
+            {intl.formatMessage({ id: 'pages.dao.config.tab.job.form.preview' })}
+          </Button>
         </Form.Item>
       </Form>
-      <Space style={{ marginTop: 65 }} direction={'vertical'}>
-        <Space style={{ marginBottom: 35 }}>
-          {intl.formatMessage({ id: 'pages.dao.config.tab.job.cycle.title' })}
-        </Space>
-        <Space>
-          <span style={{ fontWeight: 700 }}>
-            {intl.formatMessage({ id: 'pages.dao.config.tab.job.cycle.deadline' })}
-          </span>
-          {getFormatTime(data?.daoJobConfig?.thisCycle?.beginAt || 0, 'LLL')}
-          <span>-</span>
-          {getFormatTime(data?.daoJobConfig?.thisCycle?.endAt || 0, 'LLL')}
-        </Space>
-        <Space>
-          <span style={{ fontWeight: 700 }}>
-            {intl.formatMessage({ id: 'pages.dao.config.tab.job.cycle.pairing' })}
-          </span>
-          {getFormatTime(data?.daoJobConfig?.thisCycle?.pairBeginAt || 0, 'LLL')}
-          <span>-</span>
-          {getFormatTime(data?.daoJobConfig?.thisCycle?.pairEndAt || 0, 'LLL')}
-        </Space>
-        <Space>
-          <span style={{ fontWeight: 700 }}>
-            {intl.formatMessage({ id: 'pages.dao.config.tab.job.cycle.voting' })}
-          </span>
-          {getFormatTime(data?.daoJobConfig?.thisCycle?.voteBeginAt || 0, 'LLL')}
-          <span>-</span>
-          {getFormatTime(data?.daoJobConfig?.thisCycle?.voteEndAt || 0, 'LLL')}
-        </Space>
-      </Space>
+      <CycleInfo
+        title={intl.formatMessage({
+          id: 'pages.dao.config.tab.job.cycle.existed_last_cycle.title',
+        })}
+        loading={false}
+        hasData={!!existedLastCycle}
+        beginAt={existedLastCycle?.beginAt || 0}
+        endAt={existedLastCycle?.endAt || 0}
+        pairBeginAt={existedLastCycle?.pairBeginAt || 0}
+        pairEndAt={existedLastCycle?.pairEndAt || 0}
+        voteBeginAt={existedLastCycle?.voteBeginAt || 0}
+        voteEndAt={existedLastCycle?.voteEndAt || 0}
+      />
+      <CycleInfo
+        title={intl.formatMessage({ id: 'pages.dao.config.tab.job.cycle.next_cycle.title' })}
+        loading={showPreview && previewLoading}
+        hasData={!!showNextCycle}
+        beginAt={showNextCycle?.beginAt || 0}
+        endAt={showNextCycle?.endAt || 0}
+        pairBeginAt={showNextCycle?.pairBeginAt || 0}
+        pairEndAt={showNextCycle?.pairEndAt || 0}
+        voteBeginAt={showNextCycle?.voteBeginAt || 0}
+        voteEndAt={showNextCycle?.voteEndAt || 0}
+      />
     </>
   );
 };
