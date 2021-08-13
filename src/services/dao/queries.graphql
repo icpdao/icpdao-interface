@@ -36,7 +36,30 @@ query DAOJobConfig($daoId: String!) {
       votingEndDay
       votingEndHour
     }
-    thisCycle {
+    existedLastCycle {
+      timeZone
+      beginAt
+      endAt
+      pairBeginAt
+      pairEndAt
+      voteBeginAt
+      voteEndAt
+    }
+    getNextCycle {
+      timeZone
+      beginAt
+      endAt
+      pairBeginAt
+      pairEndAt
+      voteBeginAt
+      voteEndAt
+    }
+  }
+}
+
+query DAOJobConfigPreviewNextCycle($daoId: String!, $timeZone: Int, $deadlineDay: Int, $deadlineTime: Int, $pairBeginDay: Int, $pairBeginHour: Int, $pairEndDay: Int, $pairEndHour: Int, $votingBeginDay: Int, $votingBeginHour: Int, $votingEndDay: Int, $votingEndHour: Int) {
+  daoJobConfig(daoId: $daoId) {
+    previewNextCycle(timeZone: $timeZone, deadlineDay: $deadlineDay, deadlineTime: $deadlineTime, pairBeginDay: $pairBeginDay, pairBeginHour: $pairBeginHour, pairEndDay: $pairEndDay, pairEndHour: $pairEndHour, votingBeginDay: $votingBeginDay, votingBeginHour: $votingBeginHour, votingEndDay: $votingEndDay, votingEndHour: $votingEndHour) {
       timeZone
       beginAt
       endAt
