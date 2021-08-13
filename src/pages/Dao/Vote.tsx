@@ -147,13 +147,15 @@ const pairTypeVote = (
   );
 };
 
+const pageSize = 20;
+
 export default (props: { match: { params: { cycleId: string; daoId: string } } }): ReactNode => {
   const { cycleId, daoId } = props.match.params;
   const intl = useIntl();
   const { initialState } = useModel('@@initialState');
   const [queryVariables, setQueryVariables] = useState<DaoCycleVoteListQueryVariables>({
     cycleId,
-    first: 20,
+    first: pageSize,
     offset: 0,
   });
   const { data, loading, error, refetch } = useDaoCycleVoteListQuery({
@@ -192,7 +194,7 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
   const changePage = useCallback((page: number) => {
     setQueryVariables((old) => ({
       ...old,
-      offset: (page - 1) * 10,
+      offset: (page - 1) * pageSize,
     }));
   }, []);
 
@@ -231,6 +233,11 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
     });
     return listDom;
   }, [data, updateAllVote, updatePairVote]);
+
+  const handleSubmit = useCallback(() => {
+    message.info('还没有集成 token，不用点击这个提交按钮');
+  }, []);
+
   if (!initialState || loading || error) {
     return <PageLoading />;
   }
@@ -264,7 +271,7 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
               { end_left_times: endLeftTimes },
             )}
           >
-            <Button type="primary" className={styles.submitButton}>
+            <Button type="primary" className={styles.submitButton} onClick={handleSubmit}>
               {intl.formatMessage({ id: 'pages.dao.vote.submit' })}
             </Button>
           </Tooltip>
@@ -272,7 +279,8 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
           {voteList()}
           <div className={styles.pagination}>
             <Pagination
-              current={getCurrentPage(queryVariables.offset || 0, 10)}
+              pageSize={pageSize}
+              current={getCurrentPage(queryVariables.offset || 0, pageSize)}
               total={data?.cycle?.votes?.total || 0}
               onChange={(page) => changePage(page)}
             />
