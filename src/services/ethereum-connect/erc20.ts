@@ -1,6 +1,6 @@
-import { DAOTokenContract, getInfuraProvider, getMetamaskProvider } from './index';
+import {ERC20Contract, getInfuraProvider, getMetamaskProvider} from './index';
 
-export class DAOTokenConnect {
+export class ERC20Connect {
   provider: any;
   metamaskProvider: any;
   contract: any;
@@ -9,16 +9,17 @@ export class DAOTokenConnect {
   constructor(tokenAddress: string, network: string, metamaskProvider: any) {
     this.provider = getInfuraProvider(network);
     this.metamaskProvider = getMetamaskProvider(metamaskProvider);
-    this.contract = DAOTokenContract(tokenAddress, this.provider);
-    this.actionContract = DAOTokenContract(tokenAddress, this.metamaskProvider);
+    this.contract = ERC20Contract(tokenAddress, this.provider);
+    this.actionContract = ERC20Contract(tokenAddress, this.metamaskProvider);
   }
 
   async getTokenName() {
     return await this.contract.name();
   }
 
-  async getLPPool() {
-    return await this.contract.lpPool();
+  async getTokenSymbol() {
+    return await this.contract.symbol();
   }
-}
 
+  async approve() {}
+}

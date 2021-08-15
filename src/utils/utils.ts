@@ -185,3 +185,11 @@ export const EthereumNetwork = {
   '0x5': 'goerli',
   '0x2a': 'kovan',
 };
+
+export const EthereumChainId = {
+  'homestead': 1,
+  'ropsten': 3,
+  'rinkeby': 4,
+  'goerli': 5,
+  'kovan': 42,
+};
