@@ -155,3 +155,11 @@ export const getCurrentPage = (offset: number, pageSize: number) => {
 
 export const githubCallback = '/login/auth_callback';
 export const getProfile = '/users/profile';
+
+export const EthereumNetwork = {
+  '0x1': 'homestead',
+  '0x3': 'ropsten',
+  '0x4': 'rinkeby',
+  '0x5': 'goerli',
+  '0x2a': 'kovan',
+};

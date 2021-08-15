@@ -10,6 +10,7 @@ import { getUserProfile } from './services/icpdao-interface/user';
 import requestConfig from './utils/request';
 import {
   clearAuthorization,
+  EthereumNetwork,
   getAuthorization,
   getTheme,
   getUserInfo,
@@ -19,6 +20,8 @@ import type { MenuTheme } from 'antd';
 import { ApolloProvider } from '@apollo/client';
 import client from '@/utils/apolloClient';
 import detectEthereumProvider from '@metamask/detect-provider';
+import { DAOFactoryConnect } from '@/services/ethereum-connect/factory';
+import { ETHConnect } from '@/services/ethereum-connect/typings';
 
 const githubCallback = '/login/auth_callback';
 
@@ -31,6 +34,7 @@ export async function getInitialState(): Promise<{
   fetchUserInfo: () => Promise<API.UserProfile | undefined>;
   currentUser?: any;
   provider?: any;
+  ethConnect: ETHConnect;
 }> {
   const auth = getAuthorization();
   if (!auth) {
@@ -47,6 +51,18 @@ export async function getInitialState(): Promise<{
     }
   };
   const provider: any = await detectEthereumProvider({ mustBeMetaMask: true });
+
+  let ethNetwork: string = 'homestead';
+  if (provider) {
+    ethNetwork = EthereumNetwork[await provider.request({ method: 'eth_chainId' })];
+  }
+  const ethConnect = {
+    network: ethNetwork,
+    contract: {
+      daoFactory: new DAOFactoryConnect(ethNetwork, provider),
+      daoStaking: new DAOFactoryConnect(ethNetwork, provider),
+    },
+  };
   if (history.location.pathname !== githubCallback && auth) {
     await fetchUserInfo();
   }
@@ -55,6 +71,7 @@ export async function getInitialState(): Promise<{
     currentUser: getUserInfo,
     settings: { headerTheme: getTheme() as MenuTheme },
     provider,
+    ethConnect,
   };
 }
 

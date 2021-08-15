@@ -13,6 +13,7 @@ const {
   THEME,
   REACT_APP_ICPDAO_BACKEND_VERSION,
   REACT_APP_ICPDAO_MOCK_URL,
+  REACT_APP_ICPDAO_ETHEREUM_INFURA_KEY,
 } = process.env;
 
 export default defineConfig({
@@ -27,6 +28,7 @@ export default defineConfig({
     THEME: THEME || undefined,
     REACT_APP_ICPDAO_BACKEND_VERSION: REACT_APP_ICPDAO_BACKEND_VERSION || 'v1',
     REACT_APP_ICPDAO_MOCK_URL: REACT_APP_ICPDAO_MOCK_URL || undefined,
+    REACT_APP_ICPDAO_ETHEREUM_INFURA_KEY: REACT_APP_ICPDAO_ETHEREUM_INFURA_KEY || '',
   },
   layout: {
     // https://umijs.org/zh-CN/plugins/plugin-layout

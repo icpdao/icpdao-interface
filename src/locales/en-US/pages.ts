@@ -118,7 +118,7 @@ export default {
   'pages.dao.config.tab.token.create.form.normal': 'Normal mode',
   'pages.dao.config.tab.token.create.form.expert': 'Expert mode',
   'pages.dao.config.tab.token.create.form.button.create': 'Create',
-  'pages.dao.config.tab.token.create.form.button.recreate': 'Re-Create',
+  'pages.dao.config.tab.token.create.form.button.recreate': 'ReCreate',
   'pages.dao.config.tab.token.create.form.mint_value.desc': 'Mint Value',
   'pages.dao.config.tab.token.create.form.mint_change_days.desc': 'Mint Change Days',
   'pages.dao.config.tab.token.create.form.mint_change_value.desc': 'Mint Change Days',
@@ -127,7 +127,17 @@ export default {
   'pages.dao.config.tab.token.create.form.owner_address.desc': 'Owner Address',
   'pages.dao.config.tab.token.create.form.lp_ratio.desc': 'LP Ratio',
   'pages.dao.config.tab.token.create.form.genesis.desc': 'Genesis',
-
+  'pages.dao.config.tab.token.create.recreate.notice.1':
+    'Recreating the token contract will invalidate the original token.',
+  'pages.dao.config.tab.token.create.recreate.notice.2':
+    'And need to re-uniswap the trading pair, re-add liquidity,',
+  'pages.dao.config.tab.token.create.recreate.notice.3':
+    'This is a very important adjustment, please operate it carefully.',
+  'pages.dao.config.tab.token.create.recreate.input.placeholder':
+    'Please enter "confirm to recreate"',
+  'pages.dao.config.tab.token.create.recreate.input': 'confirm to recreate',
+  'pages.dao.config.tab.token.create.modal.ok': "Yes, I'm sure",
+  'pages.dao.config.tab.token.create.modal.cancel': 'Let me think again',
   'pages.dao.config.tab.token.create_pool': 'Create Pool',
   'pages.dao.config.tab.token.add_lp': 'Add LP',
   'pages.dao.config.tab.token.manager': 'Manager',

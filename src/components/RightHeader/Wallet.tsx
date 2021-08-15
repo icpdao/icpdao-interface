@@ -11,7 +11,12 @@ import HeaderDropdown from '../HeaderDropdown';
 import IconFont from '@/components/IconFont';
 import { FormattedMessage, history } from 'umi';
 import { useModel } from '@@/plugin-model/useModel';
-import { getMetamask, setMetamaskConnect, setMetamaskDisconnect } from '@/utils/utils';
+import {
+  EthereumNetwork,
+  getMetamask,
+  setMetamaskConnect,
+  setMetamaskDisconnect,
+} from '@/utils/utils';
 
 type memamaskInfo =
   | undefined
@@ -19,14 +24,6 @@ type memamaskInfo =
       account?: string;
       network?: string;
     };
-
-const network = {
-  '0x1': 'Mainnet',
-  '0x3': 'Ropsten',
-  '0x4': 'Rinkeby',
-  '0x5': 'Goerli',
-  '0x2a': 'Kovan',
-};
 
 const Wallet: React.FC = () => {
   const [connectWalletModal, setConnectWalletModal] = useState<boolean>(false);
@@ -43,7 +40,7 @@ const Wallet: React.FC = () => {
     const chainId: string = await provider.request({ method: 'eth_chainId' });
     console.log(accounts);
     if (accounts.length > 0) {
-      setConnectedMetamaskInfo({ account: accounts[0], network: network[chainId] });
+      setConnectedMetamaskInfo({ account: accounts[0], network: EthereumNetwork[chainId] });
       setMetamaskConnect();
       setConnectWalletModal(false);
     }
@@ -56,7 +53,7 @@ const Wallet: React.FC = () => {
     const accounts: string[] = await provider.request({ method: 'eth_accounts' });
     const chainId: string = await provider.request({ method: 'eth_chainId' });
     if (accounts.length > 0 && chainId && getMetamask() !== 'disconnect')
-      setConnectedMetamaskInfo({ account: accounts[0], network: network[chainId] });
+      setConnectedMetamaskInfo({ account: accounts[0], network: EthereumNetwork[chainId] });
     provider.on('accountsChanged', (acs: string[]) => {
       setConnectedMetamaskInfo((old) => ({
         ...old,
@@ -66,7 +63,7 @@ const Wallet: React.FC = () => {
     provider.on('chainChanged', (cid: string) => {
       setConnectedMetamaskInfo((old) => ({
         ...old,
-        network: network[cid],
+        network: EthereumNetwork[cid],
       }));
     });
   }, [initialState]);
@@ -140,7 +137,9 @@ const Wallet: React.FC = () => {
             <Menu className={styles.menu} onClick={handlerClickMenu}>
               <Menu.Item key={'network'}>
                 <ApartmentOutlined />
-                {connectedMetamaskInfo.network}
+                {connectedMetamaskInfo.network === 'homestead'
+                  ? 'mainnet'
+                  : connectedMetamaskInfo.network}
               </Menu.Item>
               <Menu.Item key={'account'}>
                 <AimOutlined />

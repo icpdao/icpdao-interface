@@ -71,6 +71,12 @@ query DAOJobConfigPreviewNextCycle($daoId: String!, $timeZone: Int, $deadlineDay
   }
 }
 
+query DAOTokenConfig($daoId: String!) {
+  daoTokenConfig(daoId: $daoId) {
+    ethDaoId
+  }
+}
+
 query DAOFollowInfo($id: String!, $userId: String!) {
   dao(id: $id) {
     datum {
