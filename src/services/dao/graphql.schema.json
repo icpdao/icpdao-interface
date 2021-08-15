@@ -5365,7 +5365,7 @@
                 "deprecationReason": null
               },
               {
-                "name": "userId",
+                "name": "userName",
                 "description": null,
                 "type": {
                   "kind": "SCALAR",

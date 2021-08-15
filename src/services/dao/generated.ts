@@ -1138,6 +1138,14 @@ export type DaoJobConfigPreviewNextCycleQuery = { __typename?: 'Query' } & {
   >;
 };
 
+export type DaoTokenConfigQueryVariables = Exact<{
+  daoId: Scalars['String'];
+}>;
+
+export type DaoTokenConfigQuery = { __typename?: 'Query' } & {
+  daoTokenConfig?: Maybe<{ __typename?: 'DAOTokenConfig' } & Pick<DaoTokenConfig, 'ethDaoId'>>;
+};
+
 export type DaoFollowInfoQueryVariables = Exact<{
   id: Scalars['String'];
   userId: Scalars['String'];
@@ -2918,6 +2926,54 @@ export type DaoJobConfigPreviewNextCycleLazyQueryHookResult = ReturnType<
 export type DaoJobConfigPreviewNextCycleQueryResult = Apollo.QueryResult<
   DaoJobConfigPreviewNextCycleQuery,
   DaoJobConfigPreviewNextCycleQueryVariables
+>;
+export const DaoTokenConfigDocument = gql`
+  query DAOTokenConfig($daoId: String!) {
+    daoTokenConfig(daoId: $daoId) {
+      ethDaoId
+    }
+  }
+`;
+
+/**
+ * __useDaoTokenConfigQuery__
+ *
+ * To run a query within a React component, call `useDaoTokenConfigQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDaoTokenConfigQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDaoTokenConfigQuery({
+ *   variables: {
+ *      daoId: // value for 'daoId'
+ *   },
+ * });
+ */
+export function useDaoTokenConfigQuery(
+  baseOptions: Apollo.QueryHookOptions<DaoTokenConfigQuery, DaoTokenConfigQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<DaoTokenConfigQuery, DaoTokenConfigQueryVariables>(
+    DaoTokenConfigDocument,
+    options,
+  );
+}
+export function useDaoTokenConfigLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<DaoTokenConfigQuery, DaoTokenConfigQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<DaoTokenConfigQuery, DaoTokenConfigQueryVariables>(
+    DaoTokenConfigDocument,
+    options,
+  );
+}
+export type DaoTokenConfigQueryHookResult = ReturnType<typeof useDaoTokenConfigQuery>;
+export type DaoTokenConfigLazyQueryHookResult = ReturnType<typeof useDaoTokenConfigLazyQuery>;
+export type DaoTokenConfigQueryResult = Apollo.QueryResult<
+  DaoTokenConfigQuery,
+  DaoTokenConfigQueryVariables
 >;
 export const DaoFollowInfoDocument = gql`
   query DAOFollowInfo($id: String!, $userId: String!) {
