@@ -9,6 +9,7 @@ import { PageLoading } from '@ant-design/pro-layout';
 import { useRequest } from '@@/plugin-request/request';
 import { ZeroAddress } from '@/services/ethereum-connect';
 import { useModel } from '@@/plugin-model/useModel';
+import TokenCreateLP from "@/pages/Dao/components/token/CreateLP";
 
 const { TabPane } = Tabs;
 
@@ -17,7 +18,7 @@ type TokenConfigProps = {
 };
 
 export type TokenConfigComponentsProps = {
-  ethDAOId: string;
+  ethDAOId?: string;
   tokenAddress?: string;
 };
 
@@ -50,7 +51,8 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId }) => {
           tab={intl.formatMessage({ id: 'pages.dao.config.tab.token.create_pool' })}
           key="createPool"
         >
-          Content of Tab Pane 2
+          <TokenCreateLP
+            tokenAddress={tokenAddress || ZeroAddress} />
         </TabPane>
         <TabPane tab={intl.formatMessage({ id: 'pages.dao.config.tab.token.add_lp' })} key="addLP">
           Content of Tab Pane 3

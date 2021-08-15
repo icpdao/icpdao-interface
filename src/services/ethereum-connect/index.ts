@@ -3,6 +3,7 @@ import { ethers } from 'ethers';
 import DAOFactoryABI from './abis/dao-factory.json';
 import DAOStakingABI from './abis/dao-staking.json';
 import DAOTokenABI from './abis/dao-token.json';
+import ERC20ABI from './abis/erc20.json';
 import { getNetwork } from '@ethersproject/networks';
 
 export const DAOFactoryAddress = '0xb3318aD1F4a541829608e6B57acb5793fB45D048';
@@ -37,4 +38,8 @@ export function DAOStakingContract(provider: any) {
 
 export function DAOTokenContract(tokenAddress: string, provider: any) {
   return new ethers.Contract(tokenAddress, DAOTokenABI, provider);
+}
+
+export function ERC20Contract(tokenAddress: string, provider: any) {
+  return new ethers.Contract(tokenAddress, ERC20ABI, provider);
 }

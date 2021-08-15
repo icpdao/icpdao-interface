@@ -35,4 +35,13 @@ declare namespace ETH_CONNECT {
     mintChangeValue?: number;
     mode?: string;
   };
+  type CreateLP = {
+    baseTokenAmount: number;
+    quoteTokenAddress: string;
+    quoteTokenAmount: number;
+    fee: number;
+    tickLower: number;
+    tickUpper: number;
+    sqrtPriceX96: number;
+  }
 }

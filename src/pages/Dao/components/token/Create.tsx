@@ -44,7 +44,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({ ethDAOId, tokenAddr
   const { isConnected, contract, event$ } = useModel('useWalletModel');
 
   const [createFormData, setCreateFormData] = useState<ETH_CONNECT.CreateToken>({
-    ethDAOId,
+    ethDAOId: ethDAOId || '',
     genesis: [],
     lpRatio: 0,
     ownerAddress: '',
