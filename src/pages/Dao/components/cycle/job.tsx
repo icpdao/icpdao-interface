@@ -29,6 +29,7 @@ const ownerColumns = (
   pairTypeFilter: number[] | undefined,
   disableUpdateJobPairType: boolean,
   updateJobPairType: (recordId: string, pairType: number) => void,
+  updatingJobId: string,
 ) => {
   return [
     {
@@ -91,11 +92,12 @@ const ownerColumns = (
       render: (_: any, record: JobQuery) => (
         <Select
           value={record.datum?.pairType}
+          loading={updatingJobId === record.datum?.id}
           options={[
             { value: 1, label: 'All Vote' },
             { value: 0, label: 'Pair Vote' },
           ]}
-          disabled={disableUpdateJobPairType}
+          disabled={updatingJobId === record.datum?.id || disableUpdateJobPairType}
           style={{ width: 110 }}
           onChange={(value) => updateJobPairType(record.datum?.id || '', value)}
         />
@@ -173,6 +175,7 @@ export const OwnerDaoCycleJob: React.FC<DaoCycleProps> = ({ cycleId, cycle, daoI
   const [pairing, setPairing] = useState<Record<string, any>>({});
   const [statusProps, setStatusProps] = useState<Record<string, any>>({});
   const [pairingPercent, setPairingPercent] = useState<number>(0);
+  const [updatingJobId, setUpdatingJobId] = useState<string>('');
   const {
     data: pairStatusData,
     loading: pairStatusLoading,
@@ -218,6 +221,7 @@ export const OwnerDaoCycleJob: React.FC<DaoCycleProps> = ({ cycleId, cycle, daoI
   const updateJobPairType = useCallback(
     async (recordId: string, pairType: number) => {
       try {
+        setUpdatingJobId(recordId);
         const updPairType =
           pairType === 0
             ? UpdateJobVoteTypeByOwnerArgumentPairTypeEnum.Pair
@@ -225,6 +229,7 @@ export const OwnerDaoCycleJob: React.FC<DaoCycleProps> = ({ cycleId, cycle, daoI
         await updateCycleJobVoteTypeByOwnerMutation({
           variables: { jobId: recordId, voteType: updPairType },
         });
+        setUpdatingJobId('');
         await refetch();
         message.info('Update Job Pair Type Success');
       } catch (e) {
@@ -336,6 +341,7 @@ export const OwnerDaoCycleJob: React.FC<DaoCycleProps> = ({ cycleId, cycle, daoI
           convertFilterDefault(queryVariables.pairType),
           disablePairingButton,
           updateJobPairType,
+          updatingJobId,
         )}
         loading={loading}
         rowKey={(record) => record?.datum?.id || ''}
