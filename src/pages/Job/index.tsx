@@ -10,6 +10,7 @@ import { useModel } from '@@/plugin-model/useModel';
 import TabJob from './components/TabJob';
 import PermissionErrorPage from '@/pages/403';
 import styles from './index.less';
+import TabCycle from '@/pages/Job/components/TabCycle';
 
 const { TabPane } = Tabs;
 
@@ -76,7 +77,9 @@ export default (props: {
             <TabPane tab={<FormattedMessage id={`pages.job.tab.job`} />} key="job">
               <TabJob userName={userName} daoId={props.location.query.daoId} />
             </TabPane>
-            <TabPane tab={<FormattedMessage id={`pages.job.tab.cycle`} />} key="cycle" />
+            <TabPane tab={<FormattedMessage id={`pages.job.tab.cycle`} />} key="cycle">
+              <TabCycle userName={userName} daoId={props.location.query.daoId} />
+            </TabPane>
           </Tabs>
         </div>
       </PageContainer>

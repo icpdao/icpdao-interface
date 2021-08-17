@@ -23,43 +23,13 @@ import {
   useUpdateOwnerEiMutation,
 } from '@/services/dao/generated';
 import { PageLoading } from '@ant-design/pro-layout';
-import { UserOutlined, ControlTwoTone, ExclamationCircleFilled } from '@ant-design/icons';
+import { UserOutlined, ControlTwoTone } from '@ant-design/icons';
 import { history } from '@@/core/history';
 import { getCurrentPage, getEIColor } from '@/utils/utils';
 import styles from './index.less';
 import moment from 'moment';
 import GlobalModal from '@/components/Modal';
-
-const colorTooltip = (color: string, tipsText: string) => {
-  if (tipsText === '') return <></>;
-  return (
-    <Tooltip placement="right" title={tipsText}>
-      <ExclamationCircleFilled style={{ color, fontSize: 18, marginLeft: 10 }} />
-    </Tooltip>
-  );
-};
-
-const renderSize = (intl: any, record: IcpperStatQuery) => {
-  if (!record?.datum?.size) return <>-</>;
-  let color = '#262626';
-  const tips: string[] = [];
-  if (record.datum.haveTwoTimesLt08)
-    tips.push(intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.tips.1' }));
-  if (record.datum.haveTwoTimesLt04)
-    tips.push(intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.tips.2' }));
-  if (record.datum.beDeductedSizeByReview && record.datum.beDeductedSizeByReview > 0)
-    tips.push(intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.tips.3' }));
-  if (record.datum.unVotedAllVote)
-    tips.push(intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.tips.4' }));
-  const tipsText = tips.join(' ');
-  if (tips.length > 0) color = '#ED6C6C';
-  return (
-    <>
-      <span style={{ color }}>{record.datum?.size}</span>
-      {colorTooltip(color, tipsText)}
-    </>
-  );
-};
+import { colorTooltip, renderEi, renderSize } from '@/utils/pageHelper';
 
 const getJobListUrl = (record: any, daoId: string) => {
   return `/job?userName=${record.icpper?.githubLogin}&daoId=${daoId}`;
@@ -238,37 +208,7 @@ const columns = (intl: any, daoId: string) => {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.ie" />,
       dataIndex: ['datum', 'ei'],
       render: (_: any, record: IcpperStatQuery) => {
-        if (!record?.datum?.ei) return <>-</>;
-        const tips: string[] = [];
-        let color: string = 'inherit';
-        if (record.datum.ei < 0.4) {
-          color = '#ED6C6C';
-          tips.push(intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.tips.7' }));
-        } else if (record.datum.ei < 0.8) {
-          color = '#F1C84C';
-          tips.push(intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.tips.6' }));
-        } else if (record.datum.ei >= 1.2) {
-          color = '#2CA103';
-          tips.push(intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.tips.5' }));
-        }
-
-        if (record.beReviewerHasWarningUsers && record.beReviewerHasWarningUsers.length > 0) {
-          color = '#ED6C6C';
-          tips.push(
-            intl.formatMessage(
-              { id: 'pages.dao.component.dao_cycle_icpper.tips.8' },
-              { nicknames: record.beReviewerHasWarningUsers.map((d) => d?.nickname).join(' @') },
-            ),
-          );
-        }
-
-        const tipsText = tips.join(' ');
-        return (
-          <>
-            <span style={{ color: getEIColor(record.datum.ei) }}>{record.datum?.ei}</span>
-            {tips.length > 0 && colorTooltip(color, tipsText)}
-          </>
-        );
+        return renderEi(intl, record);
       },
     },
     {

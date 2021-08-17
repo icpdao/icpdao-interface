@@ -38,8 +38,8 @@ const breadcrumb = (daoId: string) => [
 
 const configTab = (
   <>
-    <TabPane tab={<FormattedMessage id={`pages.dao.config.tab.job`} />} key="job"></TabPane>
-    <TabPane tab={<FormattedMessage id={`pages.dao.config.tab.token`} />} key="token"></TabPane>
+    <TabPane tab={<FormattedMessage id={`pages.dao.config.tab.job`} />} key="job" />
+    <TabPane tab={<FormattedMessage id={`pages.dao.config.tab.token`} />} key="token" />
   </>
 );
 
