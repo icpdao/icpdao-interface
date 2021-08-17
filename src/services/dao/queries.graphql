@@ -498,3 +498,47 @@ query DAOCycleVoteList($cycleId: String!, $first: Int, $offset: Int) {
     }
   }
 }
+
+query UserCycleIcpperStatList($daoName: String!, $userName: String!, $first: Int!, $offset: Int!) {
+  icpperStats(daoName: $daoName, userName: $userName, first: $first, offset: $offset) {
+    nodes {
+      datum {
+        id
+        jobCount
+        size
+        income
+        ei
+        beDeductedSizeByReview
+        haveTwoTimesLt04
+        haveTwoTimesLt08
+        unVotedAllVote
+      }
+      cycle {
+        id
+        timeZone
+        beginAt
+        endAt
+        pairBeginAt
+        pairEndAt
+        voteBeginAt
+        voteEndAt
+        pairedAt
+        voteResultPublishedAt
+        createAt
+        updateAt
+      }
+      icpper {
+        id
+        avatar
+        nickname
+        githubLogin
+      }
+      lastEi
+      beReviewerHasWarningUsers {
+        id
+        nickname
+      }
+    }
+    total
+  }
+}

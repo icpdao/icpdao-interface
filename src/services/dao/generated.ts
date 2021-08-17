@@ -437,6 +437,7 @@ export type IcpperStatQuery = {
   datum?: Maybe<CycleIcpperStatSchema>;
   lastEi?: Maybe<Scalars['Decimal']>;
   icpper?: Maybe<UserSchema>;
+  cycle?: Maybe<CycleSchema>;
   beReviewerHasWarningUsers?: Maybe<Array<Maybe<UserSchema>>>;
 };
 
@@ -669,6 +670,7 @@ export type Query = {
   daoGithubAppStatus?: Maybe<DaoGithubAppStatus>;
   cycle?: Maybe<CycleQuery>;
   jobs?: Maybe<Jobs>;
+  icpperStats?: Maybe<UserIcpperStatsQuery>;
 };
 
 export type QueryDaosArgs = {
@@ -711,6 +713,13 @@ export type QueryJobsArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   userName?: Maybe<Scalars['String']>;
+};
+
+export type QueryIcpperStatsArgs = {
+  daoName?: Maybe<Scalars['String']>;
+  userName?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 export enum SortedTypeEnum {
@@ -763,6 +772,12 @@ export enum UpdateJobVoteTypeByOwnerArgumentPairTypeEnum {
 export type UpdatePairVote = {
   __typename?: 'UpdatePairVote';
   ok?: Maybe<Scalars['Boolean']>;
+};
+
+export type UserIcpperStatsQuery = {
+  __typename?: 'UserIcpperStatsQuery';
+  nodes?: Maybe<Array<Maybe<IcpperStatQuery>>>;
+  total?: Maybe<Scalars['Int']>;
 };
 
 export type UserSchema = {
@@ -1793,6 +1808,70 @@ export type DaoCycleVoteListQuery = { __typename?: 'Query' } & {
           }
       >;
     }
+  >;
+};
+
+export type UserCycleIcpperStatListQueryVariables = Exact<{
+  daoName: Scalars['String'];
+  userName: Scalars['String'];
+  first: Scalars['Int'];
+  offset: Scalars['Int'];
+}>;
+
+export type UserCycleIcpperStatListQuery = { __typename?: 'Query' } & {
+  icpperStats?: Maybe<
+    { __typename?: 'UserIcpperStatsQuery' } & Pick<UserIcpperStatsQuery, 'total'> & {
+        nodes?: Maybe<
+          Array<
+            Maybe<
+              { __typename?: 'IcpperStatQuery' } & Pick<IcpperStatQuery, 'lastEi'> & {
+                  datum?: Maybe<
+                    { __typename?: 'CycleIcpperStatSchema' } & Pick<
+                      CycleIcpperStatSchema,
+                      | 'id'
+                      | 'jobCount'
+                      | 'size'
+                      | 'income'
+                      | 'ei'
+                      | 'beDeductedSizeByReview'
+                      | 'haveTwoTimesLt04'
+                      | 'haveTwoTimesLt08'
+                      | 'unVotedAllVote'
+                    >
+                  >;
+                  cycle?: Maybe<
+                    { __typename?: 'CycleSchema' } & Pick<
+                      CycleSchema,
+                      | 'id'
+                      | 'timeZone'
+                      | 'beginAt'
+                      | 'endAt'
+                      | 'pairBeginAt'
+                      | 'pairEndAt'
+                      | 'voteBeginAt'
+                      | 'voteEndAt'
+                      | 'pairedAt'
+                      | 'voteResultPublishedAt'
+                      | 'createAt'
+                      | 'updateAt'
+                    >
+                  >;
+                  icpper?: Maybe<
+                    { __typename?: 'UserSchema' } & Pick<
+                      UserSchema,
+                      'id' | 'avatar' | 'nickname' | 'githubLogin'
+                    >
+                  >;
+                  beReviewerHasWarningUsers?: Maybe<
+                    Array<
+                      Maybe<{ __typename?: 'UserSchema' } & Pick<UserSchema, 'id' | 'nickname'>>
+                    >
+                  >;
+                }
+            >
+          >
+        >;
+      }
   >;
 };
 
@@ -4144,4 +4223,108 @@ export type DaoCycleVoteListLazyQueryHookResult = ReturnType<typeof useDaoCycleV
 export type DaoCycleVoteListQueryResult = Apollo.QueryResult<
   DaoCycleVoteListQuery,
   DaoCycleVoteListQueryVariables
+>;
+export const UserCycleIcpperStatListDocument = gql`
+  query UserCycleIcpperStatList(
+    $daoName: String!
+    $userName: String!
+    $first: Int!
+    $offset: Int!
+  ) {
+    icpperStats(daoName: $daoName, userName: $userName, first: $first, offset: $offset) {
+      nodes {
+        datum {
+          id
+          jobCount
+          size
+          income
+          ei
+          beDeductedSizeByReview
+          haveTwoTimesLt04
+          haveTwoTimesLt08
+          unVotedAllVote
+        }
+        cycle {
+          id
+          timeZone
+          beginAt
+          endAt
+          pairBeginAt
+          pairEndAt
+          voteBeginAt
+          voteEndAt
+          pairedAt
+          voteResultPublishedAt
+          createAt
+          updateAt
+        }
+        icpper {
+          id
+          avatar
+          nickname
+          githubLogin
+        }
+        lastEi
+        beReviewerHasWarningUsers {
+          id
+          nickname
+        }
+      }
+      total
+    }
+  }
+`;
+
+/**
+ * __useUserCycleIcpperStatListQuery__
+ *
+ * To run a query within a React component, call `useUserCycleIcpperStatListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserCycleIcpperStatListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserCycleIcpperStatListQuery({
+ *   variables: {
+ *      daoName: // value for 'daoName'
+ *      userName: // value for 'userName'
+ *      first: // value for 'first'
+ *      offset: // value for 'offset'
+ *   },
+ * });
+ */
+export function useUserCycleIcpperStatListQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    UserCycleIcpperStatListQuery,
+    UserCycleIcpperStatListQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<UserCycleIcpperStatListQuery, UserCycleIcpperStatListQueryVariables>(
+    UserCycleIcpperStatListDocument,
+    options,
+  );
+}
+export function useUserCycleIcpperStatListLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    UserCycleIcpperStatListQuery,
+    UserCycleIcpperStatListQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<UserCycleIcpperStatListQuery, UserCycleIcpperStatListQueryVariables>(
+    UserCycleIcpperStatListDocument,
+    options,
+  );
+}
+export type UserCycleIcpperStatListQueryHookResult = ReturnType<
+  typeof useUserCycleIcpperStatListQuery
+>;
+export type UserCycleIcpperStatListLazyQueryHookResult = ReturnType<
+  typeof useUserCycleIcpperStatListLazyQuery
+>;
+export type UserCycleIcpperStatListQueryResult = Apollo.QueryResult<
+  UserCycleIcpperStatListQuery,
+  UserCycleIcpperStatListQueryVariables
 >;

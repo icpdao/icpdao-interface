@@ -125,6 +125,11 @@ export default {
   'pages.job.table.status': 'Status',
   'pages.job.table.income': 'Income',
   'pages.job.table.operation': 'Operation',
+  'pages.job.cycle.table.head.cycle': 'Cycle',
+  'pages.job.cycle.table.head.job': 'Job',
+  'pages.job.cycle.table.head.size': 'Size',
+  'pages.job.cycle.table.head.income': 'Income',
+  'pages.job.cycle.table.head.ei': 'EI',
   'pages.dao.component.dao_cycle.stat.icpper': 'Icpper',
   'pages.dao.component.dao_cycle.stat.job': 'Job',
   'pages.dao.component.dao_cycle.stat.size': 'Size',
@@ -152,9 +157,9 @@ export default {
   'pages.dao.component.dao_cycle_icpper.tips.4':
     'As the voting in this cycle not completed on time, the total size will be reduced by half.',
   'pages.dao.component.dao_cycle_icpper.tips.5':
-    'The community thinks the SIZE is too high and suggests lowering it next time. If the size is below 0.8 for 2 times, the total size will be reduced by half.',
+    'The community thinks the SIZE is too low and suggests raising it next time',
   'pages.dao.component.dao_cycle_icpper.tips.6':
-    'The community thinks the SIZE is too low and suggests raising it next time.',
+    'The community thinks the SIZE is too high and suggests lowering it next time. If the size is below 0.8 for 2 times, the total size will be reduced by half.',
   'pages.dao.component.dao_cycle_icpper.tips.7':
     "The community thinks the SIZE is too high and suggests lowering it next time. If the size is below 0.4 for 2 times, the total size will be reduced by half，and the review's reward is deducted by half of the total size of his merge jobs.",
   'pages.dao.component.dao_cycle_icpper.tips.8':
