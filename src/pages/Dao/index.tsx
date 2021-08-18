@@ -307,10 +307,16 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
 
   const noVoteAlert = useMemo(() => {
     if (showNoVoteAlert) {
-      return <Alert message="Error" type="error" showIcon />;
+      return (
+        <Alert
+          message={intl.formatMessage({ id: 'pages.dao.home.alert.no_vote' })}
+          type="error"
+          showIcon
+        />
+      );
     }
     return null;
-  }, [showNoVoteAlert]);
+  }, [intl, showNoVoteAlert]);
 
   const [updateFollowDao] = useFollowDaoMutation();
   const [updateDaoBaseInfo] = useUpdateDaoBaseInfoMutation();

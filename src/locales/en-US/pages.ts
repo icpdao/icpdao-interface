@@ -110,6 +110,7 @@ export default {
   'pages.dao.home.button.vote': 'Go Vote',
   'pages.dao.home.button.vote.tips.time_left': 'Time left to vote: {date_string}',
   'pages.dao.home.button.vote.tips.time_start': 'Time start to vote: {date_string}',
+  'pages.dao.home.alert.no_vote': "Sorry, you haven't vote to this cycle",
   'pages.dao.home.tab.icpperStat': 'Icpper',
   'pages.dao.home.tab.jobStat': 'Job',
   'pages.dao.home.tab.cycle': 'Cycle',
