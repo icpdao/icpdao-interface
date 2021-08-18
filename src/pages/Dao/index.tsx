@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { PageContainer, PageLoading } from '@ant-design/pro-layout';
 import {
   Upload,
@@ -14,22 +14,21 @@ import {
   message,
   Tabs,
   Tooltip,
+  Alert,
 } from 'antd';
 import { FormattedMessage, history, useAccess } from 'umi';
 import styles from './index.less';
 import GlobalBreadcrumb from '@/components/Breadcrumb';
 import { GithubOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from '@ant-design/icons';
 import { useModel } from '@@/plugin-model/useModel';
-import type { CycleSchema, Maybe } from '@/services/dao/generated';
+import type { Maybe } from '@/services/dao/generated';
 import {
   DaoFollowTypeEnum,
-  useDaoFollowInfoQuery,
-  useDaoProcessingCycleQuery,
-  useDaoVotingCycleQuery,
+  useDaoHomeWithLoginQueryQuery,
   useFollowDaoMutation,
   useUpdateDaoBaseInfoMutation,
 } from '@/services/dao/generated';
-import { getFormatTime, getTimeDistanceHumanize } from '@/utils/utils';
+import { getCurrentTimestamps, getFormatTime, getTimeDistanceHumanize } from '@/utils/utils';
 import { useIntl } from '@@/plugin-locale/localeExports';
 
 import DaoIcpperStat from '@/pages/Dao/components/DaoIcpperStat';
@@ -188,28 +187,133 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
   const access = useAccess();
   const intl = useIntl();
   const [followedButtonLoading, setFollowedButtonLoading] = useState(false);
-  const [votingCycle, setVotingCycle] = useState<CycleSchema>();
-  const [processingCycle, setProcessingCycle] = useState<CycleSchema>();
+  const [showNoVoteAlert, setShowNoVoteAlert] = useState(false);
+
   if (!initialState) {
     return <PageLoading />;
   }
   const { daoId } = props.match.params;
+  const nowAt = getCurrentTimestamps();
 
-  const { data, loading, error, refetch } = useDaoFollowInfoQuery({
+  const { data, loading, error, refetch } = useDaoHomeWithLoginQueryQuery({
     variables: { id: daoId, userId: initialState.currentUser()?.profile?.id },
   });
-  const { data: votingCycleData } = useDaoVotingCycleQuery({ variables: { daoId } });
-  const { data: processingCycleData } = useDaoProcessingCycleQuery({ variables: { daoId } });
+
+  // 正在投票中，距离投票结束最近的一个周期
+  const nearVotingCycle = useMemo(() => {
+    let result;
+    const votingList = data?.dao?.cycles?.nodes?.filter((item) => {
+      if (item) {
+        return (
+          item.datum?.voteBeginAt &&
+          item.datum?.voteEndAt &&
+          item.datum?.voteBeginAt <= nowAt &&
+          item.datum?.voteEndAt > nowAt
+        );
+      }
+      return false;
+    });
+    votingList?.sort((item1, item2) => {
+      return (item1?.datum?.voteEndAt || 0) - (item2?.datum?.voteEndAt || 0);
+    });
+
+    if (votingList && votingList.length > 0) {
+      // eslint-disable-next-line prefer-destructuring
+      result = votingList[0];
+    }
+    return result;
+  }, [data, nowAt]);
+
+  // 正在进行中的，距离 deadline 最近的一个周期
+  const processingCycle = useMemo(() => {
+    let result;
+    const processingCycleList = data?.dao?.cycles?.nodes?.filter((item) => {
+      if (item) {
+        return (
+          item.datum?.beginAt &&
+          item.datum?.endAt &&
+          item.datum?.beginAt <= nowAt &&
+          item.datum?.endAt > nowAt
+        );
+      }
+      return false;
+    });
+    processingCycleList?.sort((item1, item2) => {
+      return (item1?.datum?.endAt || 0) - (item2?.datum?.endAt || 0);
+    });
+
+    if (processingCycleList && processingCycleList.length > 0) {
+      // eslint-disable-next-line prefer-destructuring
+      result = processingCycleList[0];
+    }
+    return result;
+  }, [data, nowAt]);
+
+  // 未完成的，继续投票开始最近的周期
+  const nearPreVoteCycle = useMemo(() => {
+    let result;
+    const preVoteList = data?.dao?.cycles?.nodes?.filter((item) => {
+      if (item) {
+        return item.datum?.voteBeginAt && item.datum?.voteBeginAt > nowAt;
+      }
+      return false;
+    });
+    preVoteList?.sort((item1, item2) => {
+      return (item1?.datum?.voteBeginAt || 0) - (item2?.datum?.voteBeginAt || 0);
+    });
+
+    if (preVoteList && preVoteList.length > 0) {
+      // eslint-disable-next-line prefer-destructuring
+      result = preVoteList[0];
+    }
+    return result;
+  }, [data, nowAt]);
+
+  const markJobButtonTipTitle = useMemo(() => {
+    if (processingCycle && processingCycle.datum?.endAt) {
+      return intl.formatMessage(
+        { id: 'pages.dao.home.button.mark.tips' },
+        { date_string: getFormatTime(processingCycle?.datum?.endAt, 'LL') },
+      );
+    }
+    return '';
+  }, [intl, processingCycle]);
+
+  const goVoteButtonTipTitle = useMemo(() => {
+    if (nearVotingCycle && nearVotingCycle.datum?.voteEndAt) {
+      return intl.formatMessage(
+        { id: 'pages.dao.home.button.vote.tips.time_left' },
+        { date_string: getTimeDistanceHumanize(nearVotingCycle.datum?.voteEndAt) },
+      );
+    }
+
+    if (nearPreVoteCycle && nearPreVoteCycle.datum?.voteBeginAt) {
+      return intl.formatMessage(
+        { id: 'pages.dao.home.button.vote.tips.time_start' },
+        { date_string: getTimeDistanceHumanize(nearPreVoteCycle.datum?.voteBeginAt) },
+      );
+    }
+
+    return '';
+  }, [intl, nearPreVoteCycle, nearVotingCycle]);
+
+  const nearVotingCycleHasVote = useMemo(() => {
+    if (nearVotingCycle) {
+      const total = nearVotingCycle?.votes?.total || 0;
+      return total > 0;
+    }
+    return false;
+  }, [nearVotingCycle]);
+
+  const noVoteAlert = useMemo(() => {
+    if (showNoVoteAlert) {
+      return <Alert message="Error" type="error" showIcon />;
+    }
+    return null;
+  }, [showNoVoteAlert]);
+
   const [updateFollowDao] = useFollowDaoMutation();
   const [updateDaoBaseInfo] = useUpdateDaoBaseInfoMutation();
-  useEffect(() => {
-    votingCycleData?.dao?.cycles?.nodes?.forEach((v) => {
-      setVotingCycle(v?.datum as CycleSchema);
-    });
-    processingCycleData?.dao?.cycles?.nodes?.forEach((v) => {
-      setProcessingCycle(v?.datum as CycleSchema);
-    });
-  }, [votingCycleData, processingCycleData]);
 
   if (loading || error) {
     return <PageLoading />;
@@ -233,6 +337,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
         ghost
         header={{ breadcrumbRender: () => <GlobalBreadcrumb routes={breadcrumb(daoId)} /> }}
       >
+        {noVoteAlert}
         <Row className={styles.headerRow}>
           <Col span={12}>
             <Space size={30} className={styles.headerSpace}>
@@ -342,17 +447,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
         </Space>
         <Divider />
         <Space size={22} className={styles.buttonSpace}>
-          <Tooltip
-            placement="right"
-            title={
-              processingCycle?.endAt
-                ? intl.formatMessage(
-                    { id: 'pages.dao.home.button.mark.tips' },
-                    { date_string: getFormatTime(processingCycle.endAt, 'LL') },
-                  )
-                : ''
-            }
-          >
+          <Tooltip placement="right" title={markJobButtonTipTitle}>
             <Button
               size={'large'}
               type={'primary'}
@@ -361,23 +456,19 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
               <FormattedMessage id={`pages.dao.home.button.mark`} />
             </Button>
           </Tooltip>
-          <Tooltip
-            placement="right"
-            title={
-              votingCycle?.endAt
-                ? intl.formatMessage(
-                    { id: 'pages.dao.home.button.vote.tips' },
-                    { date_string: getTimeDistanceHumanize(votingCycle.endAt) },
-                  )
-                : ''
-            }
-          >
+          <Tooltip placement="right" title={goVoteButtonTipTitle}>
             <Button
               size={'large'}
               type={'primary'}
               danger
-              disabled={!votingCycle}
-              onClick={() => history.push(`/dao/${daoId}/${votingCycle?.id}/vote`)}
+              disabled={!nearVotingCycle}
+              onClick={() => {
+                if (nearVotingCycleHasVote) {
+                  history.push(`/dao/${daoId}/${nearVotingCycle?.datum?.id}/vote`);
+                } else {
+                  setShowNoVoteAlert(true);
+                }
+              }}
             >
               <FormattedMessage id={`pages.dao.home.button.vote`} />
             </Button>

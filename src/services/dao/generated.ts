@@ -70,6 +70,7 @@ export enum CycleFilterEnum {
   Processing = 'processing',
   Pairing = 'pairing',
   Voting = 'voting',
+  UnVoteEnd = 'un_vote_end',
 }
 
 export type CycleIcpperStatSchema = {
@@ -253,7 +254,7 @@ export type Dao = {
 };
 
 export type DaoCyclesArgs = {
-  filter?: Maybe<CycleFilterEnum>;
+  filter?: Maybe<Array<Maybe<CycleFilterEnum>>>;
 };
 
 export type DaoFollowSchema = {
@@ -1148,6 +1149,52 @@ export type DaoJobConfigPreviewNextCycleQuery = { __typename?: 'Query' } & {
           | 'voteBeginAt'
           | 'voteEndAt'
         >
+      >;
+    }
+  >;
+};
+
+export type DaoHomeWithLoginQueryQueryVariables = Exact<{
+  id: Scalars['String'];
+  userId: Scalars['String'];
+}>;
+
+export type DaoHomeWithLoginQueryQuery = { __typename?: 'Query' } & {
+  dao?: Maybe<
+    { __typename?: 'DAO' } & {
+      datum?: Maybe<
+        { __typename?: 'DAOSchema' } & Pick<
+          DaoSchema,
+          'id' | 'number' | 'name' | 'desc' | 'logo' | 'ownerId' | 'createAt' | 'updateAt'
+        >
+      >;
+      cycles?: Maybe<
+        { __typename?: 'CyclesQuery' } & {
+          nodes?: Maybe<
+            Array<
+              Maybe<
+                { __typename?: 'CycleQuery' } & {
+                  datum?: Maybe<
+                    { __typename?: 'CycleSchema' } & Pick<
+                      CycleSchema,
+                      'id' | 'beginAt' | 'endAt' | 'voteBeginAt' | 'voteEndAt'
+                    >
+                  >;
+                  votes?: Maybe<
+                    { __typename?: 'CycleVotesQuery' } & Pick<CycleVotesQuery, 'total'>
+                  >;
+                }
+              >
+            >
+          >;
+        }
+      >;
+      following?: Maybe<
+        { __typename?: 'DAOFollowUDSchema' } & Pick<DaoFollowUdSchema, 'total'> & {
+            followers?: Maybe<
+              Array<Maybe<{ __typename?: 'DAOFollowSchema' } & Pick<DaoFollowSchema, 'createAt'>>>
+            >;
+          }
       >;
     }
   >;
@@ -2997,6 +3044,92 @@ export type DaoJobConfigPreviewNextCycleLazyQueryHookResult = ReturnType<
 export type DaoJobConfigPreviewNextCycleQueryResult = Apollo.QueryResult<
   DaoJobConfigPreviewNextCycleQuery,
   DaoJobConfigPreviewNextCycleQueryVariables
+>;
+export const DaoHomeWithLoginQueryDocument = gql`
+  query DAOHomeWithLoginQuery($id: String!, $userId: String!) {
+    dao(id: $id) {
+      datum {
+        id
+        number
+        name
+        desc
+        logo
+        ownerId
+        createAt
+        updateAt
+      }
+      cycles(filter: [un_vote_end]) {
+        nodes {
+          datum {
+            id
+            beginAt
+            endAt
+            voteBeginAt
+            voteEndAt
+          }
+          votes(isMyself: true) {
+            total
+          }
+        }
+      }
+      following {
+        total
+        followers(userId: $userId) {
+          createAt
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useDaoHomeWithLoginQueryQuery__
+ *
+ * To run a query within a React component, call `useDaoHomeWithLoginQueryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDaoHomeWithLoginQueryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDaoHomeWithLoginQueryQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useDaoHomeWithLoginQueryQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    DaoHomeWithLoginQueryQuery,
+    DaoHomeWithLoginQueryQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<DaoHomeWithLoginQueryQuery, DaoHomeWithLoginQueryQueryVariables>(
+    DaoHomeWithLoginQueryDocument,
+    options,
+  );
+}
+export function useDaoHomeWithLoginQueryLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    DaoHomeWithLoginQueryQuery,
+    DaoHomeWithLoginQueryQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<DaoHomeWithLoginQueryQuery, DaoHomeWithLoginQueryQueryVariables>(
+    DaoHomeWithLoginQueryDocument,
+    options,
+  );
+}
+export type DaoHomeWithLoginQueryQueryHookResult = ReturnType<typeof useDaoHomeWithLoginQueryQuery>;
+export type DaoHomeWithLoginQueryLazyQueryHookResult = ReturnType<
+  typeof useDaoHomeWithLoginQueryLazyQuery
+>;
+export type DaoHomeWithLoginQueryQueryResult = Apollo.QueryResult<
+  DaoHomeWithLoginQueryQuery,
+  DaoHomeWithLoginQueryQueryVariables
 >;
 export const DaoFollowInfoDocument = gql`
   query DAOFollowInfo($id: String!, $userId: String!) {
