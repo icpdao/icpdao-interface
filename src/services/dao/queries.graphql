@@ -71,6 +71,41 @@ query DAOJobConfigPreviewNextCycle($daoId: String!, $timeZone: Int, $deadlineDay
   }
 }
 
+query DAOHomeWithLoginQuery($id: String!, $userId: String!) {
+  dao(id: $id) {
+    datum {
+      id
+      number
+      name
+      desc
+      logo
+      ownerId
+      createAt
+      updateAt
+    }
+    cycles(filter: [un_vote_end]) {
+      nodes {
+        datum {
+          id
+          beginAt
+          endAt
+          voteBeginAt
+          voteEndAt
+        }
+        votes(isMyself: true) {
+          total
+        }
+      }
+    }
+    following {
+      total
+      followers(userId: $userId) {
+        createAt
+      }
+    }
+  }
+}
+
 query DAOFollowInfo($id: String!, $userId: String!) {
   dao(id: $id) {
     datum {

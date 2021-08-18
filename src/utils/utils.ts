@@ -5,7 +5,8 @@ import momentTZ from 'moment-timezone';
 
 moment.locale('en');
 
-const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
+const reg =
+  /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
 
 export const isUrl = (path: string): boolean => reg.test(path);
 
@@ -68,7 +69,25 @@ export const getTimeDistanceDays = (timeA: number, timeB: number): number => {
 export const getTimeDistanceHumanize = (time: number): string => {
   const a = moment.utc();
   const b = moment.unix(time);
-  return moment.duration(b.diff(a)).humanize();
+  // return moment.duration(b.diff(a)).humanize();
+  let diff = Math.abs(Math.floor(b.diff(a) / 1000));
+  const days = Math.floor(diff / (60 * 60 * 24));
+  diff -= days * 60 * 60 * 24;
+  const hours = Math.floor(diff / (60 * 60));
+  diff -= hours * 60 * 60;
+  const minutes = Math.floor(diff / 60);
+
+  let res = '';
+  if (days > 0) {
+    res += `${days} days`;
+  }
+  if (hours > 0) {
+    res += ` ${hours} hours`;
+  }
+  if (minutes > 0) {
+    res += ` ${minutes} minutes`;
+  }
+  return res;
 };
 
 export const getFormatTime = (time: number, format: string): string => {
@@ -138,6 +157,10 @@ export const getEIColor = (ei: number) => {
 
 export const getCurrentPage = (offset: number, pageSize: number) => {
   return Math.ceil(offset / pageSize) + 1;
+};
+
+export const getCurrentTimestamps = () => {
+  return parseInt(String(new Date().getTime() / 1000), 10);
 };
 
 export const githubCallback = '/login/auth_callback';
