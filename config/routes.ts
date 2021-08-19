@@ -58,6 +58,10 @@
     component: './Dao/Vote',
   },
   {
+    path: '/staking',
+    component: './Staking'
+  },
+  {
     component: './404',
   },
 ];
