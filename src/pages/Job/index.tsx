@@ -38,6 +38,7 @@ const otherUserBreadcrumb = (userName: string) => {
     {
       path: '/job',
       name: userName,
+      breadcrumbName: userName,
     },
   ];
 };

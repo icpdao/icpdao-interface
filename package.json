@@ -105,6 +105,8 @@
     "@umijs/preset-dumi": "^1.1.7",
     "@umijs/preset-react": "^1.8.10",
     "@umijs/yorkie": "^2.0.3",
+    "@uniswap/sdk-core": "^3.0.1",
+    "@uniswap/v3-sdk": "^3.3.2",
     "carlo": "^0.9.46",
     "cross-env": "^7.0.0",
     "cross-port-killer": "^1.1.1",

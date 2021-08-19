@@ -3,6 +3,8 @@ import detectEthereumProvider from '@metamask/detect-provider';
 import { EthereumNetwork, getMetamask } from '@/utils/utils';
 import { DAOFactoryConnect } from '@/services/ethereum-connect/factory';
 import { useMemo, useState } from 'react';
+import {UniswapConnect} from "@/services/ethereum-connect/uniswap";
+import {DAOStakingConnect} from "@/services/ethereum-connect/staking";
 
 export default () => {
   const metamaskUserConnect = getMetamask();
@@ -38,7 +40,8 @@ export default () => {
     setIsConnected,
     contract: {
       daoFactory: new DAOFactoryConnect(network, metamaskProvider),
-      daoStaking: new DAOFactoryConnect(network, metamaskProvider),
+      daoStaking: new DAOStakingConnect(network, metamaskProvider),
+      uniswapPool: new UniswapConnect(network, metamaskProvider)
     },
   };
 };

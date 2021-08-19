@@ -411,7 +411,8 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({ ethDAOId, tokenAddr
                 <InputNumber
                   value={createFormData.mintChangeValue}
                   min={0.1}
-                  step={'0.1'}
+                  step={0.1}
+                  precision={1}
                   onChange={(value) =>
                     setCreateFormData((old) => ({
                       ...old,
