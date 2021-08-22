@@ -1,6 +1,7 @@
 import { DAOFactoryContract, getInfuraProvider, getMetamaskProvider } from './index';
 import type { ETH_CONNECT } from './typings';
-import { BigNumber, ethers } from 'ethers';
+import type { BigNumber } from 'ethers';
+import { ethers } from 'ethers';
 
 export class DAOFactoryConnect {
   provider: any;
@@ -46,7 +47,15 @@ export class DAOFactoryConnect {
       genesisTokenAmountList,
       body.lpRatio,
       body.ownerAddress,
-      { ...mintArgs },
+      {
+        p: mintArgs.p,
+        aNumerator: mintArgs.aNumerator,
+        aDenominator: mintArgs.aDenominator,
+        bNumerator: mintArgs.bNumerator,
+        bDenominator: mintArgs.bDenominator,
+        c: mintArgs.c,
+        d: mintArgs.d,
+      },
       body.tokenName,
       body.tokenSymbol,
     );

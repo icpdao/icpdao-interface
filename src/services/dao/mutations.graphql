@@ -167,3 +167,9 @@ mutation UpdateVotePairPublic($voteId: String!, $isPublic: Boolean!) {
     ok
   }
 }
+
+mutation MarkCyclesTokenReleased($daoId: String!, $cycleIds: [String]!, $unitSizeValue: String!) {
+  markCyclesTokenReleased(daoId: $daoId, cycleIds: $cycleIds, unitSizeValue: $unitSizeValue) {
+    ok
+  }
+}

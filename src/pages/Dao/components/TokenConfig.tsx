@@ -9,9 +9,10 @@ import { PageLoading } from '@ant-design/pro-layout';
 import { useRequest } from '@@/plugin-request/request';
 import { ZeroAddress } from '@/services/ethereum-connect';
 import { useModel } from '@@/plugin-model/useModel';
-import TokenCreateLP from "@/pages/Dao/components/token/CreateLP";
-import TokenAddLP from "@/pages/Dao/components/token/AddLP";
-import TokenManager from "@/pages/Dao/components/token/Manager";
+import TokenCreateLP from '@/pages/Dao/components/token/CreateLP';
+import TokenAddLP from '@/pages/Dao/components/token/AddLP';
+import TokenManager from '@/pages/Dao/components/token/Manager';
+import TokenMint from '@/pages/Dao/components/token/Mint';
 
 const { TabPane } = Tabs;
 
@@ -43,31 +44,39 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId }) => {
   if (loading || error) return <PageLoading />;
   return (
     <>
-      <Tabs className={styles.tokenConfigTabs} defaultActiveKey="create" tabPosition={'left'} onChange={setCurrentTab}>
+      <Tabs
+        className={styles.tokenConfigTabs}
+        defaultActiveKey="create"
+        tabPosition={'left'}
+        onChange={setCurrentTab}
+      >
         <TabPane tab={intl.formatMessage({ id: 'pages.dao.config.tab.token.create' })} key="create">
-          {currentTab === 'create' && <TokenCreate
+          {currentTab === 'create' && (
+            <TokenCreate
               ethDAOId={data?.daoTokenConfig?.ethDaoId || ''}
               tokenAddress={tokenAddress || ZeroAddress}
-            />}
+            />
+          )}
         </TabPane>
         <TabPane
           tab={intl.formatMessage({ id: 'pages.dao.config.tab.token.create_pool' })}
           key="createPool"
         >
-          {currentTab === 'createPool' && <TokenCreateLP
-            tokenAddress={tokenAddress || ZeroAddress} />}
+          {currentTab === 'createPool' && (
+            <TokenCreateLP tokenAddress={tokenAddress || ZeroAddress} />
+          )}
         </TabPane>
         <TabPane tab={intl.formatMessage({ id: 'pages.dao.config.tab.token.add_lp' })} key="addLP">
-          {currentTab === 'addLP' && <TokenAddLP tokenAddress={tokenAddress || ZeroAddress}/>}
+          {currentTab === 'addLP' && <TokenAddLP tokenAddress={tokenAddress || ZeroAddress} />}
         </TabPane>
         <TabPane
           tab={intl.formatMessage({ id: 'pages.dao.config.tab.token.manager' })}
           key="manager"
         >
-          {currentTab === 'manager' && <TokenManager tokenAddress={tokenAddress || ZeroAddress}/>}
+          {currentTab === 'manager' && <TokenManager tokenAddress={tokenAddress || ZeroAddress} />}
         </TabPane>
         <TabPane tab={intl.formatMessage({ id: 'pages.dao.config.tab.token.mint' })} key="mint">
-          Content of Tab Pane 3
+          {currentTab === 'mint' && <TokenMint tokenAddress={tokenAddress || ZeroAddress} />}
         </TabPane>
       </Tabs>
     </>

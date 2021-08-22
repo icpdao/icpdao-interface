@@ -504,3 +504,33 @@ query DAOCycleVoteList($cycleId: String!, $first: Int, $offset: Int) {
     }
   }
 }
+
+query CyclesByTokenUnreleasedList($lastTimestamp: Int!) {
+  cyclesByTokenUnreleased(lastTimestamp: $lastTimestamp) {
+    nodes {
+      datum {
+        id
+        daoId
+        timeZone
+        beginAt
+        endAt
+        voteResultPublishedAt
+      }
+      icpperStats {
+        nodes {
+          datum {
+            cycleId
+            jobSize
+            size
+          }
+          icpper {
+            id
+            githubLogin
+            nickname
+            erc20Address
+          }
+        }
+      }
+    }
+  }
+}

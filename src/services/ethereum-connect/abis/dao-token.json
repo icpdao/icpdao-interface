@@ -195,6 +195,12 @@
         "internalType": "int24",
         "name": "_tickUpper",
         "type": "int24"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_lpPool",
+        "type": "address"
       }
     ],
     "name": "CreateLPPoolOrLinkLPPool",
@@ -232,6 +238,12 @@
         "internalType": "int24",
         "name": "_tickUpper",
         "type": "int24"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_mintValue",
+        "type": "uint256"
       }
     ],
     "name": "Mint",

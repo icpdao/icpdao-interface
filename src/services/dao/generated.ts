@@ -66,10 +66,16 @@ export type CreateMock = {
   ok?: Maybe<Scalars['Boolean']>;
 };
 
+export type CycleByTokenUnreleasedQuery = {
+  __typename?: 'CycleByTokenUnreleasedQuery';
+  nodes?: Maybe<Array<Maybe<CycleQuery>>>;
+};
+
 export enum CycleFilterEnum {
   Processing = 'processing',
   Pairing = 'pairing',
   Voting = 'voting',
+  UnVoteEnd = 'un_vote_end',
 }
 
 export type CycleIcpperStatSchema = {
@@ -83,7 +89,7 @@ export type CycleIcpperStatSchema = {
   haveTwoTimesLt08?: Maybe<Scalars['Boolean']>;
   /** _id */
   id?: Maybe<Scalars['ID']>;
-  income: Scalars['Int'];
+  income: Scalars['Float'];
   jobCount: Scalars['Int'];
   jobSize: Scalars['Float'];
   lastId?: Maybe<Scalars['String']>;
@@ -152,6 +158,7 @@ export type CycleSchema = {
   pairEndAt: Scalars['Int'];
   pairedAt?: Maybe<Scalars['Int']>;
   timeZone: Scalars['Int'];
+  tokenReleasedAt?: Maybe<Scalars['Int']>;
   updateAt: Scalars['Int'];
   voteBeginAt: Scalars['Int'];
   voteEndAt: Scalars['Int'];
@@ -253,7 +260,7 @@ export type Dao = {
 };
 
 export type DaoCyclesArgs = {
-  filter?: Maybe<CycleFilterEnum>;
+  filter?: Maybe<Array<Maybe<CycleFilterEnum>>>;
 };
 
 export type DaoFollowSchema = {
@@ -437,6 +444,7 @@ export type IcpperStatQuery = {
   datum?: Maybe<CycleIcpperStatSchema>;
   lastEi?: Maybe<Scalars['Decimal']>;
   icpper?: Maybe<UserSchema>;
+  cycle?: Maybe<CycleSchema>;
   beReviewerHasWarningUsers?: Maybe<Array<Maybe<UserSchema>>>;
 };
 
@@ -496,7 +504,7 @@ export type JobSchema = {
   githubRepoOwnerId: Scalars['Int'];
   /** _id */
   id?: Maybe<Scalars['ID']>;
-  income: Scalars['Int'];
+  income: Scalars['Float'];
   labels?: Maybe<Array<Maybe<Scalars['String']>>>;
   pairType: Scalars['Int'];
   size: Scalars['Float'];
@@ -546,6 +554,11 @@ export type JobsStat = {
   tokenCount?: Maybe<Scalars['Float']>;
 };
 
+export type MarkCyclesTokenReleased = {
+  __typename?: 'MarkCyclesTokenReleased';
+  ok?: Maybe<Scalars['Boolean']>;
+};
+
 export type Mutations = {
   __typename?: 'Mutations';
   /** example: https://docs.graphene-python.org/en/latest/types/mutations/ */
@@ -565,6 +578,7 @@ export type Mutations = {
   createMock?: Maybe<CreateMock>;
   createCycleVoteResultStatTaskByOwner?: Maybe<CreateCycleVoteResultStatTaskByOwner>;
   createCycleVoteResultPublishTaskByOwner?: Maybe<CreateCycleVoteResultPublishTaskByOwner>;
+  markCyclesTokenReleased?: Maybe<MarkCyclesTokenReleased>;
 };
 
 export type MutationsCreateDaoArgs = {
@@ -660,6 +674,12 @@ export type MutationsCreateCycleVoteResultPublishTaskByOwnerArgs = {
   cycleId: Scalars['String'];
 };
 
+export type MutationsMarkCyclesTokenReleasedArgs = {
+  cycleIds: Array<Maybe<Scalars['String']>>;
+  daoId: Scalars['String'];
+  unitSizeValue: Scalars['String'];
+};
+
 export type Query = {
   __typename?: 'Query';
   daos?: Maybe<DaOs>;
@@ -668,7 +688,9 @@ export type Query = {
   daoTokenConfig?: Maybe<DaoTokenConfig>;
   daoGithubAppStatus?: Maybe<DaoGithubAppStatus>;
   cycle?: Maybe<CycleQuery>;
+  cyclesByTokenUnreleased?: Maybe<CycleByTokenUnreleasedQuery>;
   jobs?: Maybe<Jobs>;
+  icpperStats?: Maybe<UserIcpperStatsQuery>;
 };
 
 export type QueryDaosArgs = {
@@ -702,6 +724,10 @@ export type QueryCycleArgs = {
   id: Scalars['String'];
 };
 
+export type QueryCyclesByTokenUnreleasedArgs = {
+  lastTimestamp: Scalars['Int'];
+};
+
 export type QueryJobsArgs = {
   daoName?: Maybe<Scalars['String']>;
   beginTime?: Maybe<Scalars['Int']>;
@@ -711,6 +737,13 @@ export type QueryJobsArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   userName?: Maybe<Scalars['String']>;
+};
+
+export type QueryIcpperStatsArgs = {
+  daoName?: Maybe<Scalars['String']>;
+  userName?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
 };
 
 export enum SortedTypeEnum {
@@ -763,6 +796,12 @@ export enum UpdateJobVoteTypeByOwnerArgumentPairTypeEnum {
 export type UpdatePairVote = {
   __typename?: 'UpdatePairVote';
   ok?: Maybe<Scalars['Boolean']>;
+};
+
+export type UserIcpperStatsQuery = {
+  __typename?: 'UserIcpperStatsQuery';
+  nodes?: Maybe<Array<Maybe<IcpperStatQuery>>>;
+  total?: Maybe<Scalars['Int']>;
 };
 
 export type UserSchema = {
@@ -1027,6 +1066,18 @@ export type UpdateVotePairPublicMutationVariables = Exact<{
 export type UpdateVotePairPublicMutation = { __typename?: 'Mutations' } & {
   changeVoteResultPublic?: Maybe<
     { __typename?: 'ChangeVoteResultPublic' } & Pick<ChangeVoteResultPublic, 'ok'>
+  >;
+};
+
+export type MarkCyclesTokenReleasedMutationVariables = Exact<{
+  daoId: Scalars['String'];
+  cycleIds: Array<Maybe<Scalars['String']>> | Maybe<Scalars['String']>;
+  unitSizeValue: Scalars['String'];
+}>;
+
+export type MarkCyclesTokenReleasedMutation = { __typename?: 'Mutations' } & {
+  markCyclesTokenReleased?: Maybe<
+    { __typename?: 'MarkCyclesTokenReleased' } & Pick<MarkCyclesTokenReleased, 'ok'>
   >;
 };
 
@@ -1799,6 +1850,55 @@ export type DaoCycleVoteListQuery = { __typename?: 'Query' } & {
               >
             >;
           }
+      >;
+    }
+  >;
+};
+
+export type CyclesByTokenUnreleasedListQueryVariables = Exact<{
+  lastTimestamp: Scalars['Int'];
+}>;
+
+export type CyclesByTokenUnreleasedListQuery = { __typename?: 'Query' } & {
+  cyclesByTokenUnreleased?: Maybe<
+    { __typename?: 'CycleByTokenUnreleasedQuery' } & {
+      nodes?: Maybe<
+        Array<
+          Maybe<
+            { __typename?: 'CycleQuery' } & {
+              datum?: Maybe<
+                { __typename?: 'CycleSchema' } & Pick<
+                  CycleSchema,
+                  'id' | 'daoId' | 'timeZone' | 'beginAt' | 'endAt' | 'voteResultPublishedAt'
+                >
+              >;
+              icpperStats?: Maybe<
+                { __typename?: 'IcpperStatsQuery' } & {
+                  nodes?: Maybe<
+                    Array<
+                      Maybe<
+                        { __typename?: 'IcpperStatQuery' } & {
+                          datum?: Maybe<
+                            { __typename?: 'CycleIcpperStatSchema' } & Pick<
+                              CycleIcpperStatSchema,
+                              'cycleId' | 'jobSize' | 'size'
+                            >
+                          >;
+                          icpper?: Maybe<
+                            { __typename?: 'UserSchema' } & Pick<
+                              UserSchema,
+                              'id' | 'githubLogin' | 'nickname' | 'erc20Address'
+                            >
+                          >;
+                        }
+                      >
+                    >
+                  >;
+                }
+              >;
+            }
+          >
+        >
       >;
     }
   >;
@@ -2692,6 +2792,58 @@ export type UpdateVotePairPublicMutationResult =
 export type UpdateVotePairPublicMutationOptions = Apollo.BaseMutationOptions<
   UpdateVotePairPublicMutation,
   UpdateVotePairPublicMutationVariables
+>;
+export const MarkCyclesTokenReleasedDocument = gql`
+  mutation MarkCyclesTokenReleased($daoId: String!, $cycleIds: [String]!, $unitSizeValue: String!) {
+    markCyclesTokenReleased(daoId: $daoId, cycleIds: $cycleIds, unitSizeValue: $unitSizeValue) {
+      ok
+    }
+  }
+`;
+export type MarkCyclesTokenReleasedMutationFn = Apollo.MutationFunction<
+  MarkCyclesTokenReleasedMutation,
+  MarkCyclesTokenReleasedMutationVariables
+>;
+
+/**
+ * __useMarkCyclesTokenReleasedMutation__
+ *
+ * To run a mutation, you first call `useMarkCyclesTokenReleasedMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMarkCyclesTokenReleasedMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [markCyclesTokenReleasedMutation, { data, loading, error }] = useMarkCyclesTokenReleasedMutation({
+ *   variables: {
+ *      daoId: // value for 'daoId'
+ *      cycleIds: // value for 'cycleIds'
+ *      unitSizeValue: // value for 'unitSizeValue'
+ *   },
+ * });
+ */
+export function useMarkCyclesTokenReleasedMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    MarkCyclesTokenReleasedMutation,
+    MarkCyclesTokenReleasedMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    MarkCyclesTokenReleasedMutation,
+    MarkCyclesTokenReleasedMutationVariables
+  >(MarkCyclesTokenReleasedDocument, options);
+}
+export type MarkCyclesTokenReleasedMutationHookResult = ReturnType<
+  typeof useMarkCyclesTokenReleasedMutation
+>;
+export type MarkCyclesTokenReleasedMutationResult =
+  Apollo.MutationResult<MarkCyclesTokenReleasedMutation>;
+export type MarkCyclesTokenReleasedMutationOptions = Apollo.BaseMutationOptions<
+  MarkCyclesTokenReleasedMutation,
+  MarkCyclesTokenReleasedMutationVariables
 >;
 export const DaoDocument = gql`
   query DAO($id: String!) {
@@ -4200,4 +4352,86 @@ export type DaoCycleVoteListLazyQueryHookResult = ReturnType<typeof useDaoCycleV
 export type DaoCycleVoteListQueryResult = Apollo.QueryResult<
   DaoCycleVoteListQuery,
   DaoCycleVoteListQueryVariables
+>;
+export const CyclesByTokenUnreleasedListDocument = gql`
+  query CyclesByTokenUnreleasedList($lastTimestamp: Int!) {
+    cyclesByTokenUnreleased(lastTimestamp: $lastTimestamp) {
+      nodes {
+        datum {
+          id
+          daoId
+          timeZone
+          beginAt
+          endAt
+          voteResultPublishedAt
+        }
+        icpperStats {
+          nodes {
+            datum {
+              cycleId
+              jobSize
+              size
+            }
+            icpper {
+              id
+              githubLogin
+              nickname
+              erc20Address
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useCyclesByTokenUnreleasedListQuery__
+ *
+ * To run a query within a React component, call `useCyclesByTokenUnreleasedListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCyclesByTokenUnreleasedListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCyclesByTokenUnreleasedListQuery({
+ *   variables: {
+ *      lastTimestamp: // value for 'lastTimestamp'
+ *   },
+ * });
+ */
+export function useCyclesByTokenUnreleasedListQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    CyclesByTokenUnreleasedListQuery,
+    CyclesByTokenUnreleasedListQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    CyclesByTokenUnreleasedListQuery,
+    CyclesByTokenUnreleasedListQueryVariables
+  >(CyclesByTokenUnreleasedListDocument, options);
+}
+export function useCyclesByTokenUnreleasedListLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    CyclesByTokenUnreleasedListQuery,
+    CyclesByTokenUnreleasedListQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    CyclesByTokenUnreleasedListQuery,
+    CyclesByTokenUnreleasedListQueryVariables
+  >(CyclesByTokenUnreleasedListDocument, options);
+}
+export type CyclesByTokenUnreleasedListQueryHookResult = ReturnType<
+  typeof useCyclesByTokenUnreleasedListQuery
+>;
+export type CyclesByTokenUnreleasedListLazyQueryHookResult = ReturnType<
+  typeof useCyclesByTokenUnreleasedListLazyQuery
+>;
+export type CyclesByTokenUnreleasedListQueryResult = Apollo.QueryResult<
+  CyclesByTokenUnreleasedListQuery,
+  CyclesByTokenUnreleasedListQueryVariables
 >;
