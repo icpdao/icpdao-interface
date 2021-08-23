@@ -10,6 +10,7 @@ import { useDaoQuery } from '@/services/dao/generated';
 import PermissionErrorPage from '@/pages/403';
 import { useState } from 'react';
 import DAOJobConfig from '@/pages/Dao/components/JobConfig';
+import TokenConfig from '@/pages/Dao/components/TokenConfig';
 
 const { TabPane } = Tabs;
 const breadcrumb = (daoId: string) => [
@@ -104,6 +105,7 @@ export default (props: {
           {tab === 'job' && (
             <DAOJobConfig daoId={daoId} nextStep={status ? skipClick : undefined} />
           )}
+          {tab === 'token' && <TokenConfig daoId={daoId} />}
         </div>
       </PageContainer>
     </>
