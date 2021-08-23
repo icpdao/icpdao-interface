@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   Form,
   Upload,
@@ -10,6 +10,7 @@ import {
   Space,
   Modal,
   Table,
+  Col,
   Descriptions,
 } from 'antd';
 import { UploadOutlined, ZoomInOutlined } from '@ant-design/icons';
@@ -18,6 +19,10 @@ import * as XLSX from 'xlsx';
 import Web3 from 'web3';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import GlobalModal from '@/components/Modal';
+import { TokenConfigComponentsProps } from '@/pages/Dao/components/TokenConfig';
+import { ZeroAddress } from '@/services/ethereum-connect';
+import { ETH_CONNECT } from '@/services/ethereum-connect/typings';
+import { useRequest } from '@@/plugin-request/request';
 
 type ValidateStatus = Parameters<typeof Form.Item>[0]['validateStatus'];
 
@@ -27,42 +32,15 @@ const allowUploadGenesisFileType = [
   'text/csv',
 ];
 
-type genesisToken = {
-  address: string;
-  value: number;
-};
-
-type mintArgs = {
-  aMolecular?: number;
-  aDenominator?: number;
-  bMolecular?: number;
-  bDenominator?: number;
-  c?: number;
-  d?: number;
-  p?: number;
-};
-
-type createForm = {
-  genesis?: genesisToken[];
-  lpRatio?: number;
-  ownerAddress?: string;
-  tokenName?: string;
-  tokenSymbol?: string;
-  mintChangeDays?: number;
-  mintValue?: number;
-  mintChangeValue?: number;
-  mintArgs?: mintArgs;
-  mode?: string;
-};
-
 type validate = {
   validateStatus?: ValidateStatus;
   help?: string;
 };
 
-const TokenCreate: React.FC = () => {
+const TokenCreate: React.FC<TokenConfigComponentsProps> = ({ ethDAOId, connect, tokenAddress }) => {
   const intl = useIntl();
-  const [createFormData, setCreateFormData] = useState<createForm>({
+  const [createFormData, setCreateFormData] = useState<ETH_CONNECT.CreateToken>({
+    ethDAOId,
     genesis: [],
     lpRatio: 0,
     ownerAddress: '',
@@ -73,9 +51,9 @@ const TokenCreate: React.FC = () => {
     mintValue: 10,
     mintChangeValue: 0.5,
     mintArgs: {
-      aMolecular: 1,
+      aNumerator: 1,
       aDenominator: 2,
-      bMolecular: 1,
+      bNumerator: 1,
       bDenominator: 30,
       c: 0,
       d: 0,
@@ -85,13 +63,27 @@ const TokenCreate: React.FC = () => {
   const [createFormValidMsg, setCreateFormValidMsg] = useState<Record<string, validate>>();
   const [previewGenesis, setPreviewGenesis] = useState<boolean>(false);
   const [previewCreateModal, setPreviewCreateModal] = useState<boolean>(false);
+  const [noticeReCreateModal, setNoticeReCreateModal] = useState<boolean>(false);
+  const [confirmReCreateModal, setConfirmReCreateModal] = useState<boolean>(false);
+  const [disableConfirmReCreateButton, setDisableConfirmReCreateButton] = useState<boolean>(true);
+  const { loading, run } = useRequest(
+    async () => {
+      return await connect.contract.daoFactory.createToken(createFormData);
+    },
+    {
+      manual: true,
+      onSuccess: (result) => {
+        console.log(result);
+      },
+    },
+  );
   const readUploadExcel = useCallback((file) => {
     if (!allowUploadGenesisFileType.includes(file.type)) return false;
     const fileReader = new FileReader();
     fileReader.readAsBinaryString(file);
     fileReader.onload = (e) => {
       const { result } = e.target as any;
-      const rs: genesisToken[] = [];
+      const rs: ETH_CONNECT.TokenGenesis[] = [];
       const workbook = XLSX.read(result, { type: 'binary' });
       if (Object.keys(workbook.Sheets).length <= 0) return;
       const firstSheetKey = Object.keys(workbook.Sheets)[0];
@@ -150,6 +142,24 @@ const TokenCreate: React.FC = () => {
     const checked = handlerCheckCreateFrom();
     if (checked) setPreviewCreateModal(true);
   }, [handlerCheckCreateFrom]);
+  const handlerReCreate = useCallback(() => {
+    const checked = handlerCheckCreateFrom();
+    if (checked) setNoticeReCreateModal(true);
+  }, [handlerCheckCreateFrom]);
+  const formButton = useMemo(() => {
+    if (tokenAddress !== ZeroAddress) {
+      return (
+        <Button type="primary" htmlType="submit" onClick={() => handlerReCreate()}>
+          <FormattedMessage id={`pages.dao.config.tab.token.create.form.button.recreate`} />
+        </Button>
+      );
+    }
+    return (
+      <Button type="primary" htmlType="submit" onClick={() => handlerCreate()}>
+        <FormattedMessage id={`pages.dao.config.tab.token.create.form.button.create`} />
+      </Button>
+    );
+  }, [handlerCreate, handlerReCreate, tokenAddress]);
   return (
     <>
       <Form labelCol={{ span: 4 }} wrapperCol={{ span: 16 }} name={'tokenCreate'}>
@@ -410,7 +420,7 @@ const TokenCreate: React.FC = () => {
                   <FormattedMessage id={`pages.dao.config.tab.token.create.form.mint_args.a_m`} />
                 </div>
                 <InputNumber
-                  value={createFormData.mintArgs?.aMolecular}
+                  value={createFormData.mintArgs?.aNumerator}
                   min={0}
                   step={'1'}
                   onChange={(value) =>
@@ -450,7 +460,7 @@ const TokenCreate: React.FC = () => {
                   <FormattedMessage id={`pages.dao.config.tab.token.create.form.mint_args.b_m`} />
                 </div>
                 <InputNumber
-                  value={createFormData.mintArgs?.bMolecular}
+                  value={createFormData.mintArgs?.bNumerator}
                   min={0}
                   step={'1'}
                   onChange={(value) =>
@@ -547,11 +557,7 @@ const TokenCreate: React.FC = () => {
             </Row>
           </Form.Item>
         )}
-        <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
-          <Button type="primary" htmlType="submit" onClick={() => handlerCreate()}>
-            <FormattedMessage id={`pages.dao.config.tab.token.create.form.button.create`} />
-          </Button>
-        </Form.Item>
+        <Form.Item wrapperCol={{ offset: 4, span: 16 }}>{formButton}</Form.Item>
       </Form>
       <Modal
         key={'previewGenesis'}
@@ -602,8 +608,13 @@ const TokenCreate: React.FC = () => {
       <GlobalModal
         key={'previewCreate'}
         visible={previewCreateModal}
-        onOk={() => {}}
+        onOk={async () => {
+          await run();
+        }}
+        confirmLoading={loading}
         width={800}
+        okText={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.modal.ok' })}
+        cancelText={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.modal.cancel' })}
         onCancel={() => setPreviewCreateModal(false)}
       >
         <Descriptions title="Preview Create" bordered column={2}>
@@ -669,7 +680,7 @@ const TokenCreate: React.FC = () => {
                   id: 'pages.dao.config.tab.token.create.form.mint_args.a_m',
                 })}
               >
-                {createFormData.mintArgs?.aMolecular}
+                {createFormData.mintArgs?.aNumerator}
               </Descriptions.Item>
               <Descriptions.Item
                 label={intl.formatMessage({
@@ -683,7 +694,7 @@ const TokenCreate: React.FC = () => {
                   id: 'pages.dao.config.tab.token.create.form.mint_args.b_m',
                 })}
               >
-                {createFormData.mintArgs?.bMolecular}
+                {createFormData.mintArgs?.bNumerator}
               </Descriptions.Item>
               <Descriptions.Item
                 label={intl.formatMessage({
@@ -717,6 +728,92 @@ const TokenCreate: React.FC = () => {
           )}
         </Descriptions>
       </GlobalModal>
+      <GlobalModal
+        key={'noticeReCreate'}
+        visible={noticeReCreateModal}
+        okText={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.modal.ok' })}
+        cancelText={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.modal.cancel' })}
+        onOk={() => {
+          setConfirmReCreateModal(true);
+        }}
+        onCancel={() => setNoticeReCreateModal(false)}
+      >
+        <Space direction={'vertical'}>
+          <div>
+            <FormattedMessage id={`pages.dao.config.tab.token.create.recreate.notice.1`} />
+          </div>
+          <div>
+            <FormattedMessage id={`pages.dao.config.tab.token.create.recreate.notice.2`} />
+          </div>
+          <div>
+            <FormattedMessage id={`pages.dao.config.tab.token.create.recreate.notice.3`} />
+          </div>
+        </Space>
+      </GlobalModal>
+      <Modal
+        key={'confirmReCreate'}
+        visible={confirmReCreateModal}
+        maskClosable={true}
+        destroyOnClose={true}
+        maskStyle={{ top: 64, height: 'calc(100% - 130px)' }}
+        bodyStyle={{
+          paddingTop: 32,
+          textAlign: 'center',
+          fontWeight: 400,
+          padding: '62px 30px 20px 30px',
+        }}
+        centered
+        footer={
+          <Row justify={'center'}>
+            <Col>
+              <Space direction={'vertical'} style={{ width: 320 }}>
+                <Button
+                  block
+                  key={'submit'}
+                  type={'primary'}
+                  size={'large'}
+                  onClick={() => {
+                    setConfirmReCreateModal(false);
+                    setNoticeReCreateModal(false);
+                    setPreviewCreateModal(true);
+                  }}
+                  disabled={disableConfirmReCreateButton}
+                >
+                  {intl.formatMessage({ id: 'pages.dao.config.tab.token.create.modal.ok' })}
+                </Button>
+                <Button
+                  block
+                  key={'back'}
+                  size={'large'}
+                  onClick={() => setConfirmReCreateModal(false)}
+                >
+                  {intl.formatMessage({ id: 'pages.dao.config.tab.token.create.modal.cancel' })}
+                </Button>
+              </Space>
+            </Col>
+          </Row>
+        }
+        onOk={() => {
+          setConfirmReCreateModal(false);
+          setNoticeReCreateModal(false);
+          setPreviewCreateModal(true);
+        }}
+        onCancel={() => setConfirmReCreateModal(false)}
+      >
+        <Input
+          placeholder={intl.formatMessage({
+            id: 'pages.dao.config.tab.token.create.recreate.input.placeholder',
+          })}
+          onChange={(e) => {
+            if (
+              e.target.value ===
+              intl.formatMessage({ id: 'pages.dao.config.tab.token.create.recreate.input' })
+            ) {
+              setDisableConfirmReCreateButton(false);
+            }
+          }}
+        />
+      </Modal>
     </>
   );
 };

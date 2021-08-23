@@ -106,6 +106,12 @@ query DAOHomeWithLoginQuery($id: String!, $userId: String!) {
   }
 }
 
+query DAOTokenConfig($daoId: String!) {
+  daoTokenConfig(daoId: $daoId) {
+    ethDaoId
+  }
+}
+
 query DAOFollowInfo($id: String!, $userId: String!) {
   dao(id: $id) {
     datum {
