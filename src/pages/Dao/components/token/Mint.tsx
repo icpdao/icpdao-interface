@@ -7,10 +7,22 @@ import { ZeroAddress } from '@/services/ethereum-connect';
 import { DAOTokenConnect } from '@/services/ethereum-connect/token';
 import { useModel } from '@@/plugin-model/useModel';
 import { PageLoading } from '@ant-design/pro-layout';
-import { Avatar, Button, Form, InputNumber, Row, Select, Space, Spin, Switch, Table } from 'antd';
-import { getFormatTimeByZone } from '@/utils/utils';
+import {
+  Alert,
+  Avatar,
+  Button,
+  Form,
+  InputNumber,
+  Row,
+  Select,
+  Space,
+  Spin,
+  Switch,
+  Table,
+} from 'antd';
+import { getFormatTimeByZone, getTimestampByZone } from '@/utils/utils';
 import GlobalModal from '@/components/Modal';
-import { UserOutlined } from '@ant-design/icons';
+import { LinkOutlined, UserOutlined } from '@ant-design/icons';
 import type { ETH_CONNECT } from '@/services/ethereum-connect/typings';
 
 type previewMintData = {
@@ -45,7 +57,7 @@ const previewTableColumns = [
   },
 ];
 
-const TokenMint: React.FC<TokenConfigComponentsProps> = ({ tokenAddress }) => {
+const TokenMint: React.FC<TokenConfigComponentsProps> = ({ tokenAddress, setCurrentTab }) => {
   const intl = useIntl();
 
   const [cycles, setCycles] = useState<Record<string, CycleQuery>>({});
@@ -109,7 +121,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({ tokenAddress }) => {
   }, [cyclesByTokenUnreleasedListResult.data?.cyclesByTokenUnreleased?.nodes]);
 
   useMemo(async () => {
-    if (!lpPoolAddress || !tokenAddress) return;
+    if (!lpPoolAddress || lpPoolAddress === ZeroAddress || !tokenAddress) return;
     const pool = await contract.uniswapPool.getPoolByAddress(lpPoolAddress, tokenAddress);
     setPoolInfo(pool);
     setFormDataFast({
@@ -174,7 +186,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({ tokenAddress }) => {
       const mintBody: ETH_CONNECT.Mint = {
         mintTokenAddressList: previewMintData.map((pd) => pd.address),
         mintTokenAmountRatioList: previewMintData.map((pd) => pd.size * 100),
-        endTimestamp: previewMintEndTime[0],
+        endTimestamp: getTimestampByZone(previewMintEndTime[0], previewMintEndTime[1]),
         tickLower: position.tickLower,
         tickUpper: position.tickUpper,
       };
@@ -190,8 +202,34 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({ tokenAddress }) => {
     }
   }, [position, previewMintData, previewMintEndTime, tokenContract]);
 
-  if (cyclesByTokenUnreleasedListResult.loading || cyclesByTokenUnreleasedListResult.error) {
+  if (
+    cyclesByTokenUnreleasedListResult.loading ||
+    cyclesByTokenUnreleasedListResult.error ||
+    cyclesByTokenUnreleasedListResult.data?.cyclesByTokenUnreleased === undefined
+  ) {
     return <PageLoading />;
+  }
+
+  if (lpPoolAddress === ZeroAddress) {
+    return (
+      <>
+        <Alert
+          message="Warning"
+          description={
+            <div>
+              {intl.formatMessage({ id: 'pages.dao.config.tab.token.add_lp.notfound' })}
+              <LinkOutlined
+                onClick={() => {
+                  if (setCurrentTab) setCurrentTab('create');
+                }}
+              />
+            </div>
+          }
+          type="warning"
+          showIcon
+        />
+      </>
+    );
   }
 
   return (
@@ -200,14 +238,14 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({ tokenAddress }) => {
         tip={intl.formatMessage({ id: 'pages.token.loading' })}
         spinning={loadingTransferComplete}
       >
-        <Form layout={'vertical'} name={'tokenMintForm'}>
+        <Form layout={'vertical'} name={'tokenMintForm'} wrapperCol={{ span: 16 }}>
           <Form.Item
             label={intl.formatMessage({ id: 'pages.dao.config.tab.token.mint.form.end_cycle' })}
             tooltip={intl.formatMessage({
               id: 'pages.dao.config.tab.token.mint.form.end_cycle.desc',
             })}
           >
-            <Select onChange={(v: string) => setCurrentSelectCycle(v)}>
+            <Select onChange={(v: string) => setCurrentSelectCycle(v)} style={{ width: 450 }}>
               {Object.values(cycles).map((c) => {
                 return (
                   <Select.Option value={c.datum?.id || ''}>
@@ -313,6 +351,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({ tokenAddress }) => {
         <Table
           columns={previewTableColumns}
           dataSource={previewMintData}
+          rowKey={'uid'}
           pagination={false}
           scroll={{ x: 500, y: 500 }}
           bordered

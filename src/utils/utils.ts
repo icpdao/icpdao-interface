@@ -110,6 +110,10 @@ export const getFormatTimeByZone = (time: number, timeZone: number, format: stri
   return moment.unix(time).utcOffset(timeZone).format(format);
 };
 
+export const getTimestampByZone = (time: number, timeZone: number) => {
+  return moment.unix(time).utcOffset(timeZone).unix();
+};
+
 export const getTimeZoneOffset = () => {
   return moment().utcOffset();
 };
@@ -187,9 +191,9 @@ export const EthereumNetwork = {
 };
 
 export const EthereumChainId = {
-  'homestead': 1,
-  'ropsten': 3,
-  'rinkeby': 4,
-  'goerli': 5,
-  'kovan': 42,
+  homestead: 1,
+  ropsten: 3,
+  rinkeby: 4,
+  goerli: 5,
+  kovan: 42,
 };

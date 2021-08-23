@@ -98,6 +98,9 @@ export default {
   'pages.dao.config.tab.job.cycle.voting': 'Voting time: ',
   'pages.dao.home.logo.upload_desc': 'uploading',
   'pages.dao.config.tab.token.create': 'Create',
+  'pages.dao.config.tab.token.create.existed.p1': 'The tokens under the DAO have been created.',
+  'pages.dao.config.tab.token.create.existed.p2':
+    'But you can still recreate them. Please note that recreate is a serious operation.',
   'pages.dao.config.tab.token.create.form.upload': 'Upload',
   'pages.dao.config.tab.token.create.form.genesis': 'Genesis',
   'pages.dao.config.tab.token.create.form.lp_ratio': 'LP Ratio',
@@ -134,9 +137,8 @@ export default {
     'And need to re-uniswap the trading pair, re-add liquidity,',
   'pages.dao.config.tab.token.create.recreate.notice.3':
     'This is a very important adjustment, please operate it carefully.',
-  'pages.dao.config.tab.token.create.recreate.input.placeholder':
-    'Please enter "confirm to recreate"',
-  'pages.dao.config.tab.token.create.recreate.input': 'confirm to recreate',
+  'pages.dao.config.tab.token.create.recreate.input.placeholder': 'Please enter "recreate"',
+  'pages.dao.config.tab.token.create.recreate.input': 'recreate',
   'pages.dao.config.tab.token.create.modal.ok': "Yes, I'm sure",
   'pages.dao.config.tab.token.create.modal.cancel': 'Let me think again',
   'pages.dao.config.tab.token.create.loading': 'Waiting for the transaction to complete...',
@@ -187,6 +189,7 @@ export default {
   'pages.dao.config.tab.token.manager.form.add.desc': 'Add Manager',
   'pages.dao.config.tab.token.manager.form.button.add': 'Add',
   'pages.dao.config.tab.token.manager.list.header': 'Manager List',
+  'pages.dao.config.tab.token.manager.form.help': 'Please enter a Ethereum wallet address.',
   'pages.dao.config.tab.token.mint': 'Mint',
   'pages.dao.config.tab.token.mint.form.end_cycle': 'End Cycle',
   'pages.dao.config.tab.token.mint.form.end_cycle.desc': 'End Cycle',

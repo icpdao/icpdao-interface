@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styles from './index.less';
 import {
   AimOutlined,
@@ -16,7 +16,6 @@ import { history } from '@@/core/history';
 
 const Wallet: React.FC = () => {
   const [connectWalletModal, setConnectWalletModal] = useState<boolean>(false);
-  const { initialState } = useModel('@@initialState');
   const {
     event$,
     network,
@@ -35,13 +34,16 @@ const Wallet: React.FC = () => {
     }
     setAccounts(await metamaskProvider.request({ method: 'eth_requestAccounts' }));
     setNetwork(EthereumNetwork[await metamaskProvider.request({ method: 'eth_chainId' })]);
+  }, [metamaskProvider, setAccounts, setNetwork]);
+
+  useEffect(() => {
     console.log(accounts);
     if (accounts.length > 0) {
       setMetamaskConnect();
       setIsConnected(true);
       setConnectWalletModal(false);
     }
-  }, [accounts, metamaskProvider, setAccounts, setIsConnected, setNetwork]);
+  }, [accounts, setIsConnected]);
 
   const getConnectWalletBody = useCallback(() => {
     return (
@@ -82,9 +84,6 @@ const Wallet: React.FC = () => {
   );
   const account = useMemo(() => (accounts.length > 0 ? accounts[0] : ''), [accounts]);
 
-  if (!initialState?.currentUser().profile || !initialState?.currentUser().profile.nickname) {
-    return <></>;
-  }
   event$.useSubscription(() => {
     setConnectWalletModal(true);
   });

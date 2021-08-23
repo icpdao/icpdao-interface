@@ -25,8 +25,7 @@ import { BigNumber, ethers } from 'ethers';
 import { useModel } from '@@/plugin-model/useModel';
 import { ERC20Connect } from '@/services/ethereum-connect/erc20';
 import type { Token } from '@uniswap/sdk-core';
-import { formatUnits, parseUnits } from 'ethers/lib/utils';
-import Web3 from 'web3';
+import { formatUnits, isAddress, parseUnits } from 'ethers/lib/utils';
 import { DeleteOutlined } from '@ant-design/icons';
 import GlobalModal from '@/components/Modal';
 import { DAOStakingAddress } from '@/services/ethereum-connect';
@@ -205,7 +204,7 @@ export default (): ReactNode => {
         return;
       }
       setLoadingTokenListSelect(true);
-      if (Web3.utils.isAddress(value)) {
+      if (isAddress(value)) {
         const erc20 = await new ERC20Connect(value, network, metamaskProvider).getToken();
         setCacheTokenList([erc20]);
         setTokenInfoObject((old) => ({ ...old, [value]: erc20 }));

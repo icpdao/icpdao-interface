@@ -10,8 +10,10 @@ import { PageLoading } from '@ant-design/pro-layout';
 import { formatTickPrice, UniswapBound, UniswapField } from '@/services/ethereum-connect/uniswap';
 import GlobalModal from '@/components/Modal';
 import type { ETH_CONNECT } from '@/services/ethereum-connect/typings';
+import { LinkOutlined } from '@ant-design/icons';
+import { BigNumber } from 'ethers';
 
-const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress }) => {
+const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress, setCurrentTab }) => {
   const intl = useIntl();
 
   const {
@@ -42,7 +44,7 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress }) => {
   const [addLPButtonLoading, setAddLPButtonLoading] = useState<boolean>(false);
 
   const [lpPoolAddress, setLPPoolAddress] = useState<string>('');
-  const [totalAmount, setTotalAmount] = useState<number>();
+  const [totalAmount, setTotalAmount] = useState<BigNumber>();
 
   const tokenContract = useMemo(() => {
     if (tokenAddress && tokenAddress !== ZeroAddress) {
@@ -50,6 +52,19 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress }) => {
     }
     return undefined;
   }, [metamaskProvider, network, tokenAddress]);
+
+  const updatePoolInfo = useCallback(async () => {
+    if (!lpPoolAddress || lpPoolAddress === ZeroAddress || !tokenAddress) return;
+    const pool = await contract.uniswapPool.getPoolByAddress(lpPoolAddress, tokenAddress);
+    setPoolInfo(pool);
+    setFormDataFast({
+      fee: pool.pool?.fee,
+      baseToken: pool.tokenA?.address === tokenAddress ? pool.tokenA : pool.tokenB,
+      quoteToken: pool.tokenA?.address === tokenAddress ? pool.tokenB : pool.tokenA,
+      baseTokenAmount: 0,
+      quoteTokenAmount: 0,
+    });
+  }, [contract.uniswapPool, lpPoolAddress, setFormDataFast, setPoolInfo, tokenAddress]);
 
   const handlerAddLP = useCallback(async () => {
     if (!tokenContract) return;
@@ -67,37 +82,34 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress }) => {
       tickLower: position.tickLower,
       tickUpper: position.tickUpper,
     };
-    setAddLPButtonLoading(true);
-    const tx = await tokenContract.updateLPPool(addLP);
-    setAddLPButtonLoading(false);
-    setPreviewAddLP(false);
+    try {
+      setAddLPButtonLoading(true);
+      const tx = await tokenContract.updateLPPool(addLP);
+      setAddLPButtonLoading(false);
+      setPreviewAddLP(false);
 
-    setLoadingTransferComplete(true);
-    const deployEvent = (await tx.wait()).events.pop();
-    setLoadingTransferComplete(false);
-    console.log(deployEvent.args);
-  }, [accounts.length, network, poolInfo.invertPrice, position, tokenContract]);
+      setLoadingTransferComplete(true);
+      const deployEvent = (await tx.wait()).events.pop();
+      await updatePoolInfo();
+      setLoadingTransferComplete(false);
+      console.log(deployEvent.args);
+    } catch (e) {
+      setPreviewAddLP(false);
+      setLoadingTransferComplete(false);
+    }
+  }, [accounts.length, network, poolInfo.invertPrice, position, tokenContract, updatePoolInfo]);
 
   useMemo(async () => {
     if (!tokenContract) return;
     setLPPoolAddress(await tokenContract.getLPPool());
-    const amount = await tokenContract?.getTemporaryAmount();
-    console.log({ ta: parseInt(formatUnits(amount), 10) });
-    setTotalAmount(parseInt(formatUnits(amount), 10));
+    const amount = await tokenContract.getTemporaryAmount();
+    console.log({ ta: formatUnits(amount) });
+    setTotalAmount(amount);
   }, [tokenContract]);
 
   useMemo(async () => {
-    if (!lpPoolAddress || !tokenAddress) return;
-    const pool = await contract.uniswapPool.getPoolByAddress(lpPoolAddress, tokenAddress);
-    setPoolInfo(pool);
-    setFormDataFast({
-      fee: pool.pool?.fee,
-      baseToken: pool.tokenA?.address === tokenAddress ? pool.tokenA : pool.tokenB,
-      quoteToken: pool.tokenA?.address === tokenAddress ? pool.tokenB : pool.tokenA,
-      baseTokenAmount: 0,
-      quoteTokenAmount: 0,
-    });
-  }, [contract.uniswapPool, lpPoolAddress, setFormDataFast, setPoolInfo, tokenAddress]);
+    await updatePoolInfo();
+  }, [updatePoolInfo]);
 
   useEffect(() => {
     if (!formData.startingPrice) return;
@@ -108,21 +120,30 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress }) => {
     metamaskEvent$?.emit();
   }, [metamaskEvent$]);
 
-  if (!tokenAddress || !lpPoolAddress || totalAmount === undefined || poolInfo.pool === undefined) {
-    return <PageLoading />;
-  }
-
   if (lpPoolAddress === ZeroAddress) {
     return (
       <>
         <Alert
           message="Warning"
-          description={intl.formatMessage({ id: 'pages.dao.config.tab.token.add_lp.notfound' })}
-          type="info"
+          description={
+            <div>
+              {intl.formatMessage({ id: 'pages.dao.config.tab.token.add_lp.notfound' })}
+              <LinkOutlined
+                onClick={() => {
+                  if (setCurrentTab) setCurrentTab('create');
+                }}
+              />
+            </div>
+          }
+          type="warning"
           showIcon
         />
       </>
     );
+  }
+
+  if (!tokenAddress || !lpPoolAddress || totalAmount === undefined || poolInfo.pool === undefined) {
+    return <PageLoading />;
   }
 
   return (
@@ -160,7 +181,7 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress }) => {
                 })
               }
               min={0}
-              max={totalAmount}
+              max={formatUnits(totalAmount)}
               step={1}
             />
           </Form.Item>
