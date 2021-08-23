@@ -66,6 +66,11 @@ export type CreateMock = {
   ok?: Maybe<Scalars['Boolean']>;
 };
 
+export type CycleByTokenUnreleasedQuery = {
+  __typename?: 'CycleByTokenUnreleasedQuery';
+  nodes?: Maybe<Array<Maybe<CycleQuery>>>;
+};
+
 export enum CycleFilterEnum {
   Processing = 'processing',
   Pairing = 'pairing',
@@ -84,7 +89,7 @@ export type CycleIcpperStatSchema = {
   haveTwoTimesLt08?: Maybe<Scalars['Boolean']>;
   /** _id */
   id?: Maybe<Scalars['ID']>;
-  income: Scalars['Int'];
+  income: Scalars['Float'];
   jobCount: Scalars['Int'];
   jobSize: Scalars['Float'];
   lastId?: Maybe<Scalars['String']>;
@@ -153,6 +158,7 @@ export type CycleSchema = {
   pairEndAt: Scalars['Int'];
   pairedAt?: Maybe<Scalars['Int']>;
   timeZone: Scalars['Int'];
+  tokenReleasedAt?: Maybe<Scalars['Int']>;
   updateAt: Scalars['Int'];
   voteBeginAt: Scalars['Int'];
   voteEndAt: Scalars['Int'];
@@ -238,6 +244,7 @@ export type CycleVoteSchema = {
 export type CycleVotesQuery = {
   __typename?: 'CycleVotesQuery';
   nodes?: Maybe<Array<Maybe<CycleVoteQuery>>>;
+  confirm?: Maybe<Scalars['Boolean']>;
   total?: Maybe<Scalars['Int']>;
 };
 
@@ -377,6 +384,7 @@ export type DaoSchema = {
   name: Scalars['String'];
   number: Scalars['Int'];
   ownerId: Scalars['String'];
+  tokenAddress?: Maybe<Scalars['String']>;
   updateAt: Scalars['Int'];
 };
 
@@ -498,7 +506,7 @@ export type JobSchema = {
   githubRepoOwnerId: Scalars['Int'];
   /** _id */
   id?: Maybe<Scalars['ID']>;
-  income: Scalars['Int'];
+  income: Scalars['Float'];
   labels?: Maybe<Array<Maybe<Scalars['String']>>>;
   pairType: Scalars['Int'];
   size: Scalars['Float'];
@@ -548,6 +556,11 @@ export type JobsStat = {
   tokenCount?: Maybe<Scalars['Float']>;
 };
 
+export type MarkCyclesTokenReleased = {
+  __typename?: 'MarkCyclesTokenReleased';
+  ok?: Maybe<Scalars['Boolean']>;
+};
+
 export type Mutations = {
   __typename?: 'Mutations';
   /** example: https://docs.graphene-python.org/en/latest/types/mutations/ */
@@ -562,11 +575,13 @@ export type Mutations = {
   updateIcpperStatOwnerEi?: Maybe<UpdateIcpperStatOwnerEi>;
   updatePairVote?: Maybe<UpdatePairVote>;
   updateAllVote?: Maybe<UpdateAllVote>;
+  updateVoteConfirm?: Maybe<UpdateVoteConfirm>;
   createCycleVotePairTaskByOwner?: Maybe<CreateCycleVotePairTaskByOwner>;
   changeVoteResultPublic?: Maybe<ChangeVoteResultPublic>;
   createMock?: Maybe<CreateMock>;
   createCycleVoteResultStatTaskByOwner?: Maybe<CreateCycleVoteResultStatTaskByOwner>;
   createCycleVoteResultPublishTaskByOwner?: Maybe<CreateCycleVoteResultPublishTaskByOwner>;
+  markCyclesTokenReleased?: Maybe<MarkCyclesTokenReleased>;
 };
 
 export type MutationsCreateDaoArgs = {
@@ -602,6 +617,7 @@ export type MutationsUpdateDaoBaseInfoArgs = {
   desc?: Maybe<Scalars['String']>;
   id: Scalars['String'];
   logo?: Maybe<Scalars['String']>;
+  tokenAddress?: Maybe<Scalars['String']>;
 };
 
 export type MutationsCreateJobArgs = {
@@ -640,6 +656,13 @@ export type MutationsUpdateAllVoteArgs = {
   vote: Scalars['Boolean'];
 };
 
+export type MutationsUpdateVoteConfirmArgs = {
+  cycleId: Scalars['String'];
+  signature: Scalars['String'];
+  signatureAddress: Scalars['String'];
+  signatureMsg: Scalars['String'];
+};
+
 export type MutationsCreateCycleVotePairTaskByOwnerArgs = {
   cycleId: Scalars['String'];
 };
@@ -662,6 +685,12 @@ export type MutationsCreateCycleVoteResultPublishTaskByOwnerArgs = {
   cycleId: Scalars['String'];
 };
 
+export type MutationsMarkCyclesTokenReleasedArgs = {
+  cycleIds: Array<Maybe<Scalars['String']>>;
+  daoId: Scalars['String'];
+  unitSizeValue: Scalars['String'];
+};
+
 export type Query = {
   __typename?: 'Query';
   daos?: Maybe<DaOs>;
@@ -670,6 +699,7 @@ export type Query = {
   daoTokenConfig?: Maybe<DaoTokenConfig>;
   daoGithubAppStatus?: Maybe<DaoGithubAppStatus>;
   cycle?: Maybe<CycleQuery>;
+  cyclesByTokenUnreleased?: Maybe<CycleByTokenUnreleasedQuery>;
   jobs?: Maybe<Jobs>;
   icpperStats?: Maybe<UserIcpperStatsQuery>;
 };
@@ -703,6 +733,10 @@ export type QueryDaoGithubAppStatusArgs = {
 
 export type QueryCycleArgs = {
   id: Scalars['String'];
+};
+
+export type QueryCyclesByTokenUnreleasedArgs = {
+  lastTimestamp: Scalars['Int'];
 };
 
 export type QueryJobsArgs = {
@@ -772,6 +806,11 @@ export enum UpdateJobVoteTypeByOwnerArgumentPairTypeEnum {
 
 export type UpdatePairVote = {
   __typename?: 'UpdatePairVote';
+  ok?: Maybe<Scalars['Boolean']>;
+};
+
+export type UpdateVoteConfirm = {
+  __typename?: 'UpdateVoteConfirm';
   ok?: Maybe<Scalars['Boolean']>;
 };
 
@@ -1198,6 +1237,14 @@ export type DaoHomeWithLoginQueryQuery = { __typename?: 'Query' } & {
       >;
     }
   >;
+};
+
+export type DaoTokenConfigQueryVariables = Exact<{
+  daoId: Scalars['String'];
+}>;
+
+export type DaoTokenConfigQuery = { __typename?: 'Query' } & {
+  daoTokenConfig?: Maybe<{ __typename?: 'DAOTokenConfig' } & Pick<DaoTokenConfig, 'ethDaoId'>>;
 };
 
 export type DaoFollowInfoQueryVariables = Exact<{
@@ -3130,6 +3177,54 @@ export type DaoHomeWithLoginQueryLazyQueryHookResult = ReturnType<
 export type DaoHomeWithLoginQueryQueryResult = Apollo.QueryResult<
   DaoHomeWithLoginQueryQuery,
   DaoHomeWithLoginQueryQueryVariables
+>;
+export const DaoTokenConfigDocument = gql`
+  query DAOTokenConfig($daoId: String!) {
+    daoTokenConfig(daoId: $daoId) {
+      ethDaoId
+    }
+  }
+`;
+
+/**
+ * __useDaoTokenConfigQuery__
+ *
+ * To run a query within a React component, call `useDaoTokenConfigQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDaoTokenConfigQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDaoTokenConfigQuery({
+ *   variables: {
+ *      daoId: // value for 'daoId'
+ *   },
+ * });
+ */
+export function useDaoTokenConfigQuery(
+  baseOptions: Apollo.QueryHookOptions<DaoTokenConfigQuery, DaoTokenConfigQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<DaoTokenConfigQuery, DaoTokenConfigQueryVariables>(
+    DaoTokenConfigDocument,
+    options,
+  );
+}
+export function useDaoTokenConfigLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<DaoTokenConfigQuery, DaoTokenConfigQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<DaoTokenConfigQuery, DaoTokenConfigQueryVariables>(
+    DaoTokenConfigDocument,
+    options,
+  );
+}
+export type DaoTokenConfigQueryHookResult = ReturnType<typeof useDaoTokenConfigQuery>;
+export type DaoTokenConfigLazyQueryHookResult = ReturnType<typeof useDaoTokenConfigLazyQuery>;
+export type DaoTokenConfigQueryResult = Apollo.QueryResult<
+  DaoTokenConfigQuery,
+  DaoTokenConfigQueryVariables
 >;
 export const DaoFollowInfoDocument = gql`
   query DAOFollowInfo($id: String!, $userId: String!) {
