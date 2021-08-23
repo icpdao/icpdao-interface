@@ -244,6 +244,7 @@ export type CycleVoteSchema = {
 export type CycleVotesQuery = {
   __typename?: 'CycleVotesQuery';
   nodes?: Maybe<Array<Maybe<CycleVoteQuery>>>;
+  confirm?: Maybe<Scalars['Boolean']>;
   total?: Maybe<Scalars['Int']>;
 };
 
@@ -383,6 +384,7 @@ export type DaoSchema = {
   name: Scalars['String'];
   number: Scalars['Int'];
   ownerId: Scalars['String'];
+  tokenAddress?: Maybe<Scalars['String']>;
   updateAt: Scalars['Int'];
 };
 
@@ -573,6 +575,7 @@ export type Mutations = {
   updateIcpperStatOwnerEi?: Maybe<UpdateIcpperStatOwnerEi>;
   updatePairVote?: Maybe<UpdatePairVote>;
   updateAllVote?: Maybe<UpdateAllVote>;
+  updateVoteConfirm?: Maybe<UpdateVoteConfirm>;
   createCycleVotePairTaskByOwner?: Maybe<CreateCycleVotePairTaskByOwner>;
   changeVoteResultPublic?: Maybe<ChangeVoteResultPublic>;
   createMock?: Maybe<CreateMock>;
@@ -614,6 +617,7 @@ export type MutationsUpdateDaoBaseInfoArgs = {
   desc?: Maybe<Scalars['String']>;
   id: Scalars['String'];
   logo?: Maybe<Scalars['String']>;
+  tokenAddress?: Maybe<Scalars['String']>;
 };
 
 export type MutationsCreateJobArgs = {
@@ -650,6 +654,13 @@ export type MutationsUpdatePairVoteArgs = {
 export type MutationsUpdateAllVoteArgs = {
   id: Scalars['String'];
   vote: Scalars['Boolean'];
+};
+
+export type MutationsUpdateVoteConfirmArgs = {
+  cycleId: Scalars['String'];
+  signature: Scalars['String'];
+  signatureAddress: Scalars['String'];
+  signatureMsg: Scalars['String'];
 };
 
 export type MutationsCreateCycleVotePairTaskByOwnerArgs = {
@@ -795,6 +806,11 @@ export enum UpdateJobVoteTypeByOwnerArgumentPairTypeEnum {
 
 export type UpdatePairVote = {
   __typename?: 'UpdatePairVote';
+  ok?: Maybe<Scalars['Boolean']>;
+};
+
+export type UpdateVoteConfirm = {
+  __typename?: 'UpdateVoteConfirm';
   ok?: Maybe<Scalars['Boolean']>;
 };
 
