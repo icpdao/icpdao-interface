@@ -9,5 +9,6 @@ module.exports = {
     THEME: true,
     REACT_APP_ICPDAO_BACKEND_VERSION: true,
     REACT_APP_ICPDAO_MOCK_URL: true,
+    REACT_APP_ICPDAO_ETHEREUM_ALCHEMYAPI_KEY: true,
   },
 };

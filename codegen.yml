@@ -2,7 +2,7 @@ overwrite: true
 schema:
   - ${REACT_APP_ICPDAO_BACKEND_BASE_URL}/${REACT_APP_ICPDAO_BACKEND_VERSION}/${SERVICE}/graph:
       headers:
-        authorization: ${REACT_APP_ICPDAO_GRAPHQL_SCHEMA_AUTH}
+        authorization: "un_login"
 documents: "src/services/${SERVICE}/*.graphql"
 generates:
   src/services/${SERVICE}/generated.ts:
