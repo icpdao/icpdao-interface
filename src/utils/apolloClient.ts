@@ -29,7 +29,7 @@ const authLink = setContext((_, context) => {
   return {
     headers: {
       ...context.headers,
-      authorization: getAuthorization() || '',
+      authorization: getAuthorization() || 'unlogin',
       service: context.service,
     },
   };
