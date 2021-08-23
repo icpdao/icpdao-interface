@@ -40,3 +40,6 @@ screenshot
 build
 
 .env
+
+src/services/dao/generated.ts
+src/services/dao/graphql.schema.json
