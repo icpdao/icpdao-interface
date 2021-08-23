@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   Form,
   Upload,
@@ -13,6 +13,7 @@ import {
   Col,
   Descriptions,
   Spin,
+  Alert,
 } from 'antd';
 import { UploadOutlined, ZoomInOutlined } from '@ant-design/icons';
 import { FormattedMessage } from 'umi';
@@ -25,6 +26,8 @@ import { ZeroAddress } from '@/services/ethereum-connect';
 import type { ETH_CONNECT } from '@/services/ethereum-connect/typings';
 import { useRequest } from '@@/plugin-request/request';
 import { useModel } from '@@/plugin-model/useModel';
+import { PageLoading } from '@ant-design/pro-layout';
+import { isAddress } from 'ethers/lib/utils';
 
 type ValidateStatus = Parameters<typeof Form.Item>[0]['validateStatus'];
 
@@ -39,11 +42,10 @@ type validate = {
   help?: string;
 };
 
-const TokenCreate: React.FC<TokenConfigComponentsProps> = ({ ethDAOId, tokenAddress }) => {
-  const intl = useIntl();
-  const { isConnected, contract, event$ } = useModel('useWalletModel');
-
-  const [createFormData, setCreateFormData] = useState<ETH_CONNECT.CreateToken>({
+const genDefaultCreateForm: (value: string | undefined) => ETH_CONNECT.CreateToken = (
+  ethDAOId: string | undefined,
+) => {
+  return {
     ethDAOId: ethDAOId || '',
     genesis: [],
     lpRatio: 0,
@@ -63,7 +65,18 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({ ethDAOId, tokenAddr
       d: 0,
       p: 10,
     },
-  });
+  };
+};
+
+const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
+  ethDAOId,
+  tokenAddress,
+  setTokenAddress,
+}) => {
+  const intl = useIntl();
+  const defaultCreateForm = genDefaultCreateForm(ethDAOId);
+  const { isConnected, contract, event$ } = useModel('useWalletModel');
+  const [createFormData, setCreateFormData] = useState<ETH_CONNECT.CreateToken>(defaultCreateForm);
   const [createFormValidMsg, setCreateFormValidMsg] = useState<Record<string, validate>>();
   const [previewGenesis, setPreviewGenesis] = useState<boolean>(false);
   const [previewCreateModal, setPreviewCreateModal] = useState<boolean>(false);
@@ -73,14 +86,23 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({ ethDAOId, tokenAddr
   const [disableConfirmReCreateButton, setDisableConfirmReCreateButton] = useState<boolean>(true);
   const { loading, run } = useRequest(
     async () => {
-      console.log('createData', createFormData);
-      const tx = await contract.daoFactory.createToken(createFormData);
-      setPreviewCreateModal(false);
-      setLoadingDeployComplete(true);
-      const receipt = await tx.wait();
-      const deployEvent = receipt.events.pop();
-      setLoadingDeployComplete(false);
-      console.log(deployEvent.args);
+      try {
+        console.log('createData', createFormData);
+        const tx = await contract.daoFactory.createToken(createFormData);
+        setPreviewCreateModal(false);
+        setLoadingDeployComplete(true);
+        const receipt = await tx.wait();
+        const deployEvent = receipt.events.pop();
+        setLoadingDeployComplete(false);
+        console.log(deployEvent.args);
+        if (setTokenAddress && deployEvent.args && deployEvent.args.length > 0) {
+          setTokenAddress(deployEvent.args[-1] || '');
+          setCreateFormData(defaultCreateForm);
+        }
+      } catch (e) {
+        setPreviewCreateModal(false);
+        setLoadingDeployComplete(false);
+      }
     },
     {
       manual: true,
@@ -99,8 +121,8 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({ ethDAOId, tokenAddr
       const sheetJSON = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetKey]);
       sheetJSON.forEach((d) => {
         const td = d as any;
-        if (td.address && td.value && Web3.utils.isAddress(td.address)) {
-          rs.push({ address: td.address, value: parseInt(td.value, 10) });
+        if (td.address && td.value && isAddress(td.address)) {
+          rs.push({ address: td.address, value: parseFloat(td.value) });
         }
       });
       if (rs.length > 0)
@@ -155,22 +177,32 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({ ethDAOId, tokenAddr
     const checked = handlerCheckCreateFrom();
     if (checked) setNoticeReCreateModal(true);
   }, [handlerCheckCreateFrom]);
-  const formButton = useMemo(() => {
-    if (tokenAddress !== ZeroAddress) {
-      return (
-        <Button type="primary" htmlType="submit" onClick={() => handlerReCreate()}>
-          <FormattedMessage id={`pages.dao.config.tab.token.create.form.button.recreate`} />
-        </Button>
-      );
-    }
-    return (
-      <Button type="primary" htmlType="submit" onClick={() => handlerCreate()}>
-        <FormattedMessage id={`pages.dao.config.tab.token.create.form.button.create`} />
-      </Button>
-    );
-  }, [handlerCreate, handlerReCreate, tokenAddress]);
+
+  if (!tokenAddress) {
+    return <PageLoading />;
+  }
+
   return (
     <>
+      {tokenAddress !== ZeroAddress && (
+        <div style={{ marginBottom: 30 }}>
+          <Alert
+            message="Info"
+            description={
+              <>
+                <div>
+                  {intl.formatMessage({ id: 'pages.dao.config.tab.token.create.existed.p1' })}
+                </div>
+                <div>
+                  {intl.formatMessage({ id: 'pages.dao.config.tab.token.create.existed.p2' })}
+                </div>
+              </>
+            }
+            type="info"
+            showIcon
+          />
+        </div>
+      )}
       <Spin
         tip={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.loading' })}
         spinning={loadingDeployComplete}
@@ -575,7 +607,17 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({ ethDAOId, tokenAddr
               </Row>
             </Form.Item>
           )}
-          <Form.Item wrapperCol={{ offset: 4, span: 16 }}>{formButton}</Form.Item>
+          <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
+            {tokenAddress !== ZeroAddress ? (
+              <Button type="primary" htmlType="submit" onClick={() => handlerReCreate()}>
+                <FormattedMessage id={`pages.dao.config.tab.token.create.form.button.recreate`} />
+              </Button>
+            ) : (
+              <Button type="primary" htmlType="submit" onClick={() => handlerCreate()}>
+                <FormattedMessage id={`pages.dao.config.tab.token.create.form.button.create`} />
+              </Button>
+            )}
+          </Form.Item>
         </Form>
       </Spin>
       <Modal
@@ -600,6 +642,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({ ethDAOId, tokenAddr
           size="small"
           bordered
           key={'address'}
+          rowKey={'address'}
           pagination={false}
           summary={(pageData) => {
             let totalValue = 0;

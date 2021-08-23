@@ -23,6 +23,8 @@ type TokenConfigProps = {
 export type TokenConfigComponentsProps = {
   ethDAOId?: string;
   tokenAddress?: string;
+  setTokenAddress?: (value: string) => void;
+  setCurrentTab?: (value: string) => void;
 };
 
 const TokenConfig: React.FC<TokenConfigProps> = ({ daoId }) => {
@@ -46,7 +48,7 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId }) => {
     <>
       <Tabs
         className={styles.tokenConfigTabs}
-        defaultActiveKey="create"
+        activeKey={currentTab}
         tabPosition={'left'}
         onChange={setCurrentTab}
       >
@@ -54,7 +56,8 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId }) => {
           {currentTab === 'create' && (
             <TokenCreate
               ethDAOId={data?.daoTokenConfig?.ethDaoId || ''}
-              tokenAddress={tokenAddress || ZeroAddress}
+              tokenAddress={tokenAddress}
+              setTokenAddress={setTokenAddress}
             />
           )}
         </TabPane>
@@ -62,21 +65,23 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId }) => {
           tab={intl.formatMessage({ id: 'pages.dao.config.tab.token.create_pool' })}
           key="createPool"
         >
-          {currentTab === 'createPool' && (
-            <TokenCreateLP tokenAddress={tokenAddress || ZeroAddress} />
-          )}
+          {currentTab === 'createPool' && <TokenCreateLP tokenAddress={tokenAddress} />}
         </TabPane>
         <TabPane tab={intl.formatMessage({ id: 'pages.dao.config.tab.token.add_lp' })} key="addLP">
-          {currentTab === 'addLP' && <TokenAddLP tokenAddress={tokenAddress || ZeroAddress} />}
+          {currentTab === 'addLP' && (
+            <TokenAddLP tokenAddress={tokenAddress} setCurrentTab={setCurrentTab} />
+          )}
         </TabPane>
         <TabPane
           tab={intl.formatMessage({ id: 'pages.dao.config.tab.token.manager' })}
           key="manager"
         >
-          {currentTab === 'manager' && <TokenManager tokenAddress={tokenAddress || ZeroAddress} />}
+          {currentTab === 'manager' && <TokenManager tokenAddress={tokenAddress} />}
         </TabPane>
         <TabPane tab={intl.formatMessage({ id: 'pages.dao.config.tab.token.mint' })} key="mint">
-          {currentTab === 'mint' && <TokenMint tokenAddress={tokenAddress || ZeroAddress} />}
+          {currentTab === 'mint' && (
+            <TokenMint tokenAddress={tokenAddress} setCurrentTab={setCurrentTab} />
+          )}
         </TabPane>
       </Tabs>
     </>
