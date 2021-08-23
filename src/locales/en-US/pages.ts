@@ -346,4 +346,5 @@ export default {
   'pages.staking.button.withdraw': 'Withdraw Bonus',
   'pages.staking.balance': 'Account Deposit ICPD',
   'pages.token.loading': 'Waiting for the transaction to complete...',
+  'pages.common.connect': 'Connect Wallet',
 };

@@ -21,6 +21,7 @@ type TokenConfigProps = {
 };
 
 export type TokenConfigComponentsProps = {
+  daoId?: string;
   ethDAOId?: string;
   tokenAddress?: string;
   setTokenAddress?: (value: string) => void;
@@ -58,6 +59,7 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId }) => {
               ethDAOId={data?.daoTokenConfig?.ethDaoId || ''}
               tokenAddress={tokenAddress}
               setTokenAddress={setTokenAddress}
+              daoId={daoId}
             />
           )}
         </TabPane>
