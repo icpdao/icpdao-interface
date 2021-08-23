@@ -28,6 +28,7 @@ import { useRequest } from '@@/plugin-request/request';
 import { useModel } from '@@/plugin-model/useModel';
 import { PageLoading } from '@ant-design/pro-layout';
 import { isAddress } from 'ethers/lib/utils';
+import { useUpdateDaoBaseInfoMutation } from '@/services/dao/generated';
 
 type ValidateStatus = Parameters<typeof Form.Item>[0]['validateStatus'];
 
@@ -72,6 +73,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
   ethDAOId,
   tokenAddress,
   setTokenAddress,
+  daoId,
 }) => {
   const intl = useIntl();
   const defaultCreateForm = genDefaultCreateForm(ethDAOId);
@@ -84,8 +86,10 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
   const [confirmReCreateModal, setConfirmReCreateModal] = useState<boolean>(false);
   const [loadingDeployComplete, setLoadingDeployComplete] = useState<boolean>(false);
   const [disableConfirmReCreateButton, setDisableConfirmReCreateButton] = useState<boolean>(true);
+  const [updateDaoBaseInfo] = useUpdateDaoBaseInfoMutation();
   const { loading, run } = useRequest(
     async () => {
+      if (!daoId) return;
       try {
         console.log('createData', createFormData);
         const tx = await contract.daoFactory.createToken(createFormData);
@@ -93,12 +97,13 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
         setLoadingDeployComplete(true);
         const receipt = await tx.wait();
         const deployEvent = receipt.events.pop();
-        setLoadingDeployComplete(false);
         console.log(deployEvent.args);
         if (setTokenAddress && deployEvent.args && deployEvent.args.length > 0) {
+          await updateDaoBaseInfo({ variables: { id: daoId, tokenAddress: deployEvent.args[-1] } });
           setTokenAddress(deployEvent.args[-1] || '');
           setCreateFormData(defaultCreateForm);
         }
+        setLoadingDeployComplete(false);
       } catch (e) {
         setPreviewCreateModal(false);
         setLoadingDeployComplete(false);

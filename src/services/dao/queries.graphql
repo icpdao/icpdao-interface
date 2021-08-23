@@ -483,6 +483,7 @@ query DAOCycleVoteList($cycleId: String!, $first: Int, $offset: Int) {
     }
     votes(first: $first, offset: $offset, isMyself: true) {
       total
+      confirm
       nodes {
         datum {
           id
