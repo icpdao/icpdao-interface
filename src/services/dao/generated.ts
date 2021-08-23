@@ -4,7 +4,7 @@ export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-const defaultOptions = { context: { service: 'dao' } };
+const defaultOptions =  {"context":{"service":"dao"}}
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -35,7 +35,7 @@ export enum CreateCycleVoteResultPublishTaskByOwnerStatusEnum {
   Init = 'INIT',
   Running = 'RUNNING',
   Success = 'SUCCESS',
-  Fail = 'FAIL',
+  Fail = 'FAIL'
 }
 
 export type CreateCycleVoteResultStatTaskByOwner = {
@@ -47,7 +47,7 @@ export enum CreateCycleVoteResultStatTaskByOwnerStatusEnum {
   Init = 'INIT',
   Stating = 'STATING',
   Success = 'SUCCESS',
-  Fail = 'FAIL',
+  Fail = 'FAIL'
 }
 
 /** example: https://docs.graphene-python.org/en/latest/types/mutations/ */
@@ -75,7 +75,7 @@ export enum CycleFilterEnum {
   Processing = 'processing',
   Pairing = 'pairing',
   Voting = 'voting',
-  UnVoteEnd = 'un_vote_end',
+  UnVoteEnd = 'un_vote_end'
 }
 
 export type CycleIcpperStatSchema = {
@@ -104,12 +104,12 @@ export type CycleIcpperStatSchema = {
 export enum CycleIcpperStatSortedEnum {
   JobCount = 'jobCount',
   Size = 'size',
-  Income = 'income',
+  Income = 'income'
 }
 
 export enum CycleIcpperStatSortedTypeEnum {
   Asc = 'asc',
-  Desc = 'desc',
+  Desc = 'desc'
 }
 
 export type CycleQuery = {
@@ -124,12 +124,14 @@ export type CycleQuery = {
   voteResultPublishTask?: Maybe<CycleVoteResultPublishTaskQuery>;
 };
 
+
 export type CycleQueryIcpperStatsArgs = {
   sorted?: Maybe<CycleIcpperStatSortedEnum>;
   sortedType?: Maybe<CycleIcpperStatSortedTypeEnum>;
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
 };
+
 
 export type CycleQueryJobsArgs = {
   pairType?: Maybe<JobsQueryPairTypeEnum>;
@@ -138,6 +140,7 @@ export type CycleQueryJobsArgs = {
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
 };
+
 
 export type CycleQueryVotesArgs = {
   isPublic?: Maybe<Scalars['Boolean']>;
@@ -182,7 +185,7 @@ export enum CycleVotePairTaskStatusEnum {
   Init = 'INIT',
   Pairing = 'PAIRING',
   Success = 'SUCCESS',
-  Fail = 'FAIL',
+  Fail = 'FAIL'
 }
 
 export type CycleVoteQuery = {
@@ -204,7 +207,7 @@ export enum CycleVoteResultPublishTaskStatusEnum {
   Init = 'INIT',
   Running = 'RUNNING',
   Success = 'SUCCESS',
-  Fail = 'FAIL',
+  Fail = 'FAIL'
 }
 
 export type CycleVoteResultStatTaskQuery = {
@@ -216,12 +219,12 @@ export enum CycleVoteResultStatTaskStatusEnum {
   Init = 'INIT',
   Stating = 'STATING',
   Success = 'SUCCESS',
-  Fail = 'FAIL',
+  Fail = 'FAIL'
 }
 
 export enum CycleVoteResultTypeAllResultTypeEnum {
   Yes = 'YES',
-  No = 'NO',
+  No = 'NO'
 }
 
 export type CycleVoteSchema = {
@@ -260,6 +263,7 @@ export type Dao = {
   cycles?: Maybe<CyclesQuery>;
 };
 
+
 export type DaoCyclesArgs = {
   filter?: Maybe<Array<Maybe<CycleFilterEnum>>>;
 };
@@ -275,7 +279,7 @@ export type DaoFollowSchema = {
 
 export enum DaoFollowTypeEnum {
   Add = 'ADD',
-  Delete = 'DELETE',
+  Delete = 'DELETE'
 }
 
 export type DaoFollowUdSchema = {
@@ -284,6 +288,7 @@ export type DaoFollowUdSchema = {
   followers?: Maybe<Array<Maybe<DaoFollowSchema>>>;
   total: Scalars['Int'];
 };
+
 
 export type DaoFollowUdSchemaFollowersArgs = {
   userId?: Maybe<Scalars['String']>;
@@ -314,6 +319,7 @@ export type DaoJobConfig = {
   previewNextCycle?: Maybe<DaoJobCycle>;
   getNextCycle?: Maybe<DaoJobCycle>;
 };
+
 
 export type DaoJobConfigPreviewNextCycleArgs = {
   timeZone?: Maybe<Scalars['Int']>;
@@ -413,7 +419,7 @@ export enum DaOsFilterEnum {
   Owner = 'owner',
   Following = 'following',
   FollowingAndOwner = 'following_and_owner',
-  Member = 'member',
+  Member = 'member'
 }
 
 export enum DaOsSortedEnum {
@@ -421,12 +427,12 @@ export enum DaOsSortedEnum {
   Following = 'following',
   Job = 'job',
   Size = 'size',
-  Token = 'token',
+  Token = 'token'
 }
 
 export enum DaOsSortedTypeEnum {
   Asc = 'asc',
-  Desc = 'desc',
+  Desc = 'desc'
 }
 
 export type DaOsStat = {
@@ -435,6 +441,7 @@ export type DaOsStat = {
   size?: Maybe<Scalars['Float']>;
   income?: Maybe<Scalars['Float']>;
 };
+
 
 export type DeleteJob = {
   __typename?: 'DeleteJob';
@@ -518,7 +525,7 @@ export type JobSchema = {
 
 export enum JobSortedEnum {
   Size = 'size',
-  Income = 'income',
+  Income = 'income'
 }
 
 export type Jobs = {
@@ -536,17 +543,17 @@ export type JobsQuery = {
 
 export enum JobsQueryPairTypeEnum {
   Pair = 'pair',
-  All = 'all',
+  All = 'all'
 }
 
 export enum JobsQuerySortedEnum {
   Size = 'size',
-  Income = 'income',
+  Income = 'income'
 }
 
 export enum JobsQuerySortedTypeEnum {
   Asc = 'asc',
-  Desc = 'desc',
+  Desc = 'desc'
 }
 
 export type JobsStat = {
@@ -584,6 +591,7 @@ export type Mutations = {
   markCyclesTokenReleased?: Maybe<MarkCyclesTokenReleased>;
 };
 
+
 export type MutationsCreateDaoArgs = {
   desc: Scalars['String'];
   logo: Scalars['String'];
@@ -591,6 +599,7 @@ export type MutationsCreateDaoArgs = {
   timeZone: Scalars['Int'];
   timeZoneRegion: Scalars['String'];
 };
+
 
 export type MutationsUpdateDaoJobConfigArgs = {
   daoId: Scalars['String'];
@@ -608,10 +617,12 @@ export type MutationsUpdateDaoJobConfigArgs = {
   votingEndHour?: Maybe<Scalars['Int']>;
 };
 
+
 export type MutationsUpdateDaoFollowArgs = {
   daoId: Scalars['String'];
   type: DaoFollowTypeEnum;
 };
+
 
 export type MutationsUpdateDaoBaseInfoArgs = {
   desc?: Maybe<Scalars['String']>;
@@ -620,10 +631,12 @@ export type MutationsUpdateDaoBaseInfoArgs = {
   tokenAddress?: Maybe<Scalars['String']>;
 };
 
+
 export type MutationsCreateJobArgs = {
   issueLink: Scalars['String'];
   size: Scalars['Float'];
 };
+
 
 export type MutationsUpdateJobArgs = {
   addPr?: Maybe<Scalars['String']>;
@@ -632,29 +645,35 @@ export type MutationsUpdateJobArgs = {
   size?: Maybe<Scalars['Float']>;
 };
 
+
 export type MutationsDeleteJobArgs = {
   id: Scalars['String'];
 };
+
 
 export type MutationsUpdateJobVoteTypeByOwnerArgs = {
   id: Scalars['String'];
   voteType?: Maybe<UpdateJobVoteTypeByOwnerArgumentPairTypeEnum>;
 };
 
+
 export type MutationsUpdateIcpperStatOwnerEiArgs = {
   id: Scalars['String'];
   ownerEi?: Maybe<Scalars['Decimal']>;
 };
+
 
 export type MutationsUpdatePairVoteArgs = {
   id: Scalars['String'];
   voteJobId: Scalars['String'];
 };
 
+
 export type MutationsUpdateAllVoteArgs = {
   id: Scalars['String'];
   vote: Scalars['Boolean'];
 };
+
 
 export type MutationsUpdateVoteConfirmArgs = {
   cycleId: Scalars['String'];
@@ -663,27 +682,33 @@ export type MutationsUpdateVoteConfirmArgs = {
   signatureMsg: Scalars['String'];
 };
 
+
 export type MutationsCreateCycleVotePairTaskByOwnerArgs = {
   cycleId: Scalars['String'];
 };
+
 
 export type MutationsChangeVoteResultPublicArgs = {
   id: Scalars['String'];
   public: Scalars['Boolean'];
 };
 
+
 export type MutationsCreateMockArgs = {
   icpperGithubUserLogin: Scalars['String'];
   ownerGithubUserLogin: Scalars['String'];
 };
 
+
 export type MutationsCreateCycleVoteResultStatTaskByOwnerArgs = {
   cycleId: Scalars['String'];
 };
 
+
 export type MutationsCreateCycleVoteResultPublishTaskByOwnerArgs = {
   cycleId: Scalars['String'];
 };
+
 
 export type MutationsMarkCyclesTokenReleasedArgs = {
   cycleIds: Array<Maybe<Scalars['String']>>;
@@ -704,6 +729,7 @@ export type Query = {
   icpperStats?: Maybe<UserIcpperStatsQuery>;
 };
 
+
 export type QueryDaosArgs = {
   filter?: Maybe<DaOsFilterEnum>;
   sorted?: Maybe<DaOsSortedEnum>;
@@ -714,30 +740,37 @@ export type QueryDaosArgs = {
   userName?: Maybe<Scalars['String']>;
 };
 
+
 export type QueryDaoArgs = {
   id?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
 };
 
+
 export type QueryDaoJobConfigArgs = {
   daoId: Scalars['String'];
 };
+
 
 export type QueryDaoTokenConfigArgs = {
   daoId: Scalars['String'];
 };
 
+
 export type QueryDaoGithubAppStatusArgs = {
   name: Scalars['String'];
 };
+
 
 export type QueryCycleArgs = {
   id: Scalars['String'];
 };
 
+
 export type QueryCyclesByTokenUnreleasedArgs = {
   lastTimestamp: Scalars['Int'];
 };
+
 
 export type QueryJobsArgs = {
   daoName?: Maybe<Scalars['String']>;
@@ -750,6 +783,7 @@ export type QueryJobsArgs = {
   userName?: Maybe<Scalars['String']>;
 };
 
+
 export type QueryIcpperStatsArgs = {
   daoName?: Maybe<Scalars['String']>;
   userName?: Maybe<Scalars['String']>;
@@ -759,7 +793,7 @@ export type QueryIcpperStatsArgs = {
 
 export enum SortedTypeEnum {
   Asc = 'asc',
-  Desc = 'desc',
+  Desc = 'desc'
 }
 
 export type UpdateAllVote = {
@@ -801,7 +835,7 @@ export type UpdateJobVoteTypeByOwner = {
 
 export enum UpdateJobVoteTypeByOwnerArgumentPairTypeEnum {
   Pair = 'pair',
-  All = 'all',
+  All = 'all'
 }
 
 export type UpdatePairVote = {
@@ -841,13 +875,17 @@ export type CreateDaoMutationVariables = Exact<{
   timeZoneRegion: Scalars['String'];
 }>;
 
-export type CreateDaoMutation = { __typename?: 'Mutations' } & {
-  createDao?: Maybe<
-    { __typename?: 'CreateDAO' } & {
-      dao?: Maybe<{ __typename?: 'DAOSchema' } & Pick<DaoSchema, 'id' | 'number' | 'createAt'>>;
-    }
-  >;
-};
+
+export type CreateDaoMutation = (
+  { __typename?: 'Mutations' }
+  & { createDao?: Maybe<(
+    { __typename?: 'CreateDAO' }
+    & { dao?: Maybe<(
+      { __typename?: 'DAOSchema' }
+      & Pick<DaoSchema, 'id' | 'number' | 'createAt'>
+    )> }
+  )> }
+);
 
 export type UpdateDaoJobConfigMutationVariables = Exact<{
   daoId: Scalars['String'];
@@ -865,20 +903,28 @@ export type UpdateDaoJobConfigMutationVariables = Exact<{
   timeZone?: Maybe<Scalars['Int']>;
 }>;
 
-export type UpdateDaoJobConfigMutation = { __typename?: 'Mutations' } & {
-  updateDaoJobConfig?: Maybe<
-    { __typename?: 'UpdateDAOJobConfig' } & Pick<UpdateDaoJobConfig, 'ok'>
-  >;
-};
+
+export type UpdateDaoJobConfigMutation = (
+  { __typename?: 'Mutations' }
+  & { updateDaoJobConfig?: Maybe<(
+    { __typename?: 'UpdateDAOJobConfig' }
+    & Pick<UpdateDaoJobConfig, 'ok'>
+  )> }
+);
 
 export type FollowDaoMutationVariables = Exact<{
   daoId: Scalars['String'];
   followType: DaoFollowTypeEnum;
 }>;
 
-export type FollowDaoMutation = { __typename?: 'Mutations' } & {
-  updateDaoFollow?: Maybe<{ __typename?: 'UpdateDAOFollow' } & Pick<UpdateDaoFollow, 'ok'>>;
-};
+
+export type FollowDaoMutation = (
+  { __typename?: 'Mutations' }
+  & { updateDaoFollow?: Maybe<(
+    { __typename?: 'UpdateDAOFollow' }
+    & Pick<UpdateDaoFollow, 'ok'>
+  )> }
+);
 
 export type UpdateDaoBaseInfoMutationVariables = Exact<{
   id: Scalars['String'];
@@ -886,204 +932,225 @@ export type UpdateDaoBaseInfoMutationVariables = Exact<{
   logo?: Maybe<Scalars['String']>;
 }>;
 
-export type UpdateDaoBaseInfoMutation = { __typename?: 'Mutations' } & {
-  updateDaoBaseInfo?: Maybe<
-    { __typename?: 'UpdateDAOBaseInfo' } & {
-      dao?: Maybe<{ __typename?: 'DAOSchema' } & Pick<DaoSchema, 'updateAt'>>;
-    }
-  >;
-};
+
+export type UpdateDaoBaseInfoMutation = (
+  { __typename?: 'Mutations' }
+  & { updateDaoBaseInfo?: Maybe<(
+    { __typename?: 'UpdateDAOBaseInfo' }
+    & { dao?: Maybe<(
+      { __typename?: 'DAOSchema' }
+      & Pick<DaoSchema, 'updateAt'>
+    )> }
+  )> }
+);
 
 export type CreateJobMutationVariables = Exact<{
   issueLink: Scalars['String'];
   size: Scalars['Float'];
 }>;
 
-export type CreateJobMutation = { __typename?: 'Mutations' } & {
-  createJob?: Maybe<
-    { __typename?: 'CreateJob' } & {
-      job?: Maybe<
-        { __typename?: 'Job' } & {
-          node?: Maybe<
-            { __typename?: 'JobSchema' } & Pick<JobSchema, 'id' | 'daoId' | 'githubRepoOwner'>
-          >;
-        }
-      >;
-    }
-  >;
-};
+
+export type CreateJobMutation = (
+  { __typename?: 'Mutations' }
+  & { createJob?: Maybe<(
+    { __typename?: 'CreateJob' }
+    & { job?: Maybe<(
+      { __typename?: 'Job' }
+      & { node?: Maybe<(
+        { __typename?: 'JobSchema' }
+        & Pick<JobSchema, 'id' | 'daoId' | 'githubRepoOwner'>
+      )> }
+    )> }
+  )> }
+);
 
 export type UpdateJobSizeMutationVariables = Exact<{
   id: Scalars['String'];
   size: Scalars['Float'];
 }>;
 
-export type UpdateJobSizeMutation = { __typename?: 'Mutations' } & {
-  updateJob?: Maybe<
-    { __typename?: 'UpdateJob' } & {
-      job?: Maybe<
-        { __typename?: 'Job' } & {
-          node?: Maybe<{ __typename?: 'JobSchema' } & Pick<JobSchema, 'id'>>;
-        }
-      >;
-    }
-  >;
-};
+
+export type UpdateJobSizeMutation = (
+  { __typename?: 'Mutations' }
+  & { updateJob?: Maybe<(
+    { __typename?: 'UpdateJob' }
+    & { job?: Maybe<(
+      { __typename?: 'Job' }
+      & { node?: Maybe<(
+        { __typename?: 'JobSchema' }
+        & Pick<JobSchema, 'id'>
+      )> }
+    )> }
+  )> }
+);
 
 export type DeleteJobMutationVariables = Exact<{
   id: Scalars['String'];
 }>;
 
-export type DeleteJobMutation = { __typename?: 'Mutations' } & {
-  deleteJob?: Maybe<{ __typename?: 'DeleteJob' } & Pick<DeleteJob, 'ok'>>;
-};
+
+export type DeleteJobMutation = (
+  { __typename?: 'Mutations' }
+  & { deleteJob?: Maybe<(
+    { __typename?: 'DeleteJob' }
+    & Pick<DeleteJob, 'ok'>
+  )> }
+);
 
 export type UpdateCycleJobVoteTypeByOwnerMutationVariables = Exact<{
   jobId: Scalars['String'];
   voteType?: Maybe<UpdateJobVoteTypeByOwnerArgumentPairTypeEnum>;
 }>;
 
-export type UpdateCycleJobVoteTypeByOwnerMutation = { __typename?: 'Mutations' } & {
-  updateJobVoteTypeByOwner?: Maybe<
-    { __typename?: 'UpdateJobVoteTypeByOwner' } & Pick<UpdateJobVoteTypeByOwner, 'ok'>
-  >;
-};
+
+export type UpdateCycleJobVoteTypeByOwnerMutation = (
+  { __typename?: 'Mutations' }
+  & { updateJobVoteTypeByOwner?: Maybe<(
+    { __typename?: 'UpdateJobVoteTypeByOwner' }
+    & Pick<UpdateJobVoteTypeByOwner, 'ok'>
+  )> }
+);
 
 export type AddJobPrMutationVariables = Exact<{
   id: Scalars['String'];
   addPr: Scalars['String'];
 }>;
 
-export type AddJobPrMutation = { __typename?: 'Mutations' } & {
-  updateJob?: Maybe<
-    { __typename?: 'UpdateJob' } & {
-      job?: Maybe<
-        { __typename?: 'Job' } & {
-          node?: Maybe<{ __typename?: 'JobSchema' } & Pick<JobSchema, 'id'>>;
-          prs?: Maybe<
-            Array<
-              Maybe<
-                { __typename?: 'JobPRSchema' } & Pick<
-                  JobPrSchema,
-                  'id' | 'title' | 'githubRepoOwner' | 'githubRepoName' | 'githubPrNumber'
-                >
-              >
-            >
-          >;
-        }
-      >;
-    }
-  >;
-};
+
+export type AddJobPrMutation = (
+  { __typename?: 'Mutations' }
+  & { updateJob?: Maybe<(
+    { __typename?: 'UpdateJob' }
+    & { job?: Maybe<(
+      { __typename?: 'Job' }
+      & { node?: Maybe<(
+        { __typename?: 'JobSchema' }
+        & Pick<JobSchema, 'id'>
+      )>, prs?: Maybe<Array<Maybe<(
+        { __typename?: 'JobPRSchema' }
+        & Pick<JobPrSchema, 'id' | 'title' | 'githubRepoOwner' | 'githubRepoName' | 'githubPrNumber'>
+      )>>> }
+    )> }
+  )> }
+);
 
 export type DeleteJobPrMutationVariables = Exact<{
   id: Scalars['String'];
   deletePr: Scalars['String'];
 }>;
 
-export type DeleteJobPrMutation = { __typename?: 'Mutations' } & {
-  updateJob?: Maybe<
-    { __typename?: 'UpdateJob' } & {
-      job?: Maybe<
-        { __typename?: 'Job' } & {
-          node?: Maybe<{ __typename?: 'JobSchema' } & Pick<JobSchema, 'id'>>;
-          prs?: Maybe<
-            Array<
-              Maybe<
-                { __typename?: 'JobPRSchema' } & Pick<
-                  JobPrSchema,
-                  'id' | 'title' | 'githubRepoOwner' | 'githubRepoName' | 'githubPrNumber'
-                >
-              >
-            >
-          >;
-        }
-      >;
-    }
-  >;
-};
+
+export type DeleteJobPrMutation = (
+  { __typename?: 'Mutations' }
+  & { updateJob?: Maybe<(
+    { __typename?: 'UpdateJob' }
+    & { job?: Maybe<(
+      { __typename?: 'Job' }
+      & { node?: Maybe<(
+        { __typename?: 'JobSchema' }
+        & Pick<JobSchema, 'id'>
+      )>, prs?: Maybe<Array<Maybe<(
+        { __typename?: 'JobPRSchema' }
+        & Pick<JobPrSchema, 'id' | 'title' | 'githubRepoOwner' | 'githubRepoName' | 'githubPrNumber'>
+      )>>> }
+    )> }
+  )> }
+);
 
 export type UpdateAllVoteMutationVariables = Exact<{
   voteId: Scalars['String'];
   vote: Scalars['Boolean'];
 }>;
 
-export type UpdateAllVoteMutation = { __typename?: 'Mutations' } & {
-  updateAllVote?: Maybe<{ __typename?: 'UpdateALLVote' } & Pick<UpdateAllVote, 'ok'>>;
-};
+
+export type UpdateAllVoteMutation = (
+  { __typename?: 'Mutations' }
+  & { updateAllVote?: Maybe<(
+    { __typename?: 'UpdateALLVote' }
+    & Pick<UpdateAllVote, 'ok'>
+  )> }
+);
 
 export type UpdatePairVoteMutationVariables = Exact<{
   voteId: Scalars['String'];
   voteJobId: Scalars['String'];
 }>;
 
-export type UpdatePairVoteMutation = { __typename?: 'Mutations' } & {
-  updatePairVote?: Maybe<{ __typename?: 'UpdatePairVote' } & Pick<UpdatePairVote, 'ok'>>;
-};
+
+export type UpdatePairVoteMutation = (
+  { __typename?: 'Mutations' }
+  & { updatePairVote?: Maybe<(
+    { __typename?: 'UpdatePairVote' }
+    & Pick<UpdatePairVote, 'ok'>
+  )> }
+);
 
 export type UpdateOwnerEiMutationVariables = Exact<{
   statId: Scalars['String'];
   ownerEi: Scalars['Decimal'];
 }>;
 
-export type UpdateOwnerEiMutation = { __typename?: 'Mutations' } & {
-  updateIcpperStatOwnerEi?: Maybe<
-    { __typename?: 'UpdateIcpperStatOwnerEi' } & Pick<
-      UpdateIcpperStatOwnerEi,
-      'ei' | 'ownerEi' | 'voteEi'
-    >
-  >;
-};
+
+export type UpdateOwnerEiMutation = (
+  { __typename?: 'Mutations' }
+  & { updateIcpperStatOwnerEi?: Maybe<(
+    { __typename?: 'UpdateIcpperStatOwnerEi' }
+    & Pick<UpdateIcpperStatOwnerEi, 'ei' | 'ownerEi' | 'voteEi'>
+  )> }
+);
 
 export type BeginCyclePairTaskMutationVariables = Exact<{
   cycleId: Scalars['String'];
 }>;
 
-export type BeginCyclePairTaskMutation = { __typename?: 'Mutations' } & {
-  createCycleVotePairTaskByOwner?: Maybe<
-    { __typename?: 'CreateCycleVotePairTaskByOwner' } & Pick<
-      CreateCycleVotePairTaskByOwner,
-      'status'
-    >
-  >;
-};
+
+export type BeginCyclePairTaskMutation = (
+  { __typename?: 'Mutations' }
+  & { createCycleVotePairTaskByOwner?: Maybe<(
+    { __typename?: 'CreateCycleVotePairTaskByOwner' }
+    & Pick<CreateCycleVotePairTaskByOwner, 'status'>
+  )> }
+);
 
 export type BeginCycleVoteResultTaskMutationVariables = Exact<{
   cycleId: Scalars['String'];
 }>;
 
-export type BeginCycleVoteResultTaskMutation = { __typename?: 'Mutations' } & {
-  createCycleVoteResultStatTaskByOwner?: Maybe<
-    { __typename?: 'CreateCycleVoteResultStatTaskByOwner' } & Pick<
-      CreateCycleVoteResultStatTaskByOwner,
-      'status'
-    >
-  >;
-};
+
+export type BeginCycleVoteResultTaskMutation = (
+  { __typename?: 'Mutations' }
+  & { createCycleVoteResultStatTaskByOwner?: Maybe<(
+    { __typename?: 'CreateCycleVoteResultStatTaskByOwner' }
+    & Pick<CreateCycleVoteResultStatTaskByOwner, 'status'>
+  )> }
+);
 
 export type BeginPublishCycleTaskMutationVariables = Exact<{
   cycleId: Scalars['String'];
 }>;
 
-export type BeginPublishCycleTaskMutation = { __typename?: 'Mutations' } & {
-  createCycleVoteResultPublishTaskByOwner?: Maybe<
-    { __typename?: 'CreateCycleVoteResultPublishTaskByOwner' } & Pick<
-      CreateCycleVoteResultPublishTaskByOwner,
-      'status'
-    >
-  >;
-};
+
+export type BeginPublishCycleTaskMutation = (
+  { __typename?: 'Mutations' }
+  & { createCycleVoteResultPublishTaskByOwner?: Maybe<(
+    { __typename?: 'CreateCycleVoteResultPublishTaskByOwner' }
+    & Pick<CreateCycleVoteResultPublishTaskByOwner, 'status'>
+  )> }
+);
 
 export type UpdateVotePairPublicMutationVariables = Exact<{
   voteId: Scalars['String'];
   isPublic: Scalars['Boolean'];
 }>;
 
-export type UpdateVotePairPublicMutation = { __typename?: 'Mutations' } & {
-  changeVoteResultPublic?: Maybe<
-    { __typename?: 'ChangeVoteResultPublic' } & Pick<ChangeVoteResultPublic, 'ok'>
-  >;
-};
+
+export type UpdateVotePairPublicMutation = (
+  { __typename?: 'Mutations' }
+  & { changeVoteResultPublic?: Maybe<(
+    { __typename?: 'ChangeVoteResultPublic' }
+    & Pick<ChangeVoteResultPublic, 'ok'>
+  )> }
+);
 
 export type MarkCyclesTokenReleasedMutationVariables = Exact<{
   daoId: Scalars['String'];
@@ -1091,85 +1158,55 @@ export type MarkCyclesTokenReleasedMutationVariables = Exact<{
   unitSizeValue: Scalars['String'];
 }>;
 
-export type MarkCyclesTokenReleasedMutation = { __typename?: 'Mutations' } & {
-  markCyclesTokenReleased?: Maybe<
-    { __typename?: 'MarkCyclesTokenReleased' } & Pick<MarkCyclesTokenReleased, 'ok'>
-  >;
-};
+
+export type MarkCyclesTokenReleasedMutation = (
+  { __typename?: 'Mutations' }
+  & { markCyclesTokenReleased?: Maybe<(
+    { __typename?: 'MarkCyclesTokenReleased' }
+    & Pick<MarkCyclesTokenReleased, 'ok'>
+  )> }
+);
 
 export type DaoQueryVariables = Exact<{
   id: Scalars['String'];
 }>;
 
-export type DaoQuery = { __typename?: 'Query' } & {
-  dao?: Maybe<
-    { __typename?: 'DAO' } & {
-      datum?: Maybe<
-        { __typename?: 'DAOSchema' } & Pick<
-          DaoSchema,
-          'id' | 'number' | 'name' | 'desc' | 'logo' | 'ownerId' | 'createAt' | 'updateAt'
-        >
-      >;
-      following?: Maybe<{ __typename?: 'DAOFollowUDSchema' } & Pick<DaoFollowUdSchema, 'total'>>;
-    }
-  >;
-};
+
+export type DaoQuery = (
+  { __typename?: 'Query' }
+  & { dao?: Maybe<(
+    { __typename?: 'DAO' }
+    & { datum?: Maybe<(
+      { __typename?: 'DAOSchema' }
+      & Pick<DaoSchema, 'id' | 'number' | 'name' | 'desc' | 'logo' | 'ownerId' | 'createAt' | 'updateAt'>
+    )>, following?: Maybe<(
+      { __typename?: 'DAOFollowUDSchema' }
+      & Pick<DaoFollowUdSchema, 'total'>
+    )> }
+  )> }
+);
 
 export type DaoJobConfigQueryVariables = Exact<{
   daoId: Scalars['String'];
 }>;
 
-export type DaoJobConfigQuery = { __typename?: 'Query' } & {
-  daoJobConfig?: Maybe<
-    { __typename?: 'DAOJobConfig' } & {
-      datum?: Maybe<
-        { __typename?: 'DAOJobConfigSchema' } & Pick<
-          DaoJobConfigSchema,
-          | 'id'
-          | 'daoId'
-          | 'createAt'
-          | 'deadlineDay'
-          | 'deadlineTime'
-          | 'pairBeginDay'
-          | 'pairBeginHour'
-          | 'pairEndDay'
-          | 'pairEndHour'
-          | 'timeZone'
-          | 'timeZoneRegion'
-          | 'updateAt'
-          | 'votingBeginDay'
-          | 'votingBeginHour'
-          | 'votingEndDay'
-          | 'votingEndHour'
-        >
-      >;
-      existedLastCycle?: Maybe<
-        { __typename?: 'DAOJobCycle' } & Pick<
-          DaoJobCycle,
-          | 'timeZone'
-          | 'beginAt'
-          | 'endAt'
-          | 'pairBeginAt'
-          | 'pairEndAt'
-          | 'voteBeginAt'
-          | 'voteEndAt'
-        >
-      >;
-      getNextCycle?: Maybe<
-        { __typename?: 'DAOJobCycle' } & Pick<
-          DaoJobCycle,
-          | 'timeZone'
-          | 'beginAt'
-          | 'endAt'
-          | 'pairBeginAt'
-          | 'pairEndAt'
-          | 'voteBeginAt'
-          | 'voteEndAt'
-        >
-      >;
-    }
-  >;
-};
+
+export type DaoJobConfigQuery = (
+  { __typename?: 'Query' }
+  & { daoJobConfig?: Maybe<(
+    { __typename?: 'DAOJobConfig' }
+    & { datum?: Maybe<(
+      { __typename?: 'DAOJobConfigSchema' }
+      & Pick<DaoJobConfigSchema, 'id' | 'daoId' | 'createAt' | 'deadlineDay' | 'deadlineTime' | 'pairBeginDay' | 'pairBeginHour' | 'pairEndDay' | 'pairEndHour' | 'timeZone' | 'timeZoneRegion' | 'updateAt' | 'votingBeginDay' | 'votingBeginHour' | 'votingEndDay' | 'votingEndHour'>
+    )>, existedLastCycle?: Maybe<(
+      { __typename?: 'DAOJobCycle' }
+      & Pick<DaoJobCycle, 'timeZone' | 'beginAt' | 'endAt' | 'pairBeginAt' | 'pairEndAt' | 'voteBeginAt' | 'voteEndAt'>
+    )>, getNextCycle?: Maybe<(
+      { __typename?: 'DAOJobCycle' }
+      & Pick<DaoJobCycle, 'timeZone' | 'beginAt' | 'endAt' | 'pairBeginAt' | 'pairEndAt' | 'voteBeginAt' | 'voteEndAt'>
+    )> }
+  )> }
+);
 
 export type DaoJobConfigPreviewNextCycleQueryVariables = Exact<{
   daoId: Scalars['String'];
@@ -1186,103 +1223,90 @@ export type DaoJobConfigPreviewNextCycleQueryVariables = Exact<{
   votingEndHour?: Maybe<Scalars['Int']>;
 }>;
 
-export type DaoJobConfigPreviewNextCycleQuery = { __typename?: 'Query' } & {
-  daoJobConfig?: Maybe<
-    { __typename?: 'DAOJobConfig' } & {
-      previewNextCycle?: Maybe<
-        { __typename?: 'DAOJobCycle' } & Pick<
-          DaoJobCycle,
-          | 'timeZone'
-          | 'beginAt'
-          | 'endAt'
-          | 'pairBeginAt'
-          | 'pairEndAt'
-          | 'voteBeginAt'
-          | 'voteEndAt'
-        >
-      >;
-    }
-  >;
-};
+
+export type DaoJobConfigPreviewNextCycleQuery = (
+  { __typename?: 'Query' }
+  & { daoJobConfig?: Maybe<(
+    { __typename?: 'DAOJobConfig' }
+    & { previewNextCycle?: Maybe<(
+      { __typename?: 'DAOJobCycle' }
+      & Pick<DaoJobCycle, 'timeZone' | 'beginAt' | 'endAt' | 'pairBeginAt' | 'pairEndAt' | 'voteBeginAt' | 'voteEndAt'>
+    )> }
+  )> }
+);
 
 export type DaoHomeWithLoginQueryQueryVariables = Exact<{
   id: Scalars['String'];
   userId: Scalars['String'];
 }>;
 
-export type DaoHomeWithLoginQueryQuery = { __typename?: 'Query' } & {
-  dao?: Maybe<
-    { __typename?: 'DAO' } & {
-      datum?: Maybe<
-        { __typename?: 'DAOSchema' } & Pick<
-          DaoSchema,
-          'id' | 'number' | 'name' | 'desc' | 'logo' | 'ownerId' | 'createAt' | 'updateAt'
-        >
-      >;
-      cycles?: Maybe<
-        { __typename?: 'CyclesQuery' } & {
-          nodes?: Maybe<
-            Array<
-              Maybe<
-                { __typename?: 'CycleQuery' } & {
-                  datum?: Maybe<
-                    { __typename?: 'CycleSchema' } & Pick<
-                      CycleSchema,
-                      'id' | 'beginAt' | 'endAt' | 'voteBeginAt' | 'voteEndAt'
-                    >
-                  >;
-                  votes?: Maybe<
-                    { __typename?: 'CycleVotesQuery' } & Pick<CycleVotesQuery, 'total'>
-                  >;
-                }
-              >
-            >
-          >;
-        }
-      >;
-      following?: Maybe<
-        { __typename?: 'DAOFollowUDSchema' } & Pick<DaoFollowUdSchema, 'total'> & {
-            followers?: Maybe<
-              Array<Maybe<{ __typename?: 'DAOFollowSchema' } & Pick<DaoFollowSchema, 'createAt'>>>
-            >;
-          }
-      >;
-    }
-  >;
-};
+
+export type DaoHomeWithLoginQueryQuery = (
+  { __typename?: 'Query' }
+  & { dao?: Maybe<(
+    { __typename?: 'DAO' }
+    & { datum?: Maybe<(
+      { __typename?: 'DAOSchema' }
+      & Pick<DaoSchema, 'id' | 'number' | 'name' | 'desc' | 'logo' | 'ownerId' | 'createAt' | 'updateAt'>
+    )>, cycles?: Maybe<(
+      { __typename?: 'CyclesQuery' }
+      & { nodes?: Maybe<Array<Maybe<(
+        { __typename?: 'CycleQuery' }
+        & { datum?: Maybe<(
+          { __typename?: 'CycleSchema' }
+          & Pick<CycleSchema, 'id' | 'beginAt' | 'endAt' | 'voteBeginAt' | 'voteEndAt'>
+        )>, votes?: Maybe<(
+          { __typename?: 'CycleVotesQuery' }
+          & Pick<CycleVotesQuery, 'total'>
+        )> }
+      )>>> }
+    )>, following?: Maybe<(
+      { __typename?: 'DAOFollowUDSchema' }
+      & Pick<DaoFollowUdSchema, 'total'>
+      & { followers?: Maybe<Array<Maybe<(
+        { __typename?: 'DAOFollowSchema' }
+        & Pick<DaoFollowSchema, 'createAt'>
+      )>>> }
+    )> }
+  )> }
+);
 
 export type DaoTokenConfigQueryVariables = Exact<{
   daoId: Scalars['String'];
 }>;
 
-export type DaoTokenConfigQuery = { __typename?: 'Query' } & {
-  daoTokenConfig?: Maybe<{ __typename?: 'DAOTokenConfig' } & Pick<DaoTokenConfig, 'ethDaoId'>>;
-};
+
+export type DaoTokenConfigQuery = (
+  { __typename?: 'Query' }
+  & { daoTokenConfig?: Maybe<(
+    { __typename?: 'DAOTokenConfig' }
+    & Pick<DaoTokenConfig, 'ethDaoId'>
+  )> }
+);
 
 export type DaoFollowInfoQueryVariables = Exact<{
   id: Scalars['String'];
   userId: Scalars['String'];
 }>;
 
-export type DaoFollowInfoQuery = { __typename?: 'Query' } & {
-  dao?: Maybe<
-    { __typename?: 'DAO' } & {
-      datum?: Maybe<
-        { __typename?: 'DAOSchema' } & Pick<
-          DaoSchema,
-          'id' | 'number' | 'name' | 'desc' | 'logo' | 'ownerId' | 'createAt' | 'updateAt'
-        >
-      >;
-      following?: Maybe<
-        { __typename?: 'DAOFollowUDSchema' } & Pick<DaoFollowUdSchema, 'total'> & {
-            followers?: Maybe<
-              Array<Maybe<{ __typename?: 'DAOFollowSchema' } & Pick<DaoFollowSchema, 'createAt'>>>
-            >;
-          }
-      >;
-    }
-  >;
-};
+
+export type DaoFollowInfoQuery = (
+  { __typename?: 'Query' }
+  & { dao?: Maybe<(
+    { __typename?: 'DAO' }
+    & { datum?: Maybe<(
+      { __typename?: 'DAOSchema' }
+      & Pick<DaoSchema, 'id' | 'number' | 'name' | 'desc' | 'logo' | 'ownerId' | 'createAt' | 'updateAt'>
+    )>, following?: Maybe<(
+      { __typename?: 'DAOFollowUDSchema' }
+      & Pick<DaoFollowUdSchema, 'total'>
+      & { followers?: Maybe<Array<Maybe<(
+        { __typename?: 'DAOFollowSchema' }
+        & Pick<DaoFollowSchema, 'createAt'>
+      )>>> }
+    )> }
+  )> }
+);
 
 export type DaoListQueryVariables = Exact<{
   filter?: Maybe<DaOsFilterEnum>;
@@ -1293,66 +1317,60 @@ export type DaoListQueryVariables = Exact<{
   offset?: Maybe<Scalars['Int']>;
 }>;
 
-export type DaoListQuery = { __typename?: 'Query' } & {
-  daos?: Maybe<
-    { __typename?: 'DAOs' } & Pick<DaOs, 'total'> & {
-        dao?: Maybe<
-          Array<
-            Maybe<
-              { __typename?: 'DAOItem' } & Pick<DaoItem, 'isFollowing' | 'isOwner'> & {
-                  datum?: Maybe<
-                    { __typename?: 'DAOSchema' } & Pick<
-                      DaoSchema,
-                      'createAt' | 'desc' | 'id' | 'logo' | 'name' | 'ownerId' | 'updateAt'
-                    >
-                  >;
-                  stat?: Maybe<
-                    { __typename?: 'DAOStat' } & Pick<
-                      DaoStat,
-                      'following' | 'job' | 'size' | 'token'
-                    >
-                  >;
-                }
-            >
-          >
-        >;
-        stat?: Maybe<{ __typename?: 'DAOsStat' } & Pick<DaOsStat, 'icpper' | 'size' | 'income'>>;
-      }
-  >;
-};
+
+export type DaoListQuery = (
+  { __typename?: 'Query' }
+  & { daos?: Maybe<(
+    { __typename?: 'DAOs' }
+    & Pick<DaOs, 'total'>
+    & { dao?: Maybe<Array<Maybe<(
+      { __typename?: 'DAOItem' }
+      & Pick<DaoItem, 'isFollowing' | 'isOwner'>
+      & { datum?: Maybe<(
+        { __typename?: 'DAOSchema' }
+        & Pick<DaoSchema, 'createAt' | 'desc' | 'id' | 'logo' | 'name' | 'ownerId' | 'updateAt'>
+      )>, stat?: Maybe<(
+        { __typename?: 'DAOStat' }
+        & Pick<DaoStat, 'following' | 'job' | 'size' | 'token'>
+      )> }
+    )>>>, stat?: Maybe<(
+      { __typename?: 'DAOsStat' }
+      & Pick<DaOsStat, 'icpper' | 'size' | 'income'>
+    )> }
+  )> }
+);
 
 export type UserJobDaoListQueryVariables = Exact<{
   userName?: Maybe<Scalars['String']>;
 }>;
 
-export type UserJobDaoListQuery = { __typename?: 'Query' } & {
-  daos?: Maybe<
-    { __typename?: 'DAOs' } & {
-      dao?: Maybe<
-        Array<
-          Maybe<
-            { __typename?: 'DAOItem' } & {
-              datum?: Maybe<{ __typename?: 'DAOSchema' } & Pick<DaoSchema, 'id' | 'name'>>;
-            }
-          >
-        >
-      >;
-    }
-  >;
-};
+
+export type UserJobDaoListQuery = (
+  { __typename?: 'Query' }
+  & { daos?: Maybe<(
+    { __typename?: 'DAOs' }
+    & { dao?: Maybe<Array<Maybe<(
+      { __typename?: 'DAOItem' }
+      & { datum?: Maybe<(
+        { __typename?: 'DAOSchema' }
+        & Pick<DaoSchema, 'id' | 'name'>
+      )> }
+    )>>> }
+  )> }
+);
 
 export type DaoGithubAppStatusQueryVariables = Exact<{
   name: Scalars['String'];
 }>;
 
-export type DaoGithubAppStatusQuery = { __typename?: 'Query' } & {
-  daoGithubAppStatus?: Maybe<
-    { __typename?: 'DAOGithubAppStatus' } & Pick<
-      DaoGithubAppStatus,
-      'githubAppName' | 'githubOrgId' | 'isExists' | 'isGithubOrgOwner' | 'isIcpAppInstalled'
-    >
-  >;
-};
+
+export type DaoGithubAppStatusQuery = (
+  { __typename?: 'Query' }
+  & { daoGithubAppStatus?: Maybe<(
+    { __typename?: 'DAOGithubAppStatus' }
+    & Pick<DaoGithubAppStatus, 'githubAppName' | 'githubOrgId' | 'isExists' | 'isGithubOrgOwner' | 'isIcpAppInstalled'>
+  )> }
+);
 
 export type JobListQueryVariables = Exact<{
   beginTime?: Maybe<Scalars['Int']>;
@@ -1365,46 +1383,27 @@ export type JobListQueryVariables = Exact<{
   userName?: Maybe<Scalars['String']>;
 }>;
 
-export type JobListQuery = { __typename?: 'Query' } & {
-  jobs?: Maybe<
-    { __typename?: 'Jobs' } & Pick<Jobs, 'total'> & {
-        job?: Maybe<
-          Array<
-            Maybe<
-              { __typename?: 'Job' } & {
-                node?: Maybe<
-                  { __typename?: 'JobSchema' } & Pick<
-                    JobSchema,
-                    | 'id'
-                    | 'title'
-                    | 'size'
-                    | 'status'
-                    | 'githubRepoOwner'
-                    | 'githubRepoName'
-                    | 'githubIssueNumber'
-                    | 'income'
-                  >
-                >;
-                prs?: Maybe<
-                  Array<
-                    Maybe<
-                      { __typename?: 'JobPRSchema' } & Pick<
-                        JobPrSchema,
-                        'id' | 'title' | 'githubRepoOwner' | 'githubRepoName' | 'githubPrNumber'
-                      >
-                    >
-                  >
-                >;
-              }
-            >
-          >
-        >;
-        stat?: Maybe<
-          { __typename?: 'JobsStat' } & Pick<JobsStat, 'size' | 'tokenCount' | 'tokenName'>
-        >;
-      }
-  >;
-};
+
+export type JobListQuery = (
+  { __typename?: 'Query' }
+  & { jobs?: Maybe<(
+    { __typename?: 'Jobs' }
+    & Pick<Jobs, 'total'>
+    & { job?: Maybe<Array<Maybe<(
+      { __typename?: 'Job' }
+      & { node?: Maybe<(
+        { __typename?: 'JobSchema' }
+        & Pick<JobSchema, 'id' | 'title' | 'size' | 'status' | 'githubRepoOwner' | 'githubRepoName' | 'githubIssueNumber' | 'income'>
+      )>, prs?: Maybe<Array<Maybe<(
+        { __typename?: 'JobPRSchema' }
+        & Pick<JobPrSchema, 'id' | 'title' | 'githubRepoOwner' | 'githubRepoName' | 'githubPrNumber'>
+      )>>> }
+    )>>>, stat?: Maybe<(
+      { __typename?: 'JobsStat' }
+      & Pick<JobsStat, 'size' | 'tokenCount' | 'tokenName'>
+    )> }
+  )> }
+);
 
 export type CycleJobListQueryVariables = Exact<{
   cycleId: Scalars['String'];
@@ -1415,43 +1414,27 @@ export type CycleJobListQueryVariables = Exact<{
   sortedType?: Maybe<JobsQuerySortedTypeEnum>;
 }>;
 
-export type CycleJobListQuery = { __typename?: 'Query' } & {
-  cycle?: Maybe<
-    { __typename?: 'CycleQuery' } & {
-      jobs?: Maybe<
-        { __typename?: 'JobsQuery' } & Pick<JobsQuery, 'total'> & {
-            nodes?: Maybe<
-              Array<
-                Maybe<
-                  { __typename?: 'JobQuery' } & {
-                    datum?: Maybe<
-                      { __typename?: 'JobSchema' } & Pick<
-                        JobSchema,
-                        | 'id'
-                        | 'githubRepoOwner'
-                        | 'githubRepoName'
-                        | 'githubIssueNumber'
-                        | 'title'
-                        | 'size'
-                        | 'income'
-                        | 'pairType'
-                      >
-                    >;
-                    user?: Maybe<
-                      { __typename?: 'UserSchema' } & Pick<
-                        UserSchema,
-                        'id' | 'avatar' | 'nickname' | 'githubLogin'
-                      >
-                    >;
-                  }
-                >
-              >
-            >;
-          }
-      >;
-    }
-  >;
-};
+
+export type CycleJobListQuery = (
+  { __typename?: 'Query' }
+  & { cycle?: Maybe<(
+    { __typename?: 'CycleQuery' }
+    & { jobs?: Maybe<(
+      { __typename?: 'JobsQuery' }
+      & Pick<JobsQuery, 'total'>
+      & { nodes?: Maybe<Array<Maybe<(
+        { __typename?: 'JobQuery' }
+        & { datum?: Maybe<(
+          { __typename?: 'JobSchema' }
+          & Pick<JobSchema, 'id' | 'githubRepoOwner' | 'githubRepoName' | 'githubIssueNumber' | 'title' | 'size' | 'income' | 'pairType'>
+        )>, user?: Maybe<(
+          { __typename?: 'UserSchema' }
+          & Pick<UserSchema, 'id' | 'avatar' | 'nickname' | 'githubLogin'>
+        )> }
+      )>>> }
+    )> }
+  )> }
+);
 
 export type CycleIcpperListQueryVariables = Exact<{
   cycleId: Scalars['String'];
@@ -1461,49 +1444,31 @@ export type CycleIcpperListQueryVariables = Exact<{
   sortedType?: Maybe<CycleIcpperStatSortedTypeEnum>;
 }>;
 
-export type CycleIcpperListQuery = { __typename?: 'Query' } & {
-  cycle?: Maybe<
-    { __typename?: 'CycleQuery' } & {
-      icpperStats?: Maybe<
-        { __typename?: 'IcpperStatsQuery' } & Pick<IcpperStatsQuery, 'total'> & {
-            nodes?: Maybe<
-              Array<
-                Maybe<
-                  { __typename?: 'IcpperStatQuery' } & Pick<IcpperStatQuery, 'lastEi'> & {
-                      datum?: Maybe<
-                        { __typename?: 'CycleIcpperStatSchema' } & Pick<
-                          CycleIcpperStatSchema,
-                          | 'id'
-                          | 'jobCount'
-                          | 'size'
-                          | 'income'
-                          | 'ei'
-                          | 'beDeductedSizeByReview'
-                          | 'haveTwoTimesLt04'
-                          | 'haveTwoTimesLt08'
-                          | 'unVotedAllVote'
-                        >
-                      >;
-                      icpper?: Maybe<
-                        { __typename?: 'UserSchema' } & Pick<
-                          UserSchema,
-                          'id' | 'avatar' | 'nickname' | 'githubLogin'
-                        >
-                      >;
-                      beReviewerHasWarningUsers?: Maybe<
-                        Array<
-                          Maybe<{ __typename?: 'UserSchema' } & Pick<UserSchema, 'id' | 'nickname'>>
-                        >
-                      >;
-                    }
-                >
-              >
-            >;
-          }
-      >;
-    }
-  >;
-};
+
+export type CycleIcpperListQuery = (
+  { __typename?: 'Query' }
+  & { cycle?: Maybe<(
+    { __typename?: 'CycleQuery' }
+    & { icpperStats?: Maybe<(
+      { __typename?: 'IcpperStatsQuery' }
+      & Pick<IcpperStatsQuery, 'total'>
+      & { nodes?: Maybe<Array<Maybe<(
+        { __typename?: 'IcpperStatQuery' }
+        & Pick<IcpperStatQuery, 'lastEi'>
+        & { datum?: Maybe<(
+          { __typename?: 'CycleIcpperStatSchema' }
+          & Pick<CycleIcpperStatSchema, 'id' | 'jobCount' | 'size' | 'income' | 'ei' | 'beDeductedSizeByReview' | 'haveTwoTimesLt04' | 'haveTwoTimesLt08' | 'unVotedAllVote'>
+        )>, icpper?: Maybe<(
+          { __typename?: 'UserSchema' }
+          & Pick<UserSchema, 'id' | 'avatar' | 'nickname' | 'githubLogin'>
+        )>, beReviewerHasWarningUsers?: Maybe<Array<Maybe<(
+          { __typename?: 'UserSchema' }
+          & Pick<UserSchema, 'id' | 'nickname'>
+        )>>> }
+      )>>> }
+    )> }
+  )> }
+);
 
 export type OwnerCycleIcpperListQueryVariables = Exact<{
   cycleId: Scalars['String'];
@@ -1513,51 +1478,31 @@ export type OwnerCycleIcpperListQueryVariables = Exact<{
   sortedType?: Maybe<CycleIcpperStatSortedTypeEnum>;
 }>;
 
-export type OwnerCycleIcpperListQuery = { __typename?: 'Query' } & {
-  cycle?: Maybe<
-    { __typename?: 'CycleQuery' } & {
-      icpperStats?: Maybe<
-        { __typename?: 'IcpperStatsQuery' } & Pick<IcpperStatsQuery, 'total'> & {
-            nodes?: Maybe<
-              Array<
-                Maybe<
-                  { __typename?: 'IcpperStatQuery' } & Pick<IcpperStatQuery, 'lastEi'> & {
-                      datum?: Maybe<
-                        { __typename?: 'CycleIcpperStatSchema' } & Pick<
-                          CycleIcpperStatSchema,
-                          | 'id'
-                          | 'jobCount'
-                          | 'size'
-                          | 'income'
-                          | 'ei'
-                          | 'ownerEi'
-                          | 'voteEi'
-                          | 'beDeductedSizeByReview'
-                          | 'haveTwoTimesLt04'
-                          | 'haveTwoTimesLt08'
-                          | 'unVotedAllVote'
-                        >
-                      >;
-                      icpper?: Maybe<
-                        { __typename?: 'UserSchema' } & Pick<
-                          UserSchema,
-                          'id' | 'avatar' | 'nickname' | 'githubLogin'
-                        >
-                      >;
-                      beReviewerHasWarningUsers?: Maybe<
-                        Array<
-                          Maybe<{ __typename?: 'UserSchema' } & Pick<UserSchema, 'id' | 'nickname'>>
-                        >
-                      >;
-                    }
-                >
-              >
-            >;
-          }
-      >;
-    }
-  >;
-};
+
+export type OwnerCycleIcpperListQuery = (
+  { __typename?: 'Query' }
+  & { cycle?: Maybe<(
+    { __typename?: 'CycleQuery' }
+    & { icpperStats?: Maybe<(
+      { __typename?: 'IcpperStatsQuery' }
+      & Pick<IcpperStatsQuery, 'total'>
+      & { nodes?: Maybe<Array<Maybe<(
+        { __typename?: 'IcpperStatQuery' }
+        & Pick<IcpperStatQuery, 'lastEi'>
+        & { datum?: Maybe<(
+          { __typename?: 'CycleIcpperStatSchema' }
+          & Pick<CycleIcpperStatSchema, 'id' | 'jobCount' | 'size' | 'income' | 'ei' | 'ownerEi' | 'voteEi' | 'beDeductedSizeByReview' | 'haveTwoTimesLt04' | 'haveTwoTimesLt08' | 'unVotedAllVote'>
+        )>, icpper?: Maybe<(
+          { __typename?: 'UserSchema' }
+          & Pick<UserSchema, 'id' | 'avatar' | 'nickname' | 'githubLogin'>
+        )>, beReviewerHasWarningUsers?: Maybe<Array<Maybe<(
+          { __typename?: 'UserSchema' }
+          & Pick<UserSchema, 'id' | 'nickname'>
+        )>>> }
+      )>>> }
+    )> }
+  )> }
+);
 
 export type CycleVoteListQueryVariables = Exact<{
   cycleId: Scalars['String'];
@@ -1567,255 +1512,184 @@ export type CycleVoteListQueryVariables = Exact<{
   isPublic?: Maybe<Scalars['Boolean']>;
 }>;
 
-export type CycleVoteListQuery = { __typename?: 'Query' } & {
-  cycle?: Maybe<
-    { __typename?: 'CycleQuery' } & {
-      datum?: Maybe<
-        { __typename?: 'CycleSchema' } & Pick<
-          CycleSchema,
-          'beginAt' | 'endAt' | 'voteBeginAt' | 'voteEndAt'
-        >
-      >;
-      votes?: Maybe<
-        { __typename?: 'CycleVotesQuery' } & Pick<CycleVotesQuery, 'total'> & {
-            nodes?: Maybe<
-              Array<
-                Maybe<
-                  { __typename?: 'CycleVoteQuery' } & {
-                    datum?: Maybe<
-                      { __typename?: 'CycleVoteSchema' } & Pick<
-                        CycleVoteSchema,
-                        | 'id'
-                        | 'isResultPublic'
-                        | 'voteJobId'
-                        | 'voteResultStatTypeAll'
-                        | 'voteType'
-                        | 'voterId'
-                      >
-                    >;
-                    leftJob?: Maybe<
-                      { __typename?: 'JobItemQuery' } & {
-                        datum?: Maybe<
-                          { __typename?: 'JobSchema' } & Pick<
-                            JobSchema,
-                            | 'title'
-                            | 'githubRepoOwner'
-                            | 'githubRepoName'
-                            | 'githubIssueNumber'
-                            | 'size'
-                            | 'pairType'
-                            | 'id'
-                          >
-                        >;
-                        user?: Maybe<
-                          { __typename?: 'UserSchema' } & Pick<
-                            UserSchema,
-                            'id' | 'githubLogin' | 'nickname'
-                          >
-                        >;
-                      }
-                    >;
-                    rightJob?: Maybe<
-                      { __typename?: 'JobItemQuery' } & {
-                        datum?: Maybe<
-                          { __typename?: 'JobSchema' } & Pick<
-                            JobSchema,
-                            | 'title'
-                            | 'githubRepoOwner'
-                            | 'githubRepoName'
-                            | 'githubIssueNumber'
-                            | 'pairType'
-                            | 'size'
-                            | 'id'
-                          >
-                        >;
-                        user?: Maybe<
-                          { __typename?: 'UserSchema' } & Pick<
-                            UserSchema,
-                            'id' | 'githubLogin' | 'nickname'
-                          >
-                        >;
-                      }
-                    >;
-                    voteJob?: Maybe<
-                      { __typename?: 'JobItemQuery' } & {
-                        datum?: Maybe<{ __typename?: 'JobSchema' } & Pick<JobSchema, 'id'>>;
-                      }
-                    >;
-                    voter?: Maybe<
-                      { __typename?: 'UserSchema' } & Pick<
-                        UserSchema,
-                        'id' | 'githubLogin' | 'nickname'
-                      >
-                    >;
-                  }
-                >
-              >
-            >;
-          }
-      >;
-    }
-  >;
-};
+
+export type CycleVoteListQuery = (
+  { __typename?: 'Query' }
+  & { cycle?: Maybe<(
+    { __typename?: 'CycleQuery' }
+    & { datum?: Maybe<(
+      { __typename?: 'CycleSchema' }
+      & Pick<CycleSchema, 'beginAt' | 'endAt' | 'voteBeginAt' | 'voteEndAt'>
+    )>, votes?: Maybe<(
+      { __typename?: 'CycleVotesQuery' }
+      & Pick<CycleVotesQuery, 'total'>
+      & { nodes?: Maybe<Array<Maybe<(
+        { __typename?: 'CycleVoteQuery' }
+        & { datum?: Maybe<(
+          { __typename?: 'CycleVoteSchema' }
+          & Pick<CycleVoteSchema, 'id' | 'isResultPublic' | 'voteJobId' | 'voteResultStatTypeAll' | 'voteType' | 'voterId'>
+        )>, leftJob?: Maybe<(
+          { __typename?: 'JobItemQuery' }
+          & { datum?: Maybe<(
+            { __typename?: 'JobSchema' }
+            & Pick<JobSchema, 'title' | 'githubRepoOwner' | 'githubRepoName' | 'githubIssueNumber' | 'size' | 'pairType' | 'id'>
+          )>, user?: Maybe<(
+            { __typename?: 'UserSchema' }
+            & Pick<UserSchema, 'id' | 'githubLogin' | 'nickname'>
+          )> }
+        )>, rightJob?: Maybe<(
+          { __typename?: 'JobItemQuery' }
+          & { datum?: Maybe<(
+            { __typename?: 'JobSchema' }
+            & Pick<JobSchema, 'title' | 'githubRepoOwner' | 'githubRepoName' | 'githubIssueNumber' | 'pairType' | 'size' | 'id'>
+          )>, user?: Maybe<(
+            { __typename?: 'UserSchema' }
+            & Pick<UserSchema, 'id' | 'githubLogin' | 'nickname'>
+          )> }
+        )>, voteJob?: Maybe<(
+          { __typename?: 'JobItemQuery' }
+          & { datum?: Maybe<(
+            { __typename?: 'JobSchema' }
+            & Pick<JobSchema, 'id'>
+          )> }
+        )>, voter?: Maybe<(
+          { __typename?: 'UserSchema' }
+          & Pick<UserSchema, 'id' | 'githubLogin' | 'nickname'>
+        )> }
+      )>>> }
+    )> }
+  )> }
+);
 
 export type DaoCycleQueryVariables = Exact<{
   daoId: Scalars['String'];
 }>;
 
-export type DaoCycleQuery = { __typename?: 'Query' } & {
-  dao?: Maybe<
-    { __typename?: 'DAO' } & {
-      cycles?: Maybe<
-        { __typename?: 'CyclesQuery' } & {
-          nodes?: Maybe<
-            Array<
-              Maybe<
-                { __typename?: 'CycleQuery' } & {
-                  datum?: Maybe<
-                    { __typename?: 'CycleSchema' } & Pick<
-                      CycleSchema,
-                      | 'id'
-                      | 'timeZone'
-                      | 'beginAt'
-                      | 'endAt'
-                      | 'pairBeginAt'
-                      | 'pairEndAt'
-                      | 'voteBeginAt'
-                      | 'voteEndAt'
-                      | 'pairedAt'
-                      | 'voteResultPublishedAt'
-                      | 'voteResultStatAt'
-                    >
-                  >;
-                }
-              >
-            >
-          >;
-        }
-      >;
-    }
-  >;
-};
+
+export type DaoCycleQuery = (
+  { __typename?: 'Query' }
+  & { dao?: Maybe<(
+    { __typename?: 'DAO' }
+    & { cycles?: Maybe<(
+      { __typename?: 'CyclesQuery' }
+      & { nodes?: Maybe<Array<Maybe<(
+        { __typename?: 'CycleQuery' }
+        & { datum?: Maybe<(
+          { __typename?: 'CycleSchema' }
+          & Pick<CycleSchema, 'id' | 'timeZone' | 'beginAt' | 'endAt' | 'pairBeginAt' | 'pairEndAt' | 'voteBeginAt' | 'voteEndAt' | 'pairedAt' | 'voteResultPublishedAt' | 'voteResultStatAt'>
+        )> }
+      )>>> }
+    )> }
+  )> }
+);
 
 export type CycleStatDataQueryVariables = Exact<{
   cycleId: Scalars['String'];
 }>;
 
-export type CycleStatDataQuery = { __typename?: 'Query' } & {
-  cycle?: Maybe<
-    { __typename?: 'CycleQuery' } & {
-      stat?: Maybe<
-        { __typename?: 'CycleStatQuery' } & Pick<
-          CycleStatQuery,
-          'icpperCount' | 'jobCount' | 'size'
-        >
-      >;
-    }
-  >;
-};
+
+export type CycleStatDataQuery = (
+  { __typename?: 'Query' }
+  & { cycle?: Maybe<(
+    { __typename?: 'CycleQuery' }
+    & { stat?: Maybe<(
+      { __typename?: 'CycleStatQuery' }
+      & Pick<CycleStatQuery, 'icpperCount' | 'jobCount' | 'size'>
+    )> }
+  )> }
+);
 
 export type CyclePairStatusQueryVariables = Exact<{
   cycleId: Scalars['String'];
 }>;
 
-export type CyclePairStatusQuery = { __typename?: 'Query' } & {
-  cycle?: Maybe<
-    { __typename?: 'CycleQuery' } & {
-      pairTask?: Maybe<
-        { __typename?: 'CycleVotePairTaskQuery' } & Pick<CycleVotePairTaskQuery, 'status'>
-      >;
-    }
-  >;
-};
+
+export type CyclePairStatusQuery = (
+  { __typename?: 'Query' }
+  & { cycle?: Maybe<(
+    { __typename?: 'CycleQuery' }
+    & { pairTask?: Maybe<(
+      { __typename?: 'CycleVotePairTaskQuery' }
+      & Pick<CycleVotePairTaskQuery, 'status'>
+    )> }
+  )> }
+);
 
 export type CycleVoteResultStatusQueryVariables = Exact<{
   cycleId: Scalars['String'];
 }>;
 
-export type CycleVoteResultStatusQuery = { __typename?: 'Query' } & {
-  cycle?: Maybe<
-    { __typename?: 'CycleQuery' } & {
-      voteResultStatTask?: Maybe<
-        { __typename?: 'CycleVoteResultStatTaskQuery' } & Pick<
-          CycleVoteResultStatTaskQuery,
-          'status'
-        >
-      >;
-    }
-  >;
-};
+
+export type CycleVoteResultStatusQuery = (
+  { __typename?: 'Query' }
+  & { cycle?: Maybe<(
+    { __typename?: 'CycleQuery' }
+    & { voteResultStatTask?: Maybe<(
+      { __typename?: 'CycleVoteResultStatTaskQuery' }
+      & Pick<CycleVoteResultStatTaskQuery, 'status'>
+    )> }
+  )> }
+);
 
 export type CyclePublishStatusQueryVariables = Exact<{
   cycleId: Scalars['String'];
 }>;
 
-export type CyclePublishStatusQuery = { __typename?: 'Query' } & {
-  cycle?: Maybe<
-    { __typename?: 'CycleQuery' } & {
-      voteResultPublishTask?: Maybe<
-        { __typename?: 'CycleVoteResultPublishTaskQuery' } & Pick<
-          CycleVoteResultPublishTaskQuery,
-          'status'
-        >
-      >;
-    }
-  >;
-};
+
+export type CyclePublishStatusQuery = (
+  { __typename?: 'Query' }
+  & { cycle?: Maybe<(
+    { __typename?: 'CycleQuery' }
+    & { voteResultPublishTask?: Maybe<(
+      { __typename?: 'CycleVoteResultPublishTaskQuery' }
+      & Pick<CycleVoteResultPublishTaskQuery, 'status'>
+    )> }
+  )> }
+);
 
 export type DaoVotingCycleQueryVariables = Exact<{
   daoId: Scalars['String'];
 }>;
 
-export type DaoVotingCycleQuery = { __typename?: 'Query' } & {
-  dao?: Maybe<
-    { __typename?: 'DAO' } & {
-      cycles?: Maybe<
-        { __typename?: 'CyclesQuery' } & {
-          nodes?: Maybe<
-            Array<
-              Maybe<
-                { __typename?: 'CycleQuery' } & {
-                  datum?: Maybe<
-                    { __typename?: 'CycleSchema' } & Pick<
-                      CycleSchema,
-                      'id' | 'beginAt' | 'endAt' | 'voteBeginAt' | 'voteEndAt'
-                    >
-                  >;
-                }
-              >
-            >
-          >;
-        }
-      >;
-    }
-  >;
-};
+
+export type DaoVotingCycleQuery = (
+  { __typename?: 'Query' }
+  & { dao?: Maybe<(
+    { __typename?: 'DAO' }
+    & { cycles?: Maybe<(
+      { __typename?: 'CyclesQuery' }
+      & { nodes?: Maybe<Array<Maybe<(
+        { __typename?: 'CycleQuery' }
+        & { datum?: Maybe<(
+          { __typename?: 'CycleSchema' }
+          & Pick<CycleSchema, 'id' | 'beginAt' | 'endAt' | 'voteBeginAt' | 'voteEndAt'>
+        )> }
+      )>>> }
+    )> }
+  )> }
+);
 
 export type DaoProcessingCycleQueryVariables = Exact<{
   daoId: Scalars['String'];
 }>;
 
-export type DaoProcessingCycleQuery = { __typename?: 'Query' } & {
-  dao?: Maybe<
-    { __typename?: 'DAO' } & {
-      cycles?: Maybe<
-        { __typename?: 'CyclesQuery' } & {
-          nodes?: Maybe<
-            Array<
-              Maybe<
-                { __typename?: 'CycleQuery' } & {
-                  datum?: Maybe<
-                    { __typename?: 'CycleSchema' } & Pick<CycleSchema, 'id' | 'beginAt' | 'endAt'>
-                  >;
-                }
-              >
-            >
-          >;
-        }
-      >;
-    }
-  >;
-};
+
+export type DaoProcessingCycleQuery = (
+  { __typename?: 'Query' }
+  & { dao?: Maybe<(
+    { __typename?: 'DAO' }
+    & { cycles?: Maybe<(
+      { __typename?: 'CyclesQuery' }
+      & { nodes?: Maybe<Array<Maybe<(
+        { __typename?: 'CycleQuery' }
+        & { datum?: Maybe<(
+          { __typename?: 'CycleSchema' }
+          & Pick<CycleSchema, 'id' | 'beginAt' | 'endAt'>
+        )> }
+      )>>> }
+    )> }
+  )> }
+);
 
 export type DaoCycleVoteListQueryVariables = Exact<{
   cycleId: Scalars['String'];
@@ -1823,99 +1697,55 @@ export type DaoCycleVoteListQueryVariables = Exact<{
   offset?: Maybe<Scalars['Int']>;
 }>;
 
-export type DaoCycleVoteListQuery = { __typename?: 'Query' } & {
-  cycle?: Maybe<
-    { __typename?: 'CycleQuery' } & {
-      datum?: Maybe<
-        { __typename?: 'CycleSchema' } & Pick<
-          CycleSchema,
-          'beginAt' | 'endAt' | 'voteBeginAt' | 'voteEndAt'
-        >
-      >;
-      votes?: Maybe<
-        { __typename?: 'CycleVotesQuery' } & Pick<CycleVotesQuery, 'total'> & {
-            nodes?: Maybe<
-              Array<
-                Maybe<
-                  { __typename?: 'CycleVoteQuery' } & Pick<
-                    CycleVoteQuery,
-                    'selfVoteResultTypeAll'
-                  > & {
-                      datum?: Maybe<
-                        { __typename?: 'CycleVoteSchema' } & Pick<
-                          CycleVoteSchema,
-                          | 'id'
-                          | 'isResultPublic'
-                          | 'voteJobId'
-                          | 'voteResultStatTypeAll'
-                          | 'voteType'
-                          | 'voterId'
-                        >
-                      >;
-                      leftJob?: Maybe<
-                        { __typename?: 'JobItemQuery' } & {
-                          datum?: Maybe<
-                            { __typename?: 'JobSchema' } & Pick<
-                              JobSchema,
-                              | 'title'
-                              | 'githubRepoOwner'
-                              | 'githubRepoName'
-                              | 'githubIssueNumber'
-                              | 'size'
-                              | 'pairType'
-                              | 'id'
-                            >
-                          >;
-                          user?: Maybe<
-                            { __typename?: 'UserSchema' } & Pick<
-                              UserSchema,
-                              'id' | 'githubLogin' | 'nickname'
-                            >
-                          >;
-                        }
-                      >;
-                      rightJob?: Maybe<
-                        { __typename?: 'JobItemQuery' } & {
-                          datum?: Maybe<
-                            { __typename?: 'JobSchema' } & Pick<
-                              JobSchema,
-                              | 'title'
-                              | 'githubRepoOwner'
-                              | 'githubRepoName'
-                              | 'githubIssueNumber'
-                              | 'pairType'
-                              | 'size'
-                              | 'id'
-                            >
-                          >;
-                          user?: Maybe<
-                            { __typename?: 'UserSchema' } & Pick<
-                              UserSchema,
-                              'id' | 'githubLogin' | 'nickname'
-                            >
-                          >;
-                        }
-                      >;
-                      voteJob?: Maybe<
-                        { __typename?: 'JobItemQuery' } & {
-                          datum?: Maybe<{ __typename?: 'JobSchema' } & Pick<JobSchema, 'id'>>;
-                        }
-                      >;
-                      voter?: Maybe<
-                        { __typename?: 'UserSchema' } & Pick<
-                          UserSchema,
-                          'id' | 'githubLogin' | 'nickname'
-                        >
-                      >;
-                    }
-                >
-              >
-            >;
-          }
-      >;
-    }
-  >;
-};
+
+export type DaoCycleVoteListQuery = (
+  { __typename?: 'Query' }
+  & { cycle?: Maybe<(
+    { __typename?: 'CycleQuery' }
+    & { datum?: Maybe<(
+      { __typename?: 'CycleSchema' }
+      & Pick<CycleSchema, 'beginAt' | 'endAt' | 'voteBeginAt' | 'voteEndAt'>
+    )>, votes?: Maybe<(
+      { __typename?: 'CycleVotesQuery' }
+      & Pick<CycleVotesQuery, 'total'>
+      & { nodes?: Maybe<Array<Maybe<(
+        { __typename?: 'CycleVoteQuery' }
+        & Pick<CycleVoteQuery, 'selfVoteResultTypeAll'>
+        & { datum?: Maybe<(
+          { __typename?: 'CycleVoteSchema' }
+          & Pick<CycleVoteSchema, 'id' | 'isResultPublic' | 'voteJobId' | 'voteResultStatTypeAll' | 'voteType' | 'voterId'>
+        )>, leftJob?: Maybe<(
+          { __typename?: 'JobItemQuery' }
+          & { datum?: Maybe<(
+            { __typename?: 'JobSchema' }
+            & Pick<JobSchema, 'title' | 'githubRepoOwner' | 'githubRepoName' | 'githubIssueNumber' | 'size' | 'pairType' | 'id'>
+          )>, user?: Maybe<(
+            { __typename?: 'UserSchema' }
+            & Pick<UserSchema, 'id' | 'githubLogin' | 'nickname'>
+          )> }
+        )>, rightJob?: Maybe<(
+          { __typename?: 'JobItemQuery' }
+          & { datum?: Maybe<(
+            { __typename?: 'JobSchema' }
+            & Pick<JobSchema, 'title' | 'githubRepoOwner' | 'githubRepoName' | 'githubIssueNumber' | 'pairType' | 'size' | 'id'>
+          )>, user?: Maybe<(
+            { __typename?: 'UserSchema' }
+            & Pick<UserSchema, 'id' | 'githubLogin' | 'nickname'>
+          )> }
+        )>, voteJob?: Maybe<(
+          { __typename?: 'JobItemQuery' }
+          & { datum?: Maybe<(
+            { __typename?: 'JobSchema' }
+            & Pick<JobSchema, 'id'>
+          )> }
+        )>, voter?: Maybe<(
+          { __typename?: 'UserSchema' }
+          & Pick<UserSchema, 'id' | 'githubLogin' | 'nickname'>
+        )> }
+      )>>> }
+    )> }
+  )> }
+);
 
 export type UserCycleIcpperStatListQueryVariables = Exact<{
   daoName: Scalars['String'];
@@ -1924,139 +1754,82 @@ export type UserCycleIcpperStatListQueryVariables = Exact<{
   offset: Scalars['Int'];
 }>;
 
-export type UserCycleIcpperStatListQuery = { __typename?: 'Query' } & {
-  icpperStats?: Maybe<
-    { __typename?: 'UserIcpperStatsQuery' } & Pick<UserIcpperStatsQuery, 'total'> & {
-        nodes?: Maybe<
-          Array<
-            Maybe<
-              { __typename?: 'IcpperStatQuery' } & Pick<IcpperStatQuery, 'lastEi'> & {
-                  datum?: Maybe<
-                    { __typename?: 'CycleIcpperStatSchema' } & Pick<
-                      CycleIcpperStatSchema,
-                      | 'id'
-                      | 'jobCount'
-                      | 'size'
-                      | 'income'
-                      | 'ei'
-                      | 'beDeductedSizeByReview'
-                      | 'haveTwoTimesLt04'
-                      | 'haveTwoTimesLt08'
-                      | 'unVotedAllVote'
-                    >
-                  >;
-                  cycle?: Maybe<
-                    { __typename?: 'CycleSchema' } & Pick<
-                      CycleSchema,
-                      | 'id'
-                      | 'timeZone'
-                      | 'beginAt'
-                      | 'endAt'
-                      | 'pairBeginAt'
-                      | 'pairEndAt'
-                      | 'voteBeginAt'
-                      | 'voteEndAt'
-                      | 'pairedAt'
-                      | 'voteResultPublishedAt'
-                      | 'createAt'
-                      | 'updateAt'
-                    >
-                  >;
-                  icpper?: Maybe<
-                    { __typename?: 'UserSchema' } & Pick<
-                      UserSchema,
-                      'id' | 'avatar' | 'nickname' | 'githubLogin'
-                    >
-                  >;
-                  beReviewerHasWarningUsers?: Maybe<
-                    Array<
-                      Maybe<{ __typename?: 'UserSchema' } & Pick<UserSchema, 'id' | 'nickname'>>
-                    >
-                  >;
-                }
-            >
-          >
-        >;
-      }
-  >;
-};
+
+export type UserCycleIcpperStatListQuery = (
+  { __typename?: 'Query' }
+  & { icpperStats?: Maybe<(
+    { __typename?: 'UserIcpperStatsQuery' }
+    & Pick<UserIcpperStatsQuery, 'total'>
+    & { nodes?: Maybe<Array<Maybe<(
+      { __typename?: 'IcpperStatQuery' }
+      & Pick<IcpperStatQuery, 'lastEi'>
+      & { datum?: Maybe<(
+        { __typename?: 'CycleIcpperStatSchema' }
+        & Pick<CycleIcpperStatSchema, 'id' | 'jobCount' | 'size' | 'income' | 'ei' | 'beDeductedSizeByReview' | 'haveTwoTimesLt04' | 'haveTwoTimesLt08' | 'unVotedAllVote'>
+      )>, cycle?: Maybe<(
+        { __typename?: 'CycleSchema' }
+        & Pick<CycleSchema, 'id' | 'timeZone' | 'beginAt' | 'endAt' | 'pairBeginAt' | 'pairEndAt' | 'voteBeginAt' | 'voteEndAt' | 'pairedAt' | 'voteResultPublishedAt' | 'createAt' | 'updateAt'>
+      )>, icpper?: Maybe<(
+        { __typename?: 'UserSchema' }
+        & Pick<UserSchema, 'id' | 'avatar' | 'nickname' | 'githubLogin'>
+      )>, beReviewerHasWarningUsers?: Maybe<Array<Maybe<(
+        { __typename?: 'UserSchema' }
+        & Pick<UserSchema, 'id' | 'nickname'>
+      )>>> }
+    )>>> }
+  )> }
+);
 
 export type CyclesByTokenUnreleasedListQueryVariables = Exact<{
   lastTimestamp: Scalars['Int'];
 }>;
 
-export type CyclesByTokenUnreleasedListQuery = { __typename?: 'Query' } & {
-  cyclesByTokenUnreleased?: Maybe<
-    { __typename?: 'CycleByTokenUnreleasedQuery' } & {
-      nodes?: Maybe<
-        Array<
-          Maybe<
-            { __typename?: 'CycleQuery' } & {
-              datum?: Maybe<
-                { __typename?: 'CycleSchema' } & Pick<
-                  CycleSchema,
-                  'id' | 'daoId' | 'timeZone' | 'beginAt' | 'endAt' | 'voteResultPublishedAt'
-                >
-              >;
-              icpperStats?: Maybe<
-                { __typename?: 'IcpperStatsQuery' } & {
-                  nodes?: Maybe<
-                    Array<
-                      Maybe<
-                        { __typename?: 'IcpperStatQuery' } & {
-                          datum?: Maybe<
-                            { __typename?: 'CycleIcpperStatSchema' } & Pick<
-                              CycleIcpperStatSchema,
-                              'cycleId' | 'jobSize' | 'size'
-                            >
-                          >;
-                          icpper?: Maybe<
-                            { __typename?: 'UserSchema' } & Pick<
-                              UserSchema,
-                              'id' | 'githubLogin' | 'nickname' | 'erc20Address'
-                            >
-                          >;
-                        }
-                      >
-                    >
-                  >;
-                }
-              >;
-            }
-          >
-        >
-      >;
-    }
-  >;
-};
+
+export type CyclesByTokenUnreleasedListQuery = (
+  { __typename?: 'Query' }
+  & { cyclesByTokenUnreleased?: Maybe<(
+    { __typename?: 'CycleByTokenUnreleasedQuery' }
+    & { nodes?: Maybe<Array<Maybe<(
+      { __typename?: 'CycleQuery' }
+      & { datum?: Maybe<(
+        { __typename?: 'CycleSchema' }
+        & Pick<CycleSchema, 'id' | 'daoId' | 'timeZone' | 'beginAt' | 'endAt' | 'voteResultPublishedAt'>
+      )>, icpperStats?: Maybe<(
+        { __typename?: 'IcpperStatsQuery' }
+        & { nodes?: Maybe<Array<Maybe<(
+          { __typename?: 'IcpperStatQuery' }
+          & { datum?: Maybe<(
+            { __typename?: 'CycleIcpperStatSchema' }
+            & Pick<CycleIcpperStatSchema, 'cycleId' | 'jobSize' | 'size'>
+          )>, icpper?: Maybe<(
+            { __typename?: 'UserSchema' }
+            & Pick<UserSchema, 'id' | 'githubLogin' | 'nickname' | 'erc20Address'>
+          )> }
+        )>>> }
+      )> }
+    )>>> }
+  )> }
+);
+
 
 export const CreateDaoDocument = gql`
-  mutation CreateDAO(
-    $name: String!
-    $desc: String!
-    $logo: String!
-    $timeZone: Int!
-    $timeZoneRegion: String!
+    mutation CreateDAO($name: String!, $desc: String!, $logo: String!, $timeZone: Int!, $timeZoneRegion: String!) {
+  createDao(
+    name: $name
+    desc: $desc
+    logo: $logo
+    timeZone: $timeZone
+    timeZoneRegion: $timeZoneRegion
   ) {
-    createDao(
-      name: $name
-      desc: $desc
-      logo: $logo
-      timeZone: $timeZone
-      timeZoneRegion: $timeZoneRegion
-    ) {
-      dao {
-        id
-        number
-        createAt
-      }
+    dao {
+      id
+      number
+      createAt
     }
   }
-`;
-export type CreateDaoMutationFn = Apollo.MutationFunction<
-  CreateDaoMutation,
-  CreateDaoMutationVariables
->;
+}
+    `;
+export type CreateDaoMutationFn = Apollo.MutationFunction<CreateDaoMutation, CreateDaoMutationVariables>;
 
 /**
  * __useCreateDaoMutation__
@@ -2079,60 +1852,35 @@ export type CreateDaoMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useCreateDaoMutation(
-  baseOptions?: Apollo.MutationHookOptions<CreateDaoMutation, CreateDaoMutationVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<CreateDaoMutation, CreateDaoMutationVariables>(
-    CreateDaoDocument,
-    options,
-  );
-}
+export function useCreateDaoMutation(baseOptions?: Apollo.MutationHookOptions<CreateDaoMutation, CreateDaoMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateDaoMutation, CreateDaoMutationVariables>(CreateDaoDocument, options);
+      }
 export type CreateDaoMutationHookResult = ReturnType<typeof useCreateDaoMutation>;
 export type CreateDaoMutationResult = Apollo.MutationResult<CreateDaoMutation>;
-export type CreateDaoMutationOptions = Apollo.BaseMutationOptions<
-  CreateDaoMutation,
-  CreateDaoMutationVariables
->;
+export type CreateDaoMutationOptions = Apollo.BaseMutationOptions<CreateDaoMutation, CreateDaoMutationVariables>;
 export const UpdateDaoJobConfigDocument = gql`
-  mutation UpdateDAOJobConfig(
-    $daoId: String!
-    $deadlineDay: Int
-    $deadlineTime: Int
-    $pairBeginDay: Int
-    $pairBeginHour: Int
-    $pairEndDay: Int
-    $pairEndHour: Int
-    $votingBeginDay: Int
-    $votingBeginHour: Int
-    $votingEndDay: Int
-    $votingEndHour: Int
-    $timeZoneRegion: String
-    $timeZone: Int
+    mutation UpdateDAOJobConfig($daoId: String!, $deadlineDay: Int, $deadlineTime: Int, $pairBeginDay: Int, $pairBeginHour: Int, $pairEndDay: Int, $pairEndHour: Int, $votingBeginDay: Int, $votingBeginHour: Int, $votingEndDay: Int, $votingEndHour: Int, $timeZoneRegion: String, $timeZone: Int) {
+  updateDaoJobConfig(
+    daoId: $daoId
+    deadlineDay: $deadlineDay
+    deadlineTime: $deadlineTime
+    pairBeginDay: $pairBeginDay
+    pairBeginHour: $pairBeginHour
+    pairEndDay: $pairEndDay
+    pairEndHour: $pairEndHour
+    votingBeginDay: $votingBeginDay
+    votingBeginHour: $votingBeginHour
+    votingEndDay: $votingEndDay
+    votingEndHour: $votingEndHour
+    timeZone: $timeZone
+    timeZoneRegion: $timeZoneRegion
   ) {
-    updateDaoJobConfig(
-      daoId: $daoId
-      deadlineDay: $deadlineDay
-      deadlineTime: $deadlineTime
-      pairBeginDay: $pairBeginDay
-      pairBeginHour: $pairBeginHour
-      pairEndDay: $pairEndDay
-      pairEndHour: $pairEndHour
-      votingBeginDay: $votingBeginDay
-      votingBeginHour: $votingBeginHour
-      votingEndDay: $votingEndDay
-      votingEndHour: $votingEndHour
-      timeZone: $timeZone
-      timeZoneRegion: $timeZoneRegion
-    ) {
-      ok
-    }
+    ok
   }
-`;
-export type UpdateDaoJobConfigMutationFn = Apollo.MutationFunction<
-  UpdateDaoJobConfigMutation,
-  UpdateDaoJobConfigMutationVariables
->;
+}
+    `;
+export type UpdateDaoJobConfigMutationFn = Apollo.MutationFunction<UpdateDaoJobConfigMutation, UpdateDaoJobConfigMutationVariables>;
 
 /**
  * __useUpdateDaoJobConfigMutation__
@@ -2163,35 +1911,21 @@ export type UpdateDaoJobConfigMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useUpdateDaoJobConfigMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    UpdateDaoJobConfigMutation,
-    UpdateDaoJobConfigMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<UpdateDaoJobConfigMutation, UpdateDaoJobConfigMutationVariables>(
-    UpdateDaoJobConfigDocument,
-    options,
-  );
-}
+export function useUpdateDaoJobConfigMutation(baseOptions?: Apollo.MutationHookOptions<UpdateDaoJobConfigMutation, UpdateDaoJobConfigMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateDaoJobConfigMutation, UpdateDaoJobConfigMutationVariables>(UpdateDaoJobConfigDocument, options);
+      }
 export type UpdateDaoJobConfigMutationHookResult = ReturnType<typeof useUpdateDaoJobConfigMutation>;
 export type UpdateDaoJobConfigMutationResult = Apollo.MutationResult<UpdateDaoJobConfigMutation>;
-export type UpdateDaoJobConfigMutationOptions = Apollo.BaseMutationOptions<
-  UpdateDaoJobConfigMutation,
-  UpdateDaoJobConfigMutationVariables
->;
+export type UpdateDaoJobConfigMutationOptions = Apollo.BaseMutationOptions<UpdateDaoJobConfigMutation, UpdateDaoJobConfigMutationVariables>;
 export const FollowDaoDocument = gql`
-  mutation FollowDAO($daoId: String!, $followType: DAOFollowTypeEnum!) {
-    updateDaoFollow(daoId: $daoId, type: $followType) {
-      ok
-    }
+    mutation FollowDAO($daoId: String!, $followType: DAOFollowTypeEnum!) {
+  updateDaoFollow(daoId: $daoId, type: $followType) {
+    ok
   }
-`;
-export type FollowDaoMutationFn = Apollo.MutationFunction<
-  FollowDaoMutation,
-  FollowDaoMutationVariables
->;
+}
+    `;
+export type FollowDaoMutationFn = Apollo.MutationFunction<FollowDaoMutation, FollowDaoMutationVariables>;
 
 /**
  * __useFollowDaoMutation__
@@ -2211,34 +1945,23 @@ export type FollowDaoMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useFollowDaoMutation(
-  baseOptions?: Apollo.MutationHookOptions<FollowDaoMutation, FollowDaoMutationVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<FollowDaoMutation, FollowDaoMutationVariables>(
-    FollowDaoDocument,
-    options,
-  );
-}
+export function useFollowDaoMutation(baseOptions?: Apollo.MutationHookOptions<FollowDaoMutation, FollowDaoMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<FollowDaoMutation, FollowDaoMutationVariables>(FollowDaoDocument, options);
+      }
 export type FollowDaoMutationHookResult = ReturnType<typeof useFollowDaoMutation>;
 export type FollowDaoMutationResult = Apollo.MutationResult<FollowDaoMutation>;
-export type FollowDaoMutationOptions = Apollo.BaseMutationOptions<
-  FollowDaoMutation,
-  FollowDaoMutationVariables
->;
+export type FollowDaoMutationOptions = Apollo.BaseMutationOptions<FollowDaoMutation, FollowDaoMutationVariables>;
 export const UpdateDaoBaseInfoDocument = gql`
-  mutation UpdateDAOBaseInfo($id: String!, $desc: String, $logo: String) {
-    updateDaoBaseInfo(id: $id, desc: $desc, logo: $logo) {
-      dao {
-        updateAt
-      }
+    mutation UpdateDAOBaseInfo($id: String!, $desc: String, $logo: String) {
+  updateDaoBaseInfo(id: $id, desc: $desc, logo: $logo) {
+    dao {
+      updateAt
     }
   }
-`;
-export type UpdateDaoBaseInfoMutationFn = Apollo.MutationFunction<
-  UpdateDaoBaseInfoMutation,
-  UpdateDaoBaseInfoMutationVariables
->;
+}
+    `;
+export type UpdateDaoBaseInfoMutationFn = Apollo.MutationFunction<UpdateDaoBaseInfoMutation, UpdateDaoBaseInfoMutationVariables>;
 
 /**
  * __useUpdateDaoBaseInfoMutation__
@@ -2259,41 +1982,27 @@ export type UpdateDaoBaseInfoMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useUpdateDaoBaseInfoMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    UpdateDaoBaseInfoMutation,
-    UpdateDaoBaseInfoMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<UpdateDaoBaseInfoMutation, UpdateDaoBaseInfoMutationVariables>(
-    UpdateDaoBaseInfoDocument,
-    options,
-  );
-}
+export function useUpdateDaoBaseInfoMutation(baseOptions?: Apollo.MutationHookOptions<UpdateDaoBaseInfoMutation, UpdateDaoBaseInfoMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateDaoBaseInfoMutation, UpdateDaoBaseInfoMutationVariables>(UpdateDaoBaseInfoDocument, options);
+      }
 export type UpdateDaoBaseInfoMutationHookResult = ReturnType<typeof useUpdateDaoBaseInfoMutation>;
 export type UpdateDaoBaseInfoMutationResult = Apollo.MutationResult<UpdateDaoBaseInfoMutation>;
-export type UpdateDaoBaseInfoMutationOptions = Apollo.BaseMutationOptions<
-  UpdateDaoBaseInfoMutation,
-  UpdateDaoBaseInfoMutationVariables
->;
+export type UpdateDaoBaseInfoMutationOptions = Apollo.BaseMutationOptions<UpdateDaoBaseInfoMutation, UpdateDaoBaseInfoMutationVariables>;
 export const CreateJobDocument = gql`
-  mutation CreateJob($issueLink: String!, $size: Float!) {
-    createJob(issueLink: $issueLink, size: $size) {
-      job {
-        node {
-          id
-          daoId
-          githubRepoOwner
-        }
+    mutation CreateJob($issueLink: String!, $size: Float!) {
+  createJob(issueLink: $issueLink, size: $size) {
+    job {
+      node {
+        id
+        daoId
+        githubRepoOwner
       }
     }
   }
-`;
-export type CreateJobMutationFn = Apollo.MutationFunction<
-  CreateJobMutation,
-  CreateJobMutationVariables
->;
+}
+    `;
+export type CreateJobMutationFn = Apollo.MutationFunction<CreateJobMutation, CreateJobMutationVariables>;
 
 /**
  * __useCreateJobMutation__
@@ -2313,36 +2022,25 @@ export type CreateJobMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useCreateJobMutation(
-  baseOptions?: Apollo.MutationHookOptions<CreateJobMutation, CreateJobMutationVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<CreateJobMutation, CreateJobMutationVariables>(
-    CreateJobDocument,
-    options,
-  );
-}
+export function useCreateJobMutation(baseOptions?: Apollo.MutationHookOptions<CreateJobMutation, CreateJobMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateJobMutation, CreateJobMutationVariables>(CreateJobDocument, options);
+      }
 export type CreateJobMutationHookResult = ReturnType<typeof useCreateJobMutation>;
 export type CreateJobMutationResult = Apollo.MutationResult<CreateJobMutation>;
-export type CreateJobMutationOptions = Apollo.BaseMutationOptions<
-  CreateJobMutation,
-  CreateJobMutationVariables
->;
+export type CreateJobMutationOptions = Apollo.BaseMutationOptions<CreateJobMutation, CreateJobMutationVariables>;
 export const UpdateJobSizeDocument = gql`
-  mutation UpdateJobSize($id: String!, $size: Float!) {
-    updateJob(id: $id, size: $size) {
-      job {
-        node {
-          id
-        }
+    mutation UpdateJobSize($id: String!, $size: Float!) {
+  updateJob(id: $id, size: $size) {
+    job {
+      node {
+        id
       }
     }
   }
-`;
-export type UpdateJobSizeMutationFn = Apollo.MutationFunction<
-  UpdateJobSizeMutation,
-  UpdateJobSizeMutationVariables
->;
+}
+    `;
+export type UpdateJobSizeMutationFn = Apollo.MutationFunction<UpdateJobSizeMutation, UpdateJobSizeMutationVariables>;
 
 /**
  * __useUpdateJobSizeMutation__
@@ -2362,32 +2060,21 @@ export type UpdateJobSizeMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useUpdateJobSizeMutation(
-  baseOptions?: Apollo.MutationHookOptions<UpdateJobSizeMutation, UpdateJobSizeMutationVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<UpdateJobSizeMutation, UpdateJobSizeMutationVariables>(
-    UpdateJobSizeDocument,
-    options,
-  );
-}
+export function useUpdateJobSizeMutation(baseOptions?: Apollo.MutationHookOptions<UpdateJobSizeMutation, UpdateJobSizeMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateJobSizeMutation, UpdateJobSizeMutationVariables>(UpdateJobSizeDocument, options);
+      }
 export type UpdateJobSizeMutationHookResult = ReturnType<typeof useUpdateJobSizeMutation>;
 export type UpdateJobSizeMutationResult = Apollo.MutationResult<UpdateJobSizeMutation>;
-export type UpdateJobSizeMutationOptions = Apollo.BaseMutationOptions<
-  UpdateJobSizeMutation,
-  UpdateJobSizeMutationVariables
->;
+export type UpdateJobSizeMutationOptions = Apollo.BaseMutationOptions<UpdateJobSizeMutation, UpdateJobSizeMutationVariables>;
 export const DeleteJobDocument = gql`
-  mutation DeleteJob($id: String!) {
-    deleteJob(id: $id) {
-      ok
-    }
+    mutation DeleteJob($id: String!) {
+  deleteJob(id: $id) {
+    ok
   }
-`;
-export type DeleteJobMutationFn = Apollo.MutationFunction<
-  DeleteJobMutation,
-  DeleteJobMutationVariables
->;
+}
+    `;
+export type DeleteJobMutationFn = Apollo.MutationFunction<DeleteJobMutation, DeleteJobMutationVariables>;
 
 /**
  * __useDeleteJobMutation__
@@ -2406,35 +2093,21 @@ export type DeleteJobMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useDeleteJobMutation(
-  baseOptions?: Apollo.MutationHookOptions<DeleteJobMutation, DeleteJobMutationVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<DeleteJobMutation, DeleteJobMutationVariables>(
-    DeleteJobDocument,
-    options,
-  );
-}
+export function useDeleteJobMutation(baseOptions?: Apollo.MutationHookOptions<DeleteJobMutation, DeleteJobMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteJobMutation, DeleteJobMutationVariables>(DeleteJobDocument, options);
+      }
 export type DeleteJobMutationHookResult = ReturnType<typeof useDeleteJobMutation>;
 export type DeleteJobMutationResult = Apollo.MutationResult<DeleteJobMutation>;
-export type DeleteJobMutationOptions = Apollo.BaseMutationOptions<
-  DeleteJobMutation,
-  DeleteJobMutationVariables
->;
+export type DeleteJobMutationOptions = Apollo.BaseMutationOptions<DeleteJobMutation, DeleteJobMutationVariables>;
 export const UpdateCycleJobVoteTypeByOwnerDocument = gql`
-  mutation UpdateCycleJobVoteTypeByOwner(
-    $jobId: String!
-    $voteType: UpdateJobVoteTypeByOwnerArgumentPairTypeEnum
-  ) {
-    updateJobVoteTypeByOwner(id: $jobId, voteType: $voteType) {
-      ok
-    }
+    mutation UpdateCycleJobVoteTypeByOwner($jobId: String!, $voteType: UpdateJobVoteTypeByOwnerArgumentPairTypeEnum) {
+  updateJobVoteTypeByOwner(id: $jobId, voteType: $voteType) {
+    ok
   }
-`;
-export type UpdateCycleJobVoteTypeByOwnerMutationFn = Apollo.MutationFunction<
-  UpdateCycleJobVoteTypeByOwnerMutation,
-  UpdateCycleJobVoteTypeByOwnerMutationVariables
->;
+}
+    `;
+export type UpdateCycleJobVoteTypeByOwnerMutationFn = Apollo.MutationFunction<UpdateCycleJobVoteTypeByOwnerMutation, UpdateCycleJobVoteTypeByOwnerMutationVariables>;
 
 /**
  * __useUpdateCycleJobVoteTypeByOwnerMutation__
@@ -2454,49 +2127,32 @@ export type UpdateCycleJobVoteTypeByOwnerMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useUpdateCycleJobVoteTypeByOwnerMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    UpdateCycleJobVoteTypeByOwnerMutation,
-    UpdateCycleJobVoteTypeByOwnerMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    UpdateCycleJobVoteTypeByOwnerMutation,
-    UpdateCycleJobVoteTypeByOwnerMutationVariables
-  >(UpdateCycleJobVoteTypeByOwnerDocument, options);
-}
-export type UpdateCycleJobVoteTypeByOwnerMutationHookResult = ReturnType<
-  typeof useUpdateCycleJobVoteTypeByOwnerMutation
->;
-export type UpdateCycleJobVoteTypeByOwnerMutationResult =
-  Apollo.MutationResult<UpdateCycleJobVoteTypeByOwnerMutation>;
-export type UpdateCycleJobVoteTypeByOwnerMutationOptions = Apollo.BaseMutationOptions<
-  UpdateCycleJobVoteTypeByOwnerMutation,
-  UpdateCycleJobVoteTypeByOwnerMutationVariables
->;
+export function useUpdateCycleJobVoteTypeByOwnerMutation(baseOptions?: Apollo.MutationHookOptions<UpdateCycleJobVoteTypeByOwnerMutation, UpdateCycleJobVoteTypeByOwnerMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateCycleJobVoteTypeByOwnerMutation, UpdateCycleJobVoteTypeByOwnerMutationVariables>(UpdateCycleJobVoteTypeByOwnerDocument, options);
+      }
+export type UpdateCycleJobVoteTypeByOwnerMutationHookResult = ReturnType<typeof useUpdateCycleJobVoteTypeByOwnerMutation>;
+export type UpdateCycleJobVoteTypeByOwnerMutationResult = Apollo.MutationResult<UpdateCycleJobVoteTypeByOwnerMutation>;
+export type UpdateCycleJobVoteTypeByOwnerMutationOptions = Apollo.BaseMutationOptions<UpdateCycleJobVoteTypeByOwnerMutation, UpdateCycleJobVoteTypeByOwnerMutationVariables>;
 export const AddJobPrDocument = gql`
-  mutation AddJobPR($id: String!, $addPr: String!) {
-    updateJob(id: $id, addPr: $addPr) {
-      job {
-        node {
-          id
-        }
-        prs {
-          id
-          title
-          githubRepoOwner
-          githubRepoName
-          githubPrNumber
-        }
+    mutation AddJobPR($id: String!, $addPr: String!) {
+  updateJob(id: $id, addPr: $addPr) {
+    job {
+      node {
+        id
+      }
+      prs {
+        id
+        title
+        githubRepoOwner
+        githubRepoName
+        githubPrNumber
       }
     }
   }
-`;
-export type AddJobPrMutationFn = Apollo.MutationFunction<
-  AddJobPrMutation,
-  AddJobPrMutationVariables
->;
+}
+    `;
+export type AddJobPrMutationFn = Apollo.MutationFunction<AddJobPrMutation, AddJobPrMutationVariables>;
 
 /**
  * __useAddJobPrMutation__
@@ -2516,40 +2172,32 @@ export type AddJobPrMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useAddJobPrMutation(
-  baseOptions?: Apollo.MutationHookOptions<AddJobPrMutation, AddJobPrMutationVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<AddJobPrMutation, AddJobPrMutationVariables>(AddJobPrDocument, options);
-}
+export function useAddJobPrMutation(baseOptions?: Apollo.MutationHookOptions<AddJobPrMutation, AddJobPrMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddJobPrMutation, AddJobPrMutationVariables>(AddJobPrDocument, options);
+      }
 export type AddJobPrMutationHookResult = ReturnType<typeof useAddJobPrMutation>;
 export type AddJobPrMutationResult = Apollo.MutationResult<AddJobPrMutation>;
-export type AddJobPrMutationOptions = Apollo.BaseMutationOptions<
-  AddJobPrMutation,
-  AddJobPrMutationVariables
->;
+export type AddJobPrMutationOptions = Apollo.BaseMutationOptions<AddJobPrMutation, AddJobPrMutationVariables>;
 export const DeleteJobPrDocument = gql`
-  mutation DeleteJobPR($id: String!, $deletePr: String!) {
-    updateJob(id: $id, deletePr: $deletePr) {
-      job {
-        node {
-          id
-        }
-        prs {
-          id
-          title
-          githubRepoOwner
-          githubRepoName
-          githubPrNumber
-        }
+    mutation DeleteJobPR($id: String!, $deletePr: String!) {
+  updateJob(id: $id, deletePr: $deletePr) {
+    job {
+      node {
+        id
+      }
+      prs {
+        id
+        title
+        githubRepoOwner
+        githubRepoName
+        githubPrNumber
       }
     }
   }
-`;
-export type DeleteJobPrMutationFn = Apollo.MutationFunction<
-  DeleteJobPrMutation,
-  DeleteJobPrMutationVariables
->;
+}
+    `;
+export type DeleteJobPrMutationFn = Apollo.MutationFunction<DeleteJobPrMutation, DeleteJobPrMutationVariables>;
 
 /**
  * __useDeleteJobPrMutation__
@@ -2569,32 +2217,21 @@ export type DeleteJobPrMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useDeleteJobPrMutation(
-  baseOptions?: Apollo.MutationHookOptions<DeleteJobPrMutation, DeleteJobPrMutationVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<DeleteJobPrMutation, DeleteJobPrMutationVariables>(
-    DeleteJobPrDocument,
-    options,
-  );
-}
+export function useDeleteJobPrMutation(baseOptions?: Apollo.MutationHookOptions<DeleteJobPrMutation, DeleteJobPrMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteJobPrMutation, DeleteJobPrMutationVariables>(DeleteJobPrDocument, options);
+      }
 export type DeleteJobPrMutationHookResult = ReturnType<typeof useDeleteJobPrMutation>;
 export type DeleteJobPrMutationResult = Apollo.MutationResult<DeleteJobPrMutation>;
-export type DeleteJobPrMutationOptions = Apollo.BaseMutationOptions<
-  DeleteJobPrMutation,
-  DeleteJobPrMutationVariables
->;
+export type DeleteJobPrMutationOptions = Apollo.BaseMutationOptions<DeleteJobPrMutation, DeleteJobPrMutationVariables>;
 export const UpdateAllVoteDocument = gql`
-  mutation UpdateAllVote($voteId: String!, $vote: Boolean!) {
-    updateAllVote(id: $voteId, vote: $vote) {
-      ok
-    }
+    mutation UpdateAllVote($voteId: String!, $vote: Boolean!) {
+  updateAllVote(id: $voteId, vote: $vote) {
+    ok
   }
-`;
-export type UpdateAllVoteMutationFn = Apollo.MutationFunction<
-  UpdateAllVoteMutation,
-  UpdateAllVoteMutationVariables
->;
+}
+    `;
+export type UpdateAllVoteMutationFn = Apollo.MutationFunction<UpdateAllVoteMutation, UpdateAllVoteMutationVariables>;
 
 /**
  * __useUpdateAllVoteMutation__
@@ -2614,32 +2251,21 @@ export type UpdateAllVoteMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useUpdateAllVoteMutation(
-  baseOptions?: Apollo.MutationHookOptions<UpdateAllVoteMutation, UpdateAllVoteMutationVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<UpdateAllVoteMutation, UpdateAllVoteMutationVariables>(
-    UpdateAllVoteDocument,
-    options,
-  );
-}
+export function useUpdateAllVoteMutation(baseOptions?: Apollo.MutationHookOptions<UpdateAllVoteMutation, UpdateAllVoteMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateAllVoteMutation, UpdateAllVoteMutationVariables>(UpdateAllVoteDocument, options);
+      }
 export type UpdateAllVoteMutationHookResult = ReturnType<typeof useUpdateAllVoteMutation>;
 export type UpdateAllVoteMutationResult = Apollo.MutationResult<UpdateAllVoteMutation>;
-export type UpdateAllVoteMutationOptions = Apollo.BaseMutationOptions<
-  UpdateAllVoteMutation,
-  UpdateAllVoteMutationVariables
->;
+export type UpdateAllVoteMutationOptions = Apollo.BaseMutationOptions<UpdateAllVoteMutation, UpdateAllVoteMutationVariables>;
 export const UpdatePairVoteDocument = gql`
-  mutation UpdatePairVote($voteId: String!, $voteJobId: String!) {
-    updatePairVote(id: $voteId, voteJobId: $voteJobId) {
-      ok
-    }
+    mutation UpdatePairVote($voteId: String!, $voteJobId: String!) {
+  updatePairVote(id: $voteId, voteJobId: $voteJobId) {
+    ok
   }
-`;
-export type UpdatePairVoteMutationFn = Apollo.MutationFunction<
-  UpdatePairVoteMutation,
-  UpdatePairVoteMutationVariables
->;
+}
+    `;
+export type UpdatePairVoteMutationFn = Apollo.MutationFunction<UpdatePairVoteMutation, UpdatePairVoteMutationVariables>;
 
 /**
  * __useUpdatePairVoteMutation__
@@ -2659,34 +2285,23 @@ export type UpdatePairVoteMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useUpdatePairVoteMutation(
-  baseOptions?: Apollo.MutationHookOptions<UpdatePairVoteMutation, UpdatePairVoteMutationVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<UpdatePairVoteMutation, UpdatePairVoteMutationVariables>(
-    UpdatePairVoteDocument,
-    options,
-  );
-}
+export function useUpdatePairVoteMutation(baseOptions?: Apollo.MutationHookOptions<UpdatePairVoteMutation, UpdatePairVoteMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdatePairVoteMutation, UpdatePairVoteMutationVariables>(UpdatePairVoteDocument, options);
+      }
 export type UpdatePairVoteMutationHookResult = ReturnType<typeof useUpdatePairVoteMutation>;
 export type UpdatePairVoteMutationResult = Apollo.MutationResult<UpdatePairVoteMutation>;
-export type UpdatePairVoteMutationOptions = Apollo.BaseMutationOptions<
-  UpdatePairVoteMutation,
-  UpdatePairVoteMutationVariables
->;
+export type UpdatePairVoteMutationOptions = Apollo.BaseMutationOptions<UpdatePairVoteMutation, UpdatePairVoteMutationVariables>;
 export const UpdateOwnerEiDocument = gql`
-  mutation UpdateOwnerEI($statId: String!, $ownerEi: Decimal!) {
-    updateIcpperStatOwnerEi(id: $statId, ownerEi: $ownerEi) {
-      ei
-      ownerEi
-      voteEi
-    }
+    mutation UpdateOwnerEI($statId: String!, $ownerEi: Decimal!) {
+  updateIcpperStatOwnerEi(id: $statId, ownerEi: $ownerEi) {
+    ei
+    ownerEi
+    voteEi
   }
-`;
-export type UpdateOwnerEiMutationFn = Apollo.MutationFunction<
-  UpdateOwnerEiMutation,
-  UpdateOwnerEiMutationVariables
->;
+}
+    `;
+export type UpdateOwnerEiMutationFn = Apollo.MutationFunction<UpdateOwnerEiMutation, UpdateOwnerEiMutationVariables>;
 
 /**
  * __useUpdateOwnerEiMutation__
@@ -2706,32 +2321,21 @@ export type UpdateOwnerEiMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useUpdateOwnerEiMutation(
-  baseOptions?: Apollo.MutationHookOptions<UpdateOwnerEiMutation, UpdateOwnerEiMutationVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<UpdateOwnerEiMutation, UpdateOwnerEiMutationVariables>(
-    UpdateOwnerEiDocument,
-    options,
-  );
-}
+export function useUpdateOwnerEiMutation(baseOptions?: Apollo.MutationHookOptions<UpdateOwnerEiMutation, UpdateOwnerEiMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateOwnerEiMutation, UpdateOwnerEiMutationVariables>(UpdateOwnerEiDocument, options);
+      }
 export type UpdateOwnerEiMutationHookResult = ReturnType<typeof useUpdateOwnerEiMutation>;
 export type UpdateOwnerEiMutationResult = Apollo.MutationResult<UpdateOwnerEiMutation>;
-export type UpdateOwnerEiMutationOptions = Apollo.BaseMutationOptions<
-  UpdateOwnerEiMutation,
-  UpdateOwnerEiMutationVariables
->;
+export type UpdateOwnerEiMutationOptions = Apollo.BaseMutationOptions<UpdateOwnerEiMutation, UpdateOwnerEiMutationVariables>;
 export const BeginCyclePairTaskDocument = gql`
-  mutation BeginCyclePairTask($cycleId: String!) {
-    createCycleVotePairTaskByOwner(cycleId: $cycleId) {
-      status
-    }
+    mutation BeginCyclePairTask($cycleId: String!) {
+  createCycleVotePairTaskByOwner(cycleId: $cycleId) {
+    status
   }
-`;
-export type BeginCyclePairTaskMutationFn = Apollo.MutationFunction<
-  BeginCyclePairTaskMutation,
-  BeginCyclePairTaskMutationVariables
->;
+}
+    `;
+export type BeginCyclePairTaskMutationFn = Apollo.MutationFunction<BeginCyclePairTaskMutation, BeginCyclePairTaskMutationVariables>;
 
 /**
  * __useBeginCyclePairTaskMutation__
@@ -2750,35 +2354,21 @@ export type BeginCyclePairTaskMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useBeginCyclePairTaskMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    BeginCyclePairTaskMutation,
-    BeginCyclePairTaskMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<BeginCyclePairTaskMutation, BeginCyclePairTaskMutationVariables>(
-    BeginCyclePairTaskDocument,
-    options,
-  );
-}
+export function useBeginCyclePairTaskMutation(baseOptions?: Apollo.MutationHookOptions<BeginCyclePairTaskMutation, BeginCyclePairTaskMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<BeginCyclePairTaskMutation, BeginCyclePairTaskMutationVariables>(BeginCyclePairTaskDocument, options);
+      }
 export type BeginCyclePairTaskMutationHookResult = ReturnType<typeof useBeginCyclePairTaskMutation>;
 export type BeginCyclePairTaskMutationResult = Apollo.MutationResult<BeginCyclePairTaskMutation>;
-export type BeginCyclePairTaskMutationOptions = Apollo.BaseMutationOptions<
-  BeginCyclePairTaskMutation,
-  BeginCyclePairTaskMutationVariables
->;
+export type BeginCyclePairTaskMutationOptions = Apollo.BaseMutationOptions<BeginCyclePairTaskMutation, BeginCyclePairTaskMutationVariables>;
 export const BeginCycleVoteResultTaskDocument = gql`
-  mutation BeginCycleVoteResultTask($cycleId: String!) {
-    createCycleVoteResultStatTaskByOwner(cycleId: $cycleId) {
-      status
-    }
+    mutation BeginCycleVoteResultTask($cycleId: String!) {
+  createCycleVoteResultStatTaskByOwner(cycleId: $cycleId) {
+    status
   }
-`;
-export type BeginCycleVoteResultTaskMutationFn = Apollo.MutationFunction<
-  BeginCycleVoteResultTaskMutation,
-  BeginCycleVoteResultTaskMutationVariables
->;
+}
+    `;
+export type BeginCycleVoteResultTaskMutationFn = Apollo.MutationFunction<BeginCycleVoteResultTaskMutation, BeginCycleVoteResultTaskMutationVariables>;
 
 /**
  * __useBeginCycleVoteResultTaskMutation__
@@ -2797,38 +2387,21 @@ export type BeginCycleVoteResultTaskMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useBeginCycleVoteResultTaskMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    BeginCycleVoteResultTaskMutation,
-    BeginCycleVoteResultTaskMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    BeginCycleVoteResultTaskMutation,
-    BeginCycleVoteResultTaskMutationVariables
-  >(BeginCycleVoteResultTaskDocument, options);
-}
-export type BeginCycleVoteResultTaskMutationHookResult = ReturnType<
-  typeof useBeginCycleVoteResultTaskMutation
->;
-export type BeginCycleVoteResultTaskMutationResult =
-  Apollo.MutationResult<BeginCycleVoteResultTaskMutation>;
-export type BeginCycleVoteResultTaskMutationOptions = Apollo.BaseMutationOptions<
-  BeginCycleVoteResultTaskMutation,
-  BeginCycleVoteResultTaskMutationVariables
->;
+export function useBeginCycleVoteResultTaskMutation(baseOptions?: Apollo.MutationHookOptions<BeginCycleVoteResultTaskMutation, BeginCycleVoteResultTaskMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<BeginCycleVoteResultTaskMutation, BeginCycleVoteResultTaskMutationVariables>(BeginCycleVoteResultTaskDocument, options);
+      }
+export type BeginCycleVoteResultTaskMutationHookResult = ReturnType<typeof useBeginCycleVoteResultTaskMutation>;
+export type BeginCycleVoteResultTaskMutationResult = Apollo.MutationResult<BeginCycleVoteResultTaskMutation>;
+export type BeginCycleVoteResultTaskMutationOptions = Apollo.BaseMutationOptions<BeginCycleVoteResultTaskMutation, BeginCycleVoteResultTaskMutationVariables>;
 export const BeginPublishCycleTaskDocument = gql`
-  mutation BeginPublishCycleTask($cycleId: String!) {
-    createCycleVoteResultPublishTaskByOwner(cycleId: $cycleId) {
-      status
-    }
+    mutation BeginPublishCycleTask($cycleId: String!) {
+  createCycleVoteResultPublishTaskByOwner(cycleId: $cycleId) {
+    status
   }
-`;
-export type BeginPublishCycleTaskMutationFn = Apollo.MutationFunction<
-  BeginPublishCycleTaskMutation,
-  BeginPublishCycleTaskMutationVariables
->;
+}
+    `;
+export type BeginPublishCycleTaskMutationFn = Apollo.MutationFunction<BeginPublishCycleTaskMutation, BeginPublishCycleTaskMutationVariables>;
 
 /**
  * __useBeginPublishCycleTaskMutation__
@@ -2847,38 +2420,21 @@ export type BeginPublishCycleTaskMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useBeginPublishCycleTaskMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    BeginPublishCycleTaskMutation,
-    BeginPublishCycleTaskMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<BeginPublishCycleTaskMutation, BeginPublishCycleTaskMutationVariables>(
-    BeginPublishCycleTaskDocument,
-    options,
-  );
-}
-export type BeginPublishCycleTaskMutationHookResult = ReturnType<
-  typeof useBeginPublishCycleTaskMutation
->;
-export type BeginPublishCycleTaskMutationResult =
-  Apollo.MutationResult<BeginPublishCycleTaskMutation>;
-export type BeginPublishCycleTaskMutationOptions = Apollo.BaseMutationOptions<
-  BeginPublishCycleTaskMutation,
-  BeginPublishCycleTaskMutationVariables
->;
+export function useBeginPublishCycleTaskMutation(baseOptions?: Apollo.MutationHookOptions<BeginPublishCycleTaskMutation, BeginPublishCycleTaskMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<BeginPublishCycleTaskMutation, BeginPublishCycleTaskMutationVariables>(BeginPublishCycleTaskDocument, options);
+      }
+export type BeginPublishCycleTaskMutationHookResult = ReturnType<typeof useBeginPublishCycleTaskMutation>;
+export type BeginPublishCycleTaskMutationResult = Apollo.MutationResult<BeginPublishCycleTaskMutation>;
+export type BeginPublishCycleTaskMutationOptions = Apollo.BaseMutationOptions<BeginPublishCycleTaskMutation, BeginPublishCycleTaskMutationVariables>;
 export const UpdateVotePairPublicDocument = gql`
-  mutation UpdateVotePairPublic($voteId: String!, $isPublic: Boolean!) {
-    changeVoteResultPublic(id: $voteId, public: $isPublic) {
-      ok
-    }
+    mutation UpdateVotePairPublic($voteId: String!, $isPublic: Boolean!) {
+  changeVoteResultPublic(id: $voteId, public: $isPublic) {
+    ok
   }
-`;
-export type UpdateVotePairPublicMutationFn = Apollo.MutationFunction<
-  UpdateVotePairPublicMutation,
-  UpdateVotePairPublicMutationVariables
->;
+}
+    `;
+export type UpdateVotePairPublicMutationFn = Apollo.MutationFunction<UpdateVotePairPublicMutation, UpdateVotePairPublicMutationVariables>;
 
 /**
  * __useUpdateVotePairPublicMutation__
@@ -2898,38 +2454,25 @@ export type UpdateVotePairPublicMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useUpdateVotePairPublicMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    UpdateVotePairPublicMutation,
-    UpdateVotePairPublicMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<UpdateVotePairPublicMutation, UpdateVotePairPublicMutationVariables>(
-    UpdateVotePairPublicDocument,
-    options,
-  );
-}
-export type UpdateVotePairPublicMutationHookResult = ReturnType<
-  typeof useUpdateVotePairPublicMutation
->;
-export type UpdateVotePairPublicMutationResult =
-  Apollo.MutationResult<UpdateVotePairPublicMutation>;
-export type UpdateVotePairPublicMutationOptions = Apollo.BaseMutationOptions<
-  UpdateVotePairPublicMutation,
-  UpdateVotePairPublicMutationVariables
->;
+export function useUpdateVotePairPublicMutation(baseOptions?: Apollo.MutationHookOptions<UpdateVotePairPublicMutation, UpdateVotePairPublicMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateVotePairPublicMutation, UpdateVotePairPublicMutationVariables>(UpdateVotePairPublicDocument, options);
+      }
+export type UpdateVotePairPublicMutationHookResult = ReturnType<typeof useUpdateVotePairPublicMutation>;
+export type UpdateVotePairPublicMutationResult = Apollo.MutationResult<UpdateVotePairPublicMutation>;
+export type UpdateVotePairPublicMutationOptions = Apollo.BaseMutationOptions<UpdateVotePairPublicMutation, UpdateVotePairPublicMutationVariables>;
 export const MarkCyclesTokenReleasedDocument = gql`
-  mutation MarkCyclesTokenReleased($daoId: String!, $cycleIds: [String]!, $unitSizeValue: String!) {
-    markCyclesTokenReleased(daoId: $daoId, cycleIds: $cycleIds, unitSizeValue: $unitSizeValue) {
-      ok
-    }
+    mutation MarkCyclesTokenReleased($daoId: String!, $cycleIds: [String]!, $unitSizeValue: String!) {
+  markCyclesTokenReleased(
+    daoId: $daoId
+    cycleIds: $cycleIds
+    unitSizeValue: $unitSizeValue
+  ) {
+    ok
   }
-`;
-export type MarkCyclesTokenReleasedMutationFn = Apollo.MutationFunction<
-  MarkCyclesTokenReleasedMutation,
-  MarkCyclesTokenReleasedMutationVariables
->;
+}
+    `;
+export type MarkCyclesTokenReleasedMutationFn = Apollo.MutationFunction<MarkCyclesTokenReleasedMutation, MarkCyclesTokenReleasedMutationVariables>;
 
 /**
  * __useMarkCyclesTokenReleasedMutation__
@@ -2950,46 +2493,32 @@ export type MarkCyclesTokenReleasedMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useMarkCyclesTokenReleasedMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    MarkCyclesTokenReleasedMutation,
-    MarkCyclesTokenReleasedMutationVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    MarkCyclesTokenReleasedMutation,
-    MarkCyclesTokenReleasedMutationVariables
-  >(MarkCyclesTokenReleasedDocument, options);
-}
-export type MarkCyclesTokenReleasedMutationHookResult = ReturnType<
-  typeof useMarkCyclesTokenReleasedMutation
->;
-export type MarkCyclesTokenReleasedMutationResult =
-  Apollo.MutationResult<MarkCyclesTokenReleasedMutation>;
-export type MarkCyclesTokenReleasedMutationOptions = Apollo.BaseMutationOptions<
-  MarkCyclesTokenReleasedMutation,
-  MarkCyclesTokenReleasedMutationVariables
->;
+export function useMarkCyclesTokenReleasedMutation(baseOptions?: Apollo.MutationHookOptions<MarkCyclesTokenReleasedMutation, MarkCyclesTokenReleasedMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MarkCyclesTokenReleasedMutation, MarkCyclesTokenReleasedMutationVariables>(MarkCyclesTokenReleasedDocument, options);
+      }
+export type MarkCyclesTokenReleasedMutationHookResult = ReturnType<typeof useMarkCyclesTokenReleasedMutation>;
+export type MarkCyclesTokenReleasedMutationResult = Apollo.MutationResult<MarkCyclesTokenReleasedMutation>;
+export type MarkCyclesTokenReleasedMutationOptions = Apollo.BaseMutationOptions<MarkCyclesTokenReleasedMutation, MarkCyclesTokenReleasedMutationVariables>;
 export const DaoDocument = gql`
-  query DAO($id: String!) {
-    dao(id: $id) {
-      datum {
-        id
-        number
-        name
-        desc
-        logo
-        ownerId
-        createAt
-        updateAt
-      }
-      following {
-        total
-      }
+    query DAO($id: String!) {
+  dao(id: $id) {
+    datum {
+      id
+      number
+      name
+      desc
+      logo
+      ownerId
+      createAt
+      updateAt
+    }
+    following {
+      total
     }
   }
-`;
+}
+    `;
 
 /**
  * __useDaoQuery__
@@ -3008,60 +2537,58 @@ export const DaoDocument = gql`
  * });
  */
 export function useDaoQuery(baseOptions: Apollo.QueryHookOptions<DaoQuery, DaoQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<DaoQuery, DaoQueryVariables>(DaoDocument, options);
-}
-export function useDaoLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<DaoQuery, DaoQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<DaoQuery, DaoQueryVariables>(DaoDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<DaoQuery, DaoQueryVariables>(DaoDocument, options);
+      }
+export function useDaoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DaoQuery, DaoQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<DaoQuery, DaoQueryVariables>(DaoDocument, options);
+        }
 export type DaoQueryHookResult = ReturnType<typeof useDaoQuery>;
 export type DaoLazyQueryHookResult = ReturnType<typeof useDaoLazyQuery>;
 export type DaoQueryResult = Apollo.QueryResult<DaoQuery, DaoQueryVariables>;
 export const DaoJobConfigDocument = gql`
-  query DAOJobConfig($daoId: String!) {
-    daoJobConfig(daoId: $daoId) {
-      datum {
-        id
-        daoId
-        createAt
-        deadlineDay
-        deadlineTime
-        pairBeginDay
-        pairBeginHour
-        pairEndDay
-        pairEndHour
-        timeZone
-        timeZoneRegion
-        updateAt
-        votingBeginDay
-        votingBeginHour
-        votingEndDay
-        votingEndHour
-      }
-      existedLastCycle {
-        timeZone
-        beginAt
-        endAt
-        pairBeginAt
-        pairEndAt
-        voteBeginAt
-        voteEndAt
-      }
-      getNextCycle {
-        timeZone
-        beginAt
-        endAt
-        pairBeginAt
-        pairEndAt
-        voteBeginAt
-        voteEndAt
-      }
+    query DAOJobConfig($daoId: String!) {
+  daoJobConfig(daoId: $daoId) {
+    datum {
+      id
+      daoId
+      createAt
+      deadlineDay
+      deadlineTime
+      pairBeginDay
+      pairBeginHour
+      pairEndDay
+      pairEndHour
+      timeZone
+      timeZoneRegion
+      updateAt
+      votingBeginDay
+      votingBeginHour
+      votingEndDay
+      votingEndHour
+    }
+    existedLastCycle {
+      timeZone
+      beginAt
+      endAt
+      pairBeginAt
+      pairEndAt
+      voteBeginAt
+      voteEndAt
+    }
+    getNextCycle {
+      timeZone
+      beginAt
+      endAt
+      pairBeginAt
+      pairEndAt
+      voteBeginAt
+      voteEndAt
     }
   }
-`;
+}
+    `;
 
 /**
  * __useDaoJobConfigQuery__
@@ -3079,70 +2606,44 @@ export const DaoJobConfigDocument = gql`
  *   },
  * });
  */
-export function useDaoJobConfigQuery(
-  baseOptions: Apollo.QueryHookOptions<DaoJobConfigQuery, DaoJobConfigQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<DaoJobConfigQuery, DaoJobConfigQueryVariables>(
-    DaoJobConfigDocument,
-    options,
-  );
-}
-export function useDaoJobConfigLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<DaoJobConfigQuery, DaoJobConfigQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<DaoJobConfigQuery, DaoJobConfigQueryVariables>(
-    DaoJobConfigDocument,
-    options,
-  );
-}
+export function useDaoJobConfigQuery(baseOptions: Apollo.QueryHookOptions<DaoJobConfigQuery, DaoJobConfigQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<DaoJobConfigQuery, DaoJobConfigQueryVariables>(DaoJobConfigDocument, options);
+      }
+export function useDaoJobConfigLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DaoJobConfigQuery, DaoJobConfigQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<DaoJobConfigQuery, DaoJobConfigQueryVariables>(DaoJobConfigDocument, options);
+        }
 export type DaoJobConfigQueryHookResult = ReturnType<typeof useDaoJobConfigQuery>;
 export type DaoJobConfigLazyQueryHookResult = ReturnType<typeof useDaoJobConfigLazyQuery>;
-export type DaoJobConfigQueryResult = Apollo.QueryResult<
-  DaoJobConfigQuery,
-  DaoJobConfigQueryVariables
->;
+export type DaoJobConfigQueryResult = Apollo.QueryResult<DaoJobConfigQuery, DaoJobConfigQueryVariables>;
 export const DaoJobConfigPreviewNextCycleDocument = gql`
-  query DAOJobConfigPreviewNextCycle(
-    $daoId: String!
-    $timeZone: Int
-    $deadlineDay: Int
-    $deadlineTime: Int
-    $pairBeginDay: Int
-    $pairBeginHour: Int
-    $pairEndDay: Int
-    $pairEndHour: Int
-    $votingBeginDay: Int
-    $votingBeginHour: Int
-    $votingEndDay: Int
-    $votingEndHour: Int
-  ) {
-    daoJobConfig(daoId: $daoId) {
-      previewNextCycle(
-        timeZone: $timeZone
-        deadlineDay: $deadlineDay
-        deadlineTime: $deadlineTime
-        pairBeginDay: $pairBeginDay
-        pairBeginHour: $pairBeginHour
-        pairEndDay: $pairEndDay
-        pairEndHour: $pairEndHour
-        votingBeginDay: $votingBeginDay
-        votingBeginHour: $votingBeginHour
-        votingEndDay: $votingEndDay
-        votingEndHour: $votingEndHour
-      ) {
-        timeZone
-        beginAt
-        endAt
-        pairBeginAt
-        pairEndAt
-        voteBeginAt
-        voteEndAt
-      }
+    query DAOJobConfigPreviewNextCycle($daoId: String!, $timeZone: Int, $deadlineDay: Int, $deadlineTime: Int, $pairBeginDay: Int, $pairBeginHour: Int, $pairEndDay: Int, $pairEndHour: Int, $votingBeginDay: Int, $votingBeginHour: Int, $votingEndDay: Int, $votingEndHour: Int) {
+  daoJobConfig(daoId: $daoId) {
+    previewNextCycle(
+      timeZone: $timeZone
+      deadlineDay: $deadlineDay
+      deadlineTime: $deadlineTime
+      pairBeginDay: $pairBeginDay
+      pairBeginHour: $pairBeginHour
+      pairEndDay: $pairEndDay
+      pairEndHour: $pairEndHour
+      votingBeginDay: $votingBeginDay
+      votingBeginHour: $votingBeginHour
+      votingEndDay: $votingEndDay
+      votingEndHour: $votingEndHour
+    ) {
+      timeZone
+      beginAt
+      endAt
+      pairBeginAt
+      pairEndAt
+      voteBeginAt
+      voteEndAt
     }
   }
-`;
+}
+    `;
 
 /**
  * __useDaoJobConfigPreviewNextCycleQuery__
@@ -3171,76 +2672,53 @@ export const DaoJobConfigPreviewNextCycleDocument = gql`
  *   },
  * });
  */
-export function useDaoJobConfigPreviewNextCycleQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    DaoJobConfigPreviewNextCycleQuery,
-    DaoJobConfigPreviewNextCycleQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    DaoJobConfigPreviewNextCycleQuery,
-    DaoJobConfigPreviewNextCycleQueryVariables
-  >(DaoJobConfigPreviewNextCycleDocument, options);
-}
-export function useDaoJobConfigPreviewNextCycleLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    DaoJobConfigPreviewNextCycleQuery,
-    DaoJobConfigPreviewNextCycleQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    DaoJobConfigPreviewNextCycleQuery,
-    DaoJobConfigPreviewNextCycleQueryVariables
-  >(DaoJobConfigPreviewNextCycleDocument, options);
-}
-export type DaoJobConfigPreviewNextCycleQueryHookResult = ReturnType<
-  typeof useDaoJobConfigPreviewNextCycleQuery
->;
-export type DaoJobConfigPreviewNextCycleLazyQueryHookResult = ReturnType<
-  typeof useDaoJobConfigPreviewNextCycleLazyQuery
->;
-export type DaoJobConfigPreviewNextCycleQueryResult = Apollo.QueryResult<
-  DaoJobConfigPreviewNextCycleQuery,
-  DaoJobConfigPreviewNextCycleQueryVariables
->;
-export const DaoHomeWithLoginQueryDocument = gql`
-  query DAOHomeWithLoginQuery($id: String!, $userId: String!) {
-    dao(id: $id) {
-      datum {
-        id
-        number
-        name
-        desc
-        logo
-        ownerId
-        createAt
-        updateAt
+export function useDaoJobConfigPreviewNextCycleQuery(baseOptions: Apollo.QueryHookOptions<DaoJobConfigPreviewNextCycleQuery, DaoJobConfigPreviewNextCycleQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<DaoJobConfigPreviewNextCycleQuery, DaoJobConfigPreviewNextCycleQueryVariables>(DaoJobConfigPreviewNextCycleDocument, options);
       }
-      cycles(filter: [un_vote_end]) {
-        nodes {
-          datum {
-            id
-            beginAt
-            endAt
-            voteBeginAt
-            voteEndAt
-          }
-          votes(isMyself: true) {
-            total
-          }
+export function useDaoJobConfigPreviewNextCycleLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DaoJobConfigPreviewNextCycleQuery, DaoJobConfigPreviewNextCycleQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<DaoJobConfigPreviewNextCycleQuery, DaoJobConfigPreviewNextCycleQueryVariables>(DaoJobConfigPreviewNextCycleDocument, options);
         }
-      }
-      following {
-        total
-        followers(userId: $userId) {
-          createAt
+export type DaoJobConfigPreviewNextCycleQueryHookResult = ReturnType<typeof useDaoJobConfigPreviewNextCycleQuery>;
+export type DaoJobConfigPreviewNextCycleLazyQueryHookResult = ReturnType<typeof useDaoJobConfigPreviewNextCycleLazyQuery>;
+export type DaoJobConfigPreviewNextCycleQueryResult = Apollo.QueryResult<DaoJobConfigPreviewNextCycleQuery, DaoJobConfigPreviewNextCycleQueryVariables>;
+export const DaoHomeWithLoginQueryDocument = gql`
+    query DAOHomeWithLoginQuery($id: String!, $userId: String!) {
+  dao(id: $id) {
+    datum {
+      id
+      number
+      name
+      desc
+      logo
+      ownerId
+      createAt
+      updateAt
+    }
+    cycles(filter: [un_vote_end]) {
+      nodes {
+        datum {
+          id
+          beginAt
+          endAt
+          voteBeginAt
+          voteEndAt
+        }
+        votes(isMyself: true) {
+          total
         }
       }
     }
+    following {
+      total
+      followers(userId: $userId) {
+        createAt
+      }
+    }
   }
-`;
+}
+    `;
 
 /**
  * __useDaoHomeWithLoginQueryQuery__
@@ -3259,45 +2737,24 @@ export const DaoHomeWithLoginQueryDocument = gql`
  *   },
  * });
  */
-export function useDaoHomeWithLoginQueryQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    DaoHomeWithLoginQueryQuery,
-    DaoHomeWithLoginQueryQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<DaoHomeWithLoginQueryQuery, DaoHomeWithLoginQueryQueryVariables>(
-    DaoHomeWithLoginQueryDocument,
-    options,
-  );
-}
-export function useDaoHomeWithLoginQueryLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    DaoHomeWithLoginQueryQuery,
-    DaoHomeWithLoginQueryQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<DaoHomeWithLoginQueryQuery, DaoHomeWithLoginQueryQueryVariables>(
-    DaoHomeWithLoginQueryDocument,
-    options,
-  );
-}
+export function useDaoHomeWithLoginQueryQuery(baseOptions: Apollo.QueryHookOptions<DaoHomeWithLoginQueryQuery, DaoHomeWithLoginQueryQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<DaoHomeWithLoginQueryQuery, DaoHomeWithLoginQueryQueryVariables>(DaoHomeWithLoginQueryDocument, options);
+      }
+export function useDaoHomeWithLoginQueryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DaoHomeWithLoginQueryQuery, DaoHomeWithLoginQueryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<DaoHomeWithLoginQueryQuery, DaoHomeWithLoginQueryQueryVariables>(DaoHomeWithLoginQueryDocument, options);
+        }
 export type DaoHomeWithLoginQueryQueryHookResult = ReturnType<typeof useDaoHomeWithLoginQueryQuery>;
-export type DaoHomeWithLoginQueryLazyQueryHookResult = ReturnType<
-  typeof useDaoHomeWithLoginQueryLazyQuery
->;
-export type DaoHomeWithLoginQueryQueryResult = Apollo.QueryResult<
-  DaoHomeWithLoginQueryQuery,
-  DaoHomeWithLoginQueryQueryVariables
->;
+export type DaoHomeWithLoginQueryLazyQueryHookResult = ReturnType<typeof useDaoHomeWithLoginQueryLazyQuery>;
+export type DaoHomeWithLoginQueryQueryResult = Apollo.QueryResult<DaoHomeWithLoginQueryQuery, DaoHomeWithLoginQueryQueryVariables>;
 export const DaoTokenConfigDocument = gql`
-  query DAOTokenConfig($daoId: String!) {
-    daoTokenConfig(daoId: $daoId) {
-      ethDaoId
-    }
+    query DAOTokenConfig($daoId: String!) {
+  daoTokenConfig(daoId: $daoId) {
+    ethDaoId
   }
-`;
+}
+    `;
 
 /**
  * __useDaoTokenConfigQuery__
@@ -3315,52 +2772,39 @@ export const DaoTokenConfigDocument = gql`
  *   },
  * });
  */
-export function useDaoTokenConfigQuery(
-  baseOptions: Apollo.QueryHookOptions<DaoTokenConfigQuery, DaoTokenConfigQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<DaoTokenConfigQuery, DaoTokenConfigQueryVariables>(
-    DaoTokenConfigDocument,
-    options,
-  );
-}
-export function useDaoTokenConfigLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<DaoTokenConfigQuery, DaoTokenConfigQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<DaoTokenConfigQuery, DaoTokenConfigQueryVariables>(
-    DaoTokenConfigDocument,
-    options,
-  );
-}
+export function useDaoTokenConfigQuery(baseOptions: Apollo.QueryHookOptions<DaoTokenConfigQuery, DaoTokenConfigQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<DaoTokenConfigQuery, DaoTokenConfigQueryVariables>(DaoTokenConfigDocument, options);
+      }
+export function useDaoTokenConfigLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DaoTokenConfigQuery, DaoTokenConfigQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<DaoTokenConfigQuery, DaoTokenConfigQueryVariables>(DaoTokenConfigDocument, options);
+        }
 export type DaoTokenConfigQueryHookResult = ReturnType<typeof useDaoTokenConfigQuery>;
 export type DaoTokenConfigLazyQueryHookResult = ReturnType<typeof useDaoTokenConfigLazyQuery>;
-export type DaoTokenConfigQueryResult = Apollo.QueryResult<
-  DaoTokenConfigQuery,
-  DaoTokenConfigQueryVariables
->;
+export type DaoTokenConfigQueryResult = Apollo.QueryResult<DaoTokenConfigQuery, DaoTokenConfigQueryVariables>;
 export const DaoFollowInfoDocument = gql`
-  query DAOFollowInfo($id: String!, $userId: String!) {
-    dao(id: $id) {
-      datum {
-        id
-        number
-        name
-        desc
-        logo
-        ownerId
+    query DAOFollowInfo($id: String!, $userId: String!) {
+  dao(id: $id) {
+    datum {
+      id
+      number
+      name
+      desc
+      logo
+      ownerId
+      createAt
+      updateAt
+    }
+    following {
+      total
+      followers(userId: $userId) {
         createAt
-        updateAt
-      }
-      following {
-        total
-        followers(userId: $userId) {
-          createAt
-        }
       }
     }
   }
-`;
+}
+    `;
 
 /**
  * __useDaoFollowInfoQuery__
@@ -3379,75 +2823,55 @@ export const DaoFollowInfoDocument = gql`
  *   },
  * });
  */
-export function useDaoFollowInfoQuery(
-  baseOptions: Apollo.QueryHookOptions<DaoFollowInfoQuery, DaoFollowInfoQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<DaoFollowInfoQuery, DaoFollowInfoQueryVariables>(
-    DaoFollowInfoDocument,
-    options,
-  );
-}
-export function useDaoFollowInfoLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<DaoFollowInfoQuery, DaoFollowInfoQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<DaoFollowInfoQuery, DaoFollowInfoQueryVariables>(
-    DaoFollowInfoDocument,
-    options,
-  );
-}
+export function useDaoFollowInfoQuery(baseOptions: Apollo.QueryHookOptions<DaoFollowInfoQuery, DaoFollowInfoQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<DaoFollowInfoQuery, DaoFollowInfoQueryVariables>(DaoFollowInfoDocument, options);
+      }
+export function useDaoFollowInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DaoFollowInfoQuery, DaoFollowInfoQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<DaoFollowInfoQuery, DaoFollowInfoQueryVariables>(DaoFollowInfoDocument, options);
+        }
 export type DaoFollowInfoQueryHookResult = ReturnType<typeof useDaoFollowInfoQuery>;
 export type DaoFollowInfoLazyQueryHookResult = ReturnType<typeof useDaoFollowInfoLazyQuery>;
-export type DaoFollowInfoQueryResult = Apollo.QueryResult<
-  DaoFollowInfoQuery,
-  DaoFollowInfoQueryVariables
->;
+export type DaoFollowInfoQueryResult = Apollo.QueryResult<DaoFollowInfoQuery, DaoFollowInfoQueryVariables>;
 export const DaoListDocument = gql`
-  query DAOList(
-    $filter: DAOsFilterEnum
-    $sorted: DAOsSortedEnum
-    $sortedType: DAOsSortedTypeEnum
-    $search: String
-    $first: Int
-    $offset: Int
+    query DAOList($filter: DAOsFilterEnum, $sorted: DAOsSortedEnum, $sortedType: DAOsSortedTypeEnum, $search: String, $first: Int, $offset: Int) {
+  daos(
+    filter: $filter
+    sorted: $sorted
+    sortedType: $sortedType
+    search: $search
+    offset: $offset
+    first: $first
   ) {
-    daos(
-      filter: $filter
-      sorted: $sorted
-      sortedType: $sortedType
-      search: $search
-      offset: $offset
-      first: $first
-    ) {
-      dao {
-        datum {
-          createAt
-          desc
-          id
-          logo
-          name
-          ownerId
-          updateAt
-        }
-        stat {
-          following
-          job
-          size
-          token
-        }
-        isFollowing
-        isOwner
+    dao {
+      datum {
+        createAt
+        desc
+        id
+        logo
+        name
+        ownerId
+        updateAt
       }
       stat {
-        icpper
+        following
+        job
         size
-        income
+        token
       }
-      total
+      isFollowing
+      isOwner
     }
+    stat {
+      icpper
+      size
+      income
+    }
+    total
   }
-`;
+}
+    `;
 
 /**
  * __useDaoListQuery__
@@ -3470,33 +2894,29 @@ export const DaoListDocument = gql`
  *   },
  * });
  */
-export function useDaoListQuery(
-  baseOptions?: Apollo.QueryHookOptions<DaoListQuery, DaoListQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<DaoListQuery, DaoListQueryVariables>(DaoListDocument, options);
-}
-export function useDaoListLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<DaoListQuery, DaoListQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<DaoListQuery, DaoListQueryVariables>(DaoListDocument, options);
-}
+export function useDaoListQuery(baseOptions?: Apollo.QueryHookOptions<DaoListQuery, DaoListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<DaoListQuery, DaoListQueryVariables>(DaoListDocument, options);
+      }
+export function useDaoListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DaoListQuery, DaoListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<DaoListQuery, DaoListQueryVariables>(DaoListDocument, options);
+        }
 export type DaoListQueryHookResult = ReturnType<typeof useDaoListQuery>;
 export type DaoListLazyQueryHookResult = ReturnType<typeof useDaoListLazyQuery>;
 export type DaoListQueryResult = Apollo.QueryResult<DaoListQuery, DaoListQueryVariables>;
 export const UserJobDaoListDocument = gql`
-  query UserJobDAOList($userName: String) {
-    daos(filter: member, offset: 0, first: 100, userName: $userName) {
-      dao {
-        datum {
-          id
-          name
-        }
+    query UserJobDAOList($userName: String) {
+  daos(filter: member, offset: 0, first: 100, userName: $userName) {
+    dao {
+      datum {
+        id
+        name
       }
     }
   }
-`;
+}
+    `;
 
 /**
  * __useUserJobDaoListQuery__
@@ -3514,41 +2934,28 @@ export const UserJobDaoListDocument = gql`
  *   },
  * });
  */
-export function useUserJobDaoListQuery(
-  baseOptions?: Apollo.QueryHookOptions<UserJobDaoListQuery, UserJobDaoListQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<UserJobDaoListQuery, UserJobDaoListQueryVariables>(
-    UserJobDaoListDocument,
-    options,
-  );
-}
-export function useUserJobDaoListLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<UserJobDaoListQuery, UserJobDaoListQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<UserJobDaoListQuery, UserJobDaoListQueryVariables>(
-    UserJobDaoListDocument,
-    options,
-  );
-}
+export function useUserJobDaoListQuery(baseOptions?: Apollo.QueryHookOptions<UserJobDaoListQuery, UserJobDaoListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<UserJobDaoListQuery, UserJobDaoListQueryVariables>(UserJobDaoListDocument, options);
+      }
+export function useUserJobDaoListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserJobDaoListQuery, UserJobDaoListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<UserJobDaoListQuery, UserJobDaoListQueryVariables>(UserJobDaoListDocument, options);
+        }
 export type UserJobDaoListQueryHookResult = ReturnType<typeof useUserJobDaoListQuery>;
 export type UserJobDaoListLazyQueryHookResult = ReturnType<typeof useUserJobDaoListLazyQuery>;
-export type UserJobDaoListQueryResult = Apollo.QueryResult<
-  UserJobDaoListQuery,
-  UserJobDaoListQueryVariables
->;
+export type UserJobDaoListQueryResult = Apollo.QueryResult<UserJobDaoListQuery, UserJobDaoListQueryVariables>;
 export const DaoGithubAppStatusDocument = gql`
-  query DAOGithubAppStatus($name: String!) {
-    daoGithubAppStatus(name: $name) {
-      githubAppName
-      githubOrgId
-      isExists
-      isGithubOrgOwner
-      isIcpAppInstalled
-    }
+    query DAOGithubAppStatus($name: String!) {
+  daoGithubAppStatus(name: $name) {
+    githubAppName
+    githubOrgId
+    isExists
+    isGithubOrgOwner
+    isIcpAppInstalled
   }
-`;
+}
+    `;
 
 /**
  * __useDaoGithubAppStatusQuery__
@@ -3566,84 +2973,57 @@ export const DaoGithubAppStatusDocument = gql`
  *   },
  * });
  */
-export function useDaoGithubAppStatusQuery(
-  baseOptions: Apollo.QueryHookOptions<DaoGithubAppStatusQuery, DaoGithubAppStatusQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<DaoGithubAppStatusQuery, DaoGithubAppStatusQueryVariables>(
-    DaoGithubAppStatusDocument,
-    options,
-  );
-}
-export function useDaoGithubAppStatusLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    DaoGithubAppStatusQuery,
-    DaoGithubAppStatusQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<DaoGithubAppStatusQuery, DaoGithubAppStatusQueryVariables>(
-    DaoGithubAppStatusDocument,
-    options,
-  );
-}
+export function useDaoGithubAppStatusQuery(baseOptions: Apollo.QueryHookOptions<DaoGithubAppStatusQuery, DaoGithubAppStatusQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<DaoGithubAppStatusQuery, DaoGithubAppStatusQueryVariables>(DaoGithubAppStatusDocument, options);
+      }
+export function useDaoGithubAppStatusLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DaoGithubAppStatusQuery, DaoGithubAppStatusQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<DaoGithubAppStatusQuery, DaoGithubAppStatusQueryVariables>(DaoGithubAppStatusDocument, options);
+        }
 export type DaoGithubAppStatusQueryHookResult = ReturnType<typeof useDaoGithubAppStatusQuery>;
-export type DaoGithubAppStatusLazyQueryHookResult = ReturnType<
-  typeof useDaoGithubAppStatusLazyQuery
->;
-export type DaoGithubAppStatusQueryResult = Apollo.QueryResult<
-  DaoGithubAppStatusQuery,
-  DaoGithubAppStatusQueryVariables
->;
+export type DaoGithubAppStatusLazyQueryHookResult = ReturnType<typeof useDaoGithubAppStatusLazyQuery>;
+export type DaoGithubAppStatusQueryResult = Apollo.QueryResult<DaoGithubAppStatusQuery, DaoGithubAppStatusQueryVariables>;
 export const JobListDocument = gql`
-  query JobList(
-    $beginTime: Int
-    $endTime: Int
-    $daoName: String!
-    $first: Int
-    $offset: Int
-    $sorted: JobSortedEnum
-    $sortedType: SortedTypeEnum
-    $userName: String
+    query JobList($beginTime: Int, $endTime: Int, $daoName: String!, $first: Int, $offset: Int, $sorted: JobSortedEnum, $sortedType: SortedTypeEnum, $userName: String) {
+  jobs(
+    beginTime: $beginTime
+    daoName: $daoName
+    endTime: $endTime
+    first: $first
+    offset: $offset
+    sorted: $sorted
+    sortedType: $sortedType
+    userName: $userName
   ) {
-    jobs(
-      beginTime: $beginTime
-      daoName: $daoName
-      endTime: $endTime
-      first: $first
-      offset: $offset
-      sorted: $sorted
-      sortedType: $sortedType
-      userName: $userName
-    ) {
-      job {
-        node {
-          id
-          title
-          size
-          status
-          githubRepoOwner
-          githubRepoName
-          githubIssueNumber
-          income
-        }
-        prs {
-          id
-          title
-          githubRepoOwner
-          githubRepoName
-          githubPrNumber
-        }
-      }
-      stat {
+    job {
+      node {
+        id
+        title
         size
-        tokenCount
-        tokenName
+        status
+        githubRepoOwner
+        githubRepoName
+        githubIssueNumber
+        income
       }
-      total
+      prs {
+        id
+        title
+        githubRepoOwner
+        githubRepoName
+        githubPrNumber
+      }
     }
+    stat {
+      size
+      tokenCount
+      tokenName
+    }
+    total
   }
-`;
+}
+    `;
 
 /**
  * __useJobListQuery__
@@ -3668,61 +3048,50 @@ export const JobListDocument = gql`
  *   },
  * });
  */
-export function useJobListQuery(
-  baseOptions: Apollo.QueryHookOptions<JobListQuery, JobListQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<JobListQuery, JobListQueryVariables>(JobListDocument, options);
-}
-export function useJobListLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<JobListQuery, JobListQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<JobListQuery, JobListQueryVariables>(JobListDocument, options);
-}
+export function useJobListQuery(baseOptions: Apollo.QueryHookOptions<JobListQuery, JobListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<JobListQuery, JobListQueryVariables>(JobListDocument, options);
+      }
+export function useJobListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<JobListQuery, JobListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<JobListQuery, JobListQueryVariables>(JobListDocument, options);
+        }
 export type JobListQueryHookResult = ReturnType<typeof useJobListQuery>;
 export type JobListLazyQueryHookResult = ReturnType<typeof useJobListLazyQuery>;
 export type JobListQueryResult = Apollo.QueryResult<JobListQuery, JobListQueryVariables>;
 export const CycleJobListDocument = gql`
-  query CycleJobList(
-    $cycleId: String!
-    $first: Int
-    $offset: Int
-    $pairType: JobsQueryPairTypeEnum
-    $sorted: JobsQuerySortedEnum
-    $sortedType: JobsQuerySortedTypeEnum
-  ) {
-    cycle(id: $cycleId) {
-      jobs(
-        first: $first
-        offset: $offset
-        pairType: $pairType
-        sorted: $sorted
-        sortedType: $sortedType
-      ) {
-        nodes {
-          datum {
-            id
-            githubRepoOwner
-            githubRepoName
-            githubIssueNumber
-            title
-            size
-            income
-            pairType
-          }
-          user {
-            id
-            avatar
-            nickname
-            githubLogin
-          }
+    query CycleJobList($cycleId: String!, $first: Int, $offset: Int, $pairType: JobsQueryPairTypeEnum, $sorted: JobsQuerySortedEnum, $sortedType: JobsQuerySortedTypeEnum) {
+  cycle(id: $cycleId) {
+    jobs(
+      first: $first
+      offset: $offset
+      pairType: $pairType
+      sorted: $sorted
+      sortedType: $sortedType
+    ) {
+      nodes {
+        datum {
+          id
+          githubRepoOwner
+          githubRepoName
+          githubIssueNumber
+          title
+          size
+          income
+          pairType
         }
-        total
+        user {
+          id
+          avatar
+          nickname
+          githubLogin
+        }
       }
+      total
     }
   }
-`;
+}
+    `;
 
 /**
  * __useCycleJobListQuery__
@@ -3745,69 +3114,55 @@ export const CycleJobListDocument = gql`
  *   },
  * });
  */
-export function useCycleJobListQuery(
-  baseOptions: Apollo.QueryHookOptions<CycleJobListQuery, CycleJobListQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<CycleJobListQuery, CycleJobListQueryVariables>(
-    CycleJobListDocument,
-    options,
-  );
-}
-export function useCycleJobListLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<CycleJobListQuery, CycleJobListQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<CycleJobListQuery, CycleJobListQueryVariables>(
-    CycleJobListDocument,
-    options,
-  );
-}
+export function useCycleJobListQuery(baseOptions: Apollo.QueryHookOptions<CycleJobListQuery, CycleJobListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CycleJobListQuery, CycleJobListQueryVariables>(CycleJobListDocument, options);
+      }
+export function useCycleJobListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CycleJobListQuery, CycleJobListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CycleJobListQuery, CycleJobListQueryVariables>(CycleJobListDocument, options);
+        }
 export type CycleJobListQueryHookResult = ReturnType<typeof useCycleJobListQuery>;
 export type CycleJobListLazyQueryHookResult = ReturnType<typeof useCycleJobListLazyQuery>;
-export type CycleJobListQueryResult = Apollo.QueryResult<
-  CycleJobListQuery,
-  CycleJobListQueryVariables
->;
+export type CycleJobListQueryResult = Apollo.QueryResult<CycleJobListQuery, CycleJobListQueryVariables>;
 export const CycleIcpperListDocument = gql`
-  query CycleIcpperList(
-    $cycleId: String!
-    $first: Int
-    $offset: Int
-    $sorted: CycleIcpperStatSortedEnum
-    $sortedType: CycleIcpperStatSortedTypeEnum
-  ) {
-    cycle(id: $cycleId) {
-      icpperStats(first: $first, offset: $offset, sorted: $sorted, sortedType: $sortedType) {
-        nodes {
-          datum {
-            id
-            jobCount
-            size
-            income
-            ei
-            beDeductedSizeByReview
-            haveTwoTimesLt04
-            haveTwoTimesLt08
-            unVotedAllVote
-          }
-          icpper {
-            id
-            avatar
-            nickname
-            githubLogin
-          }
-          lastEi
-          beReviewerHasWarningUsers {
-            id
-            nickname
-          }
+    query CycleIcpperList($cycleId: String!, $first: Int, $offset: Int, $sorted: CycleIcpperStatSortedEnum, $sortedType: CycleIcpperStatSortedTypeEnum) {
+  cycle(id: $cycleId) {
+    icpperStats(
+      first: $first
+      offset: $offset
+      sorted: $sorted
+      sortedType: $sortedType
+    ) {
+      nodes {
+        datum {
+          id
+          jobCount
+          size
+          income
+          ei
+          beDeductedSizeByReview
+          haveTwoTimesLt04
+          haveTwoTimesLt08
+          unVotedAllVote
         }
-        total
+        icpper {
+          id
+          avatar
+          nickname
+          githubLogin
+        }
+        lastEi
+        beReviewerHasWarningUsers {
+          id
+          nickname
+        }
       }
+      total
     }
   }
-`;
+}
+    `;
 
 /**
  * __useCycleIcpperListQuery__
@@ -3829,71 +3184,57 @@ export const CycleIcpperListDocument = gql`
  *   },
  * });
  */
-export function useCycleIcpperListQuery(
-  baseOptions: Apollo.QueryHookOptions<CycleIcpperListQuery, CycleIcpperListQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<CycleIcpperListQuery, CycleIcpperListQueryVariables>(
-    CycleIcpperListDocument,
-    options,
-  );
-}
-export function useCycleIcpperListLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<CycleIcpperListQuery, CycleIcpperListQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<CycleIcpperListQuery, CycleIcpperListQueryVariables>(
-    CycleIcpperListDocument,
-    options,
-  );
-}
+export function useCycleIcpperListQuery(baseOptions: Apollo.QueryHookOptions<CycleIcpperListQuery, CycleIcpperListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CycleIcpperListQuery, CycleIcpperListQueryVariables>(CycleIcpperListDocument, options);
+      }
+export function useCycleIcpperListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CycleIcpperListQuery, CycleIcpperListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CycleIcpperListQuery, CycleIcpperListQueryVariables>(CycleIcpperListDocument, options);
+        }
 export type CycleIcpperListQueryHookResult = ReturnType<typeof useCycleIcpperListQuery>;
 export type CycleIcpperListLazyQueryHookResult = ReturnType<typeof useCycleIcpperListLazyQuery>;
-export type CycleIcpperListQueryResult = Apollo.QueryResult<
-  CycleIcpperListQuery,
-  CycleIcpperListQueryVariables
->;
+export type CycleIcpperListQueryResult = Apollo.QueryResult<CycleIcpperListQuery, CycleIcpperListQueryVariables>;
 export const OwnerCycleIcpperListDocument = gql`
-  query OwnerCycleIcpperList(
-    $cycleId: String!
-    $first: Int
-    $offset: Int
-    $sorted: CycleIcpperStatSortedEnum
-    $sortedType: CycleIcpperStatSortedTypeEnum
-  ) {
-    cycle(id: $cycleId) {
-      icpperStats(first: $first, offset: $offset, sorted: $sorted, sortedType: $sortedType) {
-        nodes {
-          datum {
-            id
-            jobCount
-            size
-            income
-            ei
-            ownerEi
-            voteEi
-            beDeductedSizeByReview
-            haveTwoTimesLt04
-            haveTwoTimesLt08
-            unVotedAllVote
-          }
-          icpper {
-            id
-            avatar
-            nickname
-            githubLogin
-          }
-          lastEi
-          beReviewerHasWarningUsers {
-            id
-            nickname
-          }
+    query OwnerCycleIcpperList($cycleId: String!, $first: Int, $offset: Int, $sorted: CycleIcpperStatSortedEnum, $sortedType: CycleIcpperStatSortedTypeEnum) {
+  cycle(id: $cycleId) {
+    icpperStats(
+      first: $first
+      offset: $offset
+      sorted: $sorted
+      sortedType: $sortedType
+    ) {
+      nodes {
+        datum {
+          id
+          jobCount
+          size
+          income
+          ei
+          ownerEi
+          voteEi
+          beDeductedSizeByReview
+          haveTwoTimesLt04
+          haveTwoTimesLt08
+          unVotedAllVote
         }
-        total
+        icpper {
+          id
+          avatar
+          nickname
+          githubLogin
+        }
+        lastEi
+        beReviewerHasWarningUsers {
+          id
+          nickname
+        }
       }
+      total
     }
   }
-`;
+}
+    `;
 
 /**
  * __useOwnerCycleIcpperListQuery__
@@ -3915,111 +3256,84 @@ export const OwnerCycleIcpperListDocument = gql`
  *   },
  * });
  */
-export function useOwnerCycleIcpperListQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    OwnerCycleIcpperListQuery,
-    OwnerCycleIcpperListQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<OwnerCycleIcpperListQuery, OwnerCycleIcpperListQueryVariables>(
-    OwnerCycleIcpperListDocument,
-    options,
-  );
-}
-export function useOwnerCycleIcpperListLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    OwnerCycleIcpperListQuery,
-    OwnerCycleIcpperListQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<OwnerCycleIcpperListQuery, OwnerCycleIcpperListQueryVariables>(
-    OwnerCycleIcpperListDocument,
-    options,
-  );
-}
-export type OwnerCycleIcpperListQueryHookResult = ReturnType<typeof useOwnerCycleIcpperListQuery>;
-export type OwnerCycleIcpperListLazyQueryHookResult = ReturnType<
-  typeof useOwnerCycleIcpperListLazyQuery
->;
-export type OwnerCycleIcpperListQueryResult = Apollo.QueryResult<
-  OwnerCycleIcpperListQuery,
-  OwnerCycleIcpperListQueryVariables
->;
-export const CycleVoteListDocument = gql`
-  query CycleVoteList(
-    $cycleId: String!
-    $first: Int
-    $offset: Int
-    $isMyself: Boolean
-    $isPublic: Boolean
-  ) {
-    cycle(id: $cycleId) {
-      datum {
-        beginAt
-        endAt
-        voteBeginAt
-        voteEndAt
+export function useOwnerCycleIcpperListQuery(baseOptions: Apollo.QueryHookOptions<OwnerCycleIcpperListQuery, OwnerCycleIcpperListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<OwnerCycleIcpperListQuery, OwnerCycleIcpperListQueryVariables>(OwnerCycleIcpperListDocument, options);
       }
-      votes(first: $first, offset: $offset, isMyself: $isMyself, isPublic: $isPublic) {
-        total
-        nodes {
+export function useOwnerCycleIcpperListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OwnerCycleIcpperListQuery, OwnerCycleIcpperListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<OwnerCycleIcpperListQuery, OwnerCycleIcpperListQueryVariables>(OwnerCycleIcpperListDocument, options);
+        }
+export type OwnerCycleIcpperListQueryHookResult = ReturnType<typeof useOwnerCycleIcpperListQuery>;
+export type OwnerCycleIcpperListLazyQueryHookResult = ReturnType<typeof useOwnerCycleIcpperListLazyQuery>;
+export type OwnerCycleIcpperListQueryResult = Apollo.QueryResult<OwnerCycleIcpperListQuery, OwnerCycleIcpperListQueryVariables>;
+export const CycleVoteListDocument = gql`
+    query CycleVoteList($cycleId: String!, $first: Int, $offset: Int, $isMyself: Boolean, $isPublic: Boolean) {
+  cycle(id: $cycleId) {
+    datum {
+      beginAt
+      endAt
+      voteBeginAt
+      voteEndAt
+    }
+    votes(first: $first, offset: $offset, isMyself: $isMyself, isPublic: $isPublic) {
+      total
+      nodes {
+        datum {
+          id
+          isResultPublic
+          voteJobId
+          voteResultStatTypeAll
+          voteType
+          voterId
+        }
+        leftJob {
           datum {
+            title
+            githubRepoOwner
+            githubRepoName
+            githubIssueNumber
+            size
+            pairType
             id
-            isResultPublic
-            voteJobId
-            voteResultStatTypeAll
-            voteType
-            voterId
           }
-          leftJob {
-            datum {
-              title
-              githubRepoOwner
-              githubRepoName
-              githubIssueNumber
-              size
-              pairType
-              id
-            }
-            user {
-              id
-              githubLogin
-              nickname
-            }
-          }
-          rightJob {
-            datum {
-              title
-              githubRepoOwner
-              githubRepoName
-              githubIssueNumber
-              pairType
-              size
-              id
-            }
-            user {
-              id
-              githubLogin
-              nickname
-            }
-          }
-          voteJob {
-            datum {
-              id
-            }
-          }
-          voter {
+          user {
             id
             githubLogin
             nickname
           }
         }
+        rightJob {
+          datum {
+            title
+            githubRepoOwner
+            githubRepoName
+            githubIssueNumber
+            pairType
+            size
+            id
+          }
+          user {
+            id
+            githubLogin
+            nickname
+          }
+        }
+        voteJob {
+          datum {
+            id
+          }
+        }
+        voter {
+          id
+          githubLogin
+          nickname
+        }
       }
     }
   }
-`;
+}
+    `;
 
 /**
  * __useCycleVoteListQuery__
@@ -4041,53 +3355,40 @@ export const CycleVoteListDocument = gql`
  *   },
  * });
  */
-export function useCycleVoteListQuery(
-  baseOptions: Apollo.QueryHookOptions<CycleVoteListQuery, CycleVoteListQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<CycleVoteListQuery, CycleVoteListQueryVariables>(
-    CycleVoteListDocument,
-    options,
-  );
-}
-export function useCycleVoteListLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<CycleVoteListQuery, CycleVoteListQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<CycleVoteListQuery, CycleVoteListQueryVariables>(
-    CycleVoteListDocument,
-    options,
-  );
-}
+export function useCycleVoteListQuery(baseOptions: Apollo.QueryHookOptions<CycleVoteListQuery, CycleVoteListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CycleVoteListQuery, CycleVoteListQueryVariables>(CycleVoteListDocument, options);
+      }
+export function useCycleVoteListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CycleVoteListQuery, CycleVoteListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CycleVoteListQuery, CycleVoteListQueryVariables>(CycleVoteListDocument, options);
+        }
 export type CycleVoteListQueryHookResult = ReturnType<typeof useCycleVoteListQuery>;
 export type CycleVoteListLazyQueryHookResult = ReturnType<typeof useCycleVoteListLazyQuery>;
-export type CycleVoteListQueryResult = Apollo.QueryResult<
-  CycleVoteListQuery,
-  CycleVoteListQueryVariables
->;
+export type CycleVoteListQueryResult = Apollo.QueryResult<CycleVoteListQuery, CycleVoteListQueryVariables>;
 export const DaoCycleDocument = gql`
-  query DAOCycle($daoId: String!) {
-    dao(id: $daoId) {
-      cycles {
-        nodes {
-          datum {
-            id
-            timeZone
-            beginAt
-            endAt
-            pairBeginAt
-            pairEndAt
-            voteBeginAt
-            voteEndAt
-            pairedAt
-            voteResultPublishedAt
-            voteResultStatAt
-          }
+    query DAOCycle($daoId: String!) {
+  dao(id: $daoId) {
+    cycles {
+      nodes {
+        datum {
+          id
+          timeZone
+          beginAt
+          endAt
+          pairBeginAt
+          pairEndAt
+          voteBeginAt
+          voteEndAt
+          pairedAt
+          voteResultPublishedAt
+          voteResultStatAt
         }
       }
     }
   }
-`;
+}
+    `;
 
 /**
  * __useDaoCycleQuery__
@@ -4105,32 +3406,28 @@ export const DaoCycleDocument = gql`
  *   },
  * });
  */
-export function useDaoCycleQuery(
-  baseOptions: Apollo.QueryHookOptions<DaoCycleQuery, DaoCycleQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<DaoCycleQuery, DaoCycleQueryVariables>(DaoCycleDocument, options);
-}
-export function useDaoCycleLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<DaoCycleQuery, DaoCycleQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<DaoCycleQuery, DaoCycleQueryVariables>(DaoCycleDocument, options);
-}
+export function useDaoCycleQuery(baseOptions: Apollo.QueryHookOptions<DaoCycleQuery, DaoCycleQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<DaoCycleQuery, DaoCycleQueryVariables>(DaoCycleDocument, options);
+      }
+export function useDaoCycleLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DaoCycleQuery, DaoCycleQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<DaoCycleQuery, DaoCycleQueryVariables>(DaoCycleDocument, options);
+        }
 export type DaoCycleQueryHookResult = ReturnType<typeof useDaoCycleQuery>;
 export type DaoCycleLazyQueryHookResult = ReturnType<typeof useDaoCycleLazyQuery>;
 export type DaoCycleQueryResult = Apollo.QueryResult<DaoCycleQuery, DaoCycleQueryVariables>;
 export const CycleStatDataDocument = gql`
-  query CycleStatData($cycleId: String!) {
-    cycle(id: $cycleId) {
-      stat {
-        icpperCount
-        jobCount
-        size
-      }
+    query CycleStatData($cycleId: String!) {
+  cycle(id: $cycleId) {
+    stat {
+      icpperCount
+      jobCount
+      size
     }
   }
-`;
+}
+    `;
 
 /**
  * __useCycleStatDataQuery__
@@ -4148,39 +3445,26 @@ export const CycleStatDataDocument = gql`
  *   },
  * });
  */
-export function useCycleStatDataQuery(
-  baseOptions: Apollo.QueryHookOptions<CycleStatDataQuery, CycleStatDataQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<CycleStatDataQuery, CycleStatDataQueryVariables>(
-    CycleStatDataDocument,
-    options,
-  );
-}
-export function useCycleStatDataLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<CycleStatDataQuery, CycleStatDataQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<CycleStatDataQuery, CycleStatDataQueryVariables>(
-    CycleStatDataDocument,
-    options,
-  );
-}
+export function useCycleStatDataQuery(baseOptions: Apollo.QueryHookOptions<CycleStatDataQuery, CycleStatDataQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CycleStatDataQuery, CycleStatDataQueryVariables>(CycleStatDataDocument, options);
+      }
+export function useCycleStatDataLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CycleStatDataQuery, CycleStatDataQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CycleStatDataQuery, CycleStatDataQueryVariables>(CycleStatDataDocument, options);
+        }
 export type CycleStatDataQueryHookResult = ReturnType<typeof useCycleStatDataQuery>;
 export type CycleStatDataLazyQueryHookResult = ReturnType<typeof useCycleStatDataLazyQuery>;
-export type CycleStatDataQueryResult = Apollo.QueryResult<
-  CycleStatDataQuery,
-  CycleStatDataQueryVariables
->;
+export type CycleStatDataQueryResult = Apollo.QueryResult<CycleStatDataQuery, CycleStatDataQueryVariables>;
 export const CyclePairStatusDocument = gql`
-  query CyclePairStatus($cycleId: String!) {
-    cycle(id: $cycleId) {
-      pairTask {
-        status
-      }
+    query CyclePairStatus($cycleId: String!) {
+  cycle(id: $cycleId) {
+    pairTask {
+      status
     }
   }
-`;
+}
+    `;
 
 /**
  * __useCyclePairStatusQuery__
@@ -4198,39 +3482,26 @@ export const CyclePairStatusDocument = gql`
  *   },
  * });
  */
-export function useCyclePairStatusQuery(
-  baseOptions: Apollo.QueryHookOptions<CyclePairStatusQuery, CyclePairStatusQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<CyclePairStatusQuery, CyclePairStatusQueryVariables>(
-    CyclePairStatusDocument,
-    options,
-  );
-}
-export function useCyclePairStatusLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<CyclePairStatusQuery, CyclePairStatusQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<CyclePairStatusQuery, CyclePairStatusQueryVariables>(
-    CyclePairStatusDocument,
-    options,
-  );
-}
+export function useCyclePairStatusQuery(baseOptions: Apollo.QueryHookOptions<CyclePairStatusQuery, CyclePairStatusQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CyclePairStatusQuery, CyclePairStatusQueryVariables>(CyclePairStatusDocument, options);
+      }
+export function useCyclePairStatusLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CyclePairStatusQuery, CyclePairStatusQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CyclePairStatusQuery, CyclePairStatusQueryVariables>(CyclePairStatusDocument, options);
+        }
 export type CyclePairStatusQueryHookResult = ReturnType<typeof useCyclePairStatusQuery>;
 export type CyclePairStatusLazyQueryHookResult = ReturnType<typeof useCyclePairStatusLazyQuery>;
-export type CyclePairStatusQueryResult = Apollo.QueryResult<
-  CyclePairStatusQuery,
-  CyclePairStatusQueryVariables
->;
+export type CyclePairStatusQueryResult = Apollo.QueryResult<CyclePairStatusQuery, CyclePairStatusQueryVariables>;
 export const CycleVoteResultStatusDocument = gql`
-  query CycleVoteResultStatus($cycleId: String!) {
-    cycle(id: $cycleId) {
-      voteResultStatTask {
-        status
-      }
+    query CycleVoteResultStatus($cycleId: String!) {
+  cycle(id: $cycleId) {
+    voteResultStatTask {
+      status
     }
   }
-`;
+}
+    `;
 
 /**
  * __useCycleVoteResultStatusQuery__
@@ -4248,47 +3519,26 @@ export const CycleVoteResultStatusDocument = gql`
  *   },
  * });
  */
-export function useCycleVoteResultStatusQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    CycleVoteResultStatusQuery,
-    CycleVoteResultStatusQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<CycleVoteResultStatusQuery, CycleVoteResultStatusQueryVariables>(
-    CycleVoteResultStatusDocument,
-    options,
-  );
-}
-export function useCycleVoteResultStatusLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    CycleVoteResultStatusQuery,
-    CycleVoteResultStatusQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<CycleVoteResultStatusQuery, CycleVoteResultStatusQueryVariables>(
-    CycleVoteResultStatusDocument,
-    options,
-  );
-}
-export type CycleVoteResultStatusQueryHookResult = ReturnType<typeof useCycleVoteResultStatusQuery>;
-export type CycleVoteResultStatusLazyQueryHookResult = ReturnType<
-  typeof useCycleVoteResultStatusLazyQuery
->;
-export type CycleVoteResultStatusQueryResult = Apollo.QueryResult<
-  CycleVoteResultStatusQuery,
-  CycleVoteResultStatusQueryVariables
->;
-export const CyclePublishStatusDocument = gql`
-  query CyclePublishStatus($cycleId: String!) {
-    cycle(id: $cycleId) {
-      voteResultPublishTask {
-        status
+export function useCycleVoteResultStatusQuery(baseOptions: Apollo.QueryHookOptions<CycleVoteResultStatusQuery, CycleVoteResultStatusQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CycleVoteResultStatusQuery, CycleVoteResultStatusQueryVariables>(CycleVoteResultStatusDocument, options);
       }
+export function useCycleVoteResultStatusLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CycleVoteResultStatusQuery, CycleVoteResultStatusQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CycleVoteResultStatusQuery, CycleVoteResultStatusQueryVariables>(CycleVoteResultStatusDocument, options);
+        }
+export type CycleVoteResultStatusQueryHookResult = ReturnType<typeof useCycleVoteResultStatusQuery>;
+export type CycleVoteResultStatusLazyQueryHookResult = ReturnType<typeof useCycleVoteResultStatusLazyQuery>;
+export type CycleVoteResultStatusQueryResult = Apollo.QueryResult<CycleVoteResultStatusQuery, CycleVoteResultStatusQueryVariables>;
+export const CyclePublishStatusDocument = gql`
+    query CyclePublishStatus($cycleId: String!) {
+  cycle(id: $cycleId) {
+    voteResultPublishTask {
+      status
     }
   }
-`;
+}
+    `;
 
 /**
  * __useCyclePublishStatusQuery__
@@ -4306,52 +3556,34 @@ export const CyclePublishStatusDocument = gql`
  *   },
  * });
  */
-export function useCyclePublishStatusQuery(
-  baseOptions: Apollo.QueryHookOptions<CyclePublishStatusQuery, CyclePublishStatusQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<CyclePublishStatusQuery, CyclePublishStatusQueryVariables>(
-    CyclePublishStatusDocument,
-    options,
-  );
-}
-export function useCyclePublishStatusLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    CyclePublishStatusQuery,
-    CyclePublishStatusQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<CyclePublishStatusQuery, CyclePublishStatusQueryVariables>(
-    CyclePublishStatusDocument,
-    options,
-  );
-}
+export function useCyclePublishStatusQuery(baseOptions: Apollo.QueryHookOptions<CyclePublishStatusQuery, CyclePublishStatusQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CyclePublishStatusQuery, CyclePublishStatusQueryVariables>(CyclePublishStatusDocument, options);
+      }
+export function useCyclePublishStatusLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CyclePublishStatusQuery, CyclePublishStatusQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CyclePublishStatusQuery, CyclePublishStatusQueryVariables>(CyclePublishStatusDocument, options);
+        }
 export type CyclePublishStatusQueryHookResult = ReturnType<typeof useCyclePublishStatusQuery>;
-export type CyclePublishStatusLazyQueryHookResult = ReturnType<
-  typeof useCyclePublishStatusLazyQuery
->;
-export type CyclePublishStatusQueryResult = Apollo.QueryResult<
-  CyclePublishStatusQuery,
-  CyclePublishStatusQueryVariables
->;
+export type CyclePublishStatusLazyQueryHookResult = ReturnType<typeof useCyclePublishStatusLazyQuery>;
+export type CyclePublishStatusQueryResult = Apollo.QueryResult<CyclePublishStatusQuery, CyclePublishStatusQueryVariables>;
 export const DaoVotingCycleDocument = gql`
-  query DAOVotingCycle($daoId: String!) {
-    dao(id: $daoId) {
-      cycles(filter: voting) {
-        nodes {
-          datum {
-            id
-            beginAt
-            endAt
-            voteBeginAt
-            voteEndAt
-          }
+    query DAOVotingCycle($daoId: String!) {
+  dao(id: $daoId) {
+    cycles(filter: voting) {
+      nodes {
+        datum {
+          id
+          beginAt
+          endAt
+          voteBeginAt
+          voteEndAt
         }
       }
     }
   }
-`;
+}
+    `;
 
 /**
  * __useDaoVotingCycleQuery__
@@ -4369,45 +3601,32 @@ export const DaoVotingCycleDocument = gql`
  *   },
  * });
  */
-export function useDaoVotingCycleQuery(
-  baseOptions: Apollo.QueryHookOptions<DaoVotingCycleQuery, DaoVotingCycleQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<DaoVotingCycleQuery, DaoVotingCycleQueryVariables>(
-    DaoVotingCycleDocument,
-    options,
-  );
-}
-export function useDaoVotingCycleLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<DaoVotingCycleQuery, DaoVotingCycleQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<DaoVotingCycleQuery, DaoVotingCycleQueryVariables>(
-    DaoVotingCycleDocument,
-    options,
-  );
-}
+export function useDaoVotingCycleQuery(baseOptions: Apollo.QueryHookOptions<DaoVotingCycleQuery, DaoVotingCycleQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<DaoVotingCycleQuery, DaoVotingCycleQueryVariables>(DaoVotingCycleDocument, options);
+      }
+export function useDaoVotingCycleLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DaoVotingCycleQuery, DaoVotingCycleQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<DaoVotingCycleQuery, DaoVotingCycleQueryVariables>(DaoVotingCycleDocument, options);
+        }
 export type DaoVotingCycleQueryHookResult = ReturnType<typeof useDaoVotingCycleQuery>;
 export type DaoVotingCycleLazyQueryHookResult = ReturnType<typeof useDaoVotingCycleLazyQuery>;
-export type DaoVotingCycleQueryResult = Apollo.QueryResult<
-  DaoVotingCycleQuery,
-  DaoVotingCycleQueryVariables
->;
+export type DaoVotingCycleQueryResult = Apollo.QueryResult<DaoVotingCycleQuery, DaoVotingCycleQueryVariables>;
 export const DaoProcessingCycleDocument = gql`
-  query DAOProcessingCycle($daoId: String!) {
-    dao(id: $daoId) {
-      cycles(filter: processing) {
-        nodes {
-          datum {
-            id
-            beginAt
-            endAt
-          }
+    query DAOProcessingCycle($daoId: String!) {
+  dao(id: $daoId) {
+    cycles(filter: processing) {
+      nodes {
+        datum {
+          id
+          beginAt
+          endAt
         }
       }
     }
   }
-`;
+}
+    `;
 
 /**
  * __useDaoProcessingCycleQuery__
@@ -4425,103 +3644,85 @@ export const DaoProcessingCycleDocument = gql`
  *   },
  * });
  */
-export function useDaoProcessingCycleQuery(
-  baseOptions: Apollo.QueryHookOptions<DaoProcessingCycleQuery, DaoProcessingCycleQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<DaoProcessingCycleQuery, DaoProcessingCycleQueryVariables>(
-    DaoProcessingCycleDocument,
-    options,
-  );
-}
-export function useDaoProcessingCycleLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    DaoProcessingCycleQuery,
-    DaoProcessingCycleQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<DaoProcessingCycleQuery, DaoProcessingCycleQueryVariables>(
-    DaoProcessingCycleDocument,
-    options,
-  );
-}
-export type DaoProcessingCycleQueryHookResult = ReturnType<typeof useDaoProcessingCycleQuery>;
-export type DaoProcessingCycleLazyQueryHookResult = ReturnType<
-  typeof useDaoProcessingCycleLazyQuery
->;
-export type DaoProcessingCycleQueryResult = Apollo.QueryResult<
-  DaoProcessingCycleQuery,
-  DaoProcessingCycleQueryVariables
->;
-export const DaoCycleVoteListDocument = gql`
-  query DAOCycleVoteList($cycleId: String!, $first: Int, $offset: Int) {
-    cycle(id: $cycleId) {
-      datum {
-        beginAt
-        endAt
-        voteBeginAt
-        voteEndAt
+export function useDaoProcessingCycleQuery(baseOptions: Apollo.QueryHookOptions<DaoProcessingCycleQuery, DaoProcessingCycleQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<DaoProcessingCycleQuery, DaoProcessingCycleQueryVariables>(DaoProcessingCycleDocument, options);
       }
-      votes(first: $first, offset: $offset, isMyself: true) {
-        total
-        nodes {
+export function useDaoProcessingCycleLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DaoProcessingCycleQuery, DaoProcessingCycleQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<DaoProcessingCycleQuery, DaoProcessingCycleQueryVariables>(DaoProcessingCycleDocument, options);
+        }
+export type DaoProcessingCycleQueryHookResult = ReturnType<typeof useDaoProcessingCycleQuery>;
+export type DaoProcessingCycleLazyQueryHookResult = ReturnType<typeof useDaoProcessingCycleLazyQuery>;
+export type DaoProcessingCycleQueryResult = Apollo.QueryResult<DaoProcessingCycleQuery, DaoProcessingCycleQueryVariables>;
+export const DaoCycleVoteListDocument = gql`
+    query DAOCycleVoteList($cycleId: String!, $first: Int, $offset: Int) {
+  cycle(id: $cycleId) {
+    datum {
+      beginAt
+      endAt
+      voteBeginAt
+      voteEndAt
+    }
+    votes(first: $first, offset: $offset, isMyself: true) {
+      total
+      nodes {
+        datum {
+          id
+          isResultPublic
+          voteJobId
+          voteResultStatTypeAll
+          voteType
+          voterId
+        }
+        leftJob {
           datum {
+            title
+            githubRepoOwner
+            githubRepoName
+            githubIssueNumber
+            size
+            pairType
             id
-            isResultPublic
-            voteJobId
-            voteResultStatTypeAll
-            voteType
-            voterId
           }
-          leftJob {
-            datum {
-              title
-              githubRepoOwner
-              githubRepoName
-              githubIssueNumber
-              size
-              pairType
-              id
-            }
-            user {
-              id
-              githubLogin
-              nickname
-            }
-          }
-          rightJob {
-            datum {
-              title
-              githubRepoOwner
-              githubRepoName
-              githubIssueNumber
-              pairType
-              size
-              id
-            }
-            user {
-              id
-              githubLogin
-              nickname
-            }
-          }
-          voteJob {
-            datum {
-              id
-            }
-          }
-          voter {
+          user {
             id
             githubLogin
             nickname
           }
-          selfVoteResultTypeAll
         }
+        rightJob {
+          datum {
+            title
+            githubRepoOwner
+            githubRepoName
+            githubIssueNumber
+            pairType
+            size
+            id
+          }
+          user {
+            id
+            githubLogin
+            nickname
+          }
+        }
+        voteJob {
+          datum {
+            id
+          }
+        }
+        voter {
+          id
+          githubLogin
+          nickname
+        }
+        selfVoteResultTypeAll
       }
     }
   }
-`;
+}
+    `;
 
 /**
  * __useDaoCycleVoteListQuery__
@@ -4541,80 +3742,67 @@ export const DaoCycleVoteListDocument = gql`
  *   },
  * });
  */
-export function useDaoCycleVoteListQuery(
-  baseOptions: Apollo.QueryHookOptions<DaoCycleVoteListQuery, DaoCycleVoteListQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<DaoCycleVoteListQuery, DaoCycleVoteListQueryVariables>(
-    DaoCycleVoteListDocument,
-    options,
-  );
-}
-export function useDaoCycleVoteListLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<DaoCycleVoteListQuery, DaoCycleVoteListQueryVariables>,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<DaoCycleVoteListQuery, DaoCycleVoteListQueryVariables>(
-    DaoCycleVoteListDocument,
-    options,
-  );
-}
+export function useDaoCycleVoteListQuery(baseOptions: Apollo.QueryHookOptions<DaoCycleVoteListQuery, DaoCycleVoteListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<DaoCycleVoteListQuery, DaoCycleVoteListQueryVariables>(DaoCycleVoteListDocument, options);
+      }
+export function useDaoCycleVoteListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DaoCycleVoteListQuery, DaoCycleVoteListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<DaoCycleVoteListQuery, DaoCycleVoteListQueryVariables>(DaoCycleVoteListDocument, options);
+        }
 export type DaoCycleVoteListQueryHookResult = ReturnType<typeof useDaoCycleVoteListQuery>;
 export type DaoCycleVoteListLazyQueryHookResult = ReturnType<typeof useDaoCycleVoteListLazyQuery>;
-export type DaoCycleVoteListQueryResult = Apollo.QueryResult<
-  DaoCycleVoteListQuery,
-  DaoCycleVoteListQueryVariables
->;
+export type DaoCycleVoteListQueryResult = Apollo.QueryResult<DaoCycleVoteListQuery, DaoCycleVoteListQueryVariables>;
 export const UserCycleIcpperStatListDocument = gql`
-  query UserCycleIcpperStatList(
-    $daoName: String!
-    $userName: String!
-    $first: Int!
-    $offset: Int!
+    query UserCycleIcpperStatList($daoName: String!, $userName: String!, $first: Int!, $offset: Int!) {
+  icpperStats(
+    daoName: $daoName
+    userName: $userName
+    first: $first
+    offset: $offset
   ) {
-    icpperStats(daoName: $daoName, userName: $userName, first: $first, offset: $offset) {
-      nodes {
-        datum {
-          id
-          jobCount
-          size
-          income
-          ei
-          beDeductedSizeByReview
-          haveTwoTimesLt04
-          haveTwoTimesLt08
-          unVotedAllVote
-        }
-        cycle {
-          id
-          timeZone
-          beginAt
-          endAt
-          pairBeginAt
-          pairEndAt
-          voteBeginAt
-          voteEndAt
-          pairedAt
-          voteResultPublishedAt
-          createAt
-          updateAt
-        }
-        icpper {
-          id
-          avatar
-          nickname
-          githubLogin
-        }
-        lastEi
-        beReviewerHasWarningUsers {
-          id
-          nickname
-        }
+    nodes {
+      datum {
+        id
+        jobCount
+        size
+        income
+        ei
+        beDeductedSizeByReview
+        haveTwoTimesLt04
+        haveTwoTimesLt08
+        unVotedAllVote
       }
-      total
+      cycle {
+        id
+        timeZone
+        beginAt
+        endAt
+        pairBeginAt
+        pairEndAt
+        voteBeginAt
+        voteEndAt
+        pairedAt
+        voteResultPublishedAt
+        createAt
+        updateAt
+      }
+      icpper {
+        id
+        avatar
+        nickname
+        githubLogin
+      }
+      lastEi
+      beReviewerHasWarningUsers {
+        id
+        nickname
+      }
     }
+    total
   }
-`;
+}
+    `;
 
 /**
  * __useUserCycleIcpperStatListQuery__
@@ -4635,71 +3823,48 @@ export const UserCycleIcpperStatListDocument = gql`
  *   },
  * });
  */
-export function useUserCycleIcpperStatListQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    UserCycleIcpperStatListQuery,
-    UserCycleIcpperStatListQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<UserCycleIcpperStatListQuery, UserCycleIcpperStatListQueryVariables>(
-    UserCycleIcpperStatListDocument,
-    options,
-  );
-}
-export function useUserCycleIcpperStatListLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    UserCycleIcpperStatListQuery,
-    UserCycleIcpperStatListQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<UserCycleIcpperStatListQuery, UserCycleIcpperStatListQueryVariables>(
-    UserCycleIcpperStatListDocument,
-    options,
-  );
-}
-export type UserCycleIcpperStatListQueryHookResult = ReturnType<
-  typeof useUserCycleIcpperStatListQuery
->;
-export type UserCycleIcpperStatListLazyQueryHookResult = ReturnType<
-  typeof useUserCycleIcpperStatListLazyQuery
->;
-export type UserCycleIcpperStatListQueryResult = Apollo.QueryResult<
-  UserCycleIcpperStatListQuery,
-  UserCycleIcpperStatListQueryVariables
->;
-export const CyclesByTokenUnreleasedListDocument = gql`
-  query CyclesByTokenUnreleasedList($lastTimestamp: Int!) {
-    cyclesByTokenUnreleased(lastTimestamp: $lastTimestamp) {
-      nodes {
-        datum {
-          id
-          daoId
-          timeZone
-          beginAt
-          endAt
-          voteResultPublishedAt
+export function useUserCycleIcpperStatListQuery(baseOptions: Apollo.QueryHookOptions<UserCycleIcpperStatListQuery, UserCycleIcpperStatListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<UserCycleIcpperStatListQuery, UserCycleIcpperStatListQueryVariables>(UserCycleIcpperStatListDocument, options);
+      }
+export function useUserCycleIcpperStatListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserCycleIcpperStatListQuery, UserCycleIcpperStatListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<UserCycleIcpperStatListQuery, UserCycleIcpperStatListQueryVariables>(UserCycleIcpperStatListDocument, options);
         }
-        icpperStats {
-          nodes {
-            datum {
-              cycleId
-              jobSize
-              size
-            }
-            icpper {
-              id
-              githubLogin
-              nickname
-              erc20Address
-            }
+export type UserCycleIcpperStatListQueryHookResult = ReturnType<typeof useUserCycleIcpperStatListQuery>;
+export type UserCycleIcpperStatListLazyQueryHookResult = ReturnType<typeof useUserCycleIcpperStatListLazyQuery>;
+export type UserCycleIcpperStatListQueryResult = Apollo.QueryResult<UserCycleIcpperStatListQuery, UserCycleIcpperStatListQueryVariables>;
+export const CyclesByTokenUnreleasedListDocument = gql`
+    query CyclesByTokenUnreleasedList($lastTimestamp: Int!) {
+  cyclesByTokenUnreleased(lastTimestamp: $lastTimestamp) {
+    nodes {
+      datum {
+        id
+        daoId
+        timeZone
+        beginAt
+        endAt
+        voteResultPublishedAt
+      }
+      icpperStats {
+        nodes {
+          datum {
+            cycleId
+            jobSize
+            size
+          }
+          icpper {
+            id
+            githubLogin
+            nickname
+            erc20Address
           }
         }
       }
     }
   }
-`;
+}
+    `;
 
 /**
  * __useCyclesByTokenUnreleasedListQuery__
@@ -4717,37 +3882,14 @@ export const CyclesByTokenUnreleasedListDocument = gql`
  *   },
  * });
  */
-export function useCyclesByTokenUnreleasedListQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    CyclesByTokenUnreleasedListQuery,
-    CyclesByTokenUnreleasedListQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    CyclesByTokenUnreleasedListQuery,
-    CyclesByTokenUnreleasedListQueryVariables
-  >(CyclesByTokenUnreleasedListDocument, options);
-}
-export function useCyclesByTokenUnreleasedListLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    CyclesByTokenUnreleasedListQuery,
-    CyclesByTokenUnreleasedListQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    CyclesByTokenUnreleasedListQuery,
-    CyclesByTokenUnreleasedListQueryVariables
-  >(CyclesByTokenUnreleasedListDocument, options);
-}
-export type CyclesByTokenUnreleasedListQueryHookResult = ReturnType<
-  typeof useCyclesByTokenUnreleasedListQuery
->;
-export type CyclesByTokenUnreleasedListLazyQueryHookResult = ReturnType<
-  typeof useCyclesByTokenUnreleasedListLazyQuery
->;
-export type CyclesByTokenUnreleasedListQueryResult = Apollo.QueryResult<
-  CyclesByTokenUnreleasedListQuery,
-  CyclesByTokenUnreleasedListQueryVariables
->;
+export function useCyclesByTokenUnreleasedListQuery(baseOptions: Apollo.QueryHookOptions<CyclesByTokenUnreleasedListQuery, CyclesByTokenUnreleasedListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CyclesByTokenUnreleasedListQuery, CyclesByTokenUnreleasedListQueryVariables>(CyclesByTokenUnreleasedListDocument, options);
+      }
+export function useCyclesByTokenUnreleasedListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CyclesByTokenUnreleasedListQuery, CyclesByTokenUnreleasedListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CyclesByTokenUnreleasedListQuery, CyclesByTokenUnreleasedListQueryVariables>(CyclesByTokenUnreleasedListDocument, options);
+        }
+export type CyclesByTokenUnreleasedListQueryHookResult = ReturnType<typeof useCyclesByTokenUnreleasedListQuery>;
+export type CyclesByTokenUnreleasedListLazyQueryHookResult = ReturnType<typeof useCyclesByTokenUnreleasedListLazyQuery>;
+export type CyclesByTokenUnreleasedListQueryResult = Apollo.QueryResult<CyclesByTokenUnreleasedListQuery, CyclesByTokenUnreleasedListQueryVariables>;
