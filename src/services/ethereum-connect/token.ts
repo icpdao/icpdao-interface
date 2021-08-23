@@ -1,10 +1,9 @@
 import { DAOTokenContract } from './index';
-import {ERC20Connect} from "@/services/ethereum-connect/erc20";
-import {ETH_CONNECT} from "@/services/ethereum-connect/typings";
-import {WETH9} from "@uniswap/sdk-core";
+import { ERC20Connect } from '@/services/ethereum-connect/erc20';
+import { ETH_CONNECT } from '@/services/ethereum-connect/typings';
+import { WETH9 } from '@uniswap/sdk-core';
 
 export class DAOTokenConnect extends ERC20Connect {
-
   constructor(tokenAddress: string, network: string, metamaskProvider: any) {
     super(tokenAddress, network, metamaskProvider);
     this.contract = DAOTokenContract(tokenAddress, this.provider);
@@ -23,13 +22,17 @@ export class DAOTokenConnect extends ERC20Connect {
     return await this.contract.managers();
   }
 
+  async getMintAnchor() {
+    return await this.contract.mintAnchor();
+  }
+
   async createLPPoolOrLinkLPPool(body: ETH_CONNECT.CreateLPPool) {
     const signer = this.metamaskProvider.getSigner();
     const contractWithSigner = this.actionContract.connect(signer);
-    console.log({body})
+    console.log({ body });
     let value = '0';
     if (WETH9[this.chainId].address === body.quoteTokenAddress) {
-      value = body.quoteTokenAmount
+      value = body.quoteTokenAmount;
     }
     return await contractWithSigner.createLPPoolOrLinkLPPool(
       body.baseTokenAmount,
@@ -39,19 +42,19 @@ export class DAOTokenConnect extends ERC20Connect {
       body.tickLower,
       body.tickUpper,
       body.sqrtPriceX96,
-      {value}
-    )
+      { value },
+    );
   }
 
   async updateLPPool(body: ETH_CONNECT.AddLP) {
     const signer = this.metamaskProvider.getSigner();
     const contractWithSigner = this.actionContract.connect(signer);
-    console.log({body})
+    console.log({ body });
     return await contractWithSigner.updateLPPool(
       body.baseTokenAmount,
       body.tickLower,
       body.tickUpper,
-    )
+    );
   }
 
   async addManager(managerAddress: string) {
@@ -66,5 +69,16 @@ export class DAOTokenConnect extends ERC20Connect {
     return await contractWithSigner.removeManager(managerAddress);
   }
 
+  async mint(body: ETH_CONNECT.Mint) {
+    const signer = this.metamaskProvider.getSigner();
+    const contractWithSigner = this.actionContract.connect(signer);
+    console.log(body);
+    return await contractWithSigner.mint(
+      body.mintTokenAddressList,
+      body.mintTokenAmountRatioList,
+      body.endTimestamp,
+      body.tickLower,
+      body.tickUpper,
+    );
+  }
 }
-

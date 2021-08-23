@@ -4,18 +4,18 @@ import DAOFactoryABI from './abis/dao-factory.json';
 import DAOStakingABI from './abis/dao-staking.json';
 import DAOTokenABI from './abis/dao-token.json';
 import ERC20ABI from './abis/erc20.json';
-import { abi as IUniswapV3PoolABI } from "@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json";
-import { abi as INonfungiblePositionManagerABI } from "@uniswap/v3-periphery/artifacts/contracts/interfaces/INonfungiblePositionManager.sol/INonfungiblePositionManager.json";
-import { abi as IUniswapV3FactoryABI } from "@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Factory.sol/IUniswapV3Factory.json";
+import { abi as IUniswapV3PoolABI } from '@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json';
+import { abi as INonfungiblePositionManagerABI } from '@uniswap/v3-periphery/artifacts/contracts/interfaces/INonfungiblePositionManager.sol/INonfungiblePositionManager.json';
+import { abi as IUniswapV3FactoryABI } from '@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Factory.sol/IUniswapV3Factory.json';
 
 import { getNetwork } from '@ethersproject/networks';
-import {EthereumChainId} from "@/utils/utils";
-import JSBI from "jsbi";
+import { EthereumChainId } from '@/utils/utils';
+import JSBI from 'jsbi';
 
-export const DAOFactoryAddress = '0xb3318aD1F4a541829608e6B57acb5793fB45D048';
-export const DAOStakingAddress = '0xfaA04c4318b96593bdD87b768Cc7bbF78b41b7fa';
+export const DAOFactoryAddress = '0x61ED4972A78278CFFD68855EA516f1d52C975Eb9';
+export const DAOStakingAddress = '0x3D88899Cb53db6621C294a295E95D2C7F1aD3bb8';
 export const ZeroAddress = '0x0000000000000000000000000000000000000000';
-export const BIG_INT_ZERO = JSBI.BigInt(0)
+export const BIG_INT_ZERO = JSBI.BigInt(0);
 export const UniswapPoolAddress = '0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8';
 export const UniswapV3PositionsAddress = '0xC36442b4a4522E871399CD717aBDD847Ab11FE88';
 

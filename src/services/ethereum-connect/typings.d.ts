@@ -1,9 +1,9 @@
 import type { DAOFactoryConnect } from './factory';
 import type { DAOStakingConnect } from './staking';
-import type {ethers} from "ethers";
-import type {Token} from "@uniswap/sdk-core";
-import type {FeeAmount, Pool} from "@uniswap/v3-sdk";
-import type {UniswapField} from "@/services/ethereum-connect/uniswap";
+import type { ethers } from 'ethers';
+import type { Token } from '@uniswap/sdk-core';
+import type { FeeAmount, Pool } from '@uniswap/v3-sdk';
+import type { UniswapField } from '@/services/ethereum-connect/uniswap';
 
 export type ETHConnect = {
   network: string;
@@ -60,12 +60,19 @@ declare namespace ETH_CONNECT {
     tickLower: number;
     tickUpper: number;
     sqrtPriceX96: string;
-  }
+  };
   type AddLP = {
     baseTokenAmount: string;
     tickLower: number;
     tickUpper: number;
-  }
+  };
+  type Mint = {
+    mintTokenAddressList: string[];
+    mintTokenAmountRatioList: number[];
+    endTimestamp: number;
+    tickLower: number;
+    tickUpper: number;
+  };
   type UniswapPoolImmutables = {
     factory: string;
     token0: string;
