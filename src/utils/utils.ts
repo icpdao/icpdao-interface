@@ -10,6 +10,18 @@ const reg =
 
 export const isUrl = (path: string): boolean => reg.test(path);
 
+export const setMetamaskDisconnect = () => {
+  return window.localStorage.setItem('metamask', 'disconnect');
+};
+
+export const setMetamaskConnect = () => {
+  return window.localStorage.setItem('metamask', 'connect');
+};
+
+export const getMetamask = () => {
+  return window.localStorage.getItem('metamask');
+};
+
 export const getAuthorization = () => {
   // 可能存在格式转换
   return window.localStorage.getItem('authorization');
@@ -98,6 +110,10 @@ export const getFormatTimeByZone = (time: number, timeZone: number, format: stri
   return moment.unix(time).utcOffset(timeZone).format(format);
 };
 
+export const getTimestampByZone = (time: number, timeZone: number) => {
+  return moment.unix(time).utcOffset(timeZone).unix();
+};
+
 export const getTimeZoneOffset = () => {
   return moment().utcOffset();
 };
@@ -165,3 +181,19 @@ export const getCurrentTimestamps = () => {
 
 export const githubCallback = '/login/auth_callback';
 export const getProfile = '/users/profile';
+
+export const EthereumNetwork = {
+  '0x1': 'homestead',
+  '0x3': 'ropsten',
+  '0x4': 'rinkeby',
+  '0x5': 'goerli',
+  '0x2a': 'kovan',
+};
+
+export const EthereumChainId = {
+  homestead: 1,
+  ropsten: 3,
+  rinkeby: 4,
+  goerli: 5,
+  kovan: 42,
+};

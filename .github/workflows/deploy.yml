@@ -26,6 +26,7 @@ jobs:
           REACT_APP_GITHUB_APP_CLIENT_ID: ${{secrets.DEV__ICPDAO_GITHUB_APP_CLIENT_ID}}
           REACT_APP_ICPDAO_BACKEND_BASE_URL: ${{secrets.DEV__REACT_APP_ICPDAO_BACKEND_BASE_URL}}
           REACT_APP_ICPDAO_BACKEND_VERSION: "v1"
+          REACT_APP_ICPDAO_ETHEREUM_INFURA_KEY: ${{secrets.DEV__REACT_APP_ICPDAO_ETHEREUM_INFURA_KEY}}
         run: |
           yarn
           yarn build
@@ -57,6 +58,7 @@ jobs:
           REACT_APP_GITHUB_APP_CLIENT_ID: ${{secrets.DEV__ICPDAO_GITHUB_APP_CLIENT_ID}}
           REACT_APP_ICPDAO_BACKEND_BASE_URL: ${{secrets.DEV__REACT_APP_ICPDAO_BACKEND_BASE_URL}}
           REACT_APP_ICPDAO_BACKEND_VERSION: "v1"
+          REACT_APP_ICPDAO_ETHEREUM_INFURA_KEY: ${{secrets.DEV__REACT_APP_ICPDAO_ETHEREUM_INFURA_KEY}}
           WEBSITE_BUCKET_NAME: ${{secrets.DEV__WEBSITE_BUCKET_NAME}}
         run: |
           npm install -g serverless
@@ -92,6 +94,7 @@ jobs:
           REACT_APP_ICPDAO_BACKEND_BASE_URL: ${{secrets.PROD__REACT_APP_ICPDAO_BACKEND_BASE_URL}}
           REACT_APP_ICPDAO_BACKEND_VERSION: "v1"
           WEBSITE_BUCKET_NAME: ${{secrets.PROD__WEBSITE_BUCKET_NAME}}
+          REACT_APP_ICPDAO_ETHEREUM_INFURA_KEY: ${{secrets.PROD__REACT_APP_ICPDAO_ETHEREUM_INFURA_KEY}}
         run: |
           npm install -g serverless
           yarn

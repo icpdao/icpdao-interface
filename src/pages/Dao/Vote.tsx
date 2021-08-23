@@ -13,12 +13,14 @@ import {
   useDaoCycleVoteListQuery,
   useUpdateAllVoteMutation,
   useUpdatePairVoteMutation,
+  useUpdateVoteConfirmMutation,
 } from '@/services/dao/generated';
 import { useCallback, useState } from 'react';
 import StatCard from '@/components/StatCard';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { Button, Card, message, Pagination, Row, Tooltip } from 'antd';
 import { getCurrentPage, getTimeDistanceHumanize } from '@/utils/utils';
+import { getMetamaskProvider } from '@/services/ethereum-connect';
 
 const breadcrumb = (daoId: string, cycleId: string) => [
   { icon: <HomeOutlined />, path: '', breadcrumbName: 'HOME', menuId: 'home' },
@@ -152,7 +154,9 @@ const pageSize = 20;
 export default (props: { match: { params: { cycleId: string; daoId: string } } }): ReactNode => {
   const { cycleId, daoId } = props.match.params;
   const intl = useIntl();
+  const [confirmButtonLoading, setConfirmButtonLoading] = useState<boolean>(false);
   const { initialState } = useModel('@@initialState');
+  const { isConnected, metamaskProvider, event$ } = useModel('useWalletModel');
   const [queryVariables, setQueryVariables] = useState<DaoCycleVoteListQueryVariables>({
     cycleId,
     first: pageSize,
@@ -164,6 +168,7 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
   });
   const [updateAllVoteMutation] = useUpdateAllVoteMutation();
   const [updatePairVoteMutation] = useUpdatePairVoteMutation();
+  const [updateVoteConfirm] = useUpdateVoteConfirmMutation();
   const updateAllVote = useCallback(
     async (voteId: string, voted: boolean) => {
       try {
@@ -234,9 +239,28 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
     return listDom;
   }, [data, updateAllVote, updatePairVote]);
 
-  const handleSubmit = useCallback(() => {
-    message.info('还没有集成 token，不用点击这个提交按钮');
-  }, []);
+  const handleSubmit = useCallback(async () => {
+    const provider = getMetamaskProvider(metamaskProvider);
+    if (!provider) return;
+    try {
+      const signer = provider.getSigner();
+      const signatureAddress = await signer.getAddress();
+      const signatureMsg = `I confirm the voting results of ${daoId} DAO's ${cycleId} cycle and will not modify them any more.`;
+      const signature = await signer.signMessage(signatureMsg);
+      setConfirmButtonLoading(true);
+      await updateVoteConfirm({
+        variables: { cycleId, signatureAddress, signatureMsg, signature },
+      });
+      await refetch();
+      setConfirmButtonLoading(false);
+    } catch (e) {
+      setConfirmButtonLoading(false);
+    }
+  }, [cycleId, daoId, metamaskProvider, updateVoteConfirm]);
+
+  const handlerMetamaskConnect = useCallback(() => {
+    event$?.emit();
+  }, [event$]);
 
   if (!initialState || loading || error) {
     return <PageLoading />;
@@ -271,9 +295,23 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
               { end_left_times: endLeftTimes },
             )}
           >
-            <Button type="primary" className={styles.submitButton} onClick={handleSubmit}>
-              {intl.formatMessage({ id: 'pages.dao.vote.submit' })}
-            </Button>
+            {isConnected ? (
+              <Button
+                type="primary"
+                loading={confirmButtonLoading}
+                className={styles.submitButton}
+                onClick={handleSubmit}
+                disabled={data?.cycle?.votes?.confirm || true}
+              >
+                {intl.formatMessage({ id: 'pages.dao.vote.submit' })}
+              </Button>
+            ) : (
+              <Button type="primary" onClick={() => handlerMetamaskConnect()}>
+                {intl.formatMessage({
+                  id: 'pages.dao.common.connect',
+                })}
+              </Button>
+            )}
           </Tooltip>
           <StatCard data={statCardData} />
           {voteList()}

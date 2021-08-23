@@ -48,8 +48,8 @@ mutation FollowDAO($daoId: String!, $followType: DAOFollowTypeEnum!) {
   }
 }
 
-mutation UpdateDAOBaseInfo($id: String!, $desc: String, $logo: String) {
-  updateDaoBaseInfo(id: $id, desc: $desc, logo: $logo) {
+mutation UpdateDAOBaseInfo($id: String!, $desc: String, $logo: String, $tokenAddress: String) {
+  updateDaoBaseInfo(id: $id, desc: $desc, logo: $logo, tokenAddress: $tokenAddress) {
     dao {
       updateAt
     }
@@ -164,6 +164,18 @@ mutation BeginPublishCycleTask($cycleId: String!) {
 
 mutation UpdateVotePairPublic($voteId: String!, $isPublic: Boolean!) {
   changeVoteResultPublic(id: $voteId, public: $isPublic) {
+    ok
+  }
+}
+
+mutation MarkCyclesTokenReleased($daoId: String!, $cycleIds: [String]!, $unitSizeValue: String!) {
+  markCyclesTokenReleased(daoId: $daoId, cycleIds: $cycleIds, unitSizeValue: $unitSizeValue) {
+    ok
+  }
+}
+
+mutation UpdateVoteConfirm($cycleId: String!, $signatureAddress: String!, $signatureMsg: String!, $signature: String!) {
+  updateVoteConfirm(cycleId: $cycleId, signatureAddress: $signatureAddress, signatureMsg: $signatureMsg, signature: $signature) {
     ok
   }
 }

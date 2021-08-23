@@ -69,7 +69,7 @@ const errorHandler = (error: {
 const authHeaderInterceptor = (url: string, options: RequestOptionsInit) => {
   const auth = getAuthorization();
   const prefix = url.startsWith('http') ? '' : REACT_APP_ICPDAO_BACKEND_BASE_URL;
-  if (auth) {
+  if (auth && prefix !== '') {
     return {
       url: `${prefix}${url}`,
       options: { ...options, interceptors: true, headers: { Authorization: `${auth}` } },

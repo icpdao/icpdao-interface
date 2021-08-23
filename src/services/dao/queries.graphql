@@ -106,6 +106,12 @@ query DAOHomeWithLoginQuery($id: String!, $userId: String!) {
   }
 }
 
+query DAOTokenConfig($daoId: String!) {
+  daoTokenConfig(daoId: $daoId) {
+    ethDaoId
+  }
+}
+
 query DAOFollowInfo($id: String!, $userId: String!) {
   dao(id: $id) {
     datum {
@@ -477,6 +483,7 @@ query DAOCycleVoteList($cycleId: String!, $first: Int, $offset: Int) {
     }
     votes(first: $first, offset: $offset, isMyself: true) {
       total
+      confirm
       nodes {
         datum {
           id
@@ -575,5 +582,35 @@ query UserCycleIcpperStatList($daoName: String!, $userName: String!, $first: Int
       }
     }
     total
+  }
+}
+
+query CyclesByTokenUnreleasedList($lastTimestamp: Int!) {
+  cyclesByTokenUnreleased(lastTimestamp: $lastTimestamp) {
+    nodes {
+      datum {
+        id
+        daoId
+        timeZone
+        beginAt
+        endAt
+        voteResultPublishedAt
+      }
+      icpperStats {
+        nodes {
+          datum {
+            cycleId
+            jobSize
+            size
+          }
+          icpper {
+            id
+            githubLogin
+            nickname
+            erc20Address
+          }
+        }
+      }
+    }
   }
 }
