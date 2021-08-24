@@ -350,7 +350,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
   const [updateFollowDao] = useFollowDaoMutation();
   const [updateDaoBaseInfo] = useUpdateDaoBaseInfoMutation();
 
-  const dao = data?.dao?.datum || { name: '', desc: '', createAt: 0, logo: '' };
+  const dao = data?.dao?.datum || { name: '', desc: '', createAt: 0, logo: '', tokenSymbol: '' };
 
   let userRole: 'no_login' | 'normal' | 'pre_icpper' | 'icpper' | 'owner' = 'no_login';
   if (access.isDaoOwner(data?.dao?.datum?.ownerId || '')) {
@@ -561,7 +561,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
 
         <Tabs defaultActiveKey={defaultActiveKey}>
           <TabPane tab={<FormattedMessage id={'pages.dao.home.tab.icpperStat'} />} key="icpperStat">
-            <DaoIcpperStat daoId={daoId} />
+            <DaoIcpperStat daoId={daoId} tokenSymbol={data?.dao?.datum?.tokenSymbol || ''} />
           </TabPane>
 
           <TabPane tab={<FormattedMessage id={'pages.dao.home.tab.jobStat'} />} key="jobStat">
