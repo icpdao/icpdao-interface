@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import GlobalModal from '@/components/Modal';
 import { useIntl, FormattedMessage, history } from 'umi';
 import styles from './Home.less';
@@ -9,6 +9,7 @@ import GlobalTooltip from '@/components/Tooltip';
 import { Row, Col, Space, Button } from 'antd';
 import image1 from '../assets/image/home-image-1.jpeg';
 import { useMentorWarningModal } from '@/pages/components/MentorWarningModal';
+import { getGithubOAuthUrl } from '@/components/RightHeader/AvatarDropdown';
 
 export default (): React.ReactNode => {
   const { profile } = getUserInfo();
@@ -25,12 +26,25 @@ export default (): React.ReactNode => {
 
   const intl = useIntl();
 
-  const { mentorWarningModal } = useMentorWarningModal(defaultWarning);
+  const { mentorWarningModal, setVisible } = useMentorWarningModal(defaultWarning);
 
   const [mentorAcceptLoading, setMentorAcceptLoading] = useState(false);
 
   const [mentorWelcomeVisible, setMentorWelcomeVisible] = useState(defaultWelcome);
   const { refresh } = useModel('@@initialState');
+
+  const handleMarkJob = useCallback(() => {
+    if (!profile.id) {
+      const githubOAuth = getGithubOAuthUrl();
+      window.open(githubOAuth, '_self');
+      return;
+    }
+    if (profile.status === 0) {
+      setVisible(true);
+      return;
+    }
+    history.push('/job');
+  }, [profile, setVisible]);
 
   const handleAccept = async () => {
     setMentorAcceptLoading(true);
@@ -150,7 +164,7 @@ export default (): React.ReactNode => {
                 <Button size={'large'} type="primary" onClick={() => history.push('/dao/explore')}>
                   <FormattedMessage id={'pages.home.button1'} />
                 </Button>
-                <Button size={'large'} type="primary" onClick={() => history.push('/job')}>
+                <Button size={'large'} type="primary" onClick={handleMarkJob}>
                   <FormattedMessage id={'pages.home.button2'} />
                 </Button>
               </Space>

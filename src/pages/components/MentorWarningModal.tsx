@@ -1,17 +1,20 @@
-import type { ModalProps } from 'antd/es/modal';
 import { Button, Col, Modal, Row, Space } from 'antd';
 import React, { useCallback, useState } from 'react';
 import styles from './MentorWarningModal.less';
 import { useIntl } from '@@/plugin-locale/localeExports';
 
-const MentorWarningModal: React.FC<ModalProps> = ({ visible }) => {
+type MentorWarningModalProps = {
+  visible: boolean;
+  setVisible: (bool: boolean) => void;
+};
+
+const MentorWarningModal: React.FC<MentorWarningModalProps> = ({ visible, setVisible }) => {
   const intl = useIntl();
-  const [mentorWarningVisible, setMentorWarningVisible] = useState<boolean | undefined>(visible);
 
   const onOk = useCallback(() => {
     window.open('https://discord.gg/yz7AWVdRmj', '_blank');
-    setMentorWarningVisible(false);
-  }, []);
+    setVisible(false);
+  }, [setVisible]);
 
   return (
     <Modal
@@ -26,7 +29,7 @@ const MentorWarningModal: React.FC<ModalProps> = ({ visible }) => {
       }}
       width={493}
       centered
-      visible={mentorWarningVisible}
+      visible={visible}
       footer={
         <Row justify={'center'}>
           <Col>
@@ -39,7 +42,7 @@ const MentorWarningModal: React.FC<ModalProps> = ({ visible }) => {
         </Row>
       }
       onCancel={() => {
-        setMentorWarningVisible(false);
+        setVisible(false);
       }}
     >
       <div>
@@ -78,12 +81,12 @@ const MentorWarningModal: React.FC<ModalProps> = ({ visible }) => {
   );
 };
 
-export default MentorWarningModal;
-
 export const useMentorWarningModal = (defaultVisible: boolean) => {
   const [visible, setVisible] = useState(defaultVisible);
 
-  const mentorWarningModal = <MentorWarningModal key={'warningModal'} visible={visible} />;
+  const mentorWarningModal = (
+    <MentorWarningModal key={'warningModal'} visible={visible} setVisible={setVisible} />
+  );
 
   return {
     mentorWarningModal,
