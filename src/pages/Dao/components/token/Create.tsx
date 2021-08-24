@@ -99,7 +99,14 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
         const deployEvent = receipt.events.pop();
         console.log(deployEvent.args);
         if (setTokenAddress && deployEvent.args && deployEvent.args.length > 0) {
-          await updateDaoBaseInfo({ variables: { id: daoId, tokenAddress: deployEvent.args[-1] } });
+          await updateDaoBaseInfo({
+            variables: {
+              id: daoId,
+              tokenAddress: deployEvent.args[-1],
+              tokenName: createFormData.tokenName,
+              tokenSymbol: createFormData.tokenSymbol,
+            },
+          });
           setTokenAddress(deployEvent.args[-1] || '');
           setCreateFormData(defaultCreateForm);
         }

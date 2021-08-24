@@ -2,7 +2,10 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import type { TokenConfigComponentsProps } from '@/pages/Dao/components/TokenConfig';
 import { useIntl, FormattedMessage } from 'umi';
 import type { CycleQuery } from '@/services/dao/generated';
-import { useCyclesByTokenUnreleasedListLazyQuery } from '@/services/dao/generated';
+import {
+  useCyclesByTokenUnreleasedListLazyQuery,
+  useMarkCyclesTokenReleasedMutation,
+} from '@/services/dao/generated';
 import { ZeroAddress } from '@/services/ethereum-connect';
 import { DAOTokenConnect } from '@/services/ethereum-connect/token';
 import { useModel } from '@@/plugin-model/useModel';
@@ -24,6 +27,8 @@ import { getFormatTimeByZone, getTimestampByZone } from '@/utils/utils';
 import GlobalModal from '@/components/Modal';
 import { LinkOutlined, UserOutlined } from '@ant-design/icons';
 import type { ETH_CONNECT } from '@/services/ethereum-connect/typings';
+import { formatUnits } from 'ethers/lib/utils';
+import { BigNumber } from 'ethers';
 
 type previewMintData = {
   uid: string;
@@ -57,12 +62,17 @@ const previewTableColumns = [
   },
 ];
 
-const TokenMint: React.FC<TokenConfigComponentsProps> = ({ tokenAddress, setCurrentTab }) => {
+const TokenMint: React.FC<TokenConfigComponentsProps> = ({
+  tokenAddress,
+  setCurrentTab,
+  daoId,
+}) => {
   const intl = useIntl();
 
   const [cycles, setCycles] = useState<Record<string, CycleQuery>>({});
   const [selectCycles, setSelectCycles] = useState<CycleQuery[]>([]);
   const [currentSelectCycle, setCurrentSelectCycle] = useState<string>('');
+  const [tokenReleasedCycles, setTokenReleasedCycles] = useState<string[]>([]);
   const [previewMintData, setPreviewMintData] = useState<previewMintData[]>([]);
   const [previewMintBeginTime, setPreviewMintBeginTime] = useState<number[]>([0, 0]);
   const [previewMintEndTime, setPreviewMintEndTime] = useState<number[]>([0, 0]);
@@ -99,6 +109,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({ tokenAddress, setCurr
 
   const [queryCyclesByTokenUnreleasedList, cyclesByTokenUnreleasedListResult] =
     useCyclesByTokenUnreleasedListLazyQuery({ fetchPolicy: 'no-cache' });
+  const [markCyclesTokenReleased] = useMarkCyclesTokenReleasedMutation();
 
   useMemo(async () => {
     if (!tokenContract) return;
@@ -150,6 +161,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({ tokenAddress, setCurr
       selectCycles[0]?.datum?.beginAt || 0,
       selectCycles[0]?.datum?.timeZone || 0,
     ]);
+    const cycleIds: string[] = [];
     for (let i = 0; i < selectCycles.length; i += 1) {
       selectCycles[i].icpperStats?.nodes?.forEach((is) => {
         const uid = is?.icpper?.id;
@@ -168,11 +180,13 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({ tokenAddress, setCurr
           };
         }
       });
+      cycleIds.push(selectCycles[i].datum?.id || '');
       if (selectCycles[i].datum?.id === currentSelectCycle) {
         setPreviewMintEndTime([
           selectCycles[i].datum?.endAt || 0,
           selectCycles[i].datum?.timeZone || 0,
         ]);
+        setTokenReleasedCycles(cycleIds);
         break;
       }
     }
@@ -180,7 +194,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({ tokenAddress, setCurr
   }, [currentSelectCycle, selectCycles]);
 
   const handlerMint = useCallback(async () => {
-    if (!position || !tokenContract) return;
+    if (!position || !tokenContract || !daoId) return;
     try {
       setMintButtonLoading(true);
       const mintBody: ETH_CONNECT.Mint = {
@@ -194,7 +208,17 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({ tokenAddress, setCurr
       setMintButtonLoading(false);
       setPreviewMint(false);
       setLoadingTransferComplete(true);
-      await tx.wait();
+      const receipt = await tx.wait();
+      const deployEvent = receipt.events.pop();
+      const mintValue: BigNumber = deployEvent.args[-1];
+      let allSize = 0;
+      previewMintData.forEach((pd) => {
+        allSize += pd.size;
+      });
+      const unitSizeValue = formatUnits(mintValue.div(BigNumber.from(allSize)));
+      await markCyclesTokenReleased({
+        variables: { daoId, cycleIds: tokenReleasedCycles, unitSizeValue },
+      });
       setLoadingTransferComplete(false);
     } catch (e) {
       setMintButtonLoading(false);
