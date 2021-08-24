@@ -16,7 +16,7 @@ const { TabPane } = Tabs;
 export type DaoCycleProps = {
   cycleId: string;
   cycle?: CycleSchema;
-  userRole?: 'owner' | 'icpper' | 'normal';
+  userRole?: 'no_login' | 'normal' | 'pre_icpper' | 'icpper' | 'owner';
   activeTab?: 'icpper' | 'job' | 'vote';
   daoId?: string;
 };

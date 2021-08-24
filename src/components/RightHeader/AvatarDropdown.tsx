@@ -14,15 +14,19 @@ import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
 import { clearAuthorization, githubCallback } from '@/utils/utils';
 
+export const getGithubOAuthUrl = () => {
+  const params = new URLSearchParams();
+  params.append('redirect_uri', `${window.location.origin}${githubCallback}`);
+  params.append('client_id', REACT_APP_GITHUB_APP_CLIENT_ID);
+  return `https://github.com/login/oauth/authorize?${params.toString()}`;
+};
+
 export const LoginButton: React.FC = () => {
   const intl = useIntl();
   const loginText = intl.formatMessage({
     id: 'component.header.button.login',
   });
-  const params = new URLSearchParams();
-  params.append('redirect_uri', `${window.location.origin}${githubCallback}`);
-  params.append('client_id', REACT_APP_GITHUB_APP_CLIENT_ID);
-  const githubOAuth = `https://github.com/login/oauth/authorize?${params.toString()}`;
+  const githubOAuth = getGithubOAuthUrl();
   return (
     <div className={styles.loginButton}>
       <Button href={githubOAuth} icon={<GithubOutlined style={{ fontSize: 17 }} />} block>

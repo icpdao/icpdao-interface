@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { Button, Table, Space, Avatar, Input, Dropdown, Menu, Alert } from 'antd';
+import { Button, Table, Space, Avatar, Input, Dropdown, Menu } from 'antd';
 
 import { DownOutlined, UserOutlined } from '@ant-design/icons';
 
@@ -11,6 +11,8 @@ import styles from '@/pages/Dao/components/DaoList.less';
 import { FormattedMessage, useIntl, history } from 'umi';
 import { useDaoListQuery } from '@/services/dao/generated';
 import { useAccess } from '@@/plugin-access/access';
+import { useMentorWarningModal } from '@/pages/components/MentorWarningModal';
+import { getGithubOAuthUrl } from '@/components/RightHeader/AvatarDropdown';
 
 const { Search } = Input;
 
@@ -325,30 +327,21 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
 const DaoList: React.FC<DaoListProps> = ({ menuList }) => {
   const access = useAccess();
   const intl = useIntl();
-  const [showAlertInfo, setShowAlertInfo] = useState(false);
-
-  const isPreIcpperOrIcpper = access.isPreIcpperOrIcpper();
+  const { mentorWarningModal, setMentorWarningModalVisible } = useMentorWarningModal(false);
 
   const onClick = useCallback(() => {
-    if (isPreIcpperOrIcpper) {
-      history.push('/dao/create');
-    } else {
-      setShowAlertInfo(true);
+    if (access.noLogin()) {
+      const githubOAuth = getGithubOAuthUrl();
+      window.open(githubOAuth, '_self');
+      return;
     }
-  }, [isPreIcpperOrIcpper]);
 
-  const alertInfo = useMemo(() => {
-    if (showAlertInfo) {
-      return (
-        <Alert
-          message={intl.formatMessage({ id: 'pages.dao.component.dao_list.no_role_alert_info' })}
-          type="error"
-          showIcon
-        />
-      );
+    if (access.isNormal()) {
+      setMentorWarningModalVisible(true);
+      return;
     }
-    return null;
-  }, [showAlertInfo]);
+    history.push('/dao/create');
+  }, [access, setMentorWarningModalVisible]);
 
   const createButton = useMemo(() => {
     return (
@@ -359,12 +352,13 @@ const DaoList: React.FC<DaoListProps> = ({ menuList }) => {
   }, [intl, onClick]);
 
   return (
-    <div className={styles.container}>
-      {alertInfo}
-      {createButton}
-
-      <DaoTable menuList={menuList} />
-    </div>
+    <>
+      {mentorWarningModal}
+      <div className={styles.container}>
+        {createButton}
+        <DaoTable menuList={menuList} />
+      </div>
+    </>
   );
 };
 

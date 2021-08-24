@@ -24,22 +24,21 @@
   {
     path: '/account/wallet',
     component: './Account/Wallet',
-    access: 'isNormal',
+    access: 'isLogin',
   },
   {
     path: '/dao/mine',
     component: './Dao/Mine',
-    access: 'isNormal',
+    access: 'isLogin',
   },
   {
     path: '/dao/explore',
     component: './Dao/Explore',
-    access: 'isNormal',
   },
   {
     path: '/dao/create',
     component: './Dao/Create',
-    access: 'isNormal',
+    access: 'isPreIcpperOrIcpper',
   },
   {
     path: '/dao/:daoId/config',
@@ -59,7 +58,7 @@
   },
   {
     path: '/staking',
-    component: './Staking'
+    component: './Staking',
   },
   {
     component: './404',

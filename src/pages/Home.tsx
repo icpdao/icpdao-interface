@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import GlobalModal from '@/components/Modal';
 import { useIntl, FormattedMessage, history } from 'umi';
 import styles from './Home.less';
@@ -8,6 +8,8 @@ import { useModel } from '@@/plugin-model/useModel';
 import GlobalTooltip from '@/components/Tooltip';
 import { Row, Col, Space, Button } from 'antd';
 import image1 from '../assets/image/home-image-1.jpeg';
+import { useMentorWarningModal } from '@/pages/components/MentorWarningModal';
+import { getGithubOAuthUrl } from '@/components/RightHeader/AvatarDropdown';
 
 export default (): React.ReactNode => {
   const { profile } = getUserInfo();
@@ -23,58 +25,27 @@ export default (): React.ReactNode => {
   }
 
   const intl = useIntl();
-  const [mentorWarningVisible, setMentorWarningVisible] = useState<boolean>(defaultWarning);
-  const mentorWarningModal = (
-    <GlobalModal
-      key={'warningModal'}
-      onOk={() => {
-        setMentorWarningVisible(false);
-      }}
-      onCancel={() => {
-        setMentorWarningVisible(false);
-      }}
-      footer={null}
-      visible={mentorWarningVisible}
-    >
-      <div>
-        <div className={styles.modalContentTitle}>
-          {intl.formatMessage({ id: 'pages.home.mentor.warning.title' })}
-        </div>
-        <div className={styles.modalContentP}>
-          <p
-            className={styles.title}
-            dangerouslySetInnerHTML={{
-              __html: intl.formatMessage({ id: 'pages.home.mentor.warning.p1.title' }),
-            }}
-          />
-          <p>{intl.formatMessage({ id: 'pages.home.mentor.warning.p1.content' })}</p>
-        </div>
-        <div className={styles.modalContentP}>
-          <p
-            className={styles.title}
-            dangerouslySetInnerHTML={{
-              __html: intl.formatMessage({ id: 'pages.home.mentor.warning.p2.title' }),
-            }}
-          />
-          <p>{intl.formatMessage({ id: 'pages.home.mentor.warning.p2.content' })}</p>
-        </div>
-        <div className={styles.modalContentP}>
-          <p
-            className={styles.title}
-            dangerouslySetInnerHTML={{
-              __html: intl.formatMessage({ id: 'pages.home.mentor.warning.p3.title' }),
-            }}
-          />
-          <p>{intl.formatMessage({ id: 'pages.home.mentor.warning.p3.content' })}</p>
-        </div>
-      </div>
-    </GlobalModal>
-  );
+
+  const { mentorWarningModal, setMentorWarningModalVisible } =
+    useMentorWarningModal(defaultWarning);
 
   const [mentorAcceptLoading, setMentorAcceptLoading] = useState(false);
 
   const [mentorWelcomeVisible, setMentorWelcomeVisible] = useState(defaultWelcome);
   const { refresh } = useModel('@@initialState');
+
+  const handleMarkJob = useCallback(() => {
+    if (!profile.id) {
+      const githubOAuth = getGithubOAuthUrl();
+      window.open(githubOAuth, '_self');
+      return;
+    }
+    if (profile.status === 0) {
+      setMentorWarningModalVisible(true);
+      return;
+    }
+    history.push('/job');
+  }, [profile, setMentorWarningModalVisible]);
 
   const handleAccept = async () => {
     setMentorAcceptLoading(true);
@@ -194,7 +165,7 @@ export default (): React.ReactNode => {
                 <Button size={'large'} type="primary" onClick={() => history.push('/dao/explore')}>
                   <FormattedMessage id={'pages.home.button1'} />
                 </Button>
-                <Button size={'large'} type="primary" onClick={() => history.push('/job')}>
+                <Button size={'large'} type="primary" onClick={handleMarkJob}>
                   <FormattedMessage id={'pages.home.button2'} />
                 </Button>
               </Space>
