@@ -9,6 +9,7 @@ export default {
   'pages.home.mentor.warning.p3.title': '<span style="color: #177DDC">FIND A PERSON</span>',
   'pages.home.mentor.warning.p3.content':
     'The only thing you need to do is to find the right Mentor in ICPDAO.',
+  'pages.home.mentor.warning.ok': 'find a mentor',
   'pages.home.mentor.welcome.title': 'WELCOME TO  ICPDAO',
   'pages.home.mentor.welcome.p1':
     '<span style="color: #177DDC">@{github_login}</span> is willing to be your Mentor and promises to help you, and will ask for help from TA\'s Mentor if he can\'t.',

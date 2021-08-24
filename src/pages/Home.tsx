@@ -8,6 +8,7 @@ import { useModel } from '@@/plugin-model/useModel';
 import GlobalTooltip from '@/components/Tooltip';
 import { Row, Col, Space, Button } from 'antd';
 import image1 from '../assets/image/home-image-1.jpeg';
+import { useMentorWarningModal } from '@/pages/components/MentorWarningModal';
 
 export default (): React.ReactNode => {
   const { profile } = getUserInfo();
@@ -23,53 +24,8 @@ export default (): React.ReactNode => {
   }
 
   const intl = useIntl();
-  const [mentorWarningVisible, setMentorWarningVisible] = useState<boolean>(defaultWarning);
-  const mentorWarningModal = (
-    <GlobalModal
-      key={'warningModal'}
-      onOk={() => {
-        setMentorWarningVisible(false);
-      }}
-      onCancel={() => {
-        setMentorWarningVisible(false);
-      }}
-      footer={null}
-      visible={mentorWarningVisible}
-    >
-      <div>
-        <div className={styles.modalContentTitle}>
-          {intl.formatMessage({ id: 'pages.home.mentor.warning.title' })}
-        </div>
-        <div className={styles.modalContentP}>
-          <p
-            className={styles.title}
-            dangerouslySetInnerHTML={{
-              __html: intl.formatMessage({ id: 'pages.home.mentor.warning.p1.title' }),
-            }}
-          />
-          <p>{intl.formatMessage({ id: 'pages.home.mentor.warning.p1.content' })}</p>
-        </div>
-        <div className={styles.modalContentP}>
-          <p
-            className={styles.title}
-            dangerouslySetInnerHTML={{
-              __html: intl.formatMessage({ id: 'pages.home.mentor.warning.p2.title' }),
-            }}
-          />
-          <p>{intl.formatMessage({ id: 'pages.home.mentor.warning.p2.content' })}</p>
-        </div>
-        <div className={styles.modalContentP}>
-          <p
-            className={styles.title}
-            dangerouslySetInnerHTML={{
-              __html: intl.formatMessage({ id: 'pages.home.mentor.warning.p3.title' }),
-            }}
-          />
-          <p>{intl.formatMessage({ id: 'pages.home.mentor.warning.p3.content' })}</p>
-        </div>
-      </div>
-    </GlobalModal>
-  );
+
+  const { mentorWarningModal } = useMentorWarningModal(defaultWarning);
 
   const [mentorAcceptLoading, setMentorAcceptLoading] = useState(false);
 
