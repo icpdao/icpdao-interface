@@ -1,7 +1,10 @@
 export default function access(initialState: { currentUser: any }) {
   const { currentUser } = initialState;
   return {
-    isNormal: currentUser().profile,
+    noLogin: () => currentUser().profile?.id === undefined,
+    isLogin: () => currentUser().profile?.id !== undefined,
+    isNormal: () => currentUser().profile?.status === 0,
+    isPreIcpper: () => currentUser().profile?.status === 1,
     isIcpper: () => currentUser().profile?.status === 2,
     isPreIcpperOrIcpper: () =>
       currentUser().profile?.status === 1 || currentUser().profile?.status === 2,

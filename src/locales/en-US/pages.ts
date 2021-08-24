@@ -9,6 +9,7 @@ export default {
   'pages.home.mentor.warning.p3.title': '<span style="color: #177DDC">FIND A PERSON</span>',
   'pages.home.mentor.warning.p3.content':
     'The only thing you need to do is to find the right Mentor in ICPDAO.',
+  'pages.home.mentor.warning.ok': 'find a mentor',
   'pages.home.mentor.welcome.title': 'WELCOME TO  ICPDAO',
   'pages.home.mentor.welcome.p1':
     '<span style="color: #177DDC">@{github_login}</span> is willing to be your Mentor and promises to help you, and will ask for help from TA\'s Mentor if he can\'t.',
@@ -290,8 +291,6 @@ export default {
     'More than 50% of people think yes, so the size is valid',
   'pages.dao.component.dao_cycle_vote.table.pairing.novoted':
     'More than 50% of people think no, so the size is not valid',
-  'pages.dao.component.dao_list.no_role_alert_info':
-    "Sorry, you're not an pre-icpper or icpper yet",
   'pages.dao.component.dao_list.create_dao': 'CREATE DAO',
   'pages.dao.component.dao_list.stat.card.dao': 'Dao',
   'pages.dao.component.dao_list.stat.card.icpper': 'icpper',

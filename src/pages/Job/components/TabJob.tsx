@@ -75,7 +75,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
     }
   }, [data, defaultDaoId, userName]);
 
-  const isMy = initialState && userName === initialState.currentUser().profile.github_login;
+  const isMy = initialState && userName === initialState.currentUser().profile?.github_login;
   const jobTable = useMemo(() => {
     if (isMy) {
       return (
@@ -88,13 +88,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
         />
       );
     }
-    return (
-      <OtherUserJobTable
-        jobQueryVar={jobQueryVar}
-        userName={userName}
-        setJobQueryVar={setJobQueryVar}
-      />
-    );
+    return <OtherUserJobTable jobQueryVar={jobQueryVar} setJobQueryVar={setJobQueryVar} />;
   }, [defaultDaoId, isMy, jobQueryVar, refetch, userName]);
 
   if (loading || error) {

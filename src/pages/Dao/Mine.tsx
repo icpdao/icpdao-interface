@@ -24,7 +24,7 @@ export default (): React.ReactNode => {
   }, []);
 
   const menuList: SelectDropdownMenu[] = useMemo(() => {
-    if (access.isIcpper()) {
+    if (access.isPreIcpperOrIcpper()) {
       return [
         {
           key: 'following_and_owner',
@@ -41,10 +41,6 @@ export default (): React.ReactNode => {
       ];
     }
     return [
-      {
-        key: 'following_and_owner',
-        title: intl.formatMessage({ id: 'pages.dao.mine.table.filter.following_and_owner' }),
-      },
       {
         key: 'following',
         title: intl.formatMessage({ id: 'pages.dao.mine.table.filter.following' }),

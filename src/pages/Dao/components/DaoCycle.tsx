@@ -9,7 +9,7 @@ import { getFormatTimeByZone } from '@/utils/utils';
 
 export type DaoCycleProps = {
   daoId: string;
-  userRole: 'owner' | 'icpper' | 'normal';
+  userRole: 'no_login' | 'normal' | 'pre_icpper' | 'icpper' | 'owner';
 };
 
 const DaoCycle: React.FC<DaoCycleProps> = ({ daoId, userRole }) => {
