@@ -26,7 +26,8 @@ export default (): React.ReactNode => {
 
   const intl = useIntl();
 
-  const { mentorWarningModal, setVisible } = useMentorWarningModal(defaultWarning);
+  const { mentorWarningModal, setMentorWarningModalVisible } =
+    useMentorWarningModal(defaultWarning);
 
   const [mentorAcceptLoading, setMentorAcceptLoading] = useState(false);
 
@@ -40,11 +41,11 @@ export default (): React.ReactNode => {
       return;
     }
     if (profile.status === 0) {
-      setVisible(true);
+      setMentorWarningModalVisible(true);
       return;
     }
     history.push('/job');
-  }, [profile, setVisible]);
+  }, [profile, setMentorWarningModalVisible]);
 
   const handleAccept = async () => {
     setMentorAcceptLoading(true);

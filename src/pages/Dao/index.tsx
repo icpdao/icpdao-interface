@@ -21,10 +21,15 @@ import styles from './index.less';
 import GlobalBreadcrumb from '@/components/Breadcrumb';
 import { GithubOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from '@ant-design/icons';
 import { useModel } from '@@/plugin-model/useModel';
-import type { Maybe } from '@/services/dao/generated';
+import type {
+  DaoHomeWithLoginQueryQuery,
+  DaoHomeWithLoginQueryQueryVariables,
+  Maybe,
+} from '@/services/dao/generated';
 import {
   DaoFollowTypeEnum,
   useDaoHomeWithLoginQueryQuery,
+  useDaoHomeWithUnLoginQueryQuery,
   useFollowDaoMutation,
   useUpdateDaoBaseInfoMutation,
 } from '@/services/dao/generated';
@@ -36,6 +41,10 @@ import DaoJobStat from '@/pages/Dao/components/DaoJobStat';
 import DaoCycle from '@/pages/Dao/components/DaoCycle';
 import { uploadS3AssumeRole } from '@/services/icpdao-interface/aws';
 import * as AWS from '@aws-sdk/client-s3';
+import { ApolloQueryResult } from '@apollo/client/core/types';
+import { ApolloError } from '@apollo/client';
+import { useMentorWarningModal } from '@/pages/components/MentorWarningModal';
+import { getGithubOAuthUrl } from '@/components/RightHeader/AvatarDropdown';
 
 const { TabPane } = Tabs;
 
@@ -195,9 +204,29 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
   const { daoId } = props.match.params;
   const nowAt = getCurrentTimestamps();
 
-  const { data, loading, error, refetch } = useDaoHomeWithLoginQueryQuery({
-    variables: { id: daoId, userId: initialState.currentUser()?.profile?.id },
-  });
+  let data: DaoHomeWithLoginQueryQuery | undefined;
+  let loading: boolean;
+  let error: ApolloError | undefined;
+  let refetch: (
+    variables?: Partial<DaoHomeWithLoginQueryQueryVariables>,
+  ) => Promise<ApolloQueryResult<DaoHomeWithLoginQueryQuery>>;
+  if (access.isLogin()) {
+    const tmp = useDaoHomeWithLoginQueryQuery({
+      variables: { id: daoId, userId: initialState.currentUser()?.profile?.id },
+    });
+    data = tmp.data;
+    loading = tmp.loading;
+    error = tmp.error;
+    refetch = tmp.refetch;
+  } else {
+    const tmp = useDaoHomeWithUnLoginQueryQuery({
+      variables: { id: daoId },
+    });
+    data = tmp.data;
+    loading = tmp.loading;
+    error = tmp.error;
+    refetch = tmp.refetch;
+  }
 
   // 正在投票中，距离投票结束最近的一个周期
   const nearVotingCycle = useMemo(() => {
@@ -321,24 +350,112 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
   const [updateFollowDao] = useFollowDaoMutation();
   const [updateDaoBaseInfo] = useUpdateDaoBaseInfoMutation();
 
-  if (loading || error) {
-    return <PageLoading />;
-  }
   const dao = data?.dao?.datum || { name: '', desc: '', createAt: 0, logo: '' };
 
-  const follow = data?.dao?.following;
-  const followed = follow?.followers?.length && follow?.followers[0]?.createAt;
-
-  let userRole: 'normal' | 'icpper' | 'owner' = 'normal';
+  let userRole: 'no_login' | 'normal' | 'pre_icpper' | 'icpper' | 'owner' = 'no_login';
   if (access.isDaoOwner(data?.dao?.datum?.ownerId || '')) {
     userRole = 'owner';
   } else if (access.isIcpper()) {
     userRole = 'icpper';
+  } else if (access.isPreIcpper()) {
+    userRole = 'pre_icpper';
+  } else if (access.isNormal()) {
+    userRole = 'normal';
+  } else if (access.noLogin()) {
+    userRole = 'no_login';
   }
+
+  const followBtn = useMemo(() => {
+    const follow = data?.dao?.following;
+    const followed = follow?.followers?.length && follow?.followers[0]?.createAt;
+
+    if (userRole === 'owner' || userRole === 'no_login') {
+      return null;
+    }
+    if (followed) {
+      return (
+        <Button
+          onClick={async () => {
+            setFollowedButtonLoading(true);
+            await updateFollowDao({
+              variables: { daoId, followType: DaoFollowTypeEnum.Delete },
+            });
+            await refetch();
+            setFollowedButtonLoading(false);
+          }}
+          loading={followedButtonLoading}
+        >
+          <FormattedMessage id={`pages.dao.home.unfollowed`} />
+        </Button>
+      );
+    }
+
+    return (
+      <Button
+        onClick={async () => {
+          setFollowedButtonLoading(true);
+          await updateFollowDao({
+            variables: { daoId, followType: DaoFollowTypeEnum.Add },
+          });
+          await refetch();
+          setFollowedButtonLoading(false);
+        }}
+        loading={followedButtonLoading}
+      >
+        <FormattedMessage id={`pages.dao.home.followed`} />
+      </Button>
+    );
+  }, [data, daoId, followedButtonLoading, refetch, updateFollowDao, userRole]);
+
+  const followTotalCount = useMemo(() => {
+    return data?.dao?.following?.total || 0;
+  }, [data]);
+
+  const { mentorWarningModal, setMentorWarningModalVisible } = useMentorWarningModal(false);
+
   const defaultActiveKey = 'icpperStat';
+
+  const handleMarkJob = useCallback(() => {
+    if (access.noLogin()) {
+      const githubOAuth = getGithubOAuthUrl();
+      window.open(githubOAuth, '_self');
+      return;
+    }
+
+    if (access.isNormal()) {
+      setMentorWarningModalVisible(true);
+      return;
+    }
+
+    history.push(`/job?daoId=${daoId}`);
+  }, [access, daoId, setMentorWarningModalVisible]);
+
+  const handleGoVote = useCallback(() => {
+    if (access.noLogin()) {
+      const githubOAuth = getGithubOAuthUrl();
+      window.open(githubOAuth, '_self');
+      return;
+    }
+
+    if (access.isNormal()) {
+      setMentorWarningModalVisible(true);
+      return;
+    }
+
+    if (nearVotingCycleHasVote) {
+      history.push(`/dao/${daoId}/${nearVotingCycle?.datum?.id}/vote`);
+    } else {
+      setShowNoVoteAlert(true);
+    }
+  }, [access, daoId, nearVotingCycle, nearVotingCycleHasVote, setMentorWarningModalVisible]);
+
+  if (loading || error) {
+    return <PageLoading />;
+  }
 
   return (
     <>
+      {mentorWarningModal}
       <PageContainer
         ghost
         header={{ breadcrumbRender: () => <GlobalBreadcrumb routes={breadcrumb(daoId)} /> }}
@@ -385,36 +502,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
                   icon={<SettingOutlined style={{ fontSize: 17 }} />}
                 />
               )}
-              {userRole !== 'owner' && followed && (
-                <Button
-                  onClick={async () => {
-                    setFollowedButtonLoading(true);
-                    await updateFollowDao({
-                      variables: { daoId, followType: DaoFollowTypeEnum.Delete },
-                    });
-                    await refetch();
-                    setFollowedButtonLoading(false);
-                  }}
-                  loading={followedButtonLoading}
-                >
-                  <FormattedMessage id={`pages.dao.home.unfollowed`} />
-                </Button>
-              )}
-              {userRole !== 'owner' && !followed && (
-                <Button
-                  onClick={async () => {
-                    setFollowedButtonLoading(true);
-                    await updateFollowDao({
-                      variables: { daoId, followType: DaoFollowTypeEnum.Add },
-                    });
-                    await refetch();
-                    setFollowedButtonLoading(false);
-                  }}
-                  loading={followedButtonLoading}
-                >
-                  <FormattedMessage id={`pages.dao.home.followed`} />
-                </Button>
-              )}
+              {followBtn}
             </Space>
           </Col>
         </Row>
@@ -447,18 +535,14 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
             <FormattedMessage id={`pages.dao.home.created`} />
           </Tag>
           <Tag color="success">
-            {follow?.total || 0}
+            {followTotalCount}
             <FormattedMessage id={`pages.dao.home.following`} />
           </Tag>
         </Space>
         <Divider />
         <Space size={22} className={styles.buttonSpace}>
           <Tooltip placement="right" title={markJobButtonTipTitle}>
-            <Button
-              size={'large'}
-              type={'primary'}
-              onClick={() => history.push(`/job?daoId=${daoId}`)}
-            >
+            <Button size={'large'} type={'primary'} onClick={handleMarkJob}>
               <FormattedMessage id={`pages.dao.home.button.mark`} />
             </Button>
           </Tooltip>
@@ -468,13 +552,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
               type={'primary'}
               danger
               disabled={!nearVotingCycle}
-              onClick={() => {
-                if (nearVotingCycleHasVote) {
-                  history.push(`/dao/${daoId}/${nearVotingCycle?.datum?.id}/vote`);
-                } else {
-                  setShowNoVoteAlert(true);
-                }
-              }}
+              onClick={handleGoVote}
             >
               <FormattedMessage id={`pages.dao.home.button.vote`} />
             </Button>

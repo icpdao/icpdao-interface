@@ -90,6 +90,6 @@ export const useMentorWarningModal = (defaultVisible: boolean) => {
 
   return {
     mentorWarningModal,
-    setVisible,
+    setMentorWarningModalVisible: setVisible,
   };
 };

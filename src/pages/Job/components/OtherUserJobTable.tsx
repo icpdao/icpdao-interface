@@ -9,12 +9,10 @@ import { JobSortedEnum, SortedTypeEnum, useJobListQuery } from '@/services/dao/g
 import { PageLoading } from '@ant-design/pro-layout';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { LoadingOutlined } from '@ant-design/icons';
-import { request } from '@@/plugin-request/request';
 import { useModel } from '@@/plugin-model/useModel';
 
 interface JobTableProps {
   jobQueryVar: JobListQueryVariables;
-  userName: string | undefined;
   setJobQueryVar: Dispatch<SetStateAction<JobListQueryVariables>>;
 }
 
@@ -22,70 +20,43 @@ const getCurrentPage = (offset: number, pageSize: number) => {
   return Math.ceil(offset / pageSize) + 1;
 };
 
-async function getGithubPRList(daoName: string, user: string) {
-  return request('https://api.github.com/search/issues', {
-    method: 'GET',
-    params: { q: `is:open is:pr author:${user} archived:false user:${daoName}` },
-  });
-}
-
-const OtherUserJobTable: React.FC<JobTableProps> = ({ jobQueryVar, userName, setJobQueryVar }) => {
+const OtherUserJobTable: React.FC<JobTableProps> = ({ jobQueryVar, setJobQueryVar }) => {
   const intl = useIntl();
   const { initialState } = useModel('@@initialState');
   const [form] = Form.useForm();
-  const [optionsPRs, setOptionsPRs] = useState<any[]>();
-  const [editingRowId, setEditingRowId] = useState<string>('');
   const [jobPRsSelectOptions, setJobPRsSelectOptions] = useState({});
   const [jobPRsSelectDefault, setJobPRsSelectDefault] = useState({});
   const [jobPRsSelectLoading] = useState<Record<string, boolean>>({});
-  const isEditing = useCallback((record: Job) => record.node?.id === editingRowId, [editingRowId]);
 
   const { data, loading, error } = useJobListQuery({
     variables: jobQueryVar,
     fetchPolicy: 'no-cache',
   });
-  useMemo(async () => {
-    const ret = await getGithubPRList(jobQueryVar.daoName, userName || '');
-    setOptionsPRs(ret?.items || []);
-  }, [jobQueryVar, userName]);
-  const updateJobPR = useCallback(
-    async (jobId: string, prs: JobPrSchema[] | undefined) => {
-      if (!prs) return;
-      const options: any[] = [];
-      const optionsURL: string[] = [];
-      const optionsIds: string[] = [];
-      prs.forEach((pr) => {
-        const url = `https://github.com/${pr.githubRepoOwner}/${pr.githubRepoName}/pull/${pr.githubPrNumber}`;
-        options.push({
-          id: pr.id,
-          value: pr.id,
-          label: pr.title,
-          url,
-        });
-        optionsURL.push(url);
-        optionsIds.push(pr.id || '');
+
+  const updateJobPR = useCallback(async (jobId: string, prs: JobPrSchema[] | undefined) => {
+    if (!prs) return;
+    const options: any[] = [];
+    const optionsIds: string[] = [];
+    prs.forEach((pr) => {
+      const url = `https://github.com/${pr.githubRepoOwner}/${pr.githubRepoName}/pull/${pr.githubPrNumber}`;
+      options.push({
+        id: pr.id,
+        value: pr.id,
+        label: pr.title,
+        url,
       });
-      optionsPRs?.forEach((dpr) => {
-        if (!optionsURL.includes(dpr.html_url)) {
-          options.push({
-            id: dpr.id,
-            value: dpr.html_url,
-            label: dpr.title,
-            url: dpr.html_url,
-          });
-        }
-      });
-      setJobPRsSelectOptions((old) => ({
-        ...old,
-        [jobId]: options,
-      }));
-      setJobPRsSelectDefault((old) => ({
-        ...old,
-        [jobId]: optionsIds,
-      }));
-    },
-    [optionsPRs],
-  );
+      optionsIds.push(pr.id || '');
+    });
+
+    setJobPRsSelectOptions((old) => ({
+      ...old,
+      [jobId]: options,
+    }));
+    setJobPRsSelectDefault((old) => ({
+      ...old,
+      [jobId]: optionsIds,
+    }));
+  }, []);
   useMemo(async () => {
     data?.jobs?.job?.forEach((job) => updateJobPR(job?.node?.id || '', job?.prs as any));
   }, [data, updateJobPR]);
@@ -113,7 +84,6 @@ const OtherUserJobTable: React.FC<JobTableProps> = ({ jobQueryVar, userName, set
         sorted,
         sortedType,
       }));
-      setEditingRowId('');
     },
     [setJobQueryVar],
   );
@@ -157,15 +127,7 @@ const OtherUserJobTable: React.FC<JobTableProps> = ({ jobQueryVar, userName, set
     {
       title: intl.formatMessage({ id: 'pages.job.table.size' }),
       dataIndex: ['node', 'size'],
-      editable: true,
       sorter: true,
-      onCell: (record: Job) => ({
-        record,
-        inputType: 'number',
-        dataIndex: ['node', 'size'],
-        title: intl.formatMessage({ id: 'pages.job.table.size' }),
-        editing: isEditing(record),
-      }),
     },
     {
       title: intl.formatMessage({ id: 'pages.job.table.pr' }),

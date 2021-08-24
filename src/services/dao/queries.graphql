@@ -106,6 +106,35 @@ query DAOHomeWithLoginQuery($id: String!, $userId: String!) {
   }
 }
 
+query DAOHomeWithUnLoginQuery($id: String!) {
+  dao(id: $id) {
+    datum {
+      id
+      number
+      name
+      desc
+      logo
+      ownerId
+      createAt
+      updateAt
+    }
+    cycles(filter: [un_vote_end]) {
+      nodes {
+        datum {
+          id
+          beginAt
+          endAt
+          voteBeginAt
+          voteEndAt
+        }
+      }
+    }
+    following {
+      total
+    }
+  }
+}
+
 query DAOTokenConfig($daoId: String!) {
   daoTokenConfig(daoId: $daoId) {
     ethDaoId

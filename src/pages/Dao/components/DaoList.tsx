@@ -327,7 +327,7 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
 const DaoList: React.FC<DaoListProps> = ({ menuList }) => {
   const access = useAccess();
   const intl = useIntl();
-  const { mentorWarningModal, setVisible } = useMentorWarningModal(false);
+  const { mentorWarningModal, setMentorWarningModalVisible } = useMentorWarningModal(false);
 
   const onClick = useCallback(() => {
     if (access.noLogin()) {
@@ -337,11 +337,11 @@ const DaoList: React.FC<DaoListProps> = ({ menuList }) => {
     }
 
     if (access.isNormal()) {
-      setVisible(true);
+      setMentorWarningModalVisible(true);
       return;
     }
     history.push('/dao/create');
-  }, [access, setVisible]);
+  }, [access, setMentorWarningModalVisible]);
 
   const createButton = useMemo(() => {
     return (
