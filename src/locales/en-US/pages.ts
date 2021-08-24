@@ -291,8 +291,6 @@ export default {
     'More than 50% of people think yes, so the size is valid',
   'pages.dao.component.dao_cycle_vote.table.pairing.novoted':
     'More than 50% of people think no, so the size is not valid',
-  'pages.dao.component.dao_list.no_role_alert_info':
-    "Sorry, you're not an pre-icpper or icpper yet",
   'pages.dao.component.dao_list.create_dao': 'CREATE DAO',
   'pages.dao.component.dao_list.stat.card.dao': 'Dao',
   'pages.dao.component.dao_list.stat.card.icpper': 'icpper',

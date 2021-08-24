@@ -24,7 +24,7 @@ export default (): ReactNode => {
   }, []);
 
   const menuList: SelectDropdownMenu[] = useMemo(() => {
-    if (access.isIcpper()) {
+    if (access.isPreIcpperOrIcpper()) {
       return [
         {
           key: 'all',
@@ -40,14 +40,22 @@ export default (): ReactNode => {
         },
       ];
     }
+    if (access.isNormal()) {
+      return [
+        {
+          key: 'all',
+          title: intl.formatMessage({ id: 'pages.dao.explore.table.filter.all' }),
+        },
+        {
+          key: 'following',
+          title: intl.formatMessage({ id: 'pages.dao.explore.table.filter.following' }),
+        },
+      ];
+    }
     return [
       {
         key: 'all',
         title: intl.formatMessage({ id: 'pages.dao.explore.table.filter.all' }),
-      },
-      {
-        key: 'following',
-        title: intl.formatMessage({ id: 'pages.dao.explore.table.filter.following' }),
       },
     ];
   }, [intl, access]);
