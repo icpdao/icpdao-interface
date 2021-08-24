@@ -9,6 +9,9 @@ query DAO($id: String!) {
       ownerId
       createAt
       updateAt
+      tokenAddress
+      tokenName
+      tokenSymbol
     }
     following {
       total
@@ -82,6 +85,9 @@ query DAOHomeWithLoginQuery($id: String!, $userId: String!) {
       ownerId
       createAt
       updateAt
+      tokenAddress
+      tokenName
+      tokenSymbol
     }
     cycles(filter: [un_vote_end]) {
       nodes {
@@ -117,6 +123,9 @@ query DAOHomeWithUnLoginQuery($id: String!) {
       ownerId
       createAt
       updateAt
+      tokenAddress
+      tokenName
+      tokenSymbol
     }
     cycles(filter: [un_vote_end]) {
       nodes {
@@ -638,6 +647,92 @@ query CyclesByTokenUnreleasedList($lastTimestamp: Int!) {
             nickname
             erc20Address
           }
+        }
+      }
+    }
+  }
+}
+
+query DAOIcppers($daoId: String!, $sorted: IcppersQuerySortedEnum!, $sortedType: IcppersQuerySortedTypeEnum!, $first: Int!, $offset: Int!) {
+  dao(id: $daoId) {
+    icppers(sorted: $sorted, sortedType: $sortedType, first: $first, offset: $offset) {
+      nodes {
+        user {
+          id
+          githubLogin
+          nickname
+        }
+        jobCount
+        size
+        income
+        joinTime
+      }
+      stat {
+        icpperCount
+        jobCount
+        size
+        income
+      }
+      total
+    }
+  }
+}
+
+query DAOJobs($daoId: String!, $sorted: JobsQuerySortedEnum!, $sortedType: JobsQuerySortedTypeEnum!, $first: Int!, $offset: Int!) {
+  dao(id: $daoId) {
+    jobs(sorted: $sorted, sortedType: $sortedType, first: $first, offset: $offset) {
+      nodes {
+        datum {
+          id
+          title
+          size
+          status
+          githubRepoOwner
+          githubRepoName
+          githubIssueNumber
+          income
+        }
+        user {
+          id
+          githubLogin
+          nickname
+        }
+      }
+      stat {
+        icpperCount
+        jobCount
+        size
+        income
+      }
+      total
+    }
+  }
+}
+
+query DAOCycleGroupByUser($daoId: String!) {
+  dao(id: $daoId) {
+    cycles {
+      nodes {
+        datum {
+          id
+          beginAt
+          endAt
+          timeZone
+        }
+        icpperStat {
+          datum {
+            id
+            lastId
+            ei
+            beDeductedSizeByReview
+            haveTwoTimesLt04
+            haveTwoTimesLt08
+            unVotedAllVote
+            jobCount
+            size
+            income
+          }
+          lastEi
         }
       }
     }
