@@ -708,33 +708,3 @@ query DAOJobs($daoId: String!, $sorted: JobsQuerySortedEnum!, $sortedType: JobsQ
     }
   }
 }
-
-query DAOCycleGroupByUser($daoId: String!) {
-  dao(id: $daoId) {
-    cycles {
-      nodes {
-        datum {
-          id
-          beginAt
-          endAt
-          timeZone
-        }
-        icpperStat {
-          datum {
-            id
-            lastId
-            ei
-            beDeductedSizeByReview
-            haveTwoTimesLt04
-            haveTwoTimesLt08
-            unVotedAllVote
-            jobCount
-            size
-            income
-          }
-          lastEi
-        }
-      }
-    }
-  }
-}
