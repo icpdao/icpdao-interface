@@ -130,6 +130,7 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({ selectKey, menuList, on
 const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
   const pageSize = 10;
   const intl = useIntl();
+  const access = useAccess();
   const [daoTableParams, setDaoTableParams] = useState<DaoTableParams>({
     filter: menuList[0].key,
     current: 1,
@@ -214,6 +215,10 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
 
   const handlerFollowDao = useCallback(
     async (daoId: string, followType: DaoFollowTypeEnum) => {
+      if (access.noLogin()) {
+        window.location.href = getGithubOAuthUrl();
+        return;
+      }
       setDaoFollowButtonLoading((old) => ({ ...old, [daoId]: true }));
       await followDao({ variables: { daoId, followType } });
       if (followType === DaoFollowTypeEnum.Add)
