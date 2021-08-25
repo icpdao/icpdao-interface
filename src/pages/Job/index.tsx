@@ -55,12 +55,15 @@ export default (props: {
     return <PageLoading />;
   }
 
-  const userName =
-    props.location.query.userName || initialState.currentUser().profile?.github_login;
-  const isMy = userName === initialState.currentUser().profile?.github_login;
+  const currentLoginUserName = initialState.currentUser().profile?.github_login;
+  const queryUserName = props.location.query.userName;
+  const userName = queryUserName || currentLoginUserName;
+  const isMy = userName === currentLoginUserName;
 
-  if (!props.location.query.userName && !access.isPreIcpperOrIcpper()) {
-    return <PermissionErrorPage />;
+  if (!access.isPreIcpperOrIcpper()) {
+    if (!queryUserName || queryUserName === currentLoginUserName) {
+      return <PermissionErrorPage />;
+    }
   }
 
   const breadcrumb = useMemo(() => {
