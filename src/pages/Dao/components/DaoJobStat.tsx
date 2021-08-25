@@ -166,7 +166,7 @@ const DaoJobStat: React.FC<DaoJobSatProps> = ({ daoId, tokenSymbol }) => {
       <Table
         columns={columns}
         loading={loading}
-        rowKey={(record) => record?.user?.id || ''}
+        rowKey={(record) => record?.datum?.id || ''}
         dataSource={data?.dao?.jobs?.nodes as JobQuery[]}
         onChange={(pagination, filters, sorter) => tableChange(pagination, sorter)}
         pagination={{

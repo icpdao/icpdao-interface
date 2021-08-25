@@ -9,7 +9,7 @@ import StatCard from '@/components/StatCard';
 
 import styles from '@/pages/Dao/components/DaoList.less';
 import { FormattedMessage, useIntl, history } from 'umi';
-import { useDaoListQuery } from '@/services/dao/generated';
+import { DaoFollowTypeEnum, useDaoListQuery, useFollowDaoMutation } from '@/services/dao/generated';
 import { useAccess } from '@@/plugin-access/access';
 import { useMentorWarningModal } from '@/pages/components/MentorWarningModal';
 import { getGithubOAuthUrl } from '@/components/RightHeader/AvatarDropdown';
@@ -53,73 +53,59 @@ export type DaoListProps = {
   menuList: SelectDropdownMenu[];
 };
 
-const columns = [
-  {
-    title: <FormattedMessage id="pages.dao.component.dao_list.table.head.dao_name" />,
-    dataIndex: 'name',
-    key: 'name',
-    render: (_: any, record: any) => (
-      <Space size="middle">
-        <Avatar size="small" icon={<UserOutlined />} />
-        <span>
-          <a
-            onClick={(event) => {
-              event.preventDefault();
-              history.push(`/dao/${record.id}`);
-            }}
-          >
-            {record.name}
-          </a>
-        </span>
-      </Space>
-    ),
-  },
-  {
-    title: <FormattedMessage id="pages.dao.component.dao_list.table.head.following" />,
-    dataIndex: 'following',
-    key: 'following',
-    sorter: true,
-  },
-  {
-    title: <FormattedMessage id="pages.dao.component.dao_list.table.head.job" />,
-    dataIndex: 'job',
-    key: 'job',
-    sorter: true,
-  },
-  {
-    title: <FormattedMessage id="pages.dao.component.dao_list.table.head.size" />,
-    dataIndex: 'size',
-    key: 'size',
-    sorter: true,
-  },
-  {
-    title: <FormattedMessage id="pages.dao.component.dao_list.table.head.token" />,
-    dataIndex: 'token',
-    key: 'token',
-    sorter: true,
-  },
-  {
-    title: '',
-    key: 'action',
-    render: (_: any, record: any) => {
-      if (record.isFollowing) {
-        return (
+const columns = (renderAction: (record: any) => ReactNode) => {
+  return [
+    {
+      title: <FormattedMessage id="pages.dao.component.dao_list.table.head.dao_name" />,
+      dataIndex: 'name',
+      key: 'name',
+      render: (_: any, record: any) => (
+        <Space size="middle">
+          <Avatar size="small" icon={<UserOutlined />} />
           <span>
-            <FormattedMessage id="pages.dao.component.dao_list.table.aciton.following" />
+            <a
+              onClick={(event) => {
+                event.preventDefault();
+                history.push(`/dao/${record.id}`);
+              }}
+            >
+              {record.name}
+            </a>
           </span>
-        );
-      }
-      if (record.isOwner) {
-        return (
-          <span>
-            <FormattedMessage id="pages.dao.component.dao_list.table.aciton.owner" />
-          </span>
-        );
-      }
-      return <span></span>;
+        </Space>
+      ),
     },
-  },
-];
+    {
+      title: <FormattedMessage id="pages.dao.component.dao_list.table.head.following" />,
+      dataIndex: 'following',
+      key: 'following',
+      sorter: true,
+    },
+    {
+      title: <FormattedMessage id="pages.dao.component.dao_list.table.head.job" />,
+      dataIndex: 'job',
+      key: 'job',
+      sorter: true,
+    },
+    {
+      title: <FormattedMessage id="pages.dao.component.dao_list.table.head.size" />,
+      dataIndex: 'size',
+      key: 'size',
+      sorter: true,
+    },
+    {
+      title: <FormattedMessage id="pages.dao.component.dao_list.table.head.token" />,
+      dataIndex: 'token',
+      key: 'token',
+      sorter: true,
+    },
+    {
+      title: '',
+      key: 'action',
+      render: (_: any, record: any) => renderAction(record),
+    },
+  ];
+};
 
 const SelectDropdown: React.FC<SelectDropdownProps> = ({ selectKey, menuList, onMenuClick }) => {
   let buttonTitle: string = menuList[0].title;
@@ -221,6 +207,67 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
     variables: daoQueryParams as any,
     fetchPolicy: 'no-cache',
   });
+  const [followDao] = useFollowDaoMutation();
+
+  const [daoFollowedStatus, setDaoFollowedStatus] = useState<Record<string, boolean>>({});
+  const [daoFollowButtonLoading, setDaoFollowButtonLoading] = useState<Record<string, boolean>>({});
+
+  const handlerFollowDao = useCallback(
+    async (daoId: string, followType: DaoFollowTypeEnum) => {
+      setDaoFollowButtonLoading((old) => ({ ...old, [daoId]: true }));
+      await followDao({ variables: { daoId, followType } });
+      if (followType === DaoFollowTypeEnum.Add)
+        setDaoFollowedStatus((old) => ({ ...old, [daoId]: true }));
+      if (followType === DaoFollowTypeEnum.Delete)
+        setDaoFollowedStatus((old) => ({ ...old, [daoId]: false }));
+      setDaoFollowButtonLoading((old) => ({ ...old, [daoId]: false }));
+    },
+    [followDao],
+  );
+
+  const renderFollowColumn = useCallback(
+    (record: any) => {
+      if (record?.isOwner) {
+        return (
+          <Button size={'small'}>
+            <FormattedMessage id="pages.dao.component.dao_list.table.action.owner" />
+          </Button>
+        );
+      }
+      const daoId = record?.id || '';
+      const unfollowingDom = (
+        <Button
+          loading={daoFollowButtonLoading[daoId] || false}
+          size={'small'}
+          onClick={async () => {
+            await handlerFollowDao(daoId, DaoFollowTypeEnum.Delete);
+          }}
+        >
+          <FormattedMessage id="pages.dao.component.dao_list.table.action.unfollowing" />
+        </Button>
+      );
+      const followingDom = (
+        <Button
+          loading={daoFollowButtonLoading[daoId] || false}
+          size={'small'}
+          type={'primary'}
+          onClick={async () => {
+            await handlerFollowDao(daoId, DaoFollowTypeEnum.Add);
+          }}
+        >
+          <FormattedMessage id="pages.dao.component.dao_list.table.action.following" />
+        </Button>
+      );
+      if (daoFollowedStatus[daoId] !== undefined) {
+        return <>{daoFollowedStatus[daoId] ? unfollowingDom : followingDom}</>;
+      }
+      if (record?.isFollowing) {
+        return unfollowingDom;
+      }
+      return followingDom;
+    },
+    [daoFollowButtonLoading, daoFollowedStatus, handlerFollowDao],
+  );
 
   const daoDataTotalCount: number = useMemo(() => {
     return data?.daos?.total || 0;
@@ -309,7 +356,7 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
       </div>
 
       <Table
-        columns={columns}
+        columns={columns(renderFollowColumn)}
         loading={loading}
         rowKey="name"
         dataSource={daoData}
