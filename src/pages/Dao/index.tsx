@@ -369,7 +369,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
     const follow = data?.dao?.following;
     const followed = follow?.followers?.length && follow?.followers[0]?.createAt;
 
-    if (userRole === 'owner' || userRole === 'no_login') {
+    if (userRole === 'owner') {
       return null;
     }
     if (followed) {
@@ -393,6 +393,11 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
     return (
       <Button
         onClick={async () => {
+          if (userRole === 'no_login') {
+            const githubOAuth = getGithubOAuthUrl();
+            window.open(githubOAuth, '_self');
+            return;
+          }
           setFollowedButtonLoading(true);
           await updateFollowDao({
             variables: { daoId, followType: DaoFollowTypeEnum.Add },
