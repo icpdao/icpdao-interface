@@ -565,7 +565,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
           </TabPane>
 
           <TabPane tab={<FormattedMessage id={'pages.dao.home.tab.jobStat'} />} key="jobStat">
-            <DaoJobStat daoId={daoId} />
+            <DaoJobStat daoId={daoId} tokenSymbol={data?.dao?.datum?.tokenSymbol || ''} />
           </TabPane>
 
           <TabPane tab={<FormattedMessage id={'pages.dao.home.tab.cycle'} />} key="cycle">

@@ -45,7 +45,7 @@ const DaoCycle: React.FC<DaoCycleProps> = ({ daoId, userRole }) => {
           <Select
             className={styles.tabSelect}
             value={cycleId}
-            style={{ width: 250 }}
+            style={{ width: 300 }}
             onChange={(value) => setCycleId(value as string)}
             options={options}
           />

@@ -10,7 +10,8 @@ import { PageLoading } from '@ant-design/pro-layout';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import StatCard from '@/components/StatCard';
 import { getCurrentPage, getFormatTime } from '@/utils/utils';
-import { Avatar, Space, Table, TablePaginationConfig } from 'antd';
+import type { TablePaginationConfig } from 'antd';
+import { Avatar, Space, Table } from 'antd';
 import { FormattedMessage } from 'umi';
 import { UserOutlined } from '@ant-design/icons';
 import { history } from '@@/core/history';
@@ -27,7 +28,7 @@ const DaoIcpperStat: React.FC<DaoIcpperStatProps> = ({ daoId, tokenSymbol }) => 
     daoId,
     sorted: IcppersQuerySortedEnum.JoinTime,
     sortedType: IcppersQuerySortedTypeEnum.Desc,
-    first: 20,
+    first: 10,
     offset: 0,
   });
   const { data, loading, error } = useDaoIcppersQuery({ variables: queryVariable });
@@ -129,7 +130,7 @@ const DaoIcpperStat: React.FC<DaoIcpperStatProps> = ({ daoId, tokenSymbol }) => 
   const dataSource = data?.dao?.icppers?.nodes || [];
   return (
     <>
-      <div className={styles.TabStatCard}>
+      <div className={styles.TabFirstDom}>
         <StatCard data={statCardData} />
       </div>
       <Table

@@ -130,9 +130,6 @@ const columns = (daoId: string) => {
     },
     {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_job.table.head.job" />,
-      dataIndex: ['datum', 'id'],
-      key: 'job',
-      sorter: true,
       render: (_: any, record: JobQuery) => (
         <a
           href={`https://github.com/${record.datum?.githubRepoOwner}/${record.datum?.githubRepoName}/issues/${record.datum?.githubIssueNumber}`}
