@@ -53,7 +53,7 @@ const DaoCycleIndex: React.FC<DaoCycleProps> = ({
     },
     {
       title: tokenSymbol,
-      number: data?.cycle?.stat?.size || 0,
+      number: data?.cycle?.stat?.income || 0,
     },
   ];
 
