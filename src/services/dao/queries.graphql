@@ -709,3 +709,12 @@ query DAOJobs($daoId: String!, $sorted: JobsQuerySortedEnum!, $sortedType: JobsQ
     }
   }
 }
+
+query UserVotingCycle {
+  votingCycle{
+    datum{
+      id
+      daoId
+    }
+  }
+}
