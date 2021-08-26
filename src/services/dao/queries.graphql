@@ -453,6 +453,7 @@ query CycleStatData($cycleId: String!) {
       icpperCount
       jobCount
       size
+      income
     }
   }
 }

@@ -574,7 +574,11 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
           </TabPane>
 
           <TabPane tab={<FormattedMessage id={'pages.dao.home.tab.cycle'} />} key="cycle">
-            <DaoCycle daoId={daoId} userRole={userRole} />
+            <DaoCycle
+              daoId={daoId}
+              userRole={userRole}
+              tokenSymbol={data?.dao?.datum?.tokenSymbol || ''}
+            />
           </TabPane>
         </Tabs>
       </PageContainer>

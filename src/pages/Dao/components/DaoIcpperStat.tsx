@@ -1,12 +1,10 @@
 import React, { useCallback, useState } from 'react';
+import type { DaoIcppersQueryVariables, IcpperQuery } from '@/services/dao/generated';
 import {
-  DaoIcppersQueryVariables,
-  IcpperQuery,
   IcppersQuerySortedEnum,
   IcppersQuerySortedTypeEnum,
   useDaoIcppersQuery,
 } from '@/services/dao/generated';
-import { PageLoading } from '@ant-design/pro-layout';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import StatCard from '@/components/StatCard';
 import { getCurrentPage, getFormatTime } from '@/utils/utils';
@@ -31,7 +29,7 @@ const DaoIcpperStat: React.FC<DaoIcpperStatProps> = ({ daoId, tokenSymbol }) => 
     first: 10,
     offset: 0,
   });
-  const { data, loading, error } = useDaoIcppersQuery({ variables: queryVariable });
+  const { data, loading } = useDaoIcppersQuery({ variables: queryVariable });
 
   const tableChange = useCallback((pagination: TablePaginationConfig, sorter: any) => {
     let sorted: IcppersQuerySortedEnum;
@@ -62,10 +60,6 @@ const DaoIcpperStat: React.FC<DaoIcpperStatProps> = ({ daoId, tokenSymbol }) => 
       sortedType,
     }));
   }, []);
-
-  if (loading || error) {
-    return <PageLoading />;
-  }
 
   const columns = [
     {
