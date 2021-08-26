@@ -19,9 +19,17 @@ export type DaoCycleProps = {
   userRole?: 'no_login' | 'normal' | 'pre_icpper' | 'icpper' | 'owner';
   activeTab?: 'icpper' | 'job' | 'vote';
   daoId?: string;
+  tokenSymbol: string;
 };
 
-const DaoCycleIndex: React.FC<DaoCycleProps> = ({ cycleId, cycle, daoId, userRole, activeTab }) => {
+const DaoCycleIndex: React.FC<DaoCycleProps> = ({
+  cycleId,
+  cycle,
+  daoId,
+  userRole,
+  activeTab,
+  tokenSymbol,
+}) => {
   const intl = useIntl();
   const [currentTab, setCurrentTab] = useState<string>(activeTab || 'icpper');
   const { data, loading, error } = useCycleStatDataQuery({ variables: { cycleId } });
@@ -44,8 +52,8 @@ const DaoCycleIndex: React.FC<DaoCycleProps> = ({ cycleId, cycle, daoId, userRol
       number: data?.cycle?.stat?.size || 0,
     },
     {
-      title: 'SHT',
-      number: 0,
+      title: tokenSymbol,
+      number: data?.cycle?.stat?.size || 0,
     },
   ];
 
@@ -63,19 +71,29 @@ const DaoCycleIndex: React.FC<DaoCycleProps> = ({ cycleId, cycle, daoId, userRol
           key="icpper"
         >
           {currentTab === 'icpper' && userRole === 'owner' && (
-            <OwnerDaoCycleIcpper cycle={cycle} cycleId={cycleId} daoId={daoId} />
+            <OwnerDaoCycleIcpper
+              cycle={cycle}
+              cycleId={cycleId}
+              daoId={daoId}
+              tokenSymbol={tokenSymbol}
+            />
           )}
           {currentTab === 'icpper' && userRole !== 'owner' && (
-            <DaoCycleIcpper cycleId={cycleId} daoId={daoId} />
+            <DaoCycleIcpper cycleId={cycleId} daoId={daoId} tokenSymbol={tokenSymbol} />
           )}
         </TabPane>
 
         <TabPane tab={<FormattedMessage id={'pages.dao.component.dao_cycle.tab.job'} />} key="job">
           {currentTab === 'job' && userRole === 'owner' && (
-            <OwnerDaoCycleJob cycle={cycle} cycleId={cycleId} daoId={daoId} />
+            <OwnerDaoCycleJob
+              cycle={cycle}
+              cycleId={cycleId}
+              daoId={daoId}
+              tokenSymbol={tokenSymbol}
+            />
           )}
           {currentTab === 'job' && userRole !== 'owner' && (
-            <DaoCycleJob cycleId={cycleId} daoId={daoId} />
+            <DaoCycleJob cycleId={cycleId} daoId={daoId} tokenSymbol={tokenSymbol} />
           )}
         </TabPane>
 
@@ -84,7 +102,12 @@ const DaoCycleIndex: React.FC<DaoCycleProps> = ({ cycleId, cycle, daoId, userRol
           key="vote"
         >
           {currentTab === 'vote' && (
-            <DaoCycleVote cycleId={cycleId} cycle={cycle} userRole={userRole} />
+            <DaoCycleVote
+              cycleId={cycleId}
+              cycle={cycle}
+              userRole={userRole}
+              tokenSymbol={tokenSymbol}
+            />
           )}
         </TabPane>
       </Tabs>

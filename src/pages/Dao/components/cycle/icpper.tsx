@@ -76,8 +76,8 @@ const ownerColumns = (
     },
     {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.income" />,
-      dataIndex: 'income',
-      render: () => '-',
+      dataIndex: ['datum', 'income'],
+      sorter: true,
     },
     {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.ie" />,
@@ -201,8 +201,8 @@ const columns = (intl: any, daoId: string) => {
     },
     {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.income" />,
-      dataIndex: 'income',
-      render: () => '-',
+      dataIndex: ['datum', 'income'],
+      sorter: true,
     },
     {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.ie" />,

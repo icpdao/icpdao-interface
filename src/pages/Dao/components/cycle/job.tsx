@@ -77,7 +77,6 @@ const ownerColumns = (
       dataIndex: ['datum', 'income'],
       key: 'income',
       sorter: true,
-      render: () => <>-</>,
     },
     {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_job.table.head.vote_type" />,
@@ -150,7 +149,6 @@ const columns = (daoId: string) => {
       dataIndex: ['datum', 'income'],
       key: 'income',
       sorter: true,
-      render: () => <>-</>,
     },
   ];
 };

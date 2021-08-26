@@ -10,9 +10,10 @@ import { getFormatTimeByZone } from '@/utils/utils';
 export type DaoCycleProps = {
   daoId: string;
   userRole: 'no_login' | 'normal' | 'pre_icpper' | 'icpper' | 'owner';
+  tokenSymbol: string;
 };
 
-const DaoCycle: React.FC<DaoCycleProps> = ({ daoId, userRole }) => {
+const DaoCycle: React.FC<DaoCycleProps> = ({ daoId, userRole, tokenSymbol }) => {
   const defaultActiveKey = 'icpper';
   const [options, setOptions] = useState([]);
   const [cycleId, setCycleId] = useState('');
@@ -55,6 +56,7 @@ const DaoCycle: React.FC<DaoCycleProps> = ({ daoId, userRole }) => {
             cycle={currentCycle}
             userRole={userRole}
             activeTab={defaultActiveKey}
+            tokenSymbol={tokenSymbol}
           />
         </>
       ) : (
