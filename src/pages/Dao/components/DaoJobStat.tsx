@@ -6,7 +6,6 @@ import {
   JobsQuerySortedTypeEnum,
   useDaoJobsQuery,
 } from '@/services/dao/generated';
-import { PageLoading } from '@ant-design/pro-layout';
 import type { TablePaginationConfig } from 'antd';
 import { Avatar, DatePicker, Form, Select, Space, Table, TimePicker } from 'antd';
 import styles from './index.less';
@@ -79,10 +78,8 @@ const DaoJobStat: React.FC<DaoJobSatProps> = ({ daoId, tokenSymbol }) => {
       sortedType,
     }));
   }, []);
-  const { data, loading, error } = useDaoJobsQuery({ variables: queryVariable });
-  if (loading || error) {
-    return <PageLoading />;
-  }
+  const { data, loading } = useDaoJobsQuery({ variables: queryVariable });
+
   const columns = [
     {
       title: <FormattedMessage id="pages.dao.component.dao_job.table.head.icpper" />,
