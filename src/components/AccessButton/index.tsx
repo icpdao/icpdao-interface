@@ -14,9 +14,13 @@ type AccessButtonProps = ButtonProps &
     ownerId?: string;
   };
 
-const AccessButton: React.FC<AccessButtonProps> = (props) => {
-  const { allow, onClick, ownerId, defaultWarningModal } = props;
-
+const AccessButton: React.FC<AccessButtonProps> = ({
+  allow,
+  onClick,
+  ownerId,
+  defaultWarningModal,
+  ...props
+}) => {
   const access = useAccess();
 
   const userAccess = useMemo(() => {
