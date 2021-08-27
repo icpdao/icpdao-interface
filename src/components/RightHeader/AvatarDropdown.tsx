@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
   UserOutlined,
   TransactionOutlined,
@@ -12,7 +12,13 @@ import { Avatar, Button, Menu, Spin } from 'antd';
 import { history, useIntl, useModel, useLocation, useAccess } from 'umi';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
-import { clearAuthorization, githubCallback } from '@/utils/utils';
+import {
+  clearAuthorization,
+  getAuthorization,
+  getAuthorizationExpiresAt,
+  getCurrentTimestamps,
+  githubCallback,
+} from '@/utils/utils';
 
 export const getGithubOAuthUrl = () => {
   const params = new URLSearchParams();
@@ -50,7 +56,7 @@ const loginOut = async () => {
 };
 
 const AvatarDropdown: React.FC<GlobalHeaderRightProps> = () => {
-  const { initialState, setInitialState } = useModel('@@initialState');
+  const { initialState, setInitialState, refresh } = useModel('@@initialState');
   const intl = useIntl();
   const { pathname } = useLocation();
 
@@ -65,6 +71,15 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = () => {
     },
     [initialState, setInitialState],
   );
+
+  useEffect(() => {
+    const auth = getAuthorization();
+    const expiresAt = getAuthorizationExpiresAt();
+    if (!auth || expiresAt < getCurrentTimestamps()) {
+      clearAuthorization();
+      refresh();
+    }
+  }, [pathname, refresh]);
 
   const loading = (
     <span className={`${styles.action} ${styles.account}`}>

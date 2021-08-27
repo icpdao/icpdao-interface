@@ -524,7 +524,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
         <Space size={22} className={styles.buttonSpace}>
           <Tooltip placement="right" title={markJobButtonTipTitle}>
             <AccessButton
-              allow={AccessEnum.ICPPER}
+              allow={AccessEnum.PREICPPER}
               size={'large'}
               type={'primary'}
               onClick={handleMarkJob}
@@ -534,7 +534,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
           </Tooltip>
           <Tooltip placement="right" title={goVoteButtonTipTitle}>
             <AccessButton
-              allow={AccessEnum.ICPPER}
+              allow={AccessEnum.PREICPPER}
               size={'large'}
               type={'primary'}
               danger

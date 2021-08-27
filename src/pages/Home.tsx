@@ -154,7 +154,7 @@ export default (): React.ReactNode => {
                   <FormattedMessage id={'pages.home.button1'} />
                 </Button>
                 <AccessButton
-                  allow={AccessEnum.ICPPER}
+                  allow={AccessEnum.PREICPPER}
                   defaultWarningModal={defaultWarning}
                   size={'large'}
                   type="primary"
