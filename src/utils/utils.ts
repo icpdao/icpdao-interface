@@ -67,6 +67,7 @@ export const getHistoryBack: any = () => {
 export const clearAuthorization = () => {
   // 可能存在格式转换
   window.localStorage.removeItem('authorization');
+  window.localStorage.removeItem('authorization_expires_at');
   return clearUserProfile();
 };
 

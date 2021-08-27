@@ -388,7 +388,7 @@ const DaoList: React.FC<DaoListProps> = ({ menuList }) => {
   const createButton = useMemo(() => {
     return (
       <AccessButton
-        allow={AccessEnum.ICPPER}
+        allow={AccessEnum.PREICPPER}
         className={styles.createDao}
         type="primary"
         size="large"
