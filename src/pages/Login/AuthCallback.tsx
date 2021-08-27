@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { PageLoading } from '@ant-design/pro-layout';
 import { history, useAccess } from 'umi';
 import { githubCallback } from '@/services/icpdao-interface/login';
-import { setAuthorization } from '@/utils/utils';
+import { setAuthorization, setAuthorizationExpiresAt } from '@/utils/utils';
 import { useModel } from '@@/plugin-model/useModel';
 import { useUserVotingCycleQuery } from '@/services/dao/generated';
 
@@ -42,6 +42,7 @@ const AuthCallback: React.FC<any> = (props) => {
       callGithub.current = true;
       if (resp?.data?.jwt) {
         setAuthorization(resp.data.jwt);
+        setAuthorizationExpiresAt(resp.data.expires_at || 0);
         if (initialState && initialState.fetchUserInfo) {
           await initialState.fetchUserInfo();
           await refresh();

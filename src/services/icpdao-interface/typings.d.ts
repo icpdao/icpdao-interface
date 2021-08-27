@@ -4,6 +4,7 @@
 declare namespace API {
   type GithubCallback = {
     jwt?: string;
+    expires_at?: number;
   };
 
   type UserStatus = 0 | 1 | 2;
