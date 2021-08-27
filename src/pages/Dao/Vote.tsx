@@ -308,7 +308,7 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
             ) : (
               <Button type="primary" onClick={() => handlerMetamaskConnect()}>
                 {intl.formatMessage({
-                  id: 'pages.dao.common.connect',
+                  id: 'pages.common.connect',
                 })}
               </Button>
             )}

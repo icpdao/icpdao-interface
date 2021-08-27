@@ -11,8 +11,9 @@ import styles from '@/pages/Dao/components/DaoList.less';
 import { FormattedMessage, useIntl, history } from 'umi';
 import { DaoFollowTypeEnum, useDaoListQuery, useFollowDaoMutation } from '@/services/dao/generated';
 import { useAccess } from '@@/plugin-access/access';
-import { useMentorWarningModal } from '@/pages/components/MentorWarningModal';
 import { getGithubOAuthUrl } from '@/components/RightHeader/AvatarDropdown';
+import AccessButton from '@/components/AccessButton';
+import { AccessEnum } from '@/access';
 
 const { Search } = Input;
 
@@ -377,35 +378,29 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
 };
 
 const DaoList: React.FC<DaoListProps> = ({ menuList }) => {
-  const access = useAccess();
   const intl = useIntl();
-  const { mentorWarningModal, setMentorWarningModalVisible } = useMentorWarningModal(false);
+  // const { mentorWarningModal, setMentorWarningModalVisible } = useMentorWarningModal(false);
 
   const onClick = useCallback(() => {
-    if (access.noLogin()) {
-      const githubOAuth = getGithubOAuthUrl();
-      window.open(githubOAuth, '_self');
-      return;
-    }
-
-    if (access.isNormal()) {
-      setMentorWarningModalVisible(true);
-      return;
-    }
     history.push('/dao/create');
-  }, [access, setMentorWarningModalVisible]);
+  }, []);
 
   const createButton = useMemo(() => {
     return (
-      <Button className={styles.createDao} type="primary" size="large" onClick={onClick}>
+      <AccessButton
+        allow={AccessEnum.ICPPER}
+        className={styles.createDao}
+        type="primary"
+        size="large"
+        onClick={onClick}
+      >
         {intl.formatMessage({ id: 'pages.dao.component.dao_list.create_dao' })}
-      </Button>
+      </AccessButton>
     );
   }, [intl, onClick]);
 
   return (
     <>
-      {mentorWarningModal}
       <div className={styles.container}>
         {createButton}
         <DaoTable menuList={menuList} />

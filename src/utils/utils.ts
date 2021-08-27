@@ -27,9 +27,19 @@ export const getAuthorization = () => {
   return window.localStorage.getItem('authorization');
 };
 
+export const getAuthorizationExpiresAt = () => {
+  // 可能存在格式转换
+  return parseInt(window.localStorage.getItem('authorization_expires_at') || '0', 10);
+};
+
 export const setAuthorization = (jwt: string) => {
   // 可能存在格式转换
   return window.localStorage.setItem('authorization', jwt);
+};
+
+export const setAuthorizationExpiresAt = (expiresAt: number) => {
+  // 可能存在格式转换
+  return window.localStorage.setItem('authorization_expires_at', expiresAt.toString());
 };
 
 export const getUserInfo = () => {
@@ -108,6 +118,10 @@ export const getFormatTime = (time: number, format: string): string => {
 
 export const getFormatTimeByZone = (time: number, timeZone: number, format: string): string => {
   return moment.unix(time).utcOffset(timeZone).format(format);
+};
+
+export const getTimestamp = () => {
+  return moment.utc().valueOf();
 };
 
 export const getTimestampByZone = (time: number, timeZone: number) => {
