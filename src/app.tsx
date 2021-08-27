@@ -12,8 +12,8 @@ import {
   clearAuthorization,
   getAuthorization,
   getAuthorizationExpiresAt,
+  getCurrentTimestamps,
   getTheme,
-  getTimestamp,
   getUserInfo,
   setUserProfile,
 } from '@/utils/utils';
@@ -34,9 +34,8 @@ export async function getInitialState(): Promise<{
 }> {
   const auth = getAuthorization();
   const expiresAt = getAuthorizationExpiresAt();
-  if (!auth || expiresAt >= getTimestamp()) {
+  if (!auth || expiresAt < getCurrentTimestamps()) {
     clearAuthorization();
-    localStorage.removeItem('user_info');
   }
   const fetchUserInfo = async () => {
     try {
