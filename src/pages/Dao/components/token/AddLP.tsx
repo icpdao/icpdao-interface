@@ -275,7 +275,7 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress, setCur
                 onClick={() => handlerMetamaskConnect()}
               >
                 {intl.formatMessage({
-                  id: 'pages.dao.config.tab.token.create_pool.form.button.connect',
+                  id: 'pages.common.connect',
                 })}
               </Button>
             )}

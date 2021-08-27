@@ -2,19 +2,19 @@ import type { ReactNode } from 'react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { PageContainer, PageLoading } from '@ant-design/pro-layout';
 import {
-  Upload,
+  Alert,
   Avatar,
   Button,
   Col,
-  Row,
-  Space,
-  Typography,
-  Tag,
   Divider,
   message,
+  Row,
+  Space,
   Tabs,
+  Tag,
   Tooltip,
-  Alert,
+  Typography,
+  Upload,
 } from 'antd';
 import { FormattedMessage, history, useAccess } from 'umi';
 import styles from './index.less';
@@ -43,8 +43,9 @@ import { uploadS3AssumeRole } from '@/services/icpdao-interface/aws';
 import * as AWS from '@aws-sdk/client-s3';
 import { ApolloQueryResult } from '@apollo/client/core/types';
 import { ApolloError } from '@apollo/client';
-import { useMentorWarningModal } from '@/pages/components/MentorWarningModal';
 import { getGithubOAuthUrl } from '@/components/RightHeader/AvatarDropdown';
+import AccessButton from '@/components/AccessButton';
+import { AccessEnum } from '@/access';
 
 const { TabPane } = Tabs;
 
@@ -416,43 +417,19 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
     return data?.dao?.following?.total || 0;
   }, [data]);
 
-  const { mentorWarningModal, setMentorWarningModalVisible } = useMentorWarningModal(false);
-
   const defaultActiveKey = 'icpperStat';
 
   const handleMarkJob = useCallback(() => {
-    if (access.noLogin()) {
-      const githubOAuth = getGithubOAuthUrl();
-      window.open(githubOAuth, '_self');
-      return;
-    }
-
-    if (access.isNormal()) {
-      setMentorWarningModalVisible(true);
-      return;
-    }
-
     history.push(`/job?daoId=${daoId}`);
-  }, [access, daoId, setMentorWarningModalVisible]);
+  }, [daoId]);
 
   const handleGoVote = useCallback(() => {
-    if (access.noLogin()) {
-      const githubOAuth = getGithubOAuthUrl();
-      window.open(githubOAuth, '_self');
-      return;
-    }
-
-    if (access.isNormal()) {
-      setMentorWarningModalVisible(true);
-      return;
-    }
-
     if (nearVotingCycleHasVote) {
       history.push(`/dao/${daoId}/${nearVotingCycle?.datum?.id}/vote`);
     } else {
       setShowNoVoteAlert(true);
     }
-  }, [access, daoId, nearVotingCycle, nearVotingCycleHasVote, setMentorWarningModalVisible]);
+  }, [daoId, nearVotingCycle, nearVotingCycleHasVote]);
 
   if (loading || error) {
     return <PageLoading />;
@@ -460,7 +437,6 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
 
   return (
     <>
-      {mentorWarningModal}
       <PageContainer
         ghost
         header={{ breadcrumbRender: () => <GlobalBreadcrumb routes={breadcrumb(daoId)} /> }}
@@ -547,12 +523,18 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
         <Divider />
         <Space size={22} className={styles.buttonSpace}>
           <Tooltip placement="right" title={markJobButtonTipTitle}>
-            <Button size={'large'} type={'primary'} onClick={handleMarkJob}>
+            <AccessButton
+              allow={AccessEnum.ICPPER}
+              size={'large'}
+              type={'primary'}
+              onClick={handleMarkJob}
+            >
               <FormattedMessage id={`pages.dao.home.button.mark`} />
-            </Button>
+            </AccessButton>
           </Tooltip>
           <Tooltip placement="right" title={goVoteButtonTipTitle}>
-            <Button
+            <AccessButton
+              allow={AccessEnum.ICPPER}
               size={'large'}
               type={'primary'}
               danger
@@ -560,7 +542,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
               onClick={handleGoVote}
             >
               <FormattedMessage id={`pages.dao.home.button.vote`} />
-            </Button>
+            </AccessButton>
           </Tooltip>
         </Space>
 

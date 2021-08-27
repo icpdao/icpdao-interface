@@ -281,6 +281,9 @@
         "properties": {
           "jwt": {
             "type": "string"
+          },
+          "expires_at": {
+            "type": "string"
           }
         }
       },

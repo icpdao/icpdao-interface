@@ -1,5 +1,5 @@
 import { Button, Col, Modal, Row, Space } from 'antd';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import styles from './MentorWarningModal.less';
 import { useIntl } from '@@/plugin-locale/localeExports';
 
@@ -33,7 +33,7 @@ const MentorWarningModal: React.FC<MentorWarningModalProps> = ({ visible, setVis
       footer={
         <Row justify={'center'}>
           <Col>
-            <Space direction={'vertical'} className={styles.modalButtonSpace}>
+            <Space direction={'vertical'} className={styles.ModalButtonSpace}>
               <Button block key={'submit'} type={'primary'} size={'large'} onClick={onOk}>
                 {intl.formatMessage({ id: 'pages.home.mentor.warning.ok' })}
               </Button>
@@ -46,30 +46,30 @@ const MentorWarningModal: React.FC<MentorWarningModalProps> = ({ visible, setVis
       }}
     >
       <div>
-        <div className={styles.modalContentTitle}>
+        <div className={styles.ModalContentTitle}>
           {intl.formatMessage({ id: 'pages.home.mentor.warning.title' })}
         </div>
-        <div className={styles.modalContentP}>
+        <div className={styles.ModalContentP}>
           <p
-            className={styles.modalContentPTitle}
+            className={styles.ModalContentPTitle}
             dangerouslySetInnerHTML={{
               __html: intl.formatMessage({ id: 'pages.home.mentor.warning.p1.title' }),
             }}
           />
           <p>{intl.formatMessage({ id: 'pages.home.mentor.warning.p1.content' })}</p>
         </div>
-        <div className={styles.modalContentP}>
+        <div className={styles.ModalContentP}>
           <p
-            className={styles.modalContentPTitle}
+            className={styles.ModalContentPTitle}
             dangerouslySetInnerHTML={{
               __html: intl.formatMessage({ id: 'pages.home.mentor.warning.p2.title' }),
             }}
           />
           <p>{intl.formatMessage({ id: 'pages.home.mentor.warning.p2.content' })}</p>
         </div>
-        <div className={styles.modalContentP}>
+        <div className={styles.ModalContentP}>
           <p
-            className={styles.modalContentPTitle}
+            className={styles.ModalContentPTitle}
             dangerouslySetInnerHTML={{
               __html: intl.formatMessage({ id: 'pages.home.mentor.warning.p3.title' }),
             }}
@@ -81,15 +81,4 @@ const MentorWarningModal: React.FC<MentorWarningModalProps> = ({ visible, setVis
   );
 };
 
-export const useMentorWarningModal = (defaultVisible: boolean) => {
-  const [visible, setVisible] = useState(defaultVisible);
-
-  const mentorWarningModal = (
-    <MentorWarningModal key={'warningModal'} visible={visible} setVisible={setVisible} />
-  );
-
-  return {
-    mentorWarningModal,
-    setMentorWarningModalVisible: setVisible,
-  };
-};
+export default MentorWarningModal;

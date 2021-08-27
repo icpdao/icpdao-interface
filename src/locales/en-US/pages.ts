@@ -169,7 +169,6 @@ export default {
   'pages.dao.config.tab.token.create_pool.form.quote_token_amount.desc': 'Quote Token Amount',
   'pages.dao.config.tab.token.create_pool.form.button.approve': 'Approve {quote_token_name}',
   'pages.dao.config.tab.token.create_pool.form.button.create': 'Create Pool',
-  'pages.dao.config.tab.token.create_pool.form.button.connect': 'Connect Wallet',
   'pages.dao.config.tab.token.add_lp': 'Add LP',
   'pages.dao.config.tab.token.add_lp.notfound':
     'You have not created the lp pool, create pool first.',
