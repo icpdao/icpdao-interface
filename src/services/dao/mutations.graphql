@@ -56,8 +56,8 @@ mutation UpdateDAOBaseInfo($id: String!, $desc: String, $logo: String, $tokenAdd
   }
 }
 
-mutation CreateJob($issueLink: String!, $size: Float!) {
-  createJob(issueLink: $issueLink, size: $size) {
+mutation CreateJob($issueLink: String!, $size: Float!, $autoCreatePR: Boolean!, $PRList: [RequestPR]) {
+  createJob(issueLink: $issueLink, size: $size, autoCreatePr: $autoCreatePR, prs: $PRList) {
     job {
       node {
         id
@@ -68,8 +68,8 @@ mutation CreateJob($issueLink: String!, $size: Float!) {
   }
 }
 
-mutation UpdateJobSize($id: String!, $size: Float!) {
-  updateJob(id: $id, size: $size) {
+mutation UpdateJob($id: String!, $size: Float!, $autoCreatePR: Boolean!, $PRList: [RequestPR]) {
+  updateJob(id: $id, size: $size, autoCreatePr: $autoCreatePR, prs: $PRList) {
     job {
       node {
         id
@@ -87,40 +87,6 @@ mutation DeleteJob($id: String!) {
 mutation UpdateCycleJobVoteTypeByOwner($jobId: String!, $voteType: UpdateJobVoteTypeByOwnerArgumentPairTypeEnum) {
   updateJobVoteTypeByOwner(id: $jobId, voteType: $voteType) {
     ok
-  }
-}
-
-mutation AddJobPR($id: String!, $addPr: String!) {
-  updateJob(id: $id, addPr: $addPr) {
-    job {
-      node {
-        id
-      }
-      prs {
-        id
-        title
-        githubRepoOwner
-        githubRepoName
-        githubPrNumber
-      }
-    }
-  }
-}
-
-mutation DeleteJobPR($id: String!, $deletePr: String!) {
-  updateJob(id: $id, deletePr: $deletePr) {
-    job {
-      node {
-        id
-      }
-      prs {
-        id
-        title
-        githubRepoOwner
-        githubRepoName
-        githubPrNumber
-      }
-    }
   }
 }
 

@@ -1,65 +1,31 @@
 import type { Dispatch, SetStateAction } from 'react';
-import React, { useCallback, useMemo, useState } from 'react';
-import styles from './index.less';
-import StatCard from '@/components/StatCard';
+import React, { useCallback } from 'react';
 import type { TablePaginationConfig } from 'antd';
-import { Form, Spin, Select, Table, Tag } from 'antd';
-import type { Job, JobListQueryVariables, JobPrSchema } from '@/services/dao/generated';
-import { JobSortedEnum, SortedTypeEnum, useJobListQuery } from '@/services/dao/generated';
+import { Form, Space, Table, Typography } from 'antd';
+import type { Job, JobListQueryVariables } from '@/services/dao/generated';
+import { JobSortedEnum, SortedTypeEnum } from '@/services/dao/generated';
 import { PageLoading } from '@ant-design/pro-layout';
 import { useIntl } from '@@/plugin-locale/localeExports';
-import { LoadingOutlined } from '@ant-design/icons';
 import { useModel } from '@@/plugin-model/useModel';
+import { getCurrentPage } from '@/utils/utils';
+import { EyeOutlined } from '@ant-design/icons';
+import { renderJobTag } from '@/utils/pageHelper';
 
 interface JobTableProps {
   jobQueryVar: JobListQueryVariables;
   setJobQueryVar: Dispatch<SetStateAction<JobListQueryVariables>>;
+  jobList: any;
+  openViewModal: (record: Job) => void;
 }
 
-const getCurrentPage = (offset: number, pageSize: number) => {
-  return Math.ceil(offset / pageSize) + 1;
-};
-
-const OtherUserJobTable: React.FC<JobTableProps> = ({ jobQueryVar, setJobQueryVar }) => {
+const OtherUserJobTable: React.FC<JobTableProps> = ({
+  jobQueryVar,
+  setJobQueryVar,
+  jobList,
+  openViewModal,
+}) => {
   const intl = useIntl();
   const { initialState } = useModel('@@initialState');
-  const [form] = Form.useForm();
-  const [jobPRsSelectOptions, setJobPRsSelectOptions] = useState({});
-  const [jobPRsSelectDefault, setJobPRsSelectDefault] = useState({});
-  const [jobPRsSelectLoading] = useState<Record<string, boolean>>({});
-
-  const { data, loading, error } = useJobListQuery({
-    variables: jobQueryVar,
-    fetchPolicy: 'no-cache',
-  });
-
-  const updateJobPR = useCallback(async (jobId: string, prs: JobPrSchema[] | undefined) => {
-    if (!prs) return;
-    const options: any[] = [];
-    const optionsIds: string[] = [];
-    prs.forEach((pr) => {
-      const url = `https://github.com/${pr.githubRepoOwner}/${pr.githubRepoName}/pull/${pr.githubPrNumber}`;
-      options.push({
-        id: pr.id,
-        value: pr.id,
-        label: pr.title,
-        url,
-      });
-      optionsIds.push(pr.id || '');
-    });
-
-    setJobPRsSelectOptions((old) => ({
-      ...old,
-      [jobId]: options,
-    }));
-    setJobPRsSelectDefault((old) => ({
-      ...old,
-      [jobId]: optionsIds,
-    }));
-  }, []);
-  useMemo(async () => {
-    data?.jobs?.job?.forEach((job) => updateJobPR(job?.node?.id || '', job?.prs as any));
-  }, [data, updateJobPR]);
 
   const tableChange = useCallback(
     (pagination: TablePaginationConfig, sorter: any) => {
@@ -88,24 +54,9 @@ const OtherUserJobTable: React.FC<JobTableProps> = ({ jobQueryVar, setJobQueryVa
     [setJobQueryVar],
   );
 
-  if (!initialState || loading || error) {
+  if (!initialState) {
     return <PageLoading />;
   }
-
-  const stat = [
-    {
-      number: data?.jobs?.total || 0,
-      title: intl.formatMessage({ id: 'pages.job.stat.job' }),
-    },
-    {
-      number: data?.jobs?.stat?.size || 0,
-      title: intl.formatMessage({ id: 'pages.job.stat.size' }),
-    },
-    {
-      number: data?.jobs?.stat?.tokenCount || 0,
-      title: 'Sht',
-    },
-  ];
 
   const columns = [
     {
@@ -130,83 +81,50 @@ const OtherUserJobTable: React.FC<JobTableProps> = ({ jobQueryVar, setJobQueryVa
       sorter: true,
     },
     {
-      title: intl.formatMessage({ id: 'pages.job.table.pr' }),
-      dataIndex: 'prs',
-      width: '300px',
-      render: (_: any, record: Job) => {
-        return (
-          <Spin
-            spinning={jobPRsSelectLoading[record.node?.id || ''] || false}
-            indicator={<LoadingOutlined style={{ fontSize: 20 }} />}
-          >
-            <Select
-              showSearch
-              disabled
-              loading={jobPRsSelectLoading[record.node?.id || ''] || false}
-              mode={'tags'}
-              maxTagCount={1}
-              maxTagTextLength={15}
-              maxTagPlaceholder={'...'}
-              size={'small'}
-              style={{ width: '100%' }}
-              value={jobPRsSelectDefault[record.node?.id || '']}
-              optionFilterProp="children"
-              options={jobPRsSelectOptions[record.node?.id || '']}
-              filterOption={(input, option) =>
-                option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0 ||
-                option?.value?.indexOf(input) >= 0
-              }
-            />
-          </Spin>
-        );
-      },
-    },
-    {
       title: intl.formatMessage({ id: 'pages.job.table.status' }),
       dataIndex: ['node', 'status'],
       render: (_: any, record: Job) => {
-        switch (record.node?.status) {
-          case 0:
-            return <Tag color="magenta">Awaiting merger</Tag>;
-          case 1:
-            return <Tag color="orange">Merged</Tag>;
-          case 2:
-            return <Tag color="green">Awaiting Voting</Tag>;
-          case 3:
-            return <Tag color="blue">Waiting for token</Tag>;
-          case 4:
-            return <Tag color="purple">Token released</Tag>;
-          default:
-            return <Tag color="magenta" />;
-        }
+        return renderJobTag(intl, record.node?.status);
       },
     },
     {
       title: intl.formatMessage({ id: 'pages.job.table.income' }),
       dataIndex: ['node', 'income'],
-      render: () => {
+      render: (_: any, record: Job) => {
+        if (record.node?.income) return <>{record.node.income}</>;
         return <>-</>;
+      },
+    },
+    {
+      title: intl.formatMessage({ id: 'pages.job.table.operation' }),
+      dataIndex: 'operation',
+      render: (_: any, record: Job) => {
+        return (
+          <Space>
+            <Typography.Link onClick={() => openViewModal(record)}>
+              <EyeOutlined />
+            </Typography.Link>
+          </Space>
+        );
       },
     },
   ];
 
   return (
     <>
-      <div className={styles.statCard}>
-        <StatCard data={stat} />
-      </div>
-      <Form form={form} component={false} key={'jobTable'}>
+      <Form component={false} key={'jobTable'}>
         <Table<Job>
           rowKey={(record) => record?.node?.id || ''}
           bordered
-          dataSource={data?.jobs?.job as any}
+          dataSource={jobList?.data?.jobs?.job as any}
           columns={columns}
+          loading={jobList?.loading || false}
           onChange={(pagination, filters, sorter) => {
             tableChange(pagination, sorter);
           }}
           pagination={{
             pageSize: 10,
-            total: data?.jobs?.total || 0,
+            total: jobList?.data?.jobs?.total || 0,
             current: getCurrentPage(jobQueryVar.offset || 0, 10),
           }}
         />
