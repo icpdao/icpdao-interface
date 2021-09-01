@@ -1,6 +1,6 @@
 import type { IcpperStatQuery } from '@/services/dao/generated';
 import { getEIColor } from '@/utils/utils';
-import { Tooltip } from 'antd';
+import { Tag, Tooltip } from 'antd';
 import { ExclamationCircleFilled } from '@ant-design/icons';
 
 export const colorTooltip = (color: string, tipsText: string) => {
@@ -69,4 +69,31 @@ export const renderEi = (intl: any, record: IcpperStatQuery) => {
       {tips.length > 0 && colorTooltip(color, tipsText)}
     </>
   );
+};
+
+export const renderJobTag = (intl: any, status: number | undefined) => {
+  switch (status) {
+    case 0:
+      return (
+        <Tag color="magenta">
+          {intl.formatMessage({ id: 'pages.job.table.tag.awaiting_merger' })}
+        </Tag>
+      );
+    case 1:
+      return <Tag color="orange">{intl.formatMessage({ id: 'pages.job.table.tag.merged' })}</Tag>;
+    case 2:
+      return (
+        <Tag color="green">{intl.formatMessage({ id: 'pages.job.table.tag.awaiting_voting' })}</Tag>
+      );
+    case 3:
+      return (
+        <Tag color="blue">{intl.formatMessage({ id: 'pages.job.table.tag.waiting_token' })}</Tag>
+      );
+    case 4:
+      return (
+        <Tag color="purple">{intl.formatMessage({ id: 'pages.job.table.tag.token_released' })}</Tag>
+      );
+    default:
+      return <Tag color="magenta" />;
+  }
 };
