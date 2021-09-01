@@ -288,11 +288,11 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
       selectedRowKeys: newOrEditOrViewJobFormData.prs?.map((v) => v.id),
       getCheckboxProps: (record: choosePR) => ({
         name: record.id.toString(),
-        disabled: newOrEditOrViewJobFormData.autoCreatePR || editJobModalVisible,
+        disabled: newOrEditOrViewJobFormData.autoCreatePR || viewJobModalVisible,
       }),
     };
   }, [
-    editJobModalVisible,
+    viewJobModalVisible,
     newOrEditOrViewJobFormData.autoCreatePR,
     newOrEditOrViewJobFormData.prs,
   ]);
