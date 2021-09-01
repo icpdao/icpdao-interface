@@ -35,7 +35,7 @@ export default (): ReactNode => {
     async (values: { erc20Address: string }) => {
       setSubmitButtonLoading(true);
       await updateUserProfile({ erc20_address: values.erc20Address });
-      await initialState.fetchUserInfo();
+      if (initialState.fetchUserInfo) await initialState.fetchUserInfo();
       setSubmitButtonLoading(false);
       return true;
     },

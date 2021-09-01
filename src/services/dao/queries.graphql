@@ -207,6 +207,13 @@ query UserJobDAOList($userName: String) {
       datum {
         id
         name
+        createAt
+        githubOwnerId
+        githubOwnerName
+        number
+        ownerId
+        updateAt
+        tokenSymbol
       }
     }
   }
@@ -234,6 +241,7 @@ query JobList($beginTime: Int, $endTime: Int, $daoName: String!, $first: Int, $o
         githubRepoName
         githubIssueNumber
         income
+        hadAutoCreatePr
       }
       prs {
         id
@@ -241,6 +249,8 @@ query JobList($beginTime: Int, $endTime: Int, $daoName: String!, $first: Int, $o
         githubRepoOwner
         githubRepoName
         githubPrNumber
+        isAutoCreatePr
+        githubPrId
       }
     }
     stat {
@@ -249,6 +259,27 @@ query JobList($beginTime: Int, $endTime: Int, $daoName: String!, $first: Int, $o
       tokenName
     }
     total
+  }
+}
+
+query IssueInfo($daoName: String!, $parameter: [String]) {
+  openGithub(daoName: $daoName, way: ISSUE_INFO, parameter: $parameter) {
+    way
+    data
+  }
+}
+
+query UserOpenPR($daoName: String!, $parameter: [String]) {
+  openGithub(daoName: $daoName, way: OPEN_PR, parameter: $parameter) {
+    way
+    data
+  }
+}
+
+query IssueTimeline($daoName: String!, $parameter: [String]) {
+  openGithub(daoName: $daoName, way: ISSUE_TIMELINE, parameter: $parameter) {
+    way
+    data
   }
 }
 

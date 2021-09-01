@@ -1,204 +1,39 @@
 import type { Dispatch, SetStateAction } from 'react';
-import React, { useCallback, useMemo, useState } from 'react';
-// import { history } from 'umi';
-import styles from './index.less';
-import StatCard from '@/components/StatCard';
+import React, { useCallback, useState } from 'react';
 import type { TablePaginationConfig } from 'antd';
-import {
-  Button,
-  Form,
-  Input,
-  InputNumber,
-  message,
-  Popconfirm,
-  Spin,
-  Select,
-  Space,
-  Table,
-  Tag,
-  Typography,
-} from 'antd';
-import type { Job, JobListQueryVariables, JobPrSchema } from '@/services/dao/generated';
-import {
-  JobSortedEnum,
-  SortedTypeEnum,
-  useAddJobPrMutation,
-  useCreateJobMutation,
-  useDeleteJobMutation,
-  useDeleteJobPrMutation,
-  useJobListQuery,
-  useUpdateJobSizeMutation,
-} from '@/services/dao/generated';
+import { Form, Popconfirm, Space, Table, Typography } from 'antd';
+import type { Job, JobListQueryVariables } from '@/services/dao/generated';
+import { JobSortedEnum, SortedTypeEnum, useDeleteJobMutation } from '@/services/dao/generated';
 import { PageLoading } from '@ant-design/pro-layout';
 import { useIntl } from '@@/plugin-locale/localeExports';
-import { DeleteFilled, EditFilled, LoadingOutlined } from '@ant-design/icons';
-import { request } from '@@/plugin-request/request';
+import { DeleteFilled, EditFilled, EyeOutlined } from '@ant-design/icons';
 import { useModel } from '@@/plugin-model/useModel';
+import { getCurrentPage } from '@/utils/utils';
+import { renderJobTag } from '@/utils/pageHelper';
 
 interface JobTableProps {
   jobQueryVar: JobListQueryVariables;
-  daoId: string;
-  userName: string | undefined;
-  refetchSelect: any;
   setJobQueryVar: Dispatch<SetStateAction<JobListQueryVariables>>;
-}
-
-interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
-  editing: boolean;
-  dataIndex: string;
-  title: any;
-  inputType: 'number' | 'text';
-  record: Job;
-  index: number;
-  children: React.ReactNode;
-}
-
-const EditableCell: React.FC<EditableCellProps> = ({
-  editing,
-  dataIndex,
-  title,
-  inputType,
-  record,
-  index,
-  children,
-  ...restProps
-}) => {
-  const inputNode =
-    inputType === 'number' ? (
-      <InputNumber min={0.1} step={0.1} precision={1} size={'small'} />
-    ) : (
-      <Input size={'small'} />
-    );
-
-  return (
-    <td {...restProps}>
-      {editing ? (
-        <Form.Item
-          name={dataIndex}
-          style={{ margin: 0 }}
-          rules={[
-            {
-              required: true,
-              message: `Please Input ${title}!`,
-            },
-          ]}
-        >
-          {inputNode}
-        </Form.Item>
-      ) : (
-        children
-      )}
-    </td>
-  );
-};
-
-const getCurrentPage = (offset: number, pageSize: number) => {
-  return Math.ceil(offset / pageSize) + 1;
-};
-
-async function getGithubPRList(daoName: string, user: string) {
-  return request('https://api.github.com/search/issues', {
-    method: 'GET',
-    params: { q: `is:open is:pr author:${user} archived:false user:${daoName}` },
-  });
+  jobList: any;
+  getJobList: any;
+  openEditModal: (record: Job) => void;
+  openViewModal: (record: Job) => void;
 }
 
 const OwnerJobTable: React.FC<JobTableProps> = ({
   jobQueryVar,
-  userName,
-  daoId,
-  refetchSelect,
   setJobQueryVar,
+  jobList,
+  getJobList,
+  openEditModal,
+  openViewModal,
 }) => {
   const intl = useIntl();
   const { initialState } = useModel('@@initialState');
   const [form] = Form.useForm();
-  const [optionsPRs, setOptionsPRs] = useState<any[]>();
-  const [editingRowId, setEditingRowId] = useState<string>('');
-  const [markButtonLoading, setMarkButtonLoading] = useState<boolean>(false);
-  const [jobPRsSelectOptions, setJobPRsSelectOptions] = useState({});
-  const [jobPRsSelectDefault, setJobPRsSelectDefault] = useState({});
-  const [jobPRsSelectLoading, setJobPRsSelectLoading] = useState<Record<string, boolean>>({});
   const [jobDeleteLoading, setJobDeleteLoading] = useState<Record<string, boolean>>({});
   const [jobDeleteVisible, setJobDeleteVisible] = useState<Record<string, boolean>>({});
-  // const [jobQueryVar, setJobQueryVar] = useState<JobListQueryVariables>(queryVariables);
-  const isEditing = useCallback((record: Job) => record.node?.id === editingRowId, [editingRowId]);
-  const [createJobMutation] = useCreateJobMutation();
-  const [addJobPR] = useAddJobPrMutation();
-  const [deleteJobPR] = useDeleteJobPrMutation();
-  const [updateJobSize] = useUpdateJobSizeMutation();
   const [deleteJob] = useDeleteJobMutation();
-  // useMemo(() => {
-  //   setJobQueryVar(queryVariables);
-  // }, [queryVariables]);
-  const { data, loading, error, refetch } = useJobListQuery({
-    variables: jobQueryVar,
-    fetchPolicy: 'no-cache',
-  });
-  useMemo(async () => {
-    const ret = await getGithubPRList(jobQueryVar.daoName, userName || '');
-    setOptionsPRs(ret?.items || []);
-  }, [jobQueryVar, userName]);
-  const updateJobPR = useCallback(
-    async (jobId: string, prs: JobPrSchema[] | undefined) => {
-      if (!prs) return;
-      const options: any[] = [];
-      const optionsURL: string[] = [];
-      const optionsIds: string[] = [];
-      prs.forEach((pr) => {
-        const url = `https://github.com/${pr.githubRepoOwner}/${pr.githubRepoName}/pull/${pr.githubPrNumber}`;
-        options.push({
-          id: pr.id,
-          value: pr.id,
-          label: pr.title,
-          url,
-        });
-        optionsURL.push(url);
-        optionsIds.push(pr.id || '');
-      });
-      optionsPRs?.forEach((dpr) => {
-        if (!optionsURL.includes(dpr.html_url)) {
-          options.push({
-            id: dpr.id,
-            value: dpr.html_url,
-            label: dpr.title,
-            url: dpr.html_url,
-          });
-        }
-      });
-      setJobPRsSelectOptions((old) => ({
-        ...old,
-        [jobId]: options,
-      }));
-      setJobPRsSelectDefault((old) => ({
-        ...old,
-        [jobId]: optionsIds,
-      }));
-    },
-    [optionsPRs],
-  );
-  useMemo(async () => {
-    data?.jobs?.job?.forEach((job) => updateJobPR(job?.node?.id || '', job?.prs as any));
-  }, [data, updateJobPR]);
-
-  const save = useCallback(
-    async (jobId: string) => {
-      try {
-        message.info('Job Size Updating');
-        const row = await form.validateFields();
-        await updateJobSize({
-          variables: { id: jobId, size: row.node.size },
-        });
-        await refetch();
-        message.success('Job Size Updated');
-      } catch (e) {
-        message.error('Job Size Update Failed');
-      } finally {
-        setEditingRowId('');
-      }
-    },
-    [form, refetch, updateJobSize],
-  );
   const tableChange = useCallback(
     (pagination: TablePaginationConfig, sorter: any) => {
       let sorted: JobSortedEnum | undefined;
@@ -222,7 +57,6 @@ const OwnerJobTable: React.FC<JobTableProps> = ({
         sorted,
         sortedType,
       }));
-      setEditingRowId('');
     },
     [setJobQueryVar],
   );
@@ -231,46 +65,18 @@ const OwnerJobTable: React.FC<JobTableProps> = ({
       await deleteJob({
         variables: { id: record.node?.id || '' },
       });
-      await refetch();
+      await getJobList();
     },
-    [deleteJob, refetch],
+    [deleteJob, getJobList],
   );
-  if (!initialState || loading || error) {
+  if (!initialState) {
     return <PageLoading />;
   }
-  const currentUser = initialState.currentUser().profile.github_login;
-  const cancel = () => {
-    setEditingRowId('');
-  };
-  const edit = (record: Partial<Job>) => {
-    if (record.node?.status !== 0 && record.node?.status !== 1) {
-      message.error("Job Size Can't Update");
-      return;
-    }
-    form.setFieldsValue({ ...record });
-    setEditingRowId(record.node?.id || '');
-  };
-
-  const stat = [
-    {
-      number: data?.jobs?.total || 0,
-      title: intl.formatMessage({ id: 'pages.job.stat.job' }),
-    },
-    {
-      number: data?.jobs?.stat?.size || 0,
-      title: intl.formatMessage({ id: 'pages.job.stat.size' }),
-    },
-    {
-      number: data?.jobs?.stat?.tokenCount || 0,
-      title: 'Sht',
-    },
-  ];
 
   const columns = [
     {
       title: intl.formatMessage({ id: 'pages.job.table.title' }),
       dataIndex: ['node', 'title'],
-      width: '270px',
       render: (_: any, record: Job) => {
         return (
           <a
@@ -286,109 +92,20 @@ const OwnerJobTable: React.FC<JobTableProps> = ({
     {
       title: intl.formatMessage({ id: 'pages.job.table.size' }),
       dataIndex: ['node', 'size'],
-      editable: true,
       sorter: true,
-      onCell: (record: Job) => ({
-        record,
-        inputType: 'number',
-        dataIndex: ['node', 'size'],
-        title: intl.formatMessage({ id: 'pages.job.table.size' }),
-        editing: isEditing(record),
-      }),
-    },
-    {
-      title: intl.formatMessage({ id: 'pages.job.table.pr' }),
-      dataIndex: 'prs',
-      width: '300px',
-      render: (_: any, record: Job) => {
-        return (
-          <Spin
-            spinning={jobPRsSelectLoading[record.node?.id || ''] || false}
-            indicator={<LoadingOutlined style={{ fontSize: 20 }} />}
-          >
-            <Select
-              showSearch
-              loading={jobPRsSelectLoading[record.node?.id || ''] || false}
-              mode={'tags'}
-              maxTagCount={1}
-              maxTagTextLength={15}
-              maxTagPlaceholder={'...'}
-              size={'small'}
-              style={{ width: '100%' }}
-              value={jobPRsSelectDefault[record.node?.id || '']}
-              optionFilterProp="children"
-              options={jobPRsSelectOptions[record.node?.id || '']}
-              onSelect={async (value) => {
-                try {
-                  setJobPRsSelectLoading((old) => ({ ...old, [record.node?.id || '']: true }));
-                  const tmpJobPR = await addJobPR({
-                    variables: { id: record.node?.id || '', addPr: value },
-                  });
-                  const ret = await getGithubPRList(jobQueryVar.daoName, userName || '');
-                  setOptionsPRs(ret?.items || []);
-                  await updateJobPR(
-                    record.node?.id || '',
-                    tmpJobPR.data?.updateJob?.job?.prs as any,
-                  );
-                  message.success('Job Linked PR');
-                } catch (e) {
-                  console.error('Job Linked Failed');
-                } finally {
-                  setJobPRsSelectLoading((old) => ({ ...old, [record.node?.id || '']: false }));
-                }
-              }}
-              onDeselect={async (value) => {
-                try {
-                  setJobPRsSelectLoading((old) => ({ ...old, [record.node?.id || '']: true }));
-                  const tmpJobPR = await deleteJobPR({
-                    variables: { id: record.node?.id || '', deletePr: value },
-                  });
-                  const ret = await getGithubPRList(jobQueryVar.daoName, userName || '');
-                  setOptionsPRs(ret?.items || []);
-                  await updateJobPR(
-                    record.node?.id || '',
-                    tmpJobPR.data?.updateJob?.job?.prs as any,
-                  );
-                  message.success('Job Unlinked PR');
-                } catch (e) {
-                  console.error('Job Unlinked Failed');
-                } finally {
-                  setJobPRsSelectLoading((old) => ({ ...old, [record.node?.id || '']: false }));
-                }
-              }}
-              filterOption={(input, option) =>
-                option?.children?.toLowerCase().indexOf(input.toLowerCase()) >= 0 ||
-                option?.value?.indexOf(input) >= 0
-              }
-            />
-          </Spin>
-        );
-      },
     },
     {
       title: intl.formatMessage({ id: 'pages.job.table.status' }),
       dataIndex: ['node', 'status'],
       render: (_: any, record: Job) => {
-        switch (record.node?.status) {
-          case 0:
-            return <Tag color="magenta">Awaiting merger</Tag>;
-          case 1:
-            return <Tag color="orange">Merged</Tag>;
-          case 2:
-            return <Tag color="green">Awaiting Voting</Tag>;
-          case 3:
-            return <Tag color="blue">Waiting for token</Tag>;
-          case 4:
-            return <Tag color="purple">Token released</Tag>;
-          default:
-            return <Tag color="magenta" />;
-        }
+        return renderJobTag(intl, record.node?.status);
       },
     },
     {
       title: intl.formatMessage({ id: 'pages.job.table.income' }),
       dataIndex: ['node', 'income'],
-      render: () => {
+      render: (_: any, record: Job) => {
+        if (record.node?.income) return <>{record.node.income}</>;
         return <>-</>;
       },
     },
@@ -396,30 +113,21 @@ const OwnerJobTable: React.FC<JobTableProps> = ({
       title: intl.formatMessage({ id: 'pages.job.table.operation' }),
       dataIndex: 'operation',
       render: (_: any, record: Job) => {
-        const editing = isEditing(record);
-        return editing ? (
-          <span>
-            <a
-              onClick={async () => {
-                await save(record.node?.id || '');
-              }}
-              style={{ marginRight: 8 }}
-            >
-              Save
-            </a>
-            <a onClick={cancel} style={{ marginRight: 8 }}>
-              Cancel
-            </a>
-          </span>
-        ) : (
+        return (
           <Space>
-            <Typography.Link disabled={editingRowId !== ''} onClick={() => edit(record)}>
-              <EditFilled />
-            </Typography.Link>
+            {record.node?.status !== undefined && record.node.status <= 1 ? (
+              <Typography.Link onClick={() => openEditModal(record)}>
+                <EditFilled />
+              </Typography.Link>
+            ) : (
+              <Typography.Link onClick={() => openViewModal(record)}>
+                <EyeOutlined />
+              </Typography.Link>
+            )}
             {record.node?.status === 0 && (
               <Popconfirm
                 placement={'right'}
-                title="Are you sure？"
+                title={intl.formatMessage({ id: 'pages.job.table.delete.pop_confirm' })}
                 okText="Yes"
                 cancelText="No"
                 visible={jobDeleteVisible[record.node?.id || ''] || false}
@@ -433,9 +141,11 @@ const OwnerJobTable: React.FC<JobTableProps> = ({
                     setJobDeleteVisible((old) => ({ ...old, [record.node?.id || '']: false }));
                   }
                 }}
+                onCancel={() =>
+                  setJobDeleteVisible((old) => ({ ...old, [record.node?.id || '']: false }))
+                }
               >
                 <Typography.Link
-                  disabled={editingRowId !== ''}
                   onClick={() =>
                     setJobDeleteVisible((old) => ({ ...old, [record.node?.id || '']: true }))
                   }
@@ -452,86 +162,19 @@ const OwnerJobTable: React.FC<JobTableProps> = ({
 
   return (
     <>
-      <div className={styles.statCard}>
-        <StatCard data={stat} />
-      </div>
-      {userName === currentUser && (
-        <Form
-          key={'markForm'}
-          className={styles.markForm}
-          layout="inline"
-          onFinish={async ({ issueLink, size }) => {
-            setMarkButtonLoading(true);
-            try {
-              const created = await createJobMutation({ variables: { issueLink, size } });
-              await refetchSelect();
-              await refetch();
-              if (created.data?.createJob?.job?.node?.daoId !== daoId) {
-                setJobQueryVar((old) => ({
-                  ...old,
-                  daoName: created.data?.createJob?.job?.node?.githubRepoOwner || '',
-                }));
-              }
-            } catch (e) {
-              console.error(e);
-            } finally {
-              setMarkButtonLoading(false);
-            }
-            return true;
-          }}
-        >
-          <Form.Item
-            name="issueLink"
-            className={styles.markIssueLink}
-            rules={[
-              { required: true, message: intl.formatMessage({ id: 'pages.job.mark.issue.desc' }) },
-              {
-                pattern: /https:\/\/github.com\/(.+)\/(.+)\/issues\/(\d+)/g,
-                message: intl.formatMessage({ id: 'pages.job.mark.issue.desc' }),
-              },
-            ]}
-          >
-            <Input placeholder={intl.formatMessage({ id: 'pages.job.mark.issue.desc' })} />
-          </Form.Item>
-          <Form.Item
-            className={styles.markSize}
-            name="size"
-            rules={[
-              { required: true, message: intl.formatMessage({ id: 'pages.job.mark.size.desc' }) },
-            ]}
-          >
-            <InputNumber
-              style={{ width: 200 }}
-              min={0.1}
-              step={0.1}
-              precision={1}
-              placeholder={intl.formatMessage({ id: 'pages.job.mark.size.desc' })}
-            />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" loading={markButtonLoading}>
-              {intl.formatMessage({ id: 'pages.job.mark.button' })}
-            </Button>
-          </Form.Item>
-        </Form>
-      )}
       <Form form={form} component={false} key={'jobTable'}>
         <Table<Job>
-          components={{
-            body: {
-              cell: EditableCell,
-            },
-          }}
           rowKey={(record) => record?.node?.id || ''}
           bordered
-          dataSource={data?.jobs?.job as any}
+          dataSource={jobList?.data?.jobs?.job as any}
+          loading={jobList?.loading || false}
           columns={columns}
           onChange={(pagination, filters, sorter) => {
             tableChange(pagination, sorter);
           }}
           pagination={{
             pageSize: 10,
-            total: data?.jobs?.total || 0,
+            total: jobList?.data?.data?.jobs?.total || 0,
             current: getCurrentPage(jobQueryVar.offset || 0, 10),
           }}
         />
