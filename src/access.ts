@@ -19,12 +19,9 @@ export default function access(initialState: { currentUser: any }) {
     isPreIcpperOrIcpper: () =>
       currentUser().profile?.status === 1 || currentUser().profile?.status === 2,
     canInviteIcpper: () =>
-      (currentUser().profile?.icppership?.progress !== 0 &&
-        currentUser().profile?.icppership?.progress !== undefined) ||
-      currentUser().profile?.status === 2,
+      currentUser().profile?.status === 1 || currentUser().profile?.status === 2,
     hadMentor: () =>
-      currentUser().profile?.icppership?.progress !== 0 &&
-      currentUser().profile?.icppership?.progress !== undefined &&
+      currentUser().profile?.icppership?.progress === 1 &&
       currentUser().profile?.icppership?.mentor?.github_login,
     isDaoOwner: (ownerId: string) => currentUser().profile?.id === ownerId,
     getAccess: (ownerId?: string) => {
