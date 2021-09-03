@@ -106,8 +106,8 @@ const IcpperList: React.FC = () => {
     },
     {
       title: 'Icpper',
+      dataIndex: 'icpper_icpper_count',
       key: 'icpper',
-      render: () => <>x</>,
     },
     {
       title: intl.formatMessage({ id: 'pages.account.icpper.table.column.5' }),
@@ -186,6 +186,7 @@ const IcpperList: React.FC = () => {
           github_login: datum.icpper?.github_login || '',
           accept_time: acceptTime,
           be_mentor_days: beMentorDays,
+          icpper_icpper_count: datum.icpper_icpper_count,
         });
       }
     }
