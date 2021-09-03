@@ -8,15 +8,24 @@ import { useModel } from '@@/plugin-model/useModel';
 import { Form, Input, Button } from 'antd';
 import { useCallback, useState } from 'react';
 import { updateUserProfile } from '@/services/icpdao-interface/user';
+import PermissionErrorPage from '@/pages/403';
+import { useAccess } from '@@/plugin-access/access';
 
 export default (): ReactNode => {
   const intl = useIntl();
   const { initialState } = useModel('@@initialState');
   const [form] = Form.useForm();
+  const { isLogin } = useAccess();
   const [submitButtonLoading, setSubmitButtonLoading] = useState(false);
+
   if (!initialState) {
     return <PageLoading />;
   }
+
+  if (!isLogin()) {
+    return <PermissionErrorPage />;
+  }
+
   const breadcrumb = [
     {
       icon: <HomeOutlined />,

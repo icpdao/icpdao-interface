@@ -19,17 +19,14 @@
   {
     path: '/account/mentor',
     component: './Account/Mentor',
-    access: 'hadMentor',
   },
   {
     path: '/account/wallet',
     component: './Account/Wallet',
-    access: 'isLogin',
   },
   {
     path: '/dao/mine',
     component: './Dao/Mine',
-    access: 'isLogin',
   },
   {
     path: '/dao/explore',
@@ -38,7 +35,6 @@
   {
     path: '/dao/create',
     component: './Dao/Create',
-    access: 'isPreIcpperOrIcpper',
   },
   {
     path: '/dao/:daoId/config',
