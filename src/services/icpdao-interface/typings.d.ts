@@ -11,7 +11,7 @@ declare namespace API {
 
   type IcpperShip = {
     id?: string;
-    progress?: 0 | 1 | 2;
+    progress?: 0 | 1;
     status?: UserStatus;
     mentor?: IcpperShipMentor;
   };
@@ -39,10 +39,11 @@ declare namespace API {
 
   type InviteResult = {
     id?: string;
-    progress?: 0 | 1 | 2;
+    progress?: 0 | 1;
     status?: UserStatus;
     mentor_github_login?: string;
     icpper?: InviteResultIcpper;
+    icpper_icpper_count?: number;
     create_at?: number;
     accept_at?: number;
     icpper_at?: number;
