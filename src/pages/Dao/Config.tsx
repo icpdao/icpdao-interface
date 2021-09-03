@@ -5,10 +5,9 @@ import { FormattedMessage, useAccess, history } from 'umi';
 import styles from './index.less';
 import GlobalBreadcrumb from '@/components/Breadcrumb';
 import { HomeOutlined } from '@ant-design/icons';
-import { useModel } from '@@/plugin-model/useModel';
 import { useDaoQuery } from '@/services/dao/generated';
 import PermissionErrorPage from '@/pages/403';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import DAOJobConfig from '@/pages/Dao/components/JobConfig';
 import TokenConfig from '@/pages/Dao/components/TokenConfig';
 
@@ -50,9 +49,7 @@ export default (props: {
   match: { params: { daoId: string } };
   location: { query: { status: string | undefined } };
 }): ReactNode => {
-  const { initialState } = useModel('@@initialState');
-  const access = useAccess();
-
+  const { isDaoOwner } = useAccess();
   const { daoId } = props.match.params;
   const { status } = props.location.query;
   const [tab, setTab] = useState<string>(status || 'job');
@@ -61,14 +58,9 @@ export default (props: {
     variables: { id: daoId },
   });
 
-  if (!initialState || loading || error) {
-    return <PageLoading />;
-  }
-
-  if (!access.isDaoOwner(data?.dao?.datum?.ownerId || '')) {
-    return <PermissionErrorPage />;
-  }
-
+  const ownerId = useMemo(() => {
+    return data?.dao?.datum?.ownerId;
+  }, [data?.dao?.datum?.ownerId]);
   const skipClick = useCallback(() => {
     const nowIndex = firstConfigStep.indexOf(status || '');
     if (nowIndex === -1) return;
@@ -86,6 +78,14 @@ export default (props: {
       });
     }
   }, [daoId, status]);
+
+  if (loading || error) {
+    return <PageLoading />;
+  }
+
+  if (!isDaoOwner(ownerId || '')) {
+    return <PermissionErrorPage />;
+  }
 
   return (
     <>
