@@ -1,9 +1,10 @@
 /** Request 网络请求工具 更详细的 api 文档: https://github.com/umijs/umi-request */
 import type { RequestOptionsInit } from 'umi-request';
-import { notification } from 'antd';
+import { message, notification } from 'antd';
 import type { RequestConfig } from 'umi';
 import { history } from 'umi';
 import { clearAuthorization, getAuthorization, getProfile } from '@/utils/utils';
+import { getLocale } from 'umi';
 
 const codeMessage: Record<number, string> = {
   200: '服务器成功返回请求的数据。',
@@ -35,7 +36,7 @@ const errorHandler = (error: {
 }): Response => {
   const { response, name, data, request } = error;
   if (
-    (name === 'BizError' && data.errorMessage === 'UNAUTHError') ||
+    (name === 'BizError' && data.errorMessage === 'error.common.not_login') ||
     request.url.endsWith(getProfile)
   ) {
     clearAuthorization();
@@ -62,6 +63,15 @@ const errorHandler = (error: {
     //   description: 'Your network is abnormal and cannot connect to the server',
     //   message: 'Network anomaly',
     // });
+  }
+  if (data && data.errorMessage) {
+    const intl = getLocale();
+    import(`../locales/${intl}`).then((locales) => {
+      console.warn({
+        message: `Request error ${data.errorMessage}: ${response.url || ''}`,
+      });
+      message.error(locales.default[data.errorMessage] || data.errorMessage);
+    });
   }
   return response;
 };
