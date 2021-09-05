@@ -40,10 +40,11 @@ const errorLink = onError(({ graphQLErrors, networkError, response }) => {
   const intl = getLocale();
   import(`../locales/${intl}`).then((locales) => {
     if (graphQLErrors) {
-      graphQLErrors.forEach(({ message: msg, locations, path }) => {
+      if (graphQLErrors.length > 0) {
+        const { message: msg, locations, path } = graphQLErrors[0];
         console.warn(`[GraphQL error]: Message: ${msg}, Location: ${locations}, Path: ${path}`);
         message.error(locales.default[msg] || msg);
-      });
+      }
     } else if (networkError) {
       message.error(`[Network error]: ${networkError}`);
     }
