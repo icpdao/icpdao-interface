@@ -2,11 +2,13 @@ import React from 'react';
 import { PageContainer, PageLoading } from '@ant-design/pro-layout';
 import GlobalBreadcrumb from '@/components/Breadcrumb';
 import { HomeOutlined } from '@ant-design/icons';
-import DaoList, { SelectDropdownMenu } from './components/DaoList';
+import type { SelectDropdownMenu } from './components/DaoList';
+import DaoList from './components/DaoList';
 import { useMemo } from 'react';
 import { useModel } from '@@/plugin-model/useModel';
 import { useAccess } from '@@/plugin-access/access';
 import { useIntl } from 'umi';
+import PermissionErrorPage from '@/pages/403';
 
 export default (): React.ReactNode => {
   const access = useAccess();
@@ -47,6 +49,10 @@ export default (): React.ReactNode => {
       },
     ];
   }, [intl, access]);
+
+  if (!access.isLogin()) {
+    return <PermissionErrorPage />;
+  }
 
   return (
     <PageContainer

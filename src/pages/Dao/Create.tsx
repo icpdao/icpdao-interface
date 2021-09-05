@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 
 import { Alert, Upload, Form, Input, Button, Space } from 'antd';
-import { useIntl, history } from 'umi';
+import { useIntl, history, useAccess } from 'umi';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 
 import * as AWS from '@aws-sdk/client-s3';
@@ -13,6 +13,7 @@ import { uploadS3AssumeRole } from '@/services/icpdao-interface/aws';
 import { getTimeZone, getTimeZoneOffset } from '@/utils/utils';
 import { useModel } from '@@/plugin-model/useModel';
 import { PageLoading } from '@ant-design/pro-layout';
+import PermissionErrorPage from '@/pages/403';
 
 const { Dragger } = Upload;
 
@@ -71,9 +72,8 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ onUploadSuccess, initlogoUr
 
       onProgress(file, 0);
 
-      const {
-        data: credentials,
-      }: { success?: boolean; data?: API.AwsSts } = await uploadS3AssumeRole();
+      const { data: credentials }: { success?: boolean; data?: API.AwsSts } =
+        await uploadS3AssumeRole();
 
       if (credentials === undefined) {
         return;
@@ -159,6 +159,7 @@ export default (): React.ReactNode => {
   }
 
   const intl = useIntl();
+  const { isPreIcpperOrIcpper } = useAccess();
   const draftValue = useMemo(() => {
     const value = localStorage.getItem('dao.create.draft');
     if (value) {
@@ -393,6 +394,10 @@ export default (): React.ReactNode => {
   useEffect(() => {
     updateSubmitStatus();
   }, [updateSubmitStatus]);
+
+  if (!isPreIcpperOrIcpper()) {
+    return <PermissionErrorPage />;
+  }
 
   return (
     <div className={styles.container}>
