@@ -148,7 +148,10 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
       await getIssueTimeline({
         variables: { daoName: parseIssue[1], parameter: [parseIssue[2], parseIssue[3]] },
       });
-      await getUserOpenPR({ variables: { daoName: parseIssue[1], parameter: [user] } });
+      await getUserOpenPR({
+        variables: { daoName: parseIssue[1], parameter: [user] },
+        context: { errorPolicy: 'ignore' },
+      });
     },
     {
       manual: true,

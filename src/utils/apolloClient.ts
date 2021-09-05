@@ -35,8 +35,9 @@ const authLink = setContext((_, context) => {
   };
 });
 
-const errorLink = onError(({ graphQLErrors, networkError, response }) => {
+const errorLink = onError(({ graphQLErrors, networkError, response, operation }) => {
   if (response === undefined) return;
+  if (operation?.getContext()?.errorPolicy === 'ignore') return;
   const intl = getLocale();
   import(`../locales/${intl}`).then((locales) => {
     if (graphQLErrors) {
