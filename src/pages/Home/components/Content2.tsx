@@ -33,6 +33,7 @@ const Content2: React.FC = () => {
         <QueueAnim delay={300} interval={600} type={'left'} key="worksQueueAnim">
           <div key={'worksBanner'}>
             <BannerAnim
+              autoPlay
               type={'across'}
               prefixCls={styles.P6}
               ref={setBannerRef}
