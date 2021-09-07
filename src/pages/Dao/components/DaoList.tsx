@@ -228,7 +228,7 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
         setDaoFollowedStatus((old) => ({ ...old, [daoId]: false }));
       setDaoFollowButtonLoading((old) => ({ ...old, [daoId]: false }));
     },
-    [followDao],
+    [access, followDao],
   );
 
   const renderFollowColumn = useCallback(
@@ -289,8 +289,8 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
         name: item?.datum?.name,
         following: item?.stat?.following,
         job: item?.stat?.job,
-        size: item?.stat?.size,
-        token: item?.stat?.token,
+        size: parseFloat(item?.stat?.size || ''),
+        token: parseFloat(item?.stat?.token || ''),
         isFollowing: item?.isFollowing,
         isOwner: item?.isOwner,
       };
@@ -329,11 +329,11 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
       },
       {
         title: intl.formatMessage({ id: 'pages.dao.component.dao_list.stat.card.size' }),
-        number: data.daos.stat?.size,
+        number: parseFloat(data.daos.stat?.size),
       },
       {
         title: intl.formatMessage({ id: 'pages.dao.component.dao_list.stat.card.income' }),
-        number: data.daos.stat?.income,
+        number: parseFloat(data.daos.stat?.income),
       },
     ];
   }, [data, intl]);
