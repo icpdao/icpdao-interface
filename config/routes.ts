@@ -57,6 +57,6 @@
     component: './Staking',
   },
   {
-    component: './404',
+    component: './Result/404',
   },
 ];

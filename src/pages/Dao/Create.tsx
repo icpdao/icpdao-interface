@@ -13,7 +13,7 @@ import { uploadS3AssumeRole } from '@/services/icpdao-interface/aws';
 import { getTimeZone, getTimeZoneOffset } from '@/utils/utils';
 import { useModel } from '@@/plugin-model/useModel';
 import { PageLoading } from '@ant-design/pro-layout';
-import PermissionErrorPage from '@/pages/403';
+import PermissionErrorPage from '@/pages/Result/403';
 
 const { Dragger } = Upload;
 

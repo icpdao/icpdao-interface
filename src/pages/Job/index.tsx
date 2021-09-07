@@ -8,7 +8,7 @@ import { HomeOutlined } from '@ant-design/icons';
 import { useModel } from '@@/plugin-model/useModel';
 
 import TabJob from './components/TabJob';
-import PermissionErrorPage from '@/pages/403';
+import PermissionErrorPage from '@/pages/Result/403';
 import styles from './index.less';
 import TabCycle from '@/pages/Job/components/TabCycle';
 
