@@ -6,7 +6,7 @@ import styles from './index.less';
 import GlobalBreadcrumb from '@/components/Breadcrumb';
 import { HomeOutlined } from '@ant-design/icons';
 import { useModel } from '@@/plugin-model/useModel';
-import PermissionErrorPage from '@/pages/403';
+import PermissionErrorPage from '@/pages/Result/403';
 
 export default (): ReactNode => {
   const intl = useIntl();

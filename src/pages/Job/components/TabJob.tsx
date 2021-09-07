@@ -190,6 +190,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
           ipr.event === 'cross-referenced' &&
           ipr.source &&
           ipr.source.issue &&
+          ipr.source.issue.pull_request &&
           !prsID.includes(ipr.source.issue.id || 0) &&
           userName === ipr.source.issue.user?.login
         ) {

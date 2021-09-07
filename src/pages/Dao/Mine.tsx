@@ -8,7 +8,7 @@ import { useMemo } from 'react';
 import { useModel } from '@@/plugin-model/useModel';
 import { useAccess } from '@@/plugin-access/access';
 import { useIntl } from 'umi';
-import PermissionErrorPage from '@/pages/403';
+import PermissionErrorPage from '@/pages/Result/403';
 
 export default (): React.ReactNode => {
   const access = useAccess();
