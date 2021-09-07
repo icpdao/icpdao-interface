@@ -89,11 +89,13 @@ const DaoIcpperStat: React.FC<DaoIcpperStatProps> = ({ daoId, tokenSymbol }) => 
       title: <FormattedMessage id="pages.dao.component.dao_icpper.table.head.size" />,
       dataIndex: 'size',
       sorter: true,
+      render: (_: any, record: IcpperQuery) => <>{parseFloat(record.size || '')}</>,
     },
     {
       title: <FormattedMessage id="pages.dao.component.dao_icpper.table.head.income" />,
       dataIndex: 'income',
       sorter: true,
+      render: (_: any, record: IcpperQuery) => <>{parseFloat(record.income || '')}</>,
     },
     {
       title: <FormattedMessage id="pages.dao.component.dao_icpper.table.head.join_time" />,
@@ -114,11 +116,11 @@ const DaoIcpperStat: React.FC<DaoIcpperStatProps> = ({ daoId, tokenSymbol }) => 
     },
     {
       title: intl.formatMessage({ id: 'pages.dao.component.dao_icpper.stat.size' }),
-      number: data?.dao?.icppers?.stat?.size || 0,
+      number: parseFloat(data?.dao?.icppers?.stat?.size || '') || 0,
     },
     {
-      title: tokenSymbol,
-      number: data?.dao?.icppers?.stat?.income || 0,
+      title: tokenSymbol || intl.formatMessage({ id: 'component.card.stat.income' }),
+      number: parseFloat(data?.dao?.icppers?.stat?.income || '') || 0,
     },
   ];
   const dataSource = data?.dao?.icppers?.nodes || [];

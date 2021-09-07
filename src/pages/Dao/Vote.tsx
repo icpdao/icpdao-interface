@@ -70,7 +70,7 @@ const allTypeVote = (
             {pair?.datum?.title}
           </a>
         </Row>
-        <Row>Size: {pair?.datum?.size}</Row>
+        <Row>Size: {parseFloat(pair?.datum?.size.toString() || '')}</Row>
       </div>
       <div className={styles.allTypeVoteButtons}>
         <div className={styles.allTypeVoteButton} onClick={() => updateVote(voteId, true)}>
@@ -114,7 +114,7 @@ const pairTypeVote = (
               {leftPair?.datum?.title}
             </a>
           </Row>
-          <Row>Size: {leftPair?.datum?.size}</Row>
+          <Row>Size: {parseFloat(leftPair?.datum?.size.toString() || '')}</Row>
           {voted === leftPair.datum?.id && (
             <div className={styles.pairTypeVoteCheck}>
               <CheckCircleFilled style={{ fontSize: 21, color: '#2F80ED' }} />
@@ -137,7 +137,7 @@ const pairTypeVote = (
               {rightPair?.datum?.title}
             </a>
           </Row>
-          <Row>Size: {rightPair?.datum?.size}</Row>
+          <Row>Size: {parseFloat(rightPair?.datum?.size.toString() || '')}</Row>
           {voted === rightPair.datum?.id && (
             <div className={styles.pairTypeVoteCheck}>
               <CheckCircleFilled style={{ fontSize: 21, color: '#2F80ED' }} />
