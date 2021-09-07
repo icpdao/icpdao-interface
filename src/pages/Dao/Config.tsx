@@ -6,7 +6,7 @@ import styles from './index.less';
 import GlobalBreadcrumb from '@/components/Breadcrumb';
 import { HomeOutlined } from '@ant-design/icons';
 import { useDaoQuery } from '@/services/dao/generated';
-import PermissionErrorPage from '@/pages/403';
+import PermissionErrorPage from '@/pages/Result/403';
 import { useCallback, useMemo, useState } from 'react';
 import DAOJobConfig from '@/pages/Dao/components/JobConfig';
 import TokenConfig from '@/pages/Dao/components/TokenConfig';

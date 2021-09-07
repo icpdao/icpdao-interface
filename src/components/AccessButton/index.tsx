@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button } from 'antd';
 import type { ButtonProps } from 'antd/lib/button/button';
 import { useAccess } from '@@/plugin-access/access';
@@ -12,6 +12,7 @@ type AccessButtonProps = ButtonProps &
     allow: Access;
     defaultWarningModal?: boolean;
     ownerId?: string;
+    delayWarningModal?: number;
   };
 
 const AccessButton: React.FC<AccessButtonProps> = ({
@@ -19,6 +20,7 @@ const AccessButton: React.FC<AccessButtonProps> = ({
   onClick,
   ownerId,
   defaultWarningModal,
+  delayWarningModal,
   ...props
 }) => {
   const access = useAccess();
@@ -27,7 +29,16 @@ const AccessButton: React.FC<AccessButtonProps> = ({
     return access.getAccess(ownerId);
   }, [access, ownerId]);
 
-  const [warningModalVisible, setWarningModalVisible] = useState(defaultWarningModal || false);
+  const [warningModalVisible, setWarningModalVisible] = useState(false);
+
+  useEffect(() => {
+    if (delayWarningModal !== undefined && defaultWarningModal)
+      setTimeout(() => {
+        setWarningModalVisible(true);
+      }, delayWarningModal);
+    else if (defaultWarningModal) setWarningModalVisible(true);
+  }, [defaultWarningModal, delayWarningModal]);
+
   const warningModal = useMemo(() => {
     // can have like IcpperWarningModal, PreIcpperWarningModal ...
     return (

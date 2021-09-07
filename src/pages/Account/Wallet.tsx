@@ -8,7 +8,7 @@ import { useModel } from '@@/plugin-model/useModel';
 import { Form, Input, Button } from 'antd';
 import { useCallback, useState } from 'react';
 import { updateUserProfile } from '@/services/icpdao-interface/user';
-import PermissionErrorPage from '@/pages/403';
+import PermissionErrorPage from '@/pages/Result/403';
 import { useAccess } from '@@/plugin-access/access';
 
 export default (): ReactNode => {

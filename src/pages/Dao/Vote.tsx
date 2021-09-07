@@ -5,7 +5,7 @@ import GlobalBreadcrumb from '@/components/Breadcrumb';
 import { CheckCircleFilled, FrownOutlined, HomeOutlined, SmileOutlined } from '@ant-design/icons';
 import { useModel } from '@@/plugin-model/useModel';
 
-import PermissionErrorPage from '@/pages/403';
+import PermissionErrorPage from '@/pages/Result/403';
 import styles from './index.less';
 import type { JobItemQuery, DaoCycleVoteListQueryVariables } from '@/services/dao/generated';
 import {

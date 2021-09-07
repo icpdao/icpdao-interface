@@ -78,7 +78,11 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     rightContentRender: () => <RightHeader />,
     headerTitleRender: () => <LeftHeader />,
     disableContentMargin: false,
-    footerRender: () => <Footer />,
+    footerRender: () => {
+      const { location } = history;
+      if (location.pathname !== '/home') return <Footer />;
+      return false;
+    },
     onPageChange: () => {},
     menuHeaderRender: undefined,
     ...initialState?.settings,

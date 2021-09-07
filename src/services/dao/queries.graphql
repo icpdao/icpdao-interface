@@ -749,3 +749,12 @@ query UserVotingCycle {
     }
   }
 }
+
+query HomeStatsQuery {
+  stats {
+    dao
+    icpper
+    size
+    income
+  }
+}

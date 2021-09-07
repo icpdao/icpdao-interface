@@ -1,27 +1,27 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import GlobalModal from '@/components/Modal';
 import { FormattedMessage, history, useIntl } from 'umi';
-import styles from './Home.less';
+import styles from './index.less';
 import { getUserInfo } from '@/utils/utils';
 import { acceptIcpperships } from '@/services/icpdao-interface/icpperships';
 import { useModel } from '@@/plugin-model/useModel';
 import GlobalTooltip from '@/components/Tooltip';
-import { Button, Col, Row, Space } from 'antd';
-import image1 from '../assets/image/home-image-1.jpeg';
-import AccessButton from '@/components/AccessButton';
-import { AccessEnum } from '@/access';
+import Content0 from './components/Content0';
+import Content1 from './components/Content1';
+import Content2 from './components/Content2';
+import Content3 from './components/Content3';
+import Content4 from './components/Content4';
+import Footer from '@/components/Footer';
+import { useHomeStatsQueryQuery } from '@/services/dao/generated';
+import { PageLoading } from '@ant-design/pro-layout';
 
 export default (): React.ReactNode => {
   const { profile } = getUserInfo();
-  let defaultWarning = false;
   let defaultWelcome = false;
   let welcome: { mentor: any; id: string } = { mentor: {}, id: '' };
   if (profile && profile.icppership && profile.icppership.progress === 0) {
     welcome = profile.icppership;
     defaultWelcome = true;
-  }
-  if (profile && profile.icppership && !profile.icppership.mentor) {
-    defaultWarning = true;
   }
 
   const intl = useIntl();
@@ -30,10 +30,10 @@ export default (): React.ReactNode => {
 
   const [mentorWelcomeVisible, setMentorWelcomeVisible] = useState(defaultWelcome);
   const { refresh } = useModel('@@initialState');
-
-  const handleMarkJob = useCallback(() => {
-    history.push('/job');
-  }, []);
+  const { data, loading } = useHomeStatsQueryQuery();
+  if (loading) {
+    return <PageLoading />;
+  }
 
   const handleAccept = async () => {
     setMentorAcceptLoading(true);
@@ -132,44 +132,15 @@ export default (): React.ReactNode => {
     </GlobalModal>
   );
 
-  const homeParagraphOne = (
-    <div
-      style={{
-        backgroundImage: 'url("https://i.imgur.com/EbRORng.png")',
-      }}
-      key={'p1'}
-    >
-      <Row>
-        <Col span={18} offset={3}>
-          <Space size={60} className={styles.p1}>
-            <Space direction="vertical">
-              <p className={styles.p1Title}>
-                <FormattedMessage id={'pages.home.p1'} />
-              </p>
-              <p className={styles.p1Content}>
-                <FormattedMessage id={'pages.home.p2'} />
-              </p>
-              <Space size={10} className={styles.p1Button}>
-                <Button size={'large'} type="primary" onClick={() => history.push('/dao/explore')}>
-                  <FormattedMessage id={'pages.home.button1'} />
-                </Button>
-                <AccessButton
-                  allow={AccessEnum.PREICPPER}
-                  defaultWarningModal={defaultWarning}
-                  size={'large'}
-                  type="primary"
-                  onClick={handleMarkJob}
-                >
-                  <FormattedMessage id={'pages.home.button2'} />
-                </AccessButton>
-              </Space>
-            </Space>
-            <img src={image1} alt="" />
-          </Space>
-        </Col>
-      </Row>
-    </div>
+  return (
+    <>
+      <Content0 />
+      <Content1 statsData={data?.stats} />
+      <Content2 />
+      <Content3 />
+      <Content4 />
+      <Footer />
+      {mentorWelcomeModal}
+    </>
   );
-
-  return [homeParagraphOne, mentorWelcomeModal];
 };
