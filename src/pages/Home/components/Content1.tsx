@@ -89,6 +89,7 @@ const Content1: React.FC<HomeProps> = ({ statsData }) => {
           {statCards}
           <div key={'introduceBanner'}>
             <BannerAnim
+              autoPlay
               type={'across'}
               prefixCls={styles.P3}
               ref={setBannerRef}
