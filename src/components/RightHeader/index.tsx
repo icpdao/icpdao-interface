@@ -8,7 +8,6 @@ import IconFont from '@/components/IconFont';
 import { updateTheme } from '@/components/RightHeader/Theme';
 import { getTheme } from '@/utils/utils';
 import Wallet from './Wallet';
-import { updateTheme } from '@/components/RightHeader/Theme';
 
 const GlobalHeaderRight: React.FC = () => {
   const { initialState } = useModel('@@initialState');
