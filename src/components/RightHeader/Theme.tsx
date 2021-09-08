@@ -1,5 +1,8 @@
 export const updateTheme = (dark: boolean, color?: string, publicPath = '/theme') => {
-  if (typeof window === 'undefined' || !(window as any).umi_plugin_ant_themeVar) {
+  if (
+    typeof window === 'undefined' ||
+    (!(window as any).umi_plugin_ant_themeVar && UMI_ENV !== 'dev')
+  ) {
     return;
   }
 

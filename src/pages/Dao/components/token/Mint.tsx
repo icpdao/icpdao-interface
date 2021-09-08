@@ -110,18 +110,21 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
   const [queryCyclesByTokenUnreleasedList, cyclesByTokenUnreleasedListResult] =
     useCyclesByTokenUnreleasedListLazyQuery({ fetchPolicy: 'no-cache' });
   const [markCyclesTokenReleased] = useMarkCyclesTokenReleasedMutation();
+  const [anchor, setAnchor] = useState<any>();
 
-  useMemo(async () => {
+  useEffect(() => {
     if (!tokenContract) return;
-    const anchor = await tokenContract.getMintAnchor();
-    console.log(anchor);
-    setLPPoolAddress(await tokenContract.getLPPool());
-    queryCyclesByTokenUnreleasedList({
-      variables: { lastTimestamp: anchor.lastTimestamp.toString() },
+    tokenContract.getMintAnchor().then((anc) => {
+      console.log(anc);
+      setAnchor(anc);
+      tokenContract.getLPPool().then((value) => setLPPoolAddress(value));
+      queryCyclesByTokenUnreleasedList({
+        variables: { lastTimestamp: anc.lastTimestamp.toString() },
+      });
     });
   }, [queryCyclesByTokenUnreleasedList, tokenContract]);
 
-  useMemo(() => {
+  useEffect(() => {
     const unreleasedCycle: Record<string, CycleQuery> = {};
     cyclesByTokenUnreleasedListResult.data?.cyclesByTokenUnreleased?.nodes?.forEach((d) => {
       if (!d?.datum?.id) return;
@@ -131,23 +134,24 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
     setSelectCycles(Object.values(unreleasedCycle));
   }, [cyclesByTokenUnreleasedListResult.data?.cyclesByTokenUnreleased?.nodes]);
 
-  useMemo(async () => {
+  useEffect(() => {
     if (!lpPoolAddress || lpPoolAddress === ZeroAddress || !tokenAddress) return;
-    const pool = await contract.uniswapPool.getPoolByAddress(lpPoolAddress, tokenAddress);
-    setPoolInfo(pool);
-    setFormDataFast({
-      fee: pool.pool?.fee,
-      baseToken: pool.tokenA?.address === tokenAddress ? pool.tokenA : pool.tokenB,
-      quoteToken: pool.tokenA?.address === tokenAddress ? pool.tokenB : pool.tokenA,
-      baseTokenAmount: 0,
-      quoteTokenAmount: 0,
+    contract.uniswapPool.getPoolByAddress(lpPoolAddress, tokenAddress).then((pool) => {
+      setPoolInfo(pool);
+      setFormDataFast({
+        fee: pool.pool?.fee,
+        baseToken: pool.tokenA?.address === tokenAddress ? pool.tokenA : pool.tokenB,
+        quoteToken: pool.tokenA?.address === tokenAddress ? pool.tokenB : pool.tokenA,
+        baseTokenAmount: 0,
+        quoteTokenAmount: 0,
+      });
     });
   }, [contract.uniswapPool, lpPoolAddress, setFormDataFast, setPoolInfo, tokenAddress]);
 
   useEffect(() => {
     if (!formData.startingPrice) return;
     setFormDataFast({ minPrice: formData.startingPrice.toString() });
-  }, [formData, setFormDataFast]);
+  }, [formData.startingPrice, setFormDataFast]);
 
   const handlerMetamaskConnect = useCallback(() => {
     metamaskEvent$?.emit();
@@ -194,12 +198,13 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
   }, [currentSelectCycle, selectCycles]);
 
   const handlerMint = useCallback(async () => {
-    if (!position || !tokenContract || !daoId) return;
+    if (!position || !tokenContract || !daoId || !anchor) return;
     try {
       setMintButtonLoading(true);
       const mintBody: ETH_CONNECT.Mint = {
         mintTokenAddressList: previewMintData.map((pd) => pd.address),
         mintTokenAmountRatioList: previewMintData.map((pd) => pd.size * 100),
+        startTimestamp: anchor.lastTimestamp.toString(),
         endTimestamp: getTimestampByZone(previewMintEndTime[0], previewMintEndTime[1]),
         tickLower: position.tickLower,
         tickUpper: position.tickUpper,
@@ -210,7 +215,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
       setLoadingTransferComplete(true);
       const receipt = await tx.wait();
       const deployEvent = receipt.events.pop();
-      const mintValue: BigNumber = deployEvent.args[-1];
+      const mintValue: BigNumber = deployEvent.args[deployEvent.args.length - 1];
       let allSize = 0;
       previewMintData.forEach((pd) => {
         allSize += pd.size;
@@ -224,7 +229,48 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
       setMintButtonLoading(false);
       setLoadingTransferComplete(false);
     }
-  }, [position, previewMintData, previewMintEndTime, tokenContract]);
+  }, [
+    anchor,
+    daoId,
+    markCyclesTokenReleased,
+    position,
+    previewMintData,
+    previewMintEndTime,
+    tokenContract,
+    tokenReleasedCycles,
+  ]);
+
+  // const handlerTestMint = useCallback(async () => {
+  //   console.log({tokenContract, daoId, anchor})
+  //   if (!tokenContract || !daoId || !anchor) return
+  //   const testMintData = [
+  //     {address: "0x3946d96a4b46657ca95CBE85d8a60b822186Ad1f", size: 1},
+  //     {address: "0xcab51a8d12954FC1bc5677B34c1DcEb9633ca3f1", size: 1},
+  //   ]
+  //   try {
+  //     const mintBody: ETH_CONNECT.Mint = {
+  //       mintTokenAddressList: testMintData.map((pd) => pd.address),
+  //       mintTokenAmountRatioList: testMintData.map((pd) => pd.size * 100),
+  //       startTimestamp: anchor.lastTimestamp.toNumber(),
+  //       endTimestamp: 1631070725,
+  //       tickLower: 0,
+  //       tickUpper: 0,
+  //     };
+  //     const tx = await tokenContract.mint(mintBody);
+  //     const receipt = await tx.wait();
+  //     const deployEvent = receipt.events.pop();
+  //     const mintValue: BigNumber = deployEvent.args[-1];
+  //     let allSize = 0;
+  //     testMintData.forEach((pd) => {
+  //       allSize += pd.size;
+  //     });
+  //     const unitSizeValue = formatUnits(mintValue.div(BigNumber.from(allSize)));
+  //     console.log({unitSizeValue})
+  //   } catch (e) {
+  //     setMintButtonLoading(false);
+  //     setLoadingTransferComplete(false);
+  //   }
+  // }, [anchor, daoId, position?.tickLower, position?.tickUpper, previewMintEndTime, tokenContract]);
 
   if (
     cyclesByTokenUnreleasedListResult.loading ||
@@ -349,6 +395,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
           <Form.Item>
             {metamaskIsConnected && !!formData.quoteToken && !!formData.fee && (
               <Button type="primary" disabled={!currentSelectCycle} onClick={handlerPreviewMint}>
+                {/* <Button type="primary" onClick={handlerTestMint}> */}
                 {intl.formatMessage({ id: 'pages.dao.config.tab.token.mint.form.button.submit' })}
               </Button>
             )}

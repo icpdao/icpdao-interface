@@ -12,8 +12,8 @@ import { getNetwork } from '@ethersproject/networks';
 import { EthereumChainId } from '@/utils/utils';
 import JSBI from 'jsbi';
 
-export const DAOFactoryAddress = '0x61ED4972A78278CFFD68855EA516f1d52C975Eb9';
-export const DAOStakingAddress = '0x3D88899Cb53db6621C294a295E95D2C7F1aD3bb8';
+export const DAOFactoryAddress = '0xA38548b19A9eBA627ac114b08B6e7175F2b9Ae2f';
+export const DAOStakingAddress = '0x088483a6AA7DB6c0E55dF573Af23D176545Ddf36';
 export const ZeroAddress = '0x0000000000000000000000000000000000000000';
 export const BIG_INT_ZERO = JSBI.BigInt(0);
 export const UniswapPoolAddress = '0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8';
@@ -22,6 +22,8 @@ export const UniswapV3PositionsAddress = '0xC36442b4a4522E871399CD717aBDD847Ab11
 export function getProvider(network: string) {
   return ethers.getDefaultProvider(getNetwork(network), {
     infura: REACT_APP_ICPDAO_ETHEREUM_INFURA_KEY,
+    alchemy: REACT_APP_ICPDAO_ETHEREUM_ALCHEMY_KEY,
+    etherscan: REACT_APP_ICPDAO_ETHEREUM_ETHERSCAN_KEY,
   });
 }
 
@@ -74,7 +76,7 @@ export class BaseEthereumConnect {
   chainId: number;
 
   constructor(network: string, metamaskProvider: any) {
-    this.provider = getInfuraProvider(network);
+    this.provider = getProvider(network);
     this.metamaskProvider = getMetamaskProvider(metamaskProvider);
     this.network = network;
     this.chainId = EthereumChainId[network];

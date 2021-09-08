@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tabs } from 'antd';
 import { useIntl } from '@@/plugin-locale/localeExports';
 
@@ -6,8 +6,6 @@ import styles from './index.less';
 import TokenCreate from '@/pages/Dao/components/token/Create';
 import { useDaoTokenConfigQuery } from '@/services/dao/generated';
 import { PageLoading } from '@ant-design/pro-layout';
-import { useRequest } from '@@/plugin-request/request';
-import { ZeroAddress } from '@/services/ethereum-connect';
 import { useModel } from '@@/plugin-model/useModel';
 import TokenCreateLP from '@/pages/Dao/components/token/CreateLP';
 import TokenAddLP from '@/pages/Dao/components/token/AddLP';
@@ -31,20 +29,19 @@ export type TokenConfigComponentsProps = {
 const TokenConfig: React.FC<TokenConfigProps> = ({ daoId }) => {
   const intl = useIntl();
   const { data, loading, error } = useDaoTokenConfigQuery({ variables: { daoId } });
-  const [tokenAddress, setTokenAddress] = useState<string>(ZeroAddress);
+  const [tokenAddress, setTokenAddress] = useState<string>();
   const [currentTab, setCurrentTab] = useState<string>('create');
   const { contract } = useModel('useWalletModel');
-  useRequest(
-    async () => {
-      const ta = await contract.daoFactory.getTokenAddress(data?.daoTokenConfig?.ethDaoId || '');
-      setTokenAddress(ta);
-      return ta;
-    },
-    {
-      ready: !loading && !error,
-    },
-  );
-  if (loading || error) return <PageLoading />;
+
+  useEffect(() => {
+    if (!data?.daoTokenConfig?.ethDaoId) return;
+    contract.daoFactory
+      .getTokenAddress(data.daoTokenConfig.ethDaoId)
+      .then((v: string) => setTokenAddress(v));
+  }, [contract.daoFactory, data?.daoTokenConfig?.ethDaoId]);
+
+  if (loading || error || !tokenAddress) return <PageLoading />;
+
   return (
     <>
       <Tabs
@@ -82,7 +79,7 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId }) => {
         </TabPane>
         <TabPane tab={intl.formatMessage({ id: 'pages.dao.config.tab.token.mint' })} key="mint">
           {currentTab === 'mint' && (
-            <TokenMint tokenAddress={tokenAddress} setCurrentTab={setCurrentTab} />
+            <TokenMint tokenAddress={tokenAddress} setCurrentTab={setCurrentTab} daoId={daoId} />
           )}
         </TabPane>
       </Tabs>

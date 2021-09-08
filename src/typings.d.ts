@@ -43,9 +43,12 @@ declare let ga: () => void;
 declare let ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION: 'site' | undefined;
 
 declare const REACT_APP_ENV: 'test' | 'dev' | 'pre' | false;
+declare const UMI_ENV: 'test' | 'dev' | 'pre' | false;
 declare const REACT_APP_GITHUB_APP_CLIENT_ID: string;
 declare const REACT_APP_ICPDAO_BACKEND_BASE_URL: string;
 declare const THEME: string | undefined;
 declare const REACT_APP_ICPDAO_BACKEND_VERSION: string;
 declare const REACT_APP_ICPDAO_MOCK_URL: string | undefined;
 declare const REACT_APP_ICPDAO_ETHEREUM_INFURA_KEY: string;
+declare const REACT_APP_ICPDAO_ETHEREUM_ALCHEMY_KEY: string;
+declare const REACT_APP_ICPDAO_ETHEREUM_ETHERSCAN_KEY: string;

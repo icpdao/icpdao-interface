@@ -27,7 +27,7 @@ const statisticValueFormat = (title: string, value: string | number, unit: strin
 };
 
 type HomeProps = {
-  statsData: HomeStats | undefined;
+  statsData: HomeStats | undefined | null;
 };
 
 const Content1: React.FC<HomeProps> = ({ statsData }) => {

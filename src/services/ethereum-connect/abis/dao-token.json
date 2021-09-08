@@ -224,6 +224,12 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "_startTimestamp",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "_endTimestamp",
         "type": "uint256"
       },
@@ -247,18 +253,6 @@
       }
     ],
     "name": "Mint",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [],
-    "name": "Mint",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [],
-    "name": "NewDAO",
     "type": "event"
   },
   {
@@ -657,6 +651,11 @@
         "internalType": "uint24[]",
         "name": "_mintTokenAmountRatioList",
         "type": "uint24[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_startTimestamp",
+        "type": "uint256"
       },
       {
         "internalType": "uint256",

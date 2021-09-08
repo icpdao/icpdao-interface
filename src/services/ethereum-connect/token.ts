@@ -73,10 +73,19 @@ export class DAOTokenConnect extends ERC20Connect {
     const signer = this.metamaskProvider.getSigner();
     const contractWithSigner = this.actionContract.connect(signer);
     console.log(body);
+    console.log([
+      body.mintTokenAddressList,
+      body.mintTokenAmountRatioList,
+      body.startTimestamp,
+      body.endTimestamp,
+      body.tickLower,
+      body.tickUpper,
+    ]);
     return await contractWithSigner.mint(
       body.mintTokenAddressList,
       body.mintTokenAmountRatioList,
-      body.endTimestamp,
+      body.startTimestamp.toString(),
+      body.endTimestamp.toString(),
       body.tickLower,
       body.tickUpper,
     );
