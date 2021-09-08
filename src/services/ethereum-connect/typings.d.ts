@@ -69,6 +69,7 @@ declare namespace ETH_CONNECT {
   type Mint = {
     mintTokenAddressList: string[];
     mintTokenAmountRatioList: number[];
+    startTimestamp: number;
     endTimestamp: number;
     tickLower: number;
     tickUpper: number;

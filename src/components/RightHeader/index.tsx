@@ -1,5 +1,5 @@
 import { Space } from 'antd';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useModel, setLocale } from 'umi';
 import Avatar from './AvatarDropdown';
 import styles from './index.less';
@@ -7,14 +7,15 @@ import styles from './index.less';
 // import { updateTheme } from '@/components/RightHeader/Theme';
 // import { getTheme } from '@/utils/utils';
 import Wallet from './Wallet';
+import { updateTheme } from '@/components/RightHeader/Theme';
 
 const GlobalHeaderRight: React.FC = () => {
   const { initialState } = useModel('@@initialState');
   // const [theme, setTheme] = useState<MenuTheme>(getTheme());
   // const willTheme: MenuTheme = theme === 'dark' ? 'light' : 'dark';
-  // useEffect(() => {
-  //   updateTheme(theme === 'dark');
-  // });
+  useEffect(() => {
+    updateTheme(false);
+  });
 
   if (!initialState || !initialState.settings) {
     return null;

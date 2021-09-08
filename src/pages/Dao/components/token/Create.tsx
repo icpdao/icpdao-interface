@@ -71,9 +71,9 @@ const genDefaultCreateForm: (value: string | undefined) => ETH_CONNECT.CreateTok
 
 const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
   ethDAOId,
+  daoId,
   tokenAddress,
   setTokenAddress,
-  daoId,
 }) => {
   const intl = useIntl();
   const defaultCreateForm = genDefaultCreateForm(ethDAOId);
@@ -87,6 +87,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
   const [loadingDeployComplete, setLoadingDeployComplete] = useState<boolean>(false);
   const [disableConfirmReCreateButton, setDisableConfirmReCreateButton] = useState<boolean>(true);
   const [updateDaoBaseInfo] = useUpdateDaoBaseInfoMutation();
+
   const { loading, run } = useRequest(
     async () => {
       if (!daoId) return;
@@ -102,13 +103,13 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
           await updateDaoBaseInfo({
             variables: {
               id: daoId,
-              tokenAddress: deployEvent.args[-1],
+              tokenAddress: deployEvent.args[deployEvent.args.length - 1],
               tokenName: createFormData.tokenName,
               tokenSymbol: createFormData.tokenSymbol,
             },
           });
-          setTokenAddress(deployEvent.args[-1] || '');
           setCreateFormData(defaultCreateForm);
+          setTokenAddress(deployEvent.args[deployEvent.args.length - 1] || '');
         }
         setLoadingDeployComplete(false);
       } catch (e) {

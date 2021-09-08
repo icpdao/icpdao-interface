@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Form,
   Spin,
@@ -96,8 +96,9 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress }) =
   const [approveQuoteTokenButtonLoading, setApproveQuoteTokenButtonLoading] =
     useState<boolean>(false);
   const [approvedQuoteToken, setApprovedQuoteToken] = useState<boolean>(false);
-  const [quoteTokenSelectList, setQuoteTokenSelectList] = useState<Token[]>([]);
-  const [quoteTokenSelectObject, setQuoteTokenSelectObject] = useState<Record<string, Token>>({});
+
+  const [coinGeckoObj, setCoinGeckoObj] = useState<Record<string, Token>>({});
+  const [currentSearchQuoteToken, setCurrentSearchQuoteToken] = useState<Token[]>([]);
   const [lpPoolAddress, setLPPoolAddress] = useState<string>('');
   const [previewCreateLP, setPreviewCreateLP] = useState<boolean>(false);
   const [createLPButtonLoading, setCreateLPButtonLoading] = useState<boolean>(false);
@@ -108,23 +109,35 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress }) =
     return undefined;
   }, [metamaskProvider, network, tokenAddress]);
 
-  useMemo(async () => {
+  useEffect(() => {
     if (tokenContract) {
-      setLPPoolAddress(await tokenContract.getLPPool());
-      const baseToken = await tokenContract.getToken();
-      setFormDataFast({ baseToken });
+      tokenContract.getLPPool().then((pd) => {
+        setLPPoolAddress(pd);
+        tokenContract.getToken().then((baseToken) => {
+          setFormDataFast({ baseToken });
+        });
+      });
     }
   }, [setFormDataFast, tokenContract]);
 
-  useMemo(async () => {
+  useEffect(() => {
     if (!formData.baseToken || !formData.quoteToken || !formData.fee) return;
-    const up = await contract.uniswapPool.getPool(
-      formData.baseToken,
-      formData.quoteToken,
-      formData.fee,
-    );
-    setPoolInfo(up);
+    contract.uniswapPool
+      .getPool(formData.baseToken, formData.quoteToken, formData.fee)
+      .then((up) => setPoolInfo(up));
   }, [contract.uniswapPool, formData.baseToken, formData.fee, formData.quoteToken, setPoolInfo]);
+
+  const quoteTokenRecord = useMemo(() => {
+    if (!currentSearchQuoteToken || currentSearchQuoteToken.length === 0) return coinGeckoObj;
+    const currentSearchQuoteTokenObj: Record<string, Token> = {};
+    currentSearchQuoteToken.forEach((csqt) => {
+      currentSearchQuoteTokenObj[csqt?.address || ''] = csqt;
+    });
+    return {
+      ...coinGeckoObj,
+      ...currentSearchQuoteTokenObj,
+    };
+  }, [coinGeckoObj, currentSearchQuoteToken]);
 
   const maxBaseTokenAmount = useMemo(async () => {
     const amount = await tokenContract?.getTemporaryAmount();
@@ -148,19 +161,15 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress }) =
       metamaskProvider,
     );
     const amount = await quoteTokenContract.getBalanceOf(accounts[0]);
-    const { decimals } = quoteTokenSelectObject[formData.quoteToken.address];
+    const { decimals } = quoteTokenRecord[formData.quoteToken.address] || {};
     return formatUnits(amount, decimals);
-  }, [accounts, formData.quoteToken, metamaskProvider, network, quoteTokenSelectObject]);
+  }, [accounts, formData.quoteToken, metamaskProvider, network, quoteTokenRecord]);
 
-  useMemo(async () => {
-    setQuoteTokenSelectObject(await getCoinGecko(network));
+  useEffect(() => {
+    getCoinGecko(network).then((v) => setCoinGeckoObj(v));
   }, [network]);
 
-  useMemo(() => {
-    setQuoteTokenSelectList(Object.values(quoteTokenSelectObject));
-  }, [quoteTokenSelectObject]);
-
-  useMemo(async () => {
+  useEffect(() => {
     if (!formData.quoteToken || accounts.length <= 0 || !tokenAddress) return;
     if (formData.quoteToken.address === WETH9[EthereumChainId[network]].address) {
       setApprovedQuoteToken(true);
@@ -171,19 +180,20 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress }) =
       network,
       metamaskProvider,
     );
-    const allowance = (await quoteTokenContract?.getAllowance(accounts[0], tokenAddress)) || 0;
-    const { decimals } = quoteTokenSelectObject[formData.quoteToken.address];
-    console.log({ allowance: parseFloat(formatUnits(allowance, decimals)) });
-    setApprovedQuoteToken(
-      parseFloat(formatUnits(allowance, decimals)) >= formattedAmounts[UniswapField.CURRENCY_B],
-    );
+    const { decimals } = quoteTokenRecord[formData.quoteToken.address] || {};
+    quoteTokenContract.getAllowance(accounts[0], tokenAddress).then((allowance) => {
+      console.log({ allowance: parseFloat(formatUnits(allowance, decimals)) });
+      setApprovedQuoteToken(
+        parseFloat(formatUnits(allowance, decimals)) >= formattedAmounts[UniswapField.CURRENCY_B],
+      );
+    });
   }, [
     accounts,
     formData.quoteToken,
     formattedAmounts,
     metamaskProvider,
     network,
-    quoteTokenSelectObject,
+    quoteTokenRecord,
     tokenAddress,
   ]);
 
@@ -245,7 +255,7 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress }) =
       const deployEvent = (await tx.wait()).events.pop();
       setLoadingTransferComplete(false);
       console.log(deployEvent.args);
-      setLPPoolAddress(deployEvent.args[-1]);
+      setLPPoolAddress(deployEvent.args[deployEvent.args.length - 1]);
     } catch (e) {
       setCreateLPButtonLoading(false);
       setLoadingTransferComplete(false);
@@ -255,31 +265,62 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress }) =
   const handlerQuoteTokenSearch = useCallback(
     async (value) => {
       if (!value) {
-        setQuoteTokenSelectList(Object.values(quoteTokenSelectObject));
+        setCurrentSearchQuoteToken(Object.values(coinGeckoObj));
         return;
       }
       setQuoteTokenSelectLoading(true);
-      const rt = Object.values(quoteTokenSelectObject).filter(
+      const rt = Object.values(coinGeckoObj).filter(
         (v) =>
           v.address.toLowerCase().indexOf(value.toLowerCase()) !== -1 ||
           v.symbol?.toLowerCase().indexOf(value.toLowerCase()) !== -1,
       );
       if (rt.length > 0) {
-        setQuoteTokenSelectList(rt);
+        setCurrentSearchQuoteToken(rt);
       } else if (Web3.utils.isAddress(value)) {
         const erc20 = await new ERC20Connect(value, network, metamaskProvider).getToken();
-        setQuoteTokenSelectObject((old) => ({ ...old, [value]: erc20 }));
-        setQuoteTokenSelectList([erc20]);
+        console.log({ [value]: erc20 });
+        setCurrentSearchQuoteToken([erc20]);
       } else {
-        setQuoteTokenSelectList([]);
+        setCurrentSearchQuoteToken([]);
       }
       setQuoteTokenSelectLoading(false);
     },
-    [quoteTokenSelectObject, metamaskProvider, network],
+    [coinGeckoObj, network, metamaskProvider],
   );
+
+  const quoteTokenSelect = useMemo(() => {
+    return currentSearchQuoteToken.map((t) => (
+      <Select.Option key={t.address} value={t.address} tokensymbol={t.symbol}>
+        <Space>
+          {/* <Avatar src={t.logoURI} /> */}
+          <Space size={0} direction={'vertical'}>
+            <div className={styles.quoteTokenSelectOptionSymbol}>{t.symbol}</div>
+            <div className={styles.quoteTokenSelectOptionName}>{t.name}</div>
+          </Space>
+        </Space>
+      </Select.Option>
+    ));
+  }, [currentSearchQuoteToken]);
+
+  const handlerQuoteTokenChange = useCallback(
+    async (value) => {
+      const quoteToken = quoteTokenRecord[value];
+      console.log({ value, quoteToken });
+      setFormDataFast({
+        fee: undefined,
+        startingPrice: 0,
+        baseTokenAmount: 0,
+        quoteTokenAmount: 0,
+        quoteToken,
+      });
+    },
+    [quoteTokenRecord, setFormDataFast],
+  );
+
   if (!tokenAddress || !lpPoolAddress || !formData.baseToken) {
     return <PageLoading />;
   }
+
   if (tokenAddress === ZeroAddress) {
     return (
       <>
@@ -347,29 +388,10 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress }) =
                 filterOption={false}
                 onSearch={handlerQuoteTokenSearch}
                 loading={quoteTokenSelectLoading}
-                onChange={async (value) => {
-                  const quoteToken = quoteTokenSelectObject[value];
-                  setFormDataFast({
-                    fee: undefined,
-                    startingPrice: 0,
-                    baseTokenAmount: 0,
-                    quoteTokenAmount: 0,
-                    quoteToken,
-                  });
-                }}
+                onChange={handlerQuoteTokenChange}
                 style={{ width: '200px' }}
               >
-                {quoteTokenSelectList.map((t) => (
-                  <Select.Option key={t.address} value={t.address} tokensymbol={t.symbol}>
-                    <Space>
-                      {/* <Avatar src={t.logoURI} /> */}
-                      <Space size={0} direction={'vertical'}>
-                        <div className={styles.quoteTokenSelectOptionSymbol}>{t.symbol}</div>
-                        <div className={styles.quoteTokenSelectOptionName}>{t.name}</div>
-                      </Space>
-                    </Space>
-                  </Select.Option>
-                ))}
+                {quoteTokenSelect}
               </Select>
             </Form.Item>
           </Space>

@@ -1,4 +1,4 @@
-import { DAOFactoryContract, getInfuraProvider, getMetamaskProvider } from './index';
+import { DAOFactoryContract, getMetamaskProvider, getProvider } from './index';
 import type { ETH_CONNECT } from './typings';
 import type { BigNumber } from 'ethers';
 import { ethers } from 'ethers';
@@ -10,13 +10,14 @@ export class DAOFactoryConnect {
   actionContract: any;
 
   constructor(network: string, metamaskProvider: any) {
-    this.provider = getInfuraProvider(network);
+    this.provider = getProvider(network);
     this.metamaskProvider = getMetamaskProvider(metamaskProvider);
     this.contract = DAOFactoryContract(this.provider);
     this.actionContract = DAOFactoryContract(this.metamaskProvider);
   }
 
   async getTokenAddress(ethDAOId: string) {
+    console.log({ ethDAOId });
     return await this.contract.tokens(ethDAOId);
   }
 
