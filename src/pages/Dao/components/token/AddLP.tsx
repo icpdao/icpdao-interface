@@ -93,11 +93,26 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress, setCur
       await updatePoolInfo();
       setLoadingTransferComplete(false);
       console.log(deployEvent.args);
+      setFormDataFast({
+        independentField: UniswapField.CURRENCY_A,
+        typedAmount: 0,
+      });
+      const amount = await tokenContract.getTemporaryAmount();
+      console.log({ newTa: formatUnits(amount) });
+      setTotalAmount(amount);
     } catch (e) {
       setPreviewAddLP(false);
       setLoadingTransferComplete(false);
     }
-  }, [accounts.length, network, poolInfo.invertPrice, position, tokenContract, updatePoolInfo]);
+  }, [
+    accounts.length,
+    network,
+    poolInfo.invertPrice,
+    position,
+    setFormDataFast,
+    tokenContract,
+    updatePoolInfo,
+  ]);
 
   useMemo(async () => {
     if (!tokenContract) return;
@@ -161,7 +176,7 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress, setCur
               id: 'pages.dao.config.tab.token.add_lp.form.total_amount.desc',
             })}
           >
-            {totalAmount}
+            {formatUnits(totalAmount)}
           </Form.Item>
           <Form.Item
             label={intl.formatMessage({
