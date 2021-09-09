@@ -1,7 +1,3 @@
-# icpdao-interface
-
-This is the front-end code for the icpdao dao app, and all contributors are welcome to contribute to help the community.
-
 # branch
 
 - prod
