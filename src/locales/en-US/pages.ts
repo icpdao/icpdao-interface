@@ -28,9 +28,9 @@ export default {
   'pages.home.mentor.welcome.p5': 'I also hope you can become a Mentor and help others.',
   'pages.home.mentor.welcome.ok': "Okay, I accept Mentor's invitation",
   'pages.home.mentor.welcome.cancel': 'Let me think again',
-  'pages.home.p1': 'Build and Fund the Open Web Together',
+  'pages.home.p1': 'Open The Infinite Game',
   'pages.home.p2':
-    'Connect with the community that digitizes open source projects, creates inancial freedom, and defines the new network of open cooperation.',
+    'Here is where interests are the way to realize financial freedom and dreams are the impulsion for people to converge.',
   'pages.home.button1': 'EXPLORE DAO',
   'pages.home.button2': 'MARK JOB',
   'pages.home.p3.0.title': 'Listed First Then Business',
