@@ -12,8 +12,8 @@ import { getNetwork } from '@ethersproject/networks';
 import { EthereumChainId } from '@/utils/utils';
 import JSBI from 'jsbi';
 
-export const DAOFactoryAddress = '0xA38548b19A9eBA627ac114b08B6e7175F2b9Ae2f';
-export const DAOStakingAddress = '0x088483a6AA7DB6c0E55dF573Af23D176545Ddf36';
+export const DAOFactoryAddress = '0xb0522D90d7176866e96925D7e55532b96028d4a6';
+export const DAOStakingAddress = '0x33d3b2eD7DFB2b11F4cEdC51Ee32f8FAb7895111';
 export const ZeroAddress = '0x0000000000000000000000000000000000000000';
 export const BIG_INT_ZERO = JSBI.BigInt(0);
 export const UniswapPoolAddress = '0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8';

@@ -685,6 +685,57 @@ query CyclesByTokenUnreleasedList($lastTimestamp: Int!) {
   }
 }
 
+query DAOTokenMintSplitInfo($daoId: String!, $startCycleId: String!, $endCycleId: String!) {
+  dao(id: $daoId) {
+    tokenMintSplitInfo(startCycleId: $startCycleId, endCycleId: $endCycleId) {
+      splitInfos {
+        userId
+        userNickname
+        userGithubLogin
+        userAvatar
+        userErc20Address
+        ratio
+      }
+    }
+  }
+}
+
+query DAOTokenMintRecords($daoId: String!, $tokenContractAddress: String!, $chainId: String!, $first: Int!, $offset: Int!) {
+  dao(id: $daoId) {
+    tokenMintRecords(tokenContractAddress: $tokenContractAddress, chainId: $chainId, first: $first, offset: $offset) {
+      nodes {
+        datum {
+          id
+          daoId
+          tokenContractAddress
+          status
+          totalRealSize
+          createAt
+          updateAt
+        }
+      }
+    }
+  }
+}
+
+query DAOTokenMintRunning($daoId: String!, $tokenContractAddress: String!, $chainId: String!) {
+  dao(id: $daoId) {
+    tokenMintRecords(tokenContractAddress: $tokenContractAddress, chainId: $chainId, status: [INIT, PENDING]) {
+      nodes {
+        datum {
+          id
+          daoId
+          tokenContractAddress
+          status
+          totalRealSize
+          createAt
+          updateAt
+        }
+      }
+    }
+  }
+}
+
 query DAOIcppers($daoId: String!, $sorted: IcppersQuerySortedEnum!, $sortedType: IcppersQuerySortedTypeEnum!, $first: Int!, $offset: Int!) {
   dao(id: $daoId) {
     icppers(sorted: $sorted, sortedType: $sortedType, first: $first, offset: $offset) {

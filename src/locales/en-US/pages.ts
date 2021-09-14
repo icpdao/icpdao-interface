@@ -220,7 +220,7 @@ export default {
   'pages.dao.config.tab.token.create_pool.form.button.create': 'Create Pool',
   'pages.dao.config.tab.token.add_lp': 'Add LP',
   'pages.dao.config.tab.token.add_lp.notfound':
-    'You have not created the lp pool, create pool first.',
+    'You have not created the lp pool, Ratio value from mining will be added to the contract.',
   'pages.dao.config.tab.token.add_lp.loading': 'Waiting for the transaction to complete...',
   'pages.dao.config.tab.token.add_lp.form.total_amount': 'Total Amount',
   'pages.dao.config.tab.token.add_lp.form.total_amount.desc': 'Total Amount',
@@ -253,6 +253,12 @@ export default {
   'pages.dao.config.tab.token.mint.preview.table.column.size': 'Effective Size',
   'pages.dao.config.tab.token.mint.preview.table.total': 'Total Size',
   'pages.dao.config.tab.token.mint.preview.table.time_range': 'Range Time',
+  'pages.dao.config.tab.token.mint.records.table.column.status': 'Status',
+  'pages.dao.config.tab.token.mint.records.table.column.real_size': 'Real Size',
+  'pages.dao.config.tab.token.mint.records.table.column.operation': 'Operation',
+  'pages.dao.config.tab.token.mint.create_record.failed':
+    'Failed to create mining record. Please try again.',
+  'pages.dao.config.tab.token.mint.record.button': 'Mint Record View',
   'pages.dao.home.view': 'VIEW ON GITHUB',
   'pages.dao.home.followed': 'FOLLOW',
   'pages.dao.home.unfollowed': 'FOLLOWING',
