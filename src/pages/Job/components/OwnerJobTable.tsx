@@ -10,6 +10,7 @@ import { DeleteFilled, EditFilled, EyeOutlined } from '@ant-design/icons';
 import { useModel } from '@@/plugin-model/useModel';
 import { getCurrentPage } from '@/utils/utils';
 import { renderJobTag } from '@/utils/pageHelper';
+import { defaultPageSize } from '@/pages/Job/components/OtherUserJobTable';
 
 interface JobTableProps {
   jobQueryVar: JobListQueryVariables;
@@ -173,9 +174,9 @@ const OwnerJobTable: React.FC<JobTableProps> = ({
             tableChange(pagination, sorter);
           }}
           pagination={{
-            pageSize: 10,
+            pageSize: defaultPageSize,
             total: jobList?.data?.data?.jobs?.total || 0,
-            current: getCurrentPage(jobQueryVar.offset || 0, 10),
+            current: getCurrentPage(jobQueryVar.offset || 0, defaultPageSize),
           }}
         />
       </Form>
