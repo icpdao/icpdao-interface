@@ -289,8 +289,8 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
         name: item?.datum?.name,
         following: item?.stat?.following,
         job: item?.stat?.job,
-        size: parseFloat(item?.stat?.size || ''),
-        token: parseFloat(item?.stat?.token || ''),
+        size: parseFloat(item?.stat?.size || '').toFixed(1),
+        token: parseFloat(item?.stat?.token || '').toFixed(2),
         isFollowing: item?.isFollowing,
         isOwner: item?.isOwner,
       };
@@ -329,11 +329,11 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
       },
       {
         title: intl.formatMessage({ id: 'pages.dao.component.dao_list.stat.card.size' }),
-        number: parseFloat(data.daos.stat?.size),
+        number: parseFloat(data.daos.stat?.size).toFixed(1),
       },
       {
         title: intl.formatMessage({ id: 'pages.dao.component.dao_list.stat.card.income' }),
-        number: parseFloat(data.daos.stat?.income),
+        number: parseFloat(data.daos.stat?.income).toFixed(2),
       },
     ];
   }, [data, intl]);

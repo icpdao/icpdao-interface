@@ -70,7 +70,7 @@ const allTypeVote = (
             {pair?.datum?.title}
           </a>
         </Row>
-        <Row>Size: {parseFloat(pair?.datum?.size.toString() || '')}</Row>
+        <Row>Size: {parseFloat(pair?.datum?.size.toString() || '').toFixed(1)}</Row>
       </div>
       <div className={styles.allTypeVoteButtons}>
         <div className={styles.allTypeVoteButton} onClick={() => updateVote(voteId, true)}>
@@ -114,7 +114,7 @@ const pairTypeVote = (
               {leftPair?.datum?.title}
             </a>
           </Row>
-          <Row>Size: {parseFloat(leftPair?.datum?.size.toString() || '')}</Row>
+          <Row>Size: {parseFloat(leftPair?.datum?.size.toString() || '').toFixed(1)}</Row>
           {voted === leftPair.datum?.id && (
             <div className={styles.pairTypeVoteCheck}>
               <CheckCircleFilled style={{ fontSize: 21, color: '#2F80ED' }} />
@@ -137,7 +137,7 @@ const pairTypeVote = (
               {rightPair?.datum?.title}
             </a>
           </Row>
-          <Row>Size: {parseFloat(rightPair?.datum?.size.toString() || '')}</Row>
+          <Row>Size: {parseFloat(rightPair?.datum?.size.toString() || '').toFixed(1)}</Row>
           {voted === rightPair.datum?.id && (
             <div className={styles.pairTypeVoteCheck}>
               <CheckCircleFilled style={{ fontSize: 21, color: '#2F80ED' }} />
@@ -306,7 +306,11 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
                 {intl.formatMessage({ id: 'pages.dao.vote.submit' })}
               </Button>
             ) : (
-              <Button type="primary" onClick={() => handlerMetamaskConnect()}>
+              <Button
+                type="primary"
+                onClick={() => handlerMetamaskConnect()}
+                className={styles.submitButton}
+              >
                 {intl.formatMessage({
                   id: 'pages.common.connect',
                 })}
