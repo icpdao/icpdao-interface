@@ -11,6 +11,8 @@ import { getCurrentPage } from '@/utils/utils';
 import { EyeOutlined } from '@ant-design/icons';
 import { renderJobTag } from '@/utils/pageHelper';
 
+export const defaultPageSize = 30;
+
 interface JobTableProps {
   jobQueryVar: JobListQueryVariables;
   setJobQueryVar: Dispatch<SetStateAction<JobListQueryVariables>>;
@@ -123,9 +125,9 @@ const OtherUserJobTable: React.FC<JobTableProps> = ({
             tableChange(pagination, sorter);
           }}
           pagination={{
-            pageSize: 10,
+            pageSize: defaultPageSize,
             total: jobList?.data?.jobs?.total || 0,
-            current: getCurrentPage(jobQueryVar.offset || 0, 10),
+            current: getCurrentPage(jobQueryVar.offset || 0, defaultPageSize),
           }}
         />
       </Form>
