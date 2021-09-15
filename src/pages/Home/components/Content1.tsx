@@ -48,11 +48,11 @@ const Content1: React.FC<HomeProps> = ({ statsData }) => {
         )}
         {statisticValueFormat(
           intl.formatMessage({ id: 'component.card.stat.size' }),
-          parseFloat(statsData?.size) || 0,
+          parseFloat(statsData?.size).toFixed(1) || 0,
         )}
         {statisticValueFormat(
           intl.formatMessage({ id: 'component.card.stat.income' }),
-          parseFloat(statsData?.income) || 0,
+          parseFloat(statsData?.income).toFixed(2) || 0,
         )}
       </div>
     );
