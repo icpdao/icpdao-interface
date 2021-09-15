@@ -38,6 +38,7 @@ import StatCard from '@/components/StatCard';
 import { PlusOutlined } from '@ant-design/icons';
 import { useRequest } from '@@/plugin-request/request';
 import { renderJobTag } from '@/utils/pageHelper';
+import { defaultPageSize } from '@/pages/Job/components/OtherUserJobTable';
 
 type TabJobProps = {
   daoId?: string;
@@ -93,7 +94,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
   const [jobQueryVar, setJobQueryVar] = useState<JobListQueryVariables>({
     daoName: '',
     offset: 0,
-    first: 10,
+    first: defaultPageSize,
   });
   const [choosePRData, setChoosePRData] = useState<choosePR[]>([]);
   const [backupChoosePRData, setBackupChoosePRData] = useState<choosePR[]>([]);
