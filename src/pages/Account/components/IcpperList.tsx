@@ -10,7 +10,7 @@ import { FormattedMessage, useIntl } from 'umi';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import { Button, Col, Row, Table } from 'antd';
 import styles from '@/pages/Account/index.less';
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import GlobalModal from '@/components/Modal';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
 import GlobalTooltip from '@/components/Tooltip';
@@ -44,6 +44,48 @@ const IcpperList: React.FC = () => {
     return getIcpperships();
   });
 
+  const expandedRowTableColumn = useMemo(() => {
+    return [
+      {
+        title: intl.formatMessage({ id: 'pages.account.icpper.expanded.table.column.1' }),
+        dataIndex: 'dao_name',
+        width: 60,
+      },
+      {
+        title: intl.formatMessage({ id: 'pages.account.icpper.expanded.table.column.2' }),
+        dataIndex: 'token',
+        key: 'token',
+        render: (_: any, record: any) => <>{`${record.token_name} (${record.token_symbol})`}</>,
+        width: 60,
+      },
+      {
+        title: intl.formatMessage({ id: 'pages.account.icpper.expanded.table.column.3' }),
+        dataIndex: 'total_value',
+        key: 'totalValue',
+        render: (_: any, record: any) => (
+          <>{parseFloat(record.total_value.toString() || '').toFixed(2) || 0}</>
+        ),
+        width: 60,
+      },
+    ];
+  }, [intl]);
+
+  const expandedRowRender = useCallback(
+    (record: any) => {
+      console.log(record.token_stat);
+      return (
+        <Table
+          size={'middle'}
+          rowKey={'token_name'}
+          columns={expandedRowTableColumn}
+          dataSource={record.token_stat}
+          pagination={false}
+        />
+      );
+    },
+    [expandedRowTableColumn],
+  );
+
   if (loading || error) {
     return <PageLoading />;
   }
@@ -67,7 +109,7 @@ const IcpperList: React.FC = () => {
       />
     </>
   );
-  const icpperTitle = (
+  const relationIcpperTitle = (
     <>
       <span style={{ marginRight: 6 }}>
         <FormattedMessage id={'pages.account.icpper.icpper'} />
@@ -78,12 +120,23 @@ const IcpperList: React.FC = () => {
       />
     </>
   );
+  const unrelationIcpperTitle = (
+    <>
+      <span style={{ marginRight: 6 }}>
+        <FormattedMessage id={'pages.account.icpper.released_icpper'} />
+      </span>
+      <GlobalTooltip
+        title={<FormattedMessage id={'pages.account.icpper.released_icpper.tooltip'} />}
+        key={'icpper.tooltip'}
+      />
+    </>
+  );
   const handleCancel = (id: string | undefined, github_login: string | undefined) => {
     setInviteCancelModalVisible(true);
     setInviteCancelId(id || '');
     setInviteCancelGithubLogin(github_login || '');
   };
-  const icpperColumns = [
+  const relationIcpperColumns = [
     {
       title: intl.formatMessage({ id: 'pages.account.icpper.table.column.1' }),
       key: 'index',
@@ -105,19 +158,22 @@ const IcpperList: React.FC = () => {
       key: 'be_mentor_days',
     },
     {
-      title: 'Icpper',
-      dataIndex: 'icpper_icpper_count',
+      title: intl.formatMessage({ id: 'pages.account.icpper.table.column.5' }),
+      dataIndex: 'has_reward_icpper_count',
       key: 'icpper',
     },
     {
-      title: intl.formatMessage({ id: 'pages.account.icpper.table.column.5' }),
+      title: intl.formatMessage({ id: 'pages.account.icpper.table.column.6' }),
       key: 'tokens',
-      render: () => (
-        <>20 {intl.formatMessage({ id: 'pages.account.icpper.table.column.5.text' })}</>
+      render: (record: any) => (
+        <>
+          {record?.token_count || 0}{' '}
+          {intl.formatMessage({ id: 'pages.account.icpper.table.column.6.text' })}
+        </>
       ),
     },
     {
-      title: intl.formatMessage({ id: 'pages.account.icpper.table.column.6' }),
+      title: intl.formatMessage({ id: 'pages.account.icpper.table.column.7' }),
       key: 'action',
       render: (record: any) => (
         <a
@@ -125,14 +181,48 @@ const IcpperList: React.FC = () => {
             handleCancel(record.id, record.github_login);
           }}
         >
-          {intl.formatMessage({ id: 'pages.account.icpper.table.column.6.text' })}
+          {intl.formatMessage({ id: 'pages.account.icpper.table.column.7.text' })}
         </a>
       ),
     },
   ];
 
+  const unrelationIcpperColumns = [
+    {
+      title: intl.formatMessage({ id: 'pages.account.icpper.table.column.1' }),
+      key: 'index',
+      render: (text: any, record: any, index: number) => <>{index + 1}</>,
+    },
+    {
+      title: intl.formatMessage({ id: 'pages.account.icpper.table.column.2' }),
+      dataIndex: 'github_login',
+      key: 'github_login',
+    },
+    {
+      title: intl.formatMessage({ id: 'pages.account.icpper.table.column.3' }),
+      dataIndex: 'accept_time',
+      key: 'accept_time',
+    },
+    {
+      title: intl.formatMessage({ id: 'pages.account.icpper.table.column.5' }),
+      dataIndex: 'has_reward_icpper_count',
+      key: 'icpper',
+    },
+    {
+      title: intl.formatMessage({ id: 'pages.account.icpper.table.column.6' }),
+      key: 'tokens',
+      render: (record: any) => (
+        <>
+          {record?.token_count || 0}{' '}
+          {intl.formatMessage({ id: 'pages.account.icpper.table.column.6.text' })}
+        </>
+      ),
+    },
+  ];
+
   const invited = [];
-  const icpper = [];
+  const relationIcpper = [];
+  const unrelationIcpper = [];
   if (data) {
     for (let i: number = 0; i < data.length; i += 1) {
       if (data[i].progress === 0 || data[i].status === 1) {
@@ -180,14 +270,30 @@ const IcpperList: React.FC = () => {
           data[i].accept_at || 0,
         );
         const acceptTime = getFormatTime(data[i].accept_at || 0, 'LL');
-        icpper.push({
-          key: i,
-          id: datum.id || '',
-          github_login: datum.icpper?.github_login || '',
-          accept_time: acceptTime,
-          be_mentor_days: beMentorDays,
-          icpper_icpper_count: datum.icpper_icpper_count,
-        });
+        if (datum.relation === true)
+          relationIcpper.push({
+            key: i,
+            id: datum.id || '',
+            github_login: datum.icpper?.github_login || '',
+            accept_time: acceptTime,
+            be_mentor_days: beMentorDays,
+            icpper_icpper_count: datum.icpper_icpper_count,
+            has_reward_icpper_count: datum.has_reward_icpper_count,
+            token_count: datum.token_count || 0,
+            token_stat: datum.token_stat || [],
+          });
+        else
+          unrelationIcpper.push({
+            key: i,
+            id: datum.id || '',
+            github_login: datum.icpper?.github_login || '',
+            accept_time: acceptTime,
+            be_mentor_days: beMentorDays,
+            icpper_icpper_count: datum.icpper_icpper_count,
+            has_reward_icpper_count: datum.has_reward_icpper_count || 0,
+            token_count: datum.token_count || 0,
+            token_stat: datum.token_stat || [],
+          });
       }
     }
   }
@@ -328,13 +434,38 @@ const IcpperList: React.FC = () => {
         </div>
       </GlobalModal>
       <ProDescriptions
-        key={'icpper'}
+        key={'relationIcpper'}
         className={styles.second}
         column={1}
-        title={icpperTitle}
-      ></ProDescriptions>
+        title={relationIcpperTitle}
+      />
       <div>
-        <Table columns={icpperColumns} dataSource={icpper} />
+        <Table
+          columns={relationIcpperColumns}
+          dataSource={relationIcpper}
+          pagination={false}
+          expandable={{
+            expandedRowRender,
+            rowExpandable: (record) => record.token_stat && record.token_stat.length > 0,
+          }}
+        />
+      </div>
+      <ProDescriptions
+        key={'unrelationIcpper'}
+        className={styles.second}
+        column={1}
+        title={unrelationIcpperTitle}
+      />
+      <div>
+        <Table
+          columns={unrelationIcpperColumns}
+          dataSource={unrelationIcpper}
+          pagination={false}
+          expandable={{
+            expandedRowRender,
+            rowExpandable: (record) => record.token_stat && record.token_stat.length > 0,
+          }}
+        />
       </div>
     </>
   );

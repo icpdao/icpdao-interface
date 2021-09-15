@@ -49,11 +49,11 @@ const DaoCycleIndex: React.FC<DaoCycleProps> = ({
     },
     {
       title: intl.formatMessage({ id: 'pages.dao.component.dao_cycle.stat.size' }),
-      number: parseFloat(data?.cycle?.stat?.size || '') || 0,
+      number: parseFloat(data?.cycle?.stat?.size || '').toFixed(1) || 0,
     },
     {
       title: tokenSymbol,
-      number: parseFloat(data?.cycle?.stat?.income || '') || 0,
+      number: parseFloat(data?.cycle?.stat?.income || '').toFixed(2) || 0,
     },
   ];
 

@@ -35,6 +35,15 @@ declare namespace API {
     session_token?: string;
   };
 
+  type TokenStat = {
+    dao_id?: string;
+    dao_name?: string;
+    token_contract_address?: string;
+    token_name?: string;
+    token_symbol?: string;
+    total_value?: number;
+  };
+
   type InviteResults = InviteResult[];
 
   type InviteResult = {
@@ -47,6 +56,10 @@ declare namespace API {
     create_at?: number;
     accept_at?: number;
     icpper_at?: number;
+    relation?: boolean;
+    has_reward_icpper_count?: number;
+    token_count?: number;
+    token_stat?: TokenStat[];
   };
 
   type ErrorResponse = {
@@ -104,6 +117,7 @@ declare namespace API {
   };
 
   type InviteResultIcpper = {
+    id?: string;
     nickname?: string;
     github_login?: string;
   };

@@ -134,11 +134,11 @@ const DaoJobStat: React.FC<DaoJobSatProps> = ({ daoId, tokenSymbol }) => {
     },
     {
       title: intl.formatMessage({ id: 'pages.dao.component.dao_job.stat.size' }),
-      number: parseFloat(data?.dao?.jobs?.stat?.size || '') || 0,
+      number: parseFloat(data?.dao?.jobs?.stat?.size || '').toFixed(1) || 0,
     },
     {
       title: tokenSymbol || intl.formatMessage({ id: 'component.card.stat.income' }),
-      number: parseFloat(data?.dao?.jobs?.stat?.income || '') || 0,
+      number: parseFloat(data?.dao?.jobs?.stat?.income || '').toFixed(2) || 0,
     },
   ];
   return (
