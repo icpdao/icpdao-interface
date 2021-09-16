@@ -250,12 +250,20 @@ export default {
   'pages.dao.config.tab.token.mint.form.button.submit': 'Mint',
   'pages.dao.config.tab.token.mint.preview.table.column.name': 'Name',
   'pages.dao.config.tab.token.mint.preview.table.column.address': 'Address',
-  'pages.dao.config.tab.token.mint.preview.table.column.size': 'Effective Size',
-  'pages.dao.config.tab.token.mint.preview.table.total': 'Total Size',
+  'pages.dao.config.tab.token.mint.preview.table.column.ratio': 'Ratio',
+  'pages.dao.config.tab.token.mint.preview.table.column.no_address_tips':
+    'The user did not fill in the wallet address, please remind to fill in, otherwise the mining benefits cannot be obtained.',
+  'pages.dao.config.tab.token.mint.preview.table.total': 'Total Ratio',
   'pages.dao.config.tab.token.mint.preview.table.time_range': 'Range Time',
   'pages.dao.config.tab.token.mint.records.table.column.status': 'Status',
-  'pages.dao.config.tab.token.mint.records.table.column.real_size': 'Real Size',
+  'pages.dao.config.tab.token.mint.records.table.column.create_at': 'Create Time',
   'pages.dao.config.tab.token.mint.records.table.column.operation': 'Operation',
+  'pages.dao.config.tab.token.mint.records.table.column.operation.bind_tx':
+    'Manually bind transaction',
+  'pages.dao.config.tab.token.mint.records.table.column.operation.delete': 'Delete',
+  'pages.dao.config.tab.token.mint.records.table.column.operation.bind_tx.input_pla':
+    'Example: 0xb93f1d5a80c03ac3bcf32c63d055d3952cdef66fac2142ea32eea0a3758ea37d',
+  'pages.dao.config.tab.token.mint.records.table.column.operation.bind_tx.save': 'Save',
   'pages.dao.config.tab.token.mint.create_record.failed':
     'Failed to create mining record. Please try again.',
   'pages.dao.config.tab.token.mint.record.button': 'Mint Record View',

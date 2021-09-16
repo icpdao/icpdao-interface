@@ -655,8 +655,8 @@ query UserCycleIcpperStatList($daoName: String!, $userName: String!, $first: Int
   }
 }
 
-query CyclesByTokenUnreleasedList($lastTimestamp: Int!) {
-  cyclesByTokenUnreleased(lastTimestamp: $lastTimestamp) {
+query CyclesByTokenUnreleasedList($daoId: String!, $lastTimestamp: Int!) {
+  cyclesByTokenUnreleased(daoId: $daoId, lastTimestamp: $lastTimestamp) {
     nodes {
       datum {
         id
@@ -702,7 +702,7 @@ query DAOTokenMintSplitInfo($daoId: String!, $startCycleId: String!, $endCycleId
 
 query DAOTokenMintRecords($daoId: String!, $tokenContractAddress: String!, $chainId: String!, $first: Int!, $offset: Int!) {
   dao(id: $daoId) {
-    tokenMintRecords(tokenContractAddress: $tokenContractAddress, chainId: $chainId, first: $first, offset: $offset) {
+    tokenMintRecords(tokenContractAddress: $tokenContractAddress, chainId: $chainId, first: $first, offset: $offset, status: [INIT, PENDING, SUCCESS, FAIL]) {
       nodes {
         datum {
           id

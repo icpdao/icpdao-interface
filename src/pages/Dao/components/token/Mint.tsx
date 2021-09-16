@@ -8,6 +8,7 @@ import {
   useDaoTokenMintRecordsLazyQuery,
   useDaoTokenMintRunningLazyQuery,
   useDaoTokenMintSplitInfoLazyQuery,
+  useDropMintRecordMutation,
   useLinkTxHashMutation,
 } from '@/services/dao/generated';
 import { ZeroAddress } from '@/services/ethereum-connect';
@@ -22,6 +23,7 @@ import {
   Input,
   InputNumber,
   message,
+  Popconfirm,
   Popover,
   Row,
   Select,
@@ -30,8 +32,14 @@ import {
   Switch,
   Table,
   Tag,
+  Tooltip,
 } from 'antd';
-import { EthereumChainId, getFormatTimeByZone, getTimestampByZone } from '@/utils/utils';
+import {
+  EthereumChainId,
+  getFormatTime,
+  getFormatTimeByZone,
+  getTimestampByZone,
+} from '@/utils/utils';
 import GlobalModal from '@/components/Modal';
 import { LinkOutlined, UserOutlined } from '@ant-design/icons';
 import type { ETH_CONNECT } from '@/services/ethereum-connect/typings';
@@ -52,9 +60,22 @@ const previewTableColumns = [
   {
     title: <FormattedMessage id="pages.dao.config.tab.token.mint.preview.table.column.address" />,
     dataIndex: 'userErc20Address',
+    render: (_: any, record: SplitInfo) => {
+      if (record.userErc20Address) return <span>{record.userErc20Address}</span>;
+      return (
+        <Tooltip
+          title={
+            <FormattedMessage id="pages.dao.config.tab.token.mint.preview.table.column.no_address_tips" />
+          }
+          placement={'right'}
+        >
+          <Tag color="red">warning !!!</Tag>
+        </Tooltip>
+      );
+    },
   },
   {
-    title: <FormattedMessage id="pages.dao.config.tab.token.mint.preview.table.column.size" />,
+    title: <FormattedMessage id="pages.dao.config.tab.token.mint.preview.table.column.ratio" />,
     dataIndex: 'ratio',
   },
 ];
@@ -75,6 +96,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
   const [previewMint, setPreviewMint] = useState<boolean>(false);
   const [mintRecordModal, setMintRecordModal] = useState<boolean>(false);
   const [mintButtonLoading, setMintButtonLoading] = useState<boolean>(false);
+  const [currentMintBody, setCurrentMintBody] = useState<ETH_CONNECT.Mint>();
 
   const [lpPoolAddress, setLPPoolAddress] = useState<string>('');
 
@@ -113,11 +135,12 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
   const [queryDaoTokenMintSplitInfo, daoTokenMintSplitInfoResult] =
     useDaoTokenMintSplitInfoLazyQuery({ fetchPolicy: 'no-cache' });
 
-  const [queryDaoTokenMintRecords, daoTokenMintReccordsResult] = useDaoTokenMintRecordsLazyQuery();
+  const [queryDaoTokenMintRecords, daoTokenMintRecordsResult] = useDaoTokenMintRecordsLazyQuery();
 
   const [mutationCreateTokenMintMutation, createTokenMintMutationResult] =
     useCreateTokenMintMutation();
-  const [mutationLinkTxHash] = useLinkTxHashMutation();
+  const [mutationLinkTxHash, linkTxHashResult] = useLinkTxHashMutation();
+  const [mutationDropMintRecord, dropMintRecordResult] = useDropMintRecordMutation();
   const [anchor, setAnchor] = useState<any>();
 
   useEffect(() => {
@@ -128,22 +151,28 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
   }, [daoId, network, queryDaoTokenMintRunning, tokenAddress]);
 
   useEffect(() => {
-    if (!daoTokenMintRunningResult.data?.dao?.tokenMintRecords?.nodes) return;
+    if (
+      !daoTokenMintRunningResult.data?.dao?.tokenMintRecords?.nodes ||
+      daoTokenMintRunningResult.data?.dao?.tokenMintRecords?.nodes?.length === 0
+    ) {
+      setLoadingTransferComplete(false);
+      return;
+    }
     if (daoTokenMintRunningResult.data?.dao?.tokenMintRecords?.nodes?.length > 0)
       setLoadingTransferComplete(true);
   }, [daoTokenMintRunningResult.data?.dao?.tokenMintRecords?.nodes]);
 
   useEffect(() => {
-    if (!tokenContract) return;
+    if (!tokenContract || !daoId) return;
     tokenContract.getMintAnchor().then((anc) => {
       console.log(anc);
       setAnchor(anc);
       tokenContract.getLPPool().then((value) => setLPPoolAddress(value));
       queryCyclesByTokenUnreleasedList({
-        variables: { lastTimestamp: anc.lastTimestamp.toString() },
+        variables: { daoId, lastTimestamp: anc.lastTimestamp.toString() },
       });
     });
-  }, [queryCyclesByTokenUnreleasedList, tokenContract]);
+  }, [daoId, queryCyclesByTokenUnreleasedList, tokenContract]);
 
   useEffect(() => {
     const unreleasedCycle: Record<string, CycleQuery> = {};
@@ -152,7 +181,11 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
       unreleasedCycle[d.datum.id] = d as CycleQuery;
     });
     setCycles(unreleasedCycle);
-    setSelectCycles(Object.values(unreleasedCycle));
+    setSelectCycles(
+      Object.values(unreleasedCycle).sort(
+        (a, b) => (a.datum?.beginAt || 0) - (b.datum?.beginAt || 0),
+      ),
+    );
   }, [cyclesByTokenUnreleasedListResult.data?.cyclesByTokenUnreleased?.nodes]);
 
   useEffect(() => {
@@ -205,7 +238,13 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
       return;
     try {
       setMintButtonLoading(true);
-      const splitInfos = daoTokenMintSplitInfoResult.data?.dao?.tokenMintSplitInfo?.splitInfos;
+      const splitInfos =
+        daoTokenMintSplitInfoResult.data?.dao?.tokenMintSplitInfo?.splitInfos.filter(
+          (pd) =>
+            pd?.userErc20Address &&
+            pd.userErc20Address !== '' &&
+            pd.userErc20Address !== ZeroAddress,
+        );
       const mintBody: ETH_CONNECT.Mint = {
         mintTokenAddressList: splitInfos.map((pd) => pd?.userErc20Address || ''),
         mintTokenAmountRatioList: splitInfos.map((pd) => pd?.ratio || 0),
@@ -214,6 +253,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
         tickLower: position?.tickLower || 0,
         tickUpper: position?.tickUpper || 0,
       };
+      setCurrentMintBody(mintBody);
       await mutationCreateTokenMintMutation({
         variables: {
           daoId,
@@ -224,28 +264,10 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
           endTimestamp: mintBody.endTimestamp,
           tickLower: mintBody.tickLower,
           tickUpper: mintBody.tickUpper,
-          chainId: EthereumChainId[network],
+          chainId: EthereumChainId[network].toString(),
         },
       });
       console.log({ createTokenMintMutationResult });
-      const mintRecordId =
-        createTokenMintMutationResult.data?.createTokenMintRecord?.tokenMintRecord?.id;
-      if (mintRecordId) {
-        const tx = await tokenContract.mint(mintBody);
-        console.log(tx);
-        setMintButtonLoading(false);
-        setPreviewMint(false);
-        await mutationLinkTxHash({ variables: { recordId: mintRecordId, mintTxHash: tx.hash } });
-
-        setLoadingTransferComplete(true);
-        const receipt = await tx.wait();
-        console.log(receipt);
-        setLoadingTransferComplete(false);
-      } else {
-        message.warn(
-          intl.formatMessage({ id: 'pages.dao.config.tab.token.mint.create_record.failed' }),
-        );
-      }
     } catch (e) {
       setMintButtonLoading(false);
       setLoadingTransferComplete(false);
@@ -258,41 +280,97 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
     daoTokenMintSplitInfoResult.data?.dao?.tokenMintSplitInfo?.splitInfos,
     mutationCreateTokenMintMutation,
     network,
-    position,
+    position?.tickLower,
+    position?.tickUpper,
     previewMintEndTime,
     selectCycles,
     tokenAddress,
     tokenContract,
   ]);
 
-  // const handlerTestMint = useCallback(async () => {
-  //   console.log({tokenContract, daoId, anchor}, !tokenContract || !daoId || !anchor)
-  //   if (!tokenContract || !daoId || !anchor) return;
-  //   try {
-  //     setMintButtonLoading(true);
-  //     const mintBody: ETH_CONNECT.Mint = {
-  //       mintTokenAddressList: ['0x3946d96a4b46657ca95CBE85d8a60b822186Ad1f', '0xcab51a8d12954FC1bc5677B34c1DcEb9633ca3f1'],
-  //       mintTokenAmountRatioList: [30, 70],
-  //       startTimestamp: anchor.lastTimestamp.toNumber(),
-  //       endTimestamp: 31 * 24 * 60 * 60,
-  //       tickLower: position?.tickLower || 0,
-  //       tickUpper: position?.tickUpper || 0,
-  //     };
-  //     console.log(mintBody)
-  //     const tx = await tokenContract.mint(mintBody);
-  //     console.log(tx)
-  //     setMintButtonLoading(false);
-  //     setPreviewMint(false);
-  //     setLoadingTransferComplete(true);
-  //     const receipt = await tx.wait();
-  //     console.log(receipt)
-  //     // const deployEvent = receipt.events.pop();
-  //     setLoadingTransferComplete(false);
-  //   } catch (e) {
-  //     setMintButtonLoading(false);
-  //     setLoadingTransferComplete(false);
-  //   }
-  // }, [anchor, daoId, position, tokenContract])
+  useEffect(() => {
+    if (!tokenContract || !currentMintBody || createTokenMintMutationResult.loading) return;
+    const mintRecordId =
+      createTokenMintMutationResult.data?.createTokenMintRecord?.tokenMintRecord?.id;
+    if (mintRecordId) {
+      tokenContract
+        .mint(currentMintBody)
+        .then((tx) => {
+          console.log(tx);
+          setMintButtonLoading(false);
+          setPreviewMint(false);
+          mutationLinkTxHash({ variables: { recordId: mintRecordId, mintTxHash: tx.hash } }).then(
+            () => {
+              setLoadingTransferComplete(true);
+              // event
+              tx.wait().then((receipt: any) => {
+                console.log(receipt);
+                setLoadingTransferComplete(false);
+              });
+            },
+          );
+        })
+        .catch(() => {
+          mutationDropMintRecord({ variables: { recordId: mintRecordId } });
+          setMintButtonLoading(false);
+          setLoadingTransferComplete(false);
+        });
+    } else {
+      message.warn(
+        intl.formatMessage({ id: 'pages.dao.config.tab.token.mint.create_record.failed' }),
+      );
+    }
+  }, [
+    createTokenMintMutationResult.data?.createTokenMintRecord?.tokenMintRecord?.id,
+    createTokenMintMutationResult.loading,
+    currentMintBody,
+    intl,
+    mutationLinkTxHash,
+    tokenContract,
+  ]);
+
+  const [manuallyBindInputValue, setManuallyBindInputValue] = useState<Record<string, string>>({});
+
+  const manuallyBind = useCallback(
+    (recordId: string) => {
+      return (
+        <div style={{ width: '630px', height: '65px' }}>
+          <div>
+            <Input
+              size={'small'}
+              onChange={(v) =>
+                setManuallyBindInputValue((old) => ({ ...old, [recordId]: v.target.value }))
+              }
+              placeholder={intl.formatMessage({
+                id: 'pages.dao.config.tab.token.mint.records.table.column.operation.bind_tx.input_pla',
+              })}
+            />
+          </div>
+          <div style={{ marginTop: 15, float: 'right' }}>
+            <Button
+              disabled={!manuallyBindInputValue[recordId]}
+              size={'small'}
+              type={'primary'}
+              onClick={async () => {
+                await mutationLinkTxHash({
+                  variables: { recordId, mintTxHash: manuallyBindInputValue[recordId] },
+                });
+                setManuallyBindInputValue((old) => ({ ...old, [recordId]: '' }));
+                setMintRecordModal(false);
+                if (daoTokenMintRunningResult && daoTokenMintRunningResult.refetch)
+                  await daoTokenMintRunningResult.refetch();
+              }}
+            >
+              {intl.formatMessage({
+                id: 'pages.dao.config.tab.token.mint.records.table.column.operation.bind_tx.save',
+              })}
+            </Button>
+          </div>
+        </div>
+      );
+    },
+    [daoTokenMintRunningResult, intl, manuallyBindInputValue, mutationLinkTxHash],
+  );
 
   const handlerOpenMintRecordView = useCallback(() => {
     if (!daoId || !tokenAddress) return;
@@ -334,9 +412,17 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
       },
       {
         title: (
-          <FormattedMessage id="pages.dao.config.tab.token.mint.records.table.column.real_size" />
+          <FormattedMessage id="pages.dao.config.tab.token.mint.records.table.column.create_at" />
         ),
-        dataIndex: ['datum', 'realSize'],
+        dataIndex: ['datum', 'createAt'],
+        render: (_: any, record: TokenMintRecordQuery) => {
+          if (record.datum?.status !== 0)
+            return {
+              children: <>{getFormatTime(record?.datum?.createAt || 0, 'LL')}</>,
+              props: { colSpan: 2 },
+            };
+          return <>{getFormatTime(record?.datum?.createAt || 0, 'LL')}</>;
+        },
       },
       {
         title: (
@@ -344,16 +430,50 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
         ),
         key: 'operation',
         render: (_: any, record: TokenMintRecordQuery) => {
-          if (record.datum?.status !== 0) return <></>;
+          if (record.datum?.status !== 0)
+            return {
+              children: <></>,
+              props: { colSpan: 0 },
+            };
           return (
-            <Space size={'small'}>
-              <Popover content={<Input size={'small'} />}></Popover>
+            <Space size={'small'} direction={'vertical'}>
+              <Popover content={manuallyBind(record?.datum?.id || '')} trigger="click">
+                <Button loading={linkTxHashResult.loading || false} type={'primary'}>
+                  {intl.formatMessage({
+                    id: 'pages.dao.config.tab.token.mint.records.table.column.operation.bind_tx',
+                  })}
+                </Button>
+              </Popover>
+              <Popconfirm
+                title="Are you sure？"
+                okText="Yes"
+                cancelText="No"
+                onConfirm={async () => {
+                  await mutationDropMintRecord({ variables: { recordId: record.datum?.id || '' } });
+                  setMintRecordModal(false);
+                  if (daoTokenMintRunningResult && daoTokenMintRunningResult.refetch)
+                    await daoTokenMintRunningResult.refetch();
+                }}
+              >
+                <Button loading={dropMintRecordResult.loading || false}>
+                  {intl.formatMessage({
+                    id: 'pages.dao.config.tab.token.mint.records.table.column.operation.delete',
+                  })}
+                </Button>
+              </Popconfirm>
             </Space>
           );
         },
       },
     ];
-  }, []);
+  }, [
+    daoTokenMintRunningResult,
+    dropMintRecordResult.loading,
+    intl,
+    linkTxHashResult.loading,
+    manuallyBind,
+    mutationDropMintRecord,
+  ]);
 
   if (
     cyclesByTokenUnreleasedListResult.loading ||
@@ -402,9 +522,9 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
             })}
           >
             <Select onChange={(v: string) => setCurrentSelectCycle(v)} style={{ width: 450 }}>
-              {Object.values(cycles).map((c) => {
+              {selectCycles.map((c) => {
                 return (
-                  <Select.Option value={c.datum?.id || ''}>
+                  <Select.Option value={c.datum?.id || ''} key={c.datum?.id || ''}>
                     {getFormatTimeByZone(c?.datum?.beginAt || 0, c?.datum?.timeZone || 0, 'LL')} -{' '}
                     {getFormatTimeByZone(c?.datum?.endAt || 0, c?.datum?.timeZone || 0, 'LL')}
                   </Select.Option>
@@ -507,12 +627,13 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
       >
         <Table
           columns={previewTableColumns}
+          size={'middle'}
           dataSource={
             daoTokenMintSplitInfoResult.data?.dao?.tokenMintSplitInfo?.splitInfos as [SplitInfo]
           }
           rowKey={'userId'}
           pagination={false}
-          scroll={{ x: 500, y: 500 }}
+          scroll={{ x: 500, y: 300 }}
           loading={daoTokenMintSplitInfoResult.loading || false}
           bordered
           summary={(pageData) => {
@@ -535,7 +656,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
                 <Table.Summary.Row>
                   <Table.Summary.Cell index={0}>
                     {intl.formatMessage({
-                      id: 'pages.dao.config.tab.token.mint.preview.table.range_time',
+                      id: 'pages.dao.config.tab.token.mint.preview.table.time_range',
                     })}
                   </Table.Summary.Cell>
                   <Table.Summary.Cell index={1} colSpan={2}>
@@ -551,21 +672,19 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
       <GlobalModal
         key={'mintRecord'}
         visible={mintRecordModal}
-        onOk={() => setMintRecordModal(false)}
         width={800}
-        okText={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.modal.ok' })}
-        cancelText={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.modal.cancel' })}
         onCancel={() => setMintRecordModal(false)}
       >
         <Table<TokenMintRecordQuery>
           columns={mintRecordColumns}
+          size={'middle'}
           dataSource={
-            daoTokenMintReccordsResult.data?.dao?.tokenMintRecords?.nodes as [TokenMintRecordQuery]
+            daoTokenMintRecordsResult.data?.dao?.tokenMintRecords?.nodes as [TokenMintRecordQuery]
           }
-          rowKey={'userId'}
+          rowKey={(r) => r?.datum?.id || ''}
           pagination={false}
-          scroll={{ x: 500, y: 500 }}
-          loading={daoTokenMintSplitInfoResult.loading || false}
+          scroll={{ x: 500, y: 300 }}
+          loading={daoTokenMintRecordsResult.loading || false}
           bordered
         />
       </GlobalModal>
