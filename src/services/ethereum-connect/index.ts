@@ -12,8 +12,8 @@ import { getNetwork } from '@ethersproject/networks';
 import { EthereumChainId } from '@/utils/utils';
 import JSBI from 'jsbi';
 
-export const DAOFactoryAddress = '0xb0522D90d7176866e96925D7e55532b96028d4a6';
-export const DAOStakingAddress = '0x33d3b2eD7DFB2b11F4cEdC51Ee32f8FAb7895111';
+export const DAOFactoryAddress = '0xE698080BD9832C9A6f545b55A34B7461969530dE';
+export const DAOStakingAddress = '0x8c85De9c4c19CA869438cD5cE317391C35E6C98d';
 export const ZeroAddress = '0x0000000000000000000000000000000000000000';
 export const BIG_INT_ZERO = JSBI.BigInt(0);
 export const UniswapPoolAddress = '0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8';
@@ -31,6 +31,13 @@ export function getInfuraProvider(network: string) {
   return new ethers.providers.InfuraProvider(
     getNetwork(network),
     REACT_APP_ICPDAO_ETHEREUM_INFURA_KEY,
+  );
+}
+
+export function getEtherscanProvider(network: string) {
+  return new ethers.providers.EtherscanProvider(
+    getNetwork(network),
+    REACT_APP_ICPDAO_ETHEREUM_ETHERSCAN_KEY,
   );
 }
 
@@ -80,5 +87,9 @@ export class BaseEthereumConnect {
     this.metamaskProvider = getMetamaskProvider(metamaskProvider);
     this.network = network;
     this.chainId = EthereumChainId[network];
+  }
+
+  getAddressHistory(address: string) {
+    return getEtherscanProvider(this.network).getHistory(address);
   }
 }

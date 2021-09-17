@@ -185,6 +185,14 @@ mutation SyncTokenMintRecordEvent($recordId: String!) {
   }
 }
 
+mutation FindLostTxForInitTokenMintRecord($recordId: String!) {
+  findLostTxForInitTokenMintRecord(id: $recordId) {
+    tokenMintRecord {
+      status
+    }
+  }
+}
+
 mutation UpdateVoteConfirm($cycleId: String!, $signatureAddress: String!, $signatureMsg: String!, $signature: String!) {
   updateVoteConfirm(cycleId: $cycleId, signatureAddress: $signatureAddress, signatureMsg: $signatureMsg, signature: $signature) {
     ok

@@ -9,7 +9,9 @@ import {
   useDaoTokenMintRunningLazyQuery,
   useDaoTokenMintSplitInfoLazyQuery,
   useDropMintRecordMutation,
+  useFindLostTxForInitTokenMintRecordMutation,
   useLinkTxHashMutation,
+  useSyncTokenMintRecordEventMutation,
 } from '@/services/dao/generated';
 import { ZeroAddress } from '@/services/ethereum-connect';
 import { DAOTokenConnect } from '@/services/ethereum-connect/token';
@@ -35,10 +37,13 @@ import {
   Tooltip,
 } from 'antd';
 import {
+  clearCacheMintRecordBingTxHash,
   EthereumChainId,
+  getCacheMintRecordBindTxHash,
   getFormatTime,
   getFormatTimeByZone,
   getTimestampByZone,
+  setCacheMintRecordBindTxHash,
 } from '@/utils/utils';
 import GlobalModal from '@/components/Modal';
 import { LinkOutlined, UserOutlined } from '@ant-design/icons';
@@ -141,7 +146,19 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
     useCreateTokenMintMutation();
   const [mutationLinkTxHash, linkTxHashResult] = useLinkTxHashMutation();
   const [mutationDropMintRecord, dropMintRecordResult] = useDropMintRecordMutation();
+  const [mutationSyncTokenMintRecordEvent] = useSyncTokenMintRecordEventMutation();
+  const [mutationFindLostTxForInitTokenMintRecord, findLostTxForInitTokenMintRecordResult] =
+    useFindLostTxForInitTokenMintRecordMutation();
   const [anchor, setAnchor] = useState<any>();
+
+  useEffect(() => {
+    const { recordId, txHash } = getCacheMintRecordBindTxHash();
+    if (recordId) {
+      mutationLinkTxHash({ variables: { recordId, mintTxHash: txHash } }).then(() =>
+        clearCacheMintRecordBingTxHash(),
+      );
+    }
+  }, [mutationLinkTxHash]);
 
   useEffect(() => {
     if (!daoId || !tokenAddress || tokenAddress === ZeroAddress) return;
@@ -158,9 +175,17 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
       setLoadingTransferComplete(false);
       return;
     }
-    if (daoTokenMintRunningResult.data?.dao?.tokenMintRecords?.nodes?.length > 0)
+    if (daoTokenMintRunningResult.data?.dao?.tokenMintRecords?.nodes?.length > 0) {
+      daoTokenMintRunningResult.data?.dao?.tokenMintRecords?.nodes?.forEach((r) => {
+        if (r?.datum?.status === 1)
+          mutationSyncTokenMintRecordEvent({ variables: { recordId: r?.datum?.id || '' } });
+      });
       setLoadingTransferComplete(true);
-  }, [daoTokenMintRunningResult.data?.dao?.tokenMintRecords?.nodes]);
+    }
+  }, [
+    daoTokenMintRunningResult.data?.dao?.tokenMintRecords?.nodes,
+    mutationSyncTokenMintRecordEvent,
+  ]);
 
   useEffect(() => {
     if (!tokenContract || !daoId) return;
@@ -299,10 +324,11 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
           console.log(tx);
           setMintButtonLoading(false);
           setPreviewMint(false);
+          setCacheMintRecordBindTxHash(mintRecordId, tx.hash);
           mutationLinkTxHash({ variables: { recordId: mintRecordId, mintTxHash: tx.hash } }).then(
             () => {
               setLoadingTransferComplete(true);
-              // event
+              clearCacheMintRecordBingTxHash();
               tx.wait().then((receipt: any) => {
                 console.log(receipt);
                 setLoadingTransferComplete(false);
@@ -325,6 +351,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
     createTokenMintMutationResult.loading,
     currentMintBody,
     intl,
+    mutationDropMintRecord,
     mutationLinkTxHash,
     tokenContract,
   ]);
@@ -379,12 +406,22 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
         daoId,
         tokenContractAddress: tokenAddress,
         chainId: EthereumChainId[network],
-        first: 10,
+        first: 100,
         offset: 0,
       },
     });
     setMintRecordModal(true);
   }, [daoId, network, queryDaoTokenMintRecords, tokenAddress]);
+
+  const handlerRefreshInitMintRecord = useCallback(
+    async (record: TokenMintRecordQuery) => {
+      // MAYBE: check history auto bind tx_hash
+      await mutationFindLostTxForInitTokenMintRecord({
+        variables: { recordId: record.datum?.id || '' },
+      });
+    },
+    [mutationFindLostTxForInitTokenMintRecord],
+  );
 
   const mintRecordColumns = useMemo(() => {
     return [
@@ -437,30 +474,47 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
             };
           return (
             <Space size={'small'} direction={'vertical'}>
-              <Popover content={manuallyBind(record?.datum?.id || '')} trigger="click">
-                <Button loading={linkTxHashResult.loading || false} type={'primary'}>
+              {!findLostTxForInitTokenMintRecordResult.data ? (
+                <Button
+                  onClick={() => handlerRefreshInitMintRecord(record)}
+                  loading={findLostTxForInitTokenMintRecordResult.loading || false}
+                  type={'primary'}
+                >
                   {intl.formatMessage({
-                    id: 'pages.dao.config.tab.token.mint.records.table.column.operation.bind_tx',
+                    id: 'pages.dao.config.tab.token.mint.records.table.column.operation.refresh',
                   })}
                 </Button>
-              </Popover>
-              <Popconfirm
-                title="Are you sure？"
-                okText="Yes"
-                cancelText="No"
-                onConfirm={async () => {
-                  await mutationDropMintRecord({ variables: { recordId: record.datum?.id || '' } });
-                  setMintRecordModal(false);
-                  if (daoTokenMintRunningResult && daoTokenMintRunningResult.refetch)
-                    await daoTokenMintRunningResult.refetch();
-                }}
-              >
-                <Button loading={dropMintRecordResult.loading || false}>
-                  {intl.formatMessage({
-                    id: 'pages.dao.config.tab.token.mint.records.table.column.operation.delete',
-                  })}
-                </Button>
-              </Popconfirm>
+              ) : (
+                <>
+                  <Popover content={manuallyBind(record?.datum?.id || '')} trigger="click">
+                    <Button loading={linkTxHashResult.loading || false} type={'primary'}>
+                      {intl.formatMessage({
+                        id: 'pages.dao.config.tab.token.mint.records.table.column.operation.bind_tx',
+                      })}
+                    </Button>
+                  </Popover>
+
+                  <Popconfirm
+                    title="Are you sure？"
+                    okText="Yes"
+                    cancelText="No"
+                    onConfirm={async () => {
+                      await mutationDropMintRecord({
+                        variables: { recordId: record.datum?.id || '' },
+                      });
+                      setMintRecordModal(false);
+                      if (daoTokenMintRunningResult && daoTokenMintRunningResult.refetch)
+                        await daoTokenMintRunningResult.refetch();
+                    }}
+                  >
+                    <Button loading={dropMintRecordResult.loading || false}>
+                      {intl.formatMessage({
+                        id: 'pages.dao.config.tab.token.mint.records.table.column.operation.delete',
+                      })}
+                    </Button>
+                  </Popconfirm>
+                </>
+              )}
             </Space>
           );
         },
@@ -469,6 +523,9 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
   }, [
     daoTokenMintRunningResult,
     dropMintRecordResult.loading,
+    findLostTxForInitTokenMintRecordResult.data,
+    findLostTxForInitTokenMintRecordResult.loading,
+    handlerRefreshInitMintRecord,
     intl,
     linkTxHashResult.loading,
     manuallyBind,

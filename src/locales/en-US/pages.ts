@@ -261,6 +261,7 @@ export default {
   'pages.dao.config.tab.token.mint.records.table.column.operation.bind_tx':
     'Manually bind transaction',
   'pages.dao.config.tab.token.mint.records.table.column.operation.delete': 'Delete',
+  'pages.dao.config.tab.token.mint.records.table.column.operation.refresh': 'Refresh Status',
   'pages.dao.config.tab.token.mint.records.table.column.operation.bind_tx.input_pla':
     'Example: 0xb93f1d5a80c03ac3bcf32c63d055d3952cdef66fac2142ea32eea0a3758ea37d',
   'pages.dao.config.tab.token.mint.records.table.column.operation.bind_tx.save': 'Save',
