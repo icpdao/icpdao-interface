@@ -5,10 +5,12 @@ import type { CycleQuery, SplitInfo, TokenMintRecordQuery } from '@/services/dao
 import {
   useCreateTokenMintMutation,
   useCyclesByTokenUnreleasedListLazyQuery,
+  useDaoTokenMintDropLazyQuery,
   useDaoTokenMintRecordsLazyQuery,
   useDaoTokenMintRunningLazyQuery,
   useDaoTokenMintSplitInfoLazyQuery,
   useDropMintRecordMutation,
+  useFindLostTxForDropTokenMintRecordMutation,
   useFindLostTxForInitTokenMintRecordMutation,
   useLinkTxHashMutation,
   useSyncTokenMintRecordEventMutation,
@@ -141,9 +143,11 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
     useDaoTokenMintSplitInfoLazyQuery({ fetchPolicy: 'no-cache' });
 
   const [queryDaoTokenMintRecords, daoTokenMintRecordsResult] = useDaoTokenMintRecordsLazyQuery();
+  const [queryDaoTokenMintDrop, daoTokenMintDropResult] = useDaoTokenMintDropLazyQuery();
 
   const [mutationCreateTokenMintMutation, createTokenMintMutationResult] =
     useCreateTokenMintMutation();
+  const [mutationFindLostTxForDropTokenMintRecord] = useFindLostTxForDropTokenMintRecordMutation();
   const [mutationLinkTxHash, linkTxHashResult] = useLinkTxHashMutation();
   const [mutationDropMintRecord, dropMintRecordResult] = useDropMintRecordMutation();
   const [mutationSyncTokenMintRecordEvent] = useSyncTokenMintRecordEventMutation();
@@ -165,7 +169,39 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
     queryDaoTokenMintRunning({
       variables: { daoId, tokenContractAddress: tokenAddress, chainId: EthereumChainId[network] },
     });
-  }, [daoId, network, queryDaoTokenMintRunning, tokenAddress]);
+    queryDaoTokenMintDrop({
+      variables: { daoId, tokenContractAddress: tokenAddress, chainId: EthereumChainId[network] },
+    });
+  }, [daoId, network, queryDaoTokenMintDrop, queryDaoTokenMintRunning, tokenAddress]);
+
+  useEffect(() => {
+    if (
+      !daoId ||
+      !tokenAddress ||
+      tokenAddress === ZeroAddress ||
+      daoTokenMintDropResult.loading ||
+      daoTokenMintDropResult.error ||
+      !daoTokenMintDropResult.data
+    )
+      return;
+    if (
+      daoTokenMintDropResult.data.dao?.tokenMintRecords?.nodes &&
+      daoTokenMintDropResult.data.dao?.tokenMintRecords?.nodes?.length > 0
+    ) {
+      mutationFindLostTxForDropTokenMintRecord({
+        variables: { daoId, tokenContractAddress: tokenAddress, chainId: EthereumChainId[network] },
+      });
+    }
+  }, [
+    daoId,
+    daoTokenMintDropResult.data,
+    daoTokenMintDropResult.data?.dao?.tokenMintRecords?.nodes,
+    daoTokenMintDropResult.error,
+    daoTokenMintDropResult.loading,
+    mutationFindLostTxForDropTokenMintRecord,
+    network,
+    tokenAddress,
+  ]);
 
   useEffect(() => {
     if (

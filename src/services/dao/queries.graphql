@@ -736,6 +736,24 @@ query DAOTokenMintRunning($daoId: String!, $tokenContractAddress: String!, $chai
   }
 }
 
+query DAOTokenMintDrop($daoId: String!, $tokenContractAddress: String!, $chainId: String!) {
+  dao(id: $daoId) {
+    tokenMintRecords(tokenContractAddress: $tokenContractAddress, chainId: $chainId, status: [DROPED]) {
+      nodes {
+        datum {
+          id
+          daoId
+          tokenContractAddress
+          status
+          totalRealSize
+          createAt
+          updateAt
+        }
+      }
+    }
+  }
+}
+
 query DAOIcppers($daoId: String!, $sorted: IcppersQuerySortedEnum!, $sortedType: IcppersQuerySortedTypeEnum!, $first: Int!, $offset: Int!) {
   dao(id: $daoId) {
     icppers(sorted: $sorted, sortedType: $sortedType, first: $first, offset: $offset) {

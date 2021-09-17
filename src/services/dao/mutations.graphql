@@ -193,6 +193,12 @@ mutation FindLostTxForInitTokenMintRecord($recordId: String!) {
   }
 }
 
+mutation FindLostTxForDropTokenMintRecord($daoId: String!, $tokenContractAddress: String!, $chainId: String!) {
+  findLostTxForDropTokenMintRecord(chainId: $chainId, tokenContractAddress: $tokenContractAddress, daoId: $daoId) {
+    ok
+  }
+}
+
 mutation UpdateVoteConfirm($cycleId: String!, $signatureAddress: String!, $signatureMsg: String!, $signature: String!) {
   updateVoteConfirm(cycleId: $cycleId, signatureAddress: $signatureAddress, signatureMsg: $signatureMsg, signature: $signature) {
     ok
