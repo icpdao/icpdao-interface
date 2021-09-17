@@ -1,6 +1,6 @@
 import { DAOTokenContract } from './index';
 import { ERC20Connect } from '@/services/ethereum-connect/erc20';
-import { ETH_CONNECT } from '@/services/ethereum-connect/typings';
+import type { ETH_CONNECT } from '@/services/ethereum-connect/typings';
 import { WETH9 } from '@uniswap/sdk-core';
 
 export class DAOTokenConnect extends ERC20Connect {

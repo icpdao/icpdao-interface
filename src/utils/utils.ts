@@ -56,6 +56,24 @@ export const clearUserProfile = () => {
   setUserProfile({});
 };
 
+export const getCacheMintRecordBindTxHash = () => {
+  return JSON.parse(window.localStorage.getItem('cache_mint_record_bind_tx_hash') || '{}');
+};
+
+export const setCacheMintRecordBindTxHash = (recordId: string, txHash: string) => {
+  return window.localStorage.setItem(
+    'cache_mint_record_bind_tx_hash',
+    JSON.stringify({
+      recordId,
+      txHash,
+    }),
+  );
+};
+
+export const clearCacheMintRecordBingTxHash = () => {
+  return window.localStorage.setItem('cache_mint_record_bind_tx_hash', JSON.stringify({}));
+};
+
 export const setHistoryBack = (params: any) => {
   return window.localStorage.setItem('history_back', JSON.stringify(params));
 };

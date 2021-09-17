@@ -1,24 +1,24 @@
-import { DAOFactoryContract, getMetamaskProvider, getProvider } from './index';
+import { BaseEthereumConnect, DAOFactoryContract, ZeroAddress } from './index';
 import type { ETH_CONNECT } from './typings';
 import type { BigNumber } from 'ethers';
 import { ethers } from 'ethers';
 
-export class DAOFactoryConnect {
-  provider: any;
-  metamaskProvider: any;
-  contract: any;
-  actionContract: any;
-
+export class DAOFactoryConnect extends BaseEthereumConnect {
   constructor(network: string, metamaskProvider: any) {
-    this.provider = getProvider(network);
-    this.metamaskProvider = getMetamaskProvider(metamaskProvider);
+    super(network, metamaskProvider);
+    console.log({ network, metamaskProvider });
     this.contract = DAOFactoryContract(this.provider);
     this.actionContract = DAOFactoryContract(this.metamaskProvider);
   }
 
   async getTokenAddress(ethDAOId: string) {
     console.log({ ethDAOId });
-    return await this.contract.tokens(ethDAOId);
+    // cause different network, so, should try/catch this place
+    try {
+      return await this.contract.tokens(ethDAOId);
+    } catch (e) {
+      return ZeroAddress;
+    }
   }
 
   async createToken(body: ETH_CONNECT.CreateToken) {
