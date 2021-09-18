@@ -134,8 +134,67 @@ mutation UpdateVotePairPublic($voteId: String!, $isPublic: Boolean!) {
   }
 }
 
-mutation MarkCyclesTokenReleased($daoId: String!, $cycleIds: [String]!, $unitSizeValue: String!) {
-  markCyclesTokenReleased(daoId: $daoId, cycleIds: $cycleIds, unitSizeValue: $unitSizeValue) {
+#mutation MarkCyclesTokenReleased($daoId: String!, $cycleIds: [String]!, $unitSizeValue: String!) {
+#  markCyclesTokenReleased(daoId: $daoId, cycleIds: $cycleIds, unitSizeValue: $unitSizeValue) {
+#    ok
+#  }
+#}
+
+mutation CreateTokenMint(
+  $daoId: String!, $startCycleId: String!, $endCycleId: String!,
+  $tokenContractAddress: String!,
+  $startTimestamp: Int!, $endTimestamp: Int!, $tickLower: Int!, $tickUpper: Int!, $chainId: String!) {
+  createTokenMintRecord(daoId: $daoId, startCycleId: $startCycleId, endCycleId: $endCycleId, tokenContractAddress: $tokenContractAddress, startTimestamp: $startTimestamp, endTimestamp: $endTimestamp, tickLower: $tickLower, tickUpper: $tickUpper, chainId: $chainId) {
+    tokenMintRecord {
+      id
+      daoId
+      tokenContractAddress
+      status
+      mintTxHash
+      totalRealSize
+      createAt
+      updateAt
+    }
+  }
+}
+
+mutation LinkTxHash($recordId: String!, $mintTxHash: String!) {
+  linkTxHashForTokenMintRecord(id: $recordId, mintTxHash: $mintTxHash) {
+    tokenMintRecord {
+      id
+      daoId
+      tokenContractAddress
+      status
+      mintTxHash
+      totalRealSize
+      createAt
+      updateAt
+    }
+  }
+}
+
+mutation DropMintRecord($recordId: String!) {
+  dropTokenMintRecord(id: $recordId) {
+    ok
+  }
+}
+
+mutation SyncTokenMintRecordEvent($recordId: String!) {
+  syncTokenMintRecordEvent(id: $recordId) {
+    ok
+  }
+}
+
+mutation FindLostTxForInitTokenMintRecord($recordId: String!) {
+  findLostTxForInitTokenMintRecord(id: $recordId) {
+    tokenMintRecord {
+      status
+    }
+  }
+}
+
+mutation FindLostTxForDropTokenMintRecord($daoId: String!, $tokenContractAddress: String!, $chainId: String!) {
+  findLostTxForDropTokenMintRecord(chainId: $chainId, tokenContractAddress: $tokenContractAddress, daoId: $daoId) {
     ok
   }
 }

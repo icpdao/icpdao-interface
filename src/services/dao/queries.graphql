@@ -655,8 +655,8 @@ query UserCycleIcpperStatList($daoName: String!, $userName: String!, $first: Int
   }
 }
 
-query CyclesByTokenUnreleasedList($lastTimestamp: Int!) {
-  cyclesByTokenUnreleased(lastTimestamp: $lastTimestamp) {
+query CyclesByTokenUnreleasedList($daoId: String!, $lastTimestamp: Int!) {
+  cyclesByTokenUnreleased(daoId: $daoId, lastTimestamp: $lastTimestamp) {
     nodes {
       datum {
         id
@@ -679,6 +679,75 @@ query CyclesByTokenUnreleasedList($lastTimestamp: Int!) {
             nickname
             erc20Address
           }
+        }
+      }
+    }
+  }
+}
+
+query DAOTokenMintSplitInfo($daoId: String!, $startCycleId: String!, $endCycleId: String!) {
+  dao(id: $daoId) {
+    tokenMintSplitInfo(startCycleId: $startCycleId, endCycleId: $endCycleId) {
+      splitInfos {
+        userId
+        userNickname
+        userGithubLogin
+        userAvatar
+        userErc20Address
+        ratio
+      }
+    }
+  }
+}
+
+query DAOTokenMintRecords($daoId: String!, $tokenContractAddress: String!, $chainId: String!, $first: Int!, $offset: Int!) {
+  dao(id: $daoId) {
+    tokenMintRecords(tokenContractAddress: $tokenContractAddress, chainId: $chainId, first: $first, offset: $offset, status: [INIT, PENDING, SUCCESS, FAIL]) {
+      nodes {
+        datum {
+          id
+          daoId
+          tokenContractAddress
+          status
+          totalRealSize
+          createAt
+          updateAt
+        }
+      }
+    }
+  }
+}
+
+query DAOTokenMintRunning($daoId: String!, $tokenContractAddress: String!, $chainId: String!) {
+  dao(id: $daoId) {
+    tokenMintRecords(tokenContractAddress: $tokenContractAddress, chainId: $chainId, status: [INIT, PENDING]) {
+      nodes {
+        datum {
+          id
+          daoId
+          tokenContractAddress
+          status
+          totalRealSize
+          createAt
+          updateAt
+        }
+      }
+    }
+  }
+}
+
+query DAOTokenMintDrop($daoId: String!, $tokenContractAddress: String!, $chainId: String!) {
+  dao(id: $daoId) {
+    tokenMintRecords(tokenContractAddress: $tokenContractAddress, chainId: $chainId, status: [DROPED]) {
+      nodes {
+        datum {
+          id
+          daoId
+          tokenContractAddress
+          status
+          totalRealSize
+          createAt
+          updateAt
         }
       }
     }
