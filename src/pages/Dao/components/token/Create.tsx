@@ -239,6 +239,14 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
                 showRemoveIcon: true,
                 downloadIcon: <ZoomInOutlined onClick={() => setPreviewGenesis(true)} />,
               }}
+              customRequest={({ file, onSuccess }) => {
+                if (onSuccess) onSuccess(file, {} as any);
+                return {
+                  abort() {
+                    console.log('upload progress is aborted.');
+                  },
+                };
+              }}
               accept={allowUploadGenesisFileType.join(',')}
             >
               <Button icon={<UploadOutlined />}>
