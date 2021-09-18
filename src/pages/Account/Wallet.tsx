@@ -6,7 +6,7 @@ import GlobalBreadcrumb from '@/components/Breadcrumb';
 import { HomeOutlined } from '@ant-design/icons';
 import { useModel } from '@@/plugin-model/useModel';
 import { Form, Input, Button } from 'antd';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { updateUserProfile } from '@/services/icpdao-interface/user';
 import PermissionErrorPage from '@/pages/Result/403';
 import { useAccess } from '@@/plugin-access/access';
@@ -17,6 +17,23 @@ export default (): ReactNode => {
   const [form] = Form.useForm();
   const { isLogin } = useAccess();
   const [submitButtonLoading, setSubmitButtonLoading] = useState(false);
+  const [initAddress, setInitAddress] = useState<string>();
+
+  useEffect(() => {
+    setInitAddress(initialState?.currentUser()?.profile?.erc20_address || '');
+  }, [initialState]);
+
+  const handleSubmitWallet = useCallback(
+    async (values: { erc20Address: string }) => {
+      setSubmitButtonLoading(true);
+      await updateUserProfile({ erc20_address: values.erc20Address });
+      setInitAddress(values.erc20Address);
+      if (initialState?.fetchUserInfo) await initialState.fetchUserInfo();
+      setSubmitButtonLoading(false);
+      return true;
+    },
+    [setSubmitButtonLoading, initialState],
+  );
 
   if (!initialState) {
     return <PageLoading />;
@@ -40,17 +57,6 @@ export default (): ReactNode => {
     },
   ];
 
-  const handleSubmitWallet = useCallback(
-    async (values: { erc20Address: string }) => {
-      setSubmitButtonLoading(true);
-      await updateUserProfile({ erc20_address: values.erc20Address });
-      if (initialState.fetchUserInfo) await initialState.fetchUserInfo();
-      setSubmitButtonLoading(false);
-      return true;
-    },
-    [setSubmitButtonLoading, initialState],
-  );
-
   return (
     <PageContainer
       ghost
@@ -66,7 +72,7 @@ export default (): ReactNode => {
         labelCol={{ span: 3 }}
         wrapperCol={{ span: 15 }}
         name="walletForm"
-        initialValues={{ erc20Address: initialState.currentUser()?.profile?.erc20_address || '' }}
+        initialValues={{ erc20Address: initAddress }}
         onFinish={handleSubmitWallet}
       >
         <Form.Item
