@@ -15,7 +15,7 @@ import {
   useUpdatePairVoteMutation,
   useUpdateVoteConfirmMutation,
 } from '@/services/dao/generated';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import StatCard from '@/components/StatCard';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { Button, Card, message, Pagination, Row, Tooltip } from 'antd';
@@ -44,6 +44,7 @@ const allTypeVote = (
   pair: JobItemQuery,
   voted: CycleVoteResultTypeAllResultTypeEnum,
   updateVote: (voteId: string, voted: boolean) => void,
+  voteLoading: boolean | undefined,
 ) => {
   let leftButtonColor: string = '';
   let rightButtonColor: string = '';
@@ -61,7 +62,7 @@ const allTypeVote = (
   }
 
   return (
-    <Card className={styles.allTypeVoteCard} key={voteId}>
+    <Card className={styles.allTypeVoteCard} key={voteId} loading={voteLoading || false}>
       <div className={styles.allTypeVoteContent}>
         <Row>{pair?.user?.nickname}</Row>
         <Row>
@@ -98,6 +99,7 @@ const pairTypeVote = (
   rightPair: JobItemQuery,
   voted: string,
   updateVote: (voteId: string, voteJobId: string) => void,
+  voteLoading: boolean | undefined,
 ) => {
   return (
     <div key={voteId} className={styles.pairTypeVoteCards}>
@@ -105,6 +107,7 @@ const pairTypeVote = (
         className={styles.pairTypeVoteCard}
         hoverable={voted !== leftPair.datum?.id}
         onClick={() => updateVote(voteId, leftPair.datum?.id || '')}
+        loading={voteLoading || false}
       >
         <div className={styles.pairTypeVoteContent}>
           <Row>{leftPair?.user?.nickname}</Row>
@@ -157,6 +160,7 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
   const { cycleId, daoId } = props.match.params;
   const intl = useIntl();
   const [confirmButtonLoading, setConfirmButtonLoading] = useState<boolean>(false);
+  const [voteLoading] = useState<Record<string, boolean>>({});
   const { initialState } = useModel('@@initialState');
   const { isConnected, metamaskProvider, event$ } = useModel('useWalletModel');
   const [queryVariables, setQueryVariables] = useState<DaoCycleVoteListQueryVariables>({
@@ -168,36 +172,58 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
     variables: queryVariables,
     fetchPolicy: 'no-cache',
   });
-  const [updateAllVoteMutation] = useUpdateAllVoteMutation();
-  const [updatePairVoteMutation] = useUpdatePairVoteMutation();
+  const [updateAllVoteMutation, updateAllVoteResult] = useUpdateAllVoteMutation();
+  const [updatePairVoteMutation, updatePairVoteResult] = useUpdatePairVoteMutation();
   const [updateVoteConfirm] = useUpdateVoteConfirmMutation();
 
   const updateAllVote = useCallback(
     async (voteId: string, voted: boolean) => {
+      if (data?.cycle?.votes?.confirm === true) {
+        message.warn(intl.formatMessage({ id: 'pages.dao.vote.already_confirm' }));
+        return;
+      }
       try {
-        const uam = await updateAllVoteMutation({ variables: { voteId, vote: voted } });
+        await updateAllVoteMutation({ variables: { voteId, vote: voted } });
         await refetch();
-        if (uam.data?.updateAllVote?.ok) message.success('Voted');
-        else message.error('Vote Failed');
       } catch (e) {
-        message.error('Vote Failed');
+        console.log('Vote Failed');
       }
     },
-    [refetch, updateAllVoteMutation],
+    [data?.cycle?.votes?.confirm, intl, refetch, updateAllVoteMutation],
   );
   const updatePairVote = useCallback(
     async (voteId: string, voteJobId: string) => {
+      if (data?.cycle?.votes?.confirm === true) {
+        message.warn(intl.formatMessage({ id: 'pages.dao.vote.already_confirm' }));
+        return;
+      }
       try {
-        const uam = await updatePairVoteMutation({ variables: { voteId, voteJobId } });
+        await updatePairVoteMutation({ variables: { voteId, voteJobId } });
         await refetch();
-        if (uam.data?.updatePairVote?.ok) message.success('Voted');
-        else message.error('Vote Failed');
       } catch (e) {
-        message.error('Vote Failed');
+        console.log('Vote Failed');
       }
     },
-    [refetch, updatePairVoteMutation],
+    [data?.cycle?.votes?.confirm, intl, refetch, updatePairVoteMutation],
   );
+
+  useEffect(() => {
+    if (
+      updatePairVoteResult.data?.updatePairVote?.ok === true ||
+      updateAllVoteResult.data?.updateAllVote?.ok === true
+    )
+      message.success(intl.formatMessage({ id: 'pages.dao.vote.success' }));
+    if (
+      updatePairVoteResult.data?.updatePairVote?.ok === false ||
+      updateAllVoteResult.data?.updateAllVote?.ok === false
+    )
+      message.success(intl.formatMessage({ id: 'pages.dao.vote.failed' }));
+  }, [
+    intl,
+    updateAllVoteResult.data?.updateAllVote?.ok,
+    updatePairVoteResult.data?.updatePairVote?.ok,
+  ]);
+
   const access = useAccess();
   const changePage = useCallback((page: number) => {
     setQueryVariables((old) => ({
@@ -221,6 +247,7 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
             v.rightJob as JobItemQuery,
             v.voteJob?.datum?.id || '',
             updatePairVote,
+            voteLoading[v.datum.id || ''],
           ),
         );
       }
@@ -234,6 +261,7 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
             v.leftJob as JobItemQuery,
             v.selfVoteResultTypeAll as CycleVoteResultTypeAllResultTypeEnum,
             updateAllVote,
+            voteLoading[v.datum.id || ''],
           ),
         );
       }
