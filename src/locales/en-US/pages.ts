@@ -411,6 +411,10 @@ export default {
   'pages.dao.vote.pair.desc': 'Please choose the job you think is higher effciency.',
   'pages.dao.vote.sign.disagree_wallet':
     'Please sign the submission using the wallet address saved in the user profile.',
+  'pages.dao.vote.already_confirm':
+    'The ballot signature has been submitted and cannot be modified.',
+  'pages.dao.vote.success': 'Vote success',
+  'pages.dao.vote.failed': 'Failed vote, Please try again',
   'pages.dao.explore.table.filter.all': 'All',
   'pages.dao.explore.table.filter.following': 'Following',
   'pages.dao.explore.table.filter.following_and_owner': 'My dao',
