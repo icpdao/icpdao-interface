@@ -408,7 +408,9 @@ export default {
   'pages.dao.vote.submit.tips':
     'Please Signatures and submit the results after voting，and the voting ends after {end_left_times}',
   'pages.dao.vote.all.desc': 'Do you think the size of the contribution is reasonable? ',
-  'pages.dao.vote.pair.desc': 'Please choose the job you think is higher effciency .',
+  'pages.dao.vote.pair.desc': 'Please choose the job you think is higher effciency.',
+  'pages.dao.vote.sign.disagree_wallet':
+    'Please sign the submission using the wallet address saved in the user profile.',
   'pages.dao.explore.table.filter.all': 'All',
   'pages.dao.explore.table.filter.following': 'Following',
   'pages.dao.explore.table.filter.following_and_owner': 'My dao',
