@@ -367,7 +367,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
               clearCacheMintRecordBingTxHash();
               tx.wait().then((receipt: any) => {
                 console.log(receipt);
-                setLoadingTransferComplete(false);
+                // setLoadingTransferComplete(false);
               });
             },
           );
@@ -375,7 +375,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
         .catch(() => {
           mutationDropMintRecord({ variables: { recordId: mintRecordId } });
           setMintButtonLoading(false);
-          setLoadingTransferComplete(false);
+          // setLoadingTransferComplete(false);
         });
     } else {
       message.warn(
@@ -448,6 +448,17 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
     });
     setMintRecordModal(true);
   }, [daoId, network, queryDaoTokenMintRecords, tokenAddress]);
+
+  useEffect(() => {
+    const successRecord = daoTokenMintRecordsResult.data?.dao?.tokenMintRecords?.nodes?.filter(
+      (tmr) => tmr?.datum?.status === 2,
+    );
+    if (
+      successRecord &&
+      successRecord.length === daoTokenMintRecordsResult.data?.dao?.tokenMintRecords?.nodes?.length
+    )
+      setLoadingTransferComplete(false);
+  }, [daoTokenMintRecordsResult.data?.dao?.tokenMintRecords?.nodes]);
 
   const handlerRefreshInitMintRecord = useCallback(
     async (record: TokenMintRecordQuery) => {
@@ -567,6 +578,14 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
     manuallyBind,
     mutationDropMintRecord,
   ]);
+
+  const previewModalDisabledOk = useMemo(() => {
+    return (
+      daoTokenMintSplitInfoResult.data?.dao?.tokenMintSplitInfo?.splitInfos?.filter((d) => {
+        return !d?.userErc20Address;
+      }).length !== 0 || false
+    );
+  }, [daoTokenMintSplitInfoResult.data?.dao?.tokenMintSplitInfo?.splitInfos]);
 
   if (
     cyclesByTokenUnreleasedListResult.loading ||
@@ -717,6 +736,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
         okText={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.modal.ok' })}
         cancelText={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.modal.cancel' })}
         onCancel={() => setPreviewMint(false)}
+        disabledOk={previewModalDisabledOk}
       >
         <Table
           columns={previewTableColumns}
