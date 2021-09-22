@@ -21,6 +21,7 @@ declare namespace API {
     nickname?: string;
     avatar?: string;
     github_login?: string;
+    github_user_id?: number;
     status?: UserStatus;
     icppership?: IcpperShip;
     erc20_address?: string;

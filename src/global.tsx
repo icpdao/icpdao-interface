@@ -1,6 +1,8 @@
 import { Button, message, notification } from 'antd';
 import { useIntl } from 'umi';
 import defaultSettings from '../config/defaultSettings';
+import * as Sentry from '@sentry/react';
+import { Integrations } from '@sentry/tracing';
 
 const { pwa } = defaultSettings;
 const isHttps = document.location.protocol === 'https:';
@@ -80,4 +82,22 @@ if (pwa) {
       });
     });
   }
+}
+
+if (window.document.location.hostname === TEST_ENV_HOSTNAME) {
+  Sentry.init({
+    dsn: REACT_APP_ICPDAO_SENTRY_DSN,
+    integrations: [new Integrations.BrowserTracing()],
+    tracesSampleRate: 1.0,
+    environment: 'test',
+  });
+}
+
+if (window.document.location.hostname === PROD_ENV_HOSTNAME) {
+  Sentry.init({
+    dsn: REACT_APP_ICPDAO_SENTRY_DSN,
+    integrations: [new Integrations.BrowserTracing()],
+    tracesSampleRate: 1.0,
+    environment: 'prod',
+  });
 }

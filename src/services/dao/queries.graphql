@@ -234,6 +234,7 @@ query JobList($beginTime: Int, $endTime: Int, $daoName: String!, $first: Int, $o
     job {
       node {
         id
+        userId
         title
         size
         status
@@ -251,6 +252,8 @@ query JobList($beginTime: Int, $endTime: Int, $daoName: String!, $first: Int, $o
         githubPrNumber
         isAutoCreatePr
         githubPrId
+        mergedAt
+        mergedUserGithubUserId
       }
     }
     stat {

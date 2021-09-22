@@ -8,16 +8,17 @@ import { PageLoading } from '@ant-design/pro-layout';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { useModel } from '@@/plugin-model/useModel';
 import { getCurrentPage } from '@/utils/utils';
-import { EyeOutlined } from '@ant-design/icons';
+import { ArrowUpOutlined, EyeOutlined } from '@ant-design/icons';
 import { renderJobTag } from '@/utils/pageHelper';
 
-export const defaultPageSize = 30;
+export const defaultPageSize = 10;
 
 interface JobTableProps {
   jobQueryVar: JobListQueryVariables;
   setJobQueryVar: Dispatch<SetStateAction<JobListQueryVariables>>;
   jobList: any;
   openViewModal: (record: Job) => void;
+  openAdjustSizeModal: (record: Job, status: 'increase' | 'decrease') => void;
 }
 
 const OtherUserJobTable: React.FC<JobTableProps> = ({
@@ -25,6 +26,7 @@ const OtherUserJobTable: React.FC<JobTableProps> = ({
   setJobQueryVar,
   jobList,
   openViewModal,
+  openAdjustSizeModal,
 }) => {
   const intl = useIntl();
   const { initialState } = useModel('@@initialState');
@@ -101,8 +103,16 @@ const OtherUserJobTable: React.FC<JobTableProps> = ({
       title: intl.formatMessage({ id: 'pages.job.table.operation' }),
       dataIndex: 'operation',
       render: (_: any, record: Job) => {
+        const reviewers: number[] = record.prs?.map((pr) => pr?.mergedUserGithubUserId || 0) || [];
         return (
           <Space>
+            {record.node?.status !== undefined &&
+              record.node.status === 1 &&
+              reviewers.includes(initialState.currentUser()?.profile?.github_user_id) && (
+                <Typography.Link onClick={() => openAdjustSizeModal(record, 'increase')}>
+                  <ArrowUpOutlined />
+                </Typography.Link>
+              )}
             <Typography.Link onClick={() => openViewModal(record)}>
               <EyeOutlined />
             </Typography.Link>
