@@ -363,7 +363,7 @@ export default {
   'pages.dao.component.dao_cycle_icpper.tips.3':
     "As the EI is below 0.4 for 2 times,  the review's size is deducted by half of the total size of his merge jobs.",
   'pages.dao.component.dao_cycle_icpper.tips.4':
-    'As the voting in this cycle not completed on time, the total size will be reduced by half.',
+    'As the voting in this cycle not completed on time, the total size will be zero.',
   'pages.dao.component.dao_cycle_icpper.tips.5':
     'The community thinks the SIZE is too low and suggests raising it next time',
   'pages.dao.component.dao_cycle_icpper.tips.6':
