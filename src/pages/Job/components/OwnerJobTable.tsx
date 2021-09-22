@@ -6,7 +6,7 @@ import type { Job, JobListQueryVariables } from '@/services/dao/generated';
 import { JobSortedEnum, SortedTypeEnum, useDeleteJobMutation } from '@/services/dao/generated';
 import { PageLoading } from '@ant-design/pro-layout';
 import { useIntl } from '@@/plugin-locale/localeExports';
-import { DeleteFilled, EditFilled, EyeOutlined } from '@ant-design/icons';
+import { ArrowDownOutlined, DeleteFilled, EditFilled, EyeOutlined } from '@ant-design/icons';
 import { useModel } from '@@/plugin-model/useModel';
 import { getCurrentPage } from '@/utils/utils';
 import { renderJobTag } from '@/utils/pageHelper';
@@ -19,6 +19,7 @@ interface JobTableProps {
   getJobList: any;
   openEditModal: (record: Job) => void;
   openViewModal: (record: Job) => void;
+  openAdjustSizeModal: (record: Job, status: 'increase' | 'decrease') => void;
 }
 
 const OwnerJobTable: React.FC<JobTableProps> = ({
@@ -28,6 +29,7 @@ const OwnerJobTable: React.FC<JobTableProps> = ({
   getJobList,
   openEditModal,
   openViewModal,
+  openAdjustSizeModal,
 }) => {
   const intl = useIntl();
   const { initialState } = useModel('@@initialState');
@@ -66,9 +68,9 @@ const OwnerJobTable: React.FC<JobTableProps> = ({
       await deleteJob({
         variables: { id: record.node?.id || '' },
       });
-      await getJobList();
+      await getJobList({ variables: jobQueryVar });
     },
-    [deleteJob, getJobList],
+    [deleteJob, getJobList, jobQueryVar],
   );
   if (!initialState) {
     return <PageLoading />;
@@ -116,15 +118,19 @@ const OwnerJobTable: React.FC<JobTableProps> = ({
       render: (_: any, record: Job) => {
         return (
           <Space>
-            {record.node?.status !== undefined && record.node.status <= 1 ? (
+            {record.node?.status !== undefined && record.node.status === 0 && (
               <Typography.Link onClick={() => openEditModal(record)}>
                 <EditFilled />
               </Typography.Link>
-            ) : (
-              <Typography.Link onClick={() => openViewModal(record)}>
-                <EyeOutlined />
+            )}
+            {record.node?.status !== undefined && record.node.status === 1 && (
+              <Typography.Link onClick={() => openAdjustSizeModal(record, 'decrease')}>
+                <ArrowDownOutlined />
               </Typography.Link>
             )}
+            <Typography.Link onClick={() => openViewModal(record)}>
+              <EyeOutlined />
+            </Typography.Link>
             {record.node?.status === 0 && (
               <Popconfirm
                 placement={'right'}

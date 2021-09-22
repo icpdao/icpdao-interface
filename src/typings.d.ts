@@ -52,3 +52,6 @@ declare const REACT_APP_ICPDAO_MOCK_URL: string | undefined;
 declare const REACT_APP_ICPDAO_ETHEREUM_INFURA_KEY: string;
 declare const REACT_APP_ICPDAO_ETHEREUM_ALCHEMY_KEY: string;
 declare const REACT_APP_ICPDAO_ETHEREUM_ETHERSCAN_KEY: string;
+declare const REACT_APP_ICPDAO_SENTRY_DSN: string;
+declare const TEST_ENV_HOSTNAME: string;
+declare const PROD_ENV_HOSTNAME: string;

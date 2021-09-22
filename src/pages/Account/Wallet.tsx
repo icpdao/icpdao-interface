@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { PageContainer, PageLoading } from '@ant-design/pro-layout';
+import { PageContainer } from '@ant-design/pro-layout';
 import { FormattedMessage, useIntl } from 'umi';
 import styles from './index.less';
 import GlobalBreadcrumb from '@/components/Breadcrumb';
@@ -17,27 +17,21 @@ export default (): ReactNode => {
   const [form] = Form.useForm();
   const { isLogin } = useAccess();
   const [submitButtonLoading, setSubmitButtonLoading] = useState(false);
-  const [initAddress, setInitAddress] = useState<string>();
 
   useEffect(() => {
-    setInitAddress(initialState?.currentUser()?.profile?.erc20_address || '');
-  }, [initialState]);
+    form.setFieldsValue({ erc20Address: initialState?.currentUser().profile?.erc20_address });
+  }, [form, initialState]);
 
   const handleSubmitWallet = useCallback(
     async (values: { erc20Address: string }) => {
       setSubmitButtonLoading(true);
       await updateUserProfile({ erc20_address: values.erc20Address });
-      setInitAddress(values.erc20Address);
       if (initialState?.fetchUserInfo) await initialState.fetchUserInfo();
       setSubmitButtonLoading(false);
       return true;
     },
     [setSubmitButtonLoading, initialState],
   );
-
-  if (!initialState) {
-    return <PageLoading />;
-  }
 
   if (!isLogin()) {
     return <PermissionErrorPage />;
@@ -72,7 +66,6 @@ export default (): ReactNode => {
         labelCol={{ span: 3 }}
         wrapperCol={{ span: 15 }}
         name="walletForm"
-        initialValues={{ erc20Address: initAddress }}
         onFinish={handleSubmitWallet}
       >
         <Form.Item

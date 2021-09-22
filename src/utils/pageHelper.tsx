@@ -75,25 +75,63 @@ export const renderJobTag = (intl: any, status: number | undefined) => {
   switch (status) {
     case 0:
       return (
-        <Tag color="magenta">
-          {intl.formatMessage({ id: 'pages.job.table.tag.awaiting_merger' })}
-        </Tag>
+        <Tooltip
+          placement={'right'}
+          title={intl.formatMessage({ id: 'pages.job.table.tips.awaiting_merger' })}
+        >
+          <Tag color="magenta">
+            {intl.formatMessage({ id: 'pages.job.table.tag.awaiting_merger' })}
+          </Tag>
+        </Tooltip>
       );
     case 1:
-      return <Tag color="orange">{intl.formatMessage({ id: 'pages.job.table.tag.merged' })}</Tag>;
+      return (
+        <Tooltip
+          placement={'right'}
+          title={intl.formatMessage({ id: 'pages.job.table.tips.merged' })}
+        >
+          <Tag color="orange">{intl.formatMessage({ id: 'pages.job.table.tag.merged' })}</Tag>
+        </Tooltip>
+      );
     case 2:
       return (
-        <Tag color="green">{intl.formatMessage({ id: 'pages.job.table.tag.awaiting_voting' })}</Tag>
+        <Tooltip
+          placement={'right'}
+          title={intl.formatMessage({ id: 'pages.job.table.tips.awaiting_voting' })}
+        >
+          <Tag color="green">
+            {intl.formatMessage({ id: 'pages.job.table.tag.awaiting_voting' })}
+          </Tag>
+        </Tooltip>
       );
     case 3:
       return (
-        <Tag color="blue">{intl.formatMessage({ id: 'pages.job.table.tag.waiting_token' })}</Tag>
+        <Tooltip
+          placement={'right'}
+          title={intl.formatMessage({ id: 'pages.job.table.tips.waiting_token' })}
+        >
+          <Tag color="blue">{intl.formatMessage({ id: 'pages.job.table.tag.waiting_token' })}</Tag>
+        </Tooltip>
       );
     case 4:
       return (
-        <Tag color="purple">{intl.formatMessage({ id: 'pages.job.table.tag.token_released' })}</Tag>
+        <Tooltip
+          placement={'right'}
+          title={intl.formatMessage({ id: 'pages.job.table.tips.token_released' })}
+        >
+          <Tag color="purple">
+            {intl.formatMessage({ id: 'pages.job.table.tag.token_released' })}
+          </Tag>
+        </Tooltip>
       );
     default:
-      return <Tag color="magenta" />;
+      return (
+        <Tooltip
+          placement={'right'}
+          title={intl.formatMessage({ id: 'pages.job.table.tips.awaiting_merger' })}
+        >
+          <Tag color="magenta" />
+        </Tooltip>
+      );
   }
 };

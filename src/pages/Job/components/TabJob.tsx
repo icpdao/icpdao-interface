@@ -35,7 +35,7 @@ import OtherUserJobTable from '@/pages/Job/components/OtherUserJobTable';
 import { useModel } from '@@/plugin-model/useModel';
 import { FormattedMessage, useIntl } from 'umi';
 import StatCard from '@/components/StatCard';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, QuestionOutlined } from '@ant-design/icons';
 import { useRequest } from '@@/plugin-request/request';
 import { renderJobTag } from '@/utils/pageHelper';
 import { defaultPageSize } from '@/pages/Job/components/OtherUserJobTable';
@@ -66,6 +66,8 @@ const { Option } = Select;
 
 const githubIssueLinkReg = /https:\/\/github.com\/(.+)\/(.+)\/issues\/(\d+)/;
 const githubPRLinkReg = /https:\/\/github.com\/(.+)\/(.+)\/pull\/(\d+)/;
+const workInfoURL =
+  'https://icpdao.gitbook.io/icpdao/yong-hu-zhi-dao/biao-ji-gong-xian-tou-piao/biao-ji-gong-xian';
 
 function PickerWithType({ type, onChange, size }: any) {
   if (type === 'time')
@@ -79,6 +81,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
   const { initialState } = useModel('@@initialState');
   const intl = useIntl();
   const [newOrEditJobForm] = Form.useForm();
+  const [adjustJobSizeForm] = Form.useForm();
   const [newOrEditOrViewJobFormData, setNewOrEditOrViewJobFormData] = useState<newJobFormData>({
     issue: '',
     size: undefined,
@@ -91,6 +94,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
   const [newJobModalVisible, setNewJobModalVisible] = useState<boolean>(false);
   const [editJobModalVisible, setEditJobModalVisible] = useState<boolean>(false);
   const [viewJobModalVisible, setViewJobModalVisible] = useState<boolean>(false);
+  const [adjustJobSizeStatus, setAdjustJobSizeStatus] = useState<string>('');
   const [jobQueryVar, setJobQueryVar] = useState<JobListQueryVariables>({
     daoName: '',
     offset: 0,
@@ -176,13 +180,15 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
     }
     if (issueInfo?.openGithub?.data) {
       const prInfo = JSON.parse(issueInfo?.openGithub?.data);
-      choosePRs.push({
-        id: prInfo.id || 0,
-        title: prInfo.title || '',
-        htmlUrl: prInfo.html_url || '',
-        type: 'tmp',
-      });
-      prsID.push(prInfo.id || 0);
+      if (!prsID.includes(prInfo.id || 0)) {
+        choosePRs.push({
+          id: prInfo.id || 0,
+          title: prInfo.title || '',
+          htmlUrl: prInfo.html_url || '',
+          type: 'tmp',
+        });
+        prsID.push(prInfo.id || 0);
+      }
     }
     if (issueTimeline?.openGithub?.data) {
       const issueConnectPR = JSON.parse(issueTimeline?.openGithub?.data);
@@ -221,6 +227,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
         });
       }
     }
+    choosePRs.sort((a, b) => a.id - b.id);
     setChoosePRData(choosePRs);
     setBackupChoosePRData(choosePRs);
   }, [
@@ -270,19 +277,44 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
         }
       }
       await daoListReFetch();
-      await getJobList({ variables: jobQueryVar });
-      setNewOrEditOrViewJobFormData({
+      const clearFormData = {
         issue: '',
         size: undefined,
         autoCreatePR: false,
         prs: [],
-      });
+      };
+      setNewOrEditOrViewJobFormData(clearFormData);
       setChoosePRData([]);
       setBackupChoosePRData([]);
+      await newOrEditJobForm.setFieldsValue({
+        [`${type}issue`]: clearFormData.issue,
+        [`${type}size`]: clearFormData.size,
+        [`${type}autoCreatePR`]: clearFormData.autoCreatePR,
+      });
       await newOrEditJobForm.resetFields();
     },
-    [daoListReFetch, getJobList, jobQueryVar, newOrEditJobForm],
+    [daoListReFetch, newOrEditJobForm],
   );
+
+  const handlerAdjustSizeModalCancel = useCallback(async () => {
+    setAdjustJobSizeStatus('');
+    await daoListReFetch();
+    const clearFormData = {
+      issue: '',
+      size: undefined,
+      autoCreatePR: false,
+      prs: [],
+    };
+    setNewOrEditOrViewJobFormData(clearFormData);
+    setChoosePRData([]);
+    setBackupChoosePRData([]);
+    await adjustJobSizeForm.setFieldsValue({
+      [`adjustIssue`]: clearFormData.issue,
+      [`adjustSize`]: clearFormData.size,
+      [`adjustAutoCreatePR`]: clearFormData.autoCreatePR,
+    });
+    await adjustJobSizeForm.resetFields();
+  }, [daoListReFetch, adjustJobSizeForm]);
 
   const choosePRTableRowSelection = useMemo(() => {
     console.log(newOrEditOrViewJobFormData.prs?.map((v) => v.id.toString()));
@@ -293,13 +325,17 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
       selectedRowKeys: newOrEditOrViewJobFormData.prs?.map((v) => v.id),
       getCheckboxProps: (record: choosePR) => ({
         name: record.id.toString(),
-        disabled: newOrEditOrViewJobFormData.autoCreatePR || viewJobModalVisible,
+        disabled:
+          newOrEditOrViewJobFormData.autoCreatePR ||
+          viewJobModalVisible ||
+          adjustJobSizeStatus !== '',
       }),
     };
   }, [
-    viewJobModalVisible,
-    newOrEditOrViewJobFormData.autoCreatePR,
     newOrEditOrViewJobFormData.prs,
+    newOrEditOrViewJobFormData.autoCreatePR,
+    viewJobModalVisible,
+    adjustJobSizeStatus,
   ]);
 
   const choosePRTable = useMemo(() => {
@@ -376,7 +412,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
 
         if (cont) setOkContinueButtonLoading(false);
         else setOkButtonLoading(false);
-
+        await getJobList({ variables: jobQueryVar });
         await handlerModalCancel('new_job', !cont);
       } catch (e) {
         console.log(e);
@@ -384,14 +420,26 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
         else setOkButtonLoading(false);
       }
     },
-    [createJob, handlerModalCancel, newOrEditJobForm, newOrEditOrViewJobFormData],
+    [
+      createJob,
+      getJobList,
+      handlerModalCancel,
+      jobQueryVar,
+      newOrEditJobForm,
+      newOrEditOrViewJobFormData,
+    ],
   );
 
   const handlerSaveJob = useCallback(async () => {
     try {
       await newOrEditJobForm.validateFields();
       console.log(newOrEditOrViewJobFormData);
-      if (!newOrEditOrViewJobFormData.jobId) return;
+      if (
+        !newOrEditOrViewJobFormData.jobId ||
+        !newOrEditOrViewJobFormData.size ||
+        newOrEditOrViewJobFormData.size === 0
+      )
+        return;
       setSaveButtonLoading(true);
       await updateJob({
         variables: {
@@ -402,11 +450,46 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
         },
       });
       setSaveButtonLoading(false);
+      await getJobList({ variables: jobQueryVar });
       await handlerModalCancel('edit_job');
     } catch (e) {
       setSaveButtonLoading(false);
     }
-  }, [handlerModalCancel, newOrEditJobForm, newOrEditOrViewJobFormData, updateJob]);
+  }, [
+    getJobList,
+    handlerModalCancel,
+    jobQueryVar,
+    newOrEditJobForm,
+    newOrEditOrViewJobFormData,
+    updateJob,
+  ]);
+
+  const handlerAdjustJobSize = useCallback(async () => {
+    try {
+      console.log(newOrEditOrViewJobFormData);
+      if (!newOrEditOrViewJobFormData.jobId || !newOrEditOrViewJobFormData.size) return;
+      setSaveButtonLoading(true);
+      await updateJob({
+        variables: {
+          id: newOrEditOrViewJobFormData.jobId,
+          size: newOrEditOrViewJobFormData.size || 0,
+          autoCreatePR: newOrEditOrViewJobFormData.autoCreatePR,
+          PRList: newOrEditOrViewJobFormData.prs?.map((p) => ({ id: p.id, htmlUrl: p.htmlUrl })),
+        },
+      });
+      setSaveButtonLoading(false);
+      await getJobList({ variables: jobQueryVar });
+      await handlerAdjustSizeModalCancel();
+    } catch (e) {
+      setSaveButtonLoading(false);
+    }
+  }, [
+    getJobList,
+    handlerAdjustSizeModalCancel,
+    jobQueryVar,
+    newOrEditOrViewJobFormData,
+    updateJob,
+  ]);
 
   const modalTag = useMemo(() => {
     if (newOrEditOrViewJobFormData.jobStatus === undefined && !newOrEditOrViewJobFormData.jobIncome)
@@ -524,6 +607,13 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
                         required: true,
                         message: intl.formatMessage({ id: 'pages.job.modal.new_job.size.help' }),
                       },
+                      {
+                        type: 'number',
+                        min: 0.1,
+                        message: intl.formatMessage({
+                          id: 'pages.job.modal.new_job.size.min.help',
+                        }),
+                      },
                     ]}
                   >
                     <InputNumber
@@ -635,6 +725,139 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
     ],
   );
 
+  const adjustJobSizeModal = useMemo(() => {
+    return (
+      <Modal
+        destroyOnClose={true}
+        width={700}
+        visible={adjustJobSizeStatus !== ''}
+        title={intl.formatMessage({ id: `pages.job.modal.adjust_size.title` })}
+        footer={
+          <Space direction={'horizontal'} className={styles.globalModalButtonSpace}>
+            <Button block key={'back'} onClick={handlerAdjustSizeModalCancel}>
+              {intl.formatMessage({ id: 'pages.job.modal.button.cancel' })}
+            </Button>
+            <Button
+              block
+              key={'submit'}
+              loading={saveButtonLoading}
+              type={'primary'}
+              onClick={handlerAdjustJobSize}
+            >
+              {intl.formatMessage({ id: 'pages.job.modal.button.save' })}
+            </Button>
+          </Space>
+        }
+        onOk={() => {}}
+        onCancel={handlerAdjustSizeModalCancel}
+      >
+        <Spin spinning={updateJobLoading}>
+          <Form
+            form={adjustJobSizeForm}
+            key={`adjustForm`}
+            initialValues={{
+              adjustIssue: newOrEditOrViewJobFormData.issue,
+              adjustSize: newOrEditOrViewJobFormData.size,
+              adjustAutoCreatePR: newOrEditOrViewJobFormData.autoCreatePR,
+            }}
+          >
+            <Row gutter={30}>
+              <Col span={17}>
+                <Form.Item name={`adjustIssue`}>
+                  <Input
+                    disabled={true}
+                    value={newOrEditOrViewJobFormData.issue}
+                    placeholder={intl.formatMessage({ id: 'pages.job.modal.new_job.issue.pla' })}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={7}>
+                <Form.Item
+                  name={`adjustSize`}
+                  rules={[
+                    {
+                      required: true,
+                      message: intl.formatMessage({ id: 'pages.job.modal.new_job.size.help' }),
+                    },
+                    {
+                      type: 'number',
+                      min: 0.1,
+                      message: intl.formatMessage({ id: 'pages.job.modal.new_job.size.min.help' }),
+                    },
+                    {
+                      validator: (_, value) => {
+                        if (
+                          adjustJobSizeStatus === 'increase' &&
+                          newOrEditOrViewJobFormData.size &&
+                          newOrEditOrViewJobFormData.size >= value
+                        ) {
+                          return Promise.reject(
+                            new Error(
+                              intl.formatMessage({
+                                id: 'pages.job.modal.adjust_size.increase.warn',
+                              }),
+                            ),
+                          );
+                        }
+                        if (
+                          adjustJobSizeStatus === 'decrease' &&
+                          newOrEditOrViewJobFormData.size &&
+                          newOrEditOrViewJobFormData.size <= value
+                        ) {
+                          return Promise.reject(
+                            new Error(
+                              intl.formatMessage({
+                                id: 'pages.job.modal.adjust_size.decrease.warn',
+                              }),
+                            ),
+                          );
+                        }
+                        return Promise.resolve();
+                      },
+                    },
+                  ]}
+                >
+                  <InputNumber
+                    style={{ width: '100%' }}
+                    min={0.1}
+                    step={0.1}
+                    precision={1}
+                    value={newOrEditOrViewJobFormData.size}
+                    placeholder={intl.formatMessage({ id: 'pages.job.modal.new_job.size.pla' })}
+                    onChange={async () => {
+                      try {
+                        const checked = await adjustJobSizeForm.validateFields([`adjustSize`]);
+                        setNewOrEditOrViewJobFormData((old) => ({
+                          ...old,
+                          size: checked.adjustSize,
+                        }));
+                      } catch (e) {
+                        console.log(e);
+                      }
+                    }}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Form>
+          {choosePRTable}
+        </Spin>
+      </Modal>
+    );
+  }, [
+    adjustJobSizeStatus,
+    intl,
+    handlerAdjustSizeModalCancel,
+    saveButtonLoading,
+    handlerAdjustJobSize,
+    updateJobLoading,
+    adjustJobSizeForm,
+    newOrEditOrViewJobFormData.issue,
+    newOrEditOrViewJobFormData.size,
+    newOrEditOrViewJobFormData.autoCreatePR,
+    choosePRTable,
+  ]);
+
   const viewJobModal = useMemo(() => {
     return (
       <Modal
@@ -719,6 +942,32 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
     [getChoosePRs, userName],
   );
 
+  const handlerOpenAdjustSizeModal = useCallback(
+    async (record: Job, status: 'increase' | 'decrease') => {
+      const issue = `https://github.com/${record.node?.githubRepoOwner}/${record.node?.githubRepoName}/issues/${record.node?.githubIssueNumber}`;
+      console.log(issue, record.prs);
+      setNewOrEditOrViewJobFormData({
+        issue,
+        size: record.node?.size,
+        autoCreatePR: record.node?.hadAutoCreatePr || false,
+        prs: record.prs?.map((p) => ({
+          id: p?.githubPrId || 0,
+          htmlUrl: `https://github.com/${p?.githubRepoOwner}/${p?.githubRepoName}/issues/${p?.githubPrNumber}`,
+          title: p?.title || '',
+          type: 'link',
+        })),
+        jobId: record.node?.id || undefined,
+        jobStatus: record.node?.status,
+        jobIncome: record.node?.income,
+      });
+      setNewJobModalVisible(false);
+      setViewJobModalVisible(false);
+      setEditJobModalVisible(false);
+      setAdjustJobSizeStatus(status);
+    },
+    [],
+  );
+
   const handlerOpenViewModal = useCallback((record: Job) => {
     const issue = `https://github.com/${record.node?.githubRepoOwner}/${record.node?.githubRepoName}/issues/${record.node?.githubIssueNumber}`;
     setNewOrEditOrViewJobFormData({
@@ -740,16 +989,23 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
     setViewJobModalVisible(true);
   }, []);
 
+  const handlerUpdateCurrentDao = useCallback(
+    (currentId = undefined) => {
+      if (daoListData?.daos?.dao && daoListData?.daos?.dao.length > 0) {
+        let current: DaoSchema | undefined;
+        daoListData?.daos?.dao.forEach((d) => {
+          if (currentId && d?.datum && d?.datum?.id === currentId) {
+            current = d.datum;
+          }
+        });
+        setCurrentDao(current || daoListData.daos.dao[0]?.datum || undefined);
+      }
+    },
+    [daoListData?.daos?.dao],
+  );
+
   useEffect(() => {
-    if (daoListData?.daos?.dao && daoListData?.daos?.dao.length > 0) {
-      let current: DaoSchema | undefined;
-      daoListData?.daos?.dao.forEach((d) => {
-        if (daoId && d?.datum?.id === daoId) {
-          current = d.datum;
-        }
-      });
-      setCurrentDao(current || daoListData.daos.dao[0]?.datum || undefined);
-    }
+    handlerUpdateCurrentDao(daoId);
   }, [daoId, daoListData]);
 
   useEffect(() => {
@@ -762,6 +1018,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
   }, [currentDao, userName]);
 
   useEffect(() => {
+    if (jobQueryVar.daoName === '') return;
     getJobList({ variables: jobQueryVar });
   }, [getJobList, jobQueryVar]);
 
@@ -775,6 +1032,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
         <OwnerJobTable
           openEditModal={handlerOpenEditModal}
           openViewModal={handlerOpenViewModal}
+          openAdjustSizeModal={handlerOpenAdjustSizeModal}
           jobQueryVar={jobQueryVar}
           setJobQueryVar={setJobQueryVar}
           getJobList={getJobList}
@@ -785,18 +1043,65 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
     return (
       <OtherUserJobTable
         openViewModal={handlerOpenViewModal}
+        openAdjustSizeModal={handlerOpenAdjustSizeModal}
         jobQueryVar={jobQueryVar}
         setJobQueryVar={setJobQueryVar}
         jobList={jobList}
       />
     );
-  }, [isMy, handlerOpenViewModal, jobQueryVar, jobList, handlerOpenEditModal, getJobList]);
+  }, [
+    isMy,
+    handlerOpenViewModal,
+    handlerOpenAdjustSizeModal,
+    jobQueryVar,
+    jobList,
+    handlerOpenEditModal,
+    getJobList,
+  ]);
+
+  const searchFormSpan = useMemo(() => {
+    if (isMy) return [18, 6];
+    return [21, 3];
+  }, [isMy]);
+
+  const searchFormButton = useMemo(() => {
+    if (isMy)
+      return (
+        <Space size={'middle'} style={{ width: '100%' }}>
+          <Button
+            href={workInfoURL}
+            target={'_blank'}
+            size={'large'}
+            block
+            icon={<QuestionOutlined />}
+          >
+            {intl.formatMessage({ id: 'pages.job.table.info' })}
+          </Button>
+          {isMy && (
+            <Button
+              type="primary"
+              block
+              size={'large'}
+              icon={<PlusOutlined />}
+              onClick={() => setNewJobModalVisible(true)}
+            >
+              {intl.formatMessage({ id: 'pages.job.table.button' })}
+            </Button>
+          )}
+        </Space>
+      );
+    return (
+      <Button href={workInfoURL} target={'_blank'} size={'large'} block icon={<QuestionOutlined />}>
+        {intl.formatMessage({ id: 'pages.job.table.info' })}
+      </Button>
+    );
+  }, [intl, isMy]);
 
   const searchForm = useMemo(() => {
     return (
       <div key={'searchForm'} className={styles.SearchForm}>
         <Row>
-          <Col span={21}>
+          <Col span={searchFormSpan[0]}>
             <Space direction={'horizontal'}>
               <Select
                 size={'large'}
@@ -805,16 +1110,16 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
                 optionFilterProp="children"
                 value={currentDao?.id || ''}
                 filterOption={(input, option) =>
-                  option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                  ((option?.label as string) || '').toLowerCase().indexOf(input.toLowerCase()) >= 0
                 }
                 notFoundContent={null}
                 onSelect={async (value, option) => {
-                  console.log(value);
-                  if (option.children)
-                    setJobQueryVar((old) => ({
-                      ...old,
-                      daoName: option.children,
-                    }));
+                  console.log(value, option.label);
+                  if (option.label) handlerUpdateCurrentDao(value);
+                  setJobQueryVar((old) => ({
+                    ...old,
+                    daoName: option.label as string,
+                  }));
                 }}
                 options={
                   daoListData?.daos?.dao?.map((d) => ({
@@ -853,23 +1158,19 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
               />
             </Space>
           </Col>
-          {isMy && (
-            <Col span={3}>
-              <Button
-                type="primary"
-                style={{ width: '100%' }}
-                size={'large'}
-                icon={<PlusOutlined />}
-                onClick={() => setNewJobModalVisible(true)}
-              >
-                {intl.formatMessage({ id: 'pages.job.table.button' })}
-              </Button>
-            </Col>
-          )}
+          <Col span={searchFormSpan[1]}>{searchFormButton}</Col>
         </Row>
       </div>
     );
-  }, [currentDao?.id, daoListData?.daos?.dao, intl, isMy, parseTime, searchDateType]);
+  }, [
+    currentDao?.id,
+    daoListData?.daos?.dao,
+    handlerUpdateCurrentDao,
+    parseTime,
+    searchDateType,
+    searchFormButton,
+    searchFormSpan,
+  ]);
 
   const stat = useMemo(() => {
     return [
@@ -878,7 +1179,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
         title: intl.formatMessage({ id: 'component.card.stat.job' }),
       },
       {
-        number: jobList.data?.jobs?.stat?.size || 0,
+        number: parseFloat(jobList.data?.jobs?.stat?.size?.toString() || '0').toFixed(1),
         title: intl.formatMessage({ id: 'component.card.stat.size' }),
       },
       {
@@ -908,6 +1209,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
       {newOrEditJobModal('new_job')}
       {newOrEditJobModal('edit_job')}
       {viewJobModal}
+      {adjustJobSizeModal}
     </>
   );
 };
