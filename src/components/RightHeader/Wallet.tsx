@@ -12,7 +12,6 @@ import IconFont from '@/components/IconFont';
 import { FormattedMessage } from 'umi';
 import { useModel } from '@@/plugin-model/useModel';
 import { EthereumNetwork, setMetamaskConnect, setMetamaskDisconnect } from '@/utils/utils';
-import { history } from '@@/core/history';
 
 const Wallet: React.FC = () => {
   const [connectWalletModal, setConnectWalletModal] = useState<boolean>(false);
@@ -29,7 +28,7 @@ const Wallet: React.FC = () => {
 
   const connectMetamask = useCallback(async () => {
     if (!metamaskProvider) {
-      history.push('https://metamask.io/');
+      window.location.href = 'https://metamask.io/';
       return;
     }
     setAccounts(await metamaskProvider.request({ method: 'eth_requestAccounts' }));
