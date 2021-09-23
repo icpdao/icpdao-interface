@@ -9,6 +9,7 @@ import PermissionErrorPage from '@/pages/Result/403';
 import styles from './index.less';
 import type { JobItemQuery, DaoCycleVoteListQueryVariables } from '@/services/dao/generated';
 import {
+  CycleVoteFilterEnum,
   CycleVoteResultTypeAllResultTypeEnum,
   useDaoCycleVoteListQuery,
   useUpdateAllVoteMutation,
@@ -18,7 +19,7 @@ import {
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import StatCard from '@/components/StatCard';
 import { useIntl } from '@@/plugin-locale/localeExports';
-import { Button, Card, message, Pagination, Row, Tooltip } from 'antd';
+import { Button, Card, Empty, message, Pagination, Row, Select, Skeleton, Tooltip } from 'antd';
 import { getCurrentPage, getTimeDistanceHumanize } from '@/utils/utils';
 import { getMetamaskProvider } from '@/services/ethereum-connect';
 import moment from 'moment';
@@ -62,34 +63,39 @@ const allTypeVote = (
   }
 
   return (
-    <Card className={styles.allTypeVoteCard} key={voteId} loading={voteLoading || false}>
-      <div className={styles.allTypeVoteContent}>
-        <Row>{pair?.user?.nickname}</Row>
-        <Row>
-          <a
-            href={`https://github.com/${pair?.datum?.githubRepoOwner}/${pair?.datum?.githubRepoName}/issues/${pair?.datum?.githubIssueNumber}`}
-            target="_blank"
-          >
-            {pair?.datum?.title}
-          </a>
-        </Row>
-        <Row>Size: {parseFloat(pair?.datum?.size.toString() || '').toFixed(1)}</Row>
-      </div>
-      <div className={styles.allTypeVoteButtons}>
-        <div className={styles.allTypeVoteButton} onClick={() => updateVote(voteId, true)}>
-          <div>
-            <SmileOutlined style={{ fontSize: 21, color: leftButtonColor }} />
+    <>
+      <Skeleton active loading={voteLoading || false} />
+      {!voteLoading && (
+        <Card className={`${styles.allTypeVoteCard} ${!!voted && styles.VotedPairBG}`} key={voteId}>
+          <div className={styles.allTypeVoteContent}>
+            <Row>{pair?.user?.nickname}</Row>
+            <Row>
+              <a
+                href={`https://github.com/${pair?.datum?.githubRepoOwner}/${pair?.datum?.githubRepoName}/issues/${pair?.datum?.githubIssueNumber}`}
+                target="_blank"
+              >
+                {pair?.datum?.title}
+              </a>
+            </Row>
+            <Row>Size: {parseFloat(pair?.datum?.size.toString() || '').toFixed(1)}</Row>
           </div>
-          <div style={{ color: leftButtonColor }}>YES</div>
-        </div>
-        <div className={styles.allTypeVoteButton} onClick={() => updateVote(voteId, false)}>
-          <div>
-            <FrownOutlined style={{ fontSize: 21, color: rightButtonColor }} />
+          <div className={styles.allTypeVoteButtons}>
+            <div className={styles.allTypeVoteButton} onClick={() => updateVote(voteId, true)}>
+              <div>
+                <SmileOutlined style={{ fontSize: 21, color: leftButtonColor }} />
+              </div>
+              <div style={{ color: leftButtonColor }}>YES</div>
+            </div>
+            <div className={styles.allTypeVoteButton} onClick={() => updateVote(voteId, false)}>
+              <div>
+                <FrownOutlined style={{ fontSize: 21, color: rightButtonColor }} />
+              </div>
+              <div style={{ color: rightButtonColor }}>NO</div>
+            </div>
           </div>
-          <div style={{ color: rightButtonColor }}>NO</div>
-        </div>
-      </div>
-    </Card>
+        </Card>
+      )}
+    </>
   );
 };
 
@@ -103,53 +109,57 @@ const pairTypeVote = (
 ) => {
   return (
     <div key={voteId} className={styles.pairTypeVoteCards}>
-      <Card
-        className={styles.pairTypeVoteCard}
-        hoverable={voted !== leftPair.datum?.id}
-        onClick={() => updateVote(voteId, leftPair.datum?.id || '')}
-        loading={voteLoading || false}
-      >
-        <div className={styles.pairTypeVoteContent}>
-          <Row>{leftPair?.user?.nickname}</Row>
-          <Row>
-            <a
-              href={`https://github.com/${leftPair?.datum?.githubRepoOwner}/${leftPair?.datum?.githubRepoName}/issues/${leftPair?.datum?.githubIssueNumber}`}
-              target="_blank"
-            >
-              {leftPair?.datum?.title}
-            </a>
-          </Row>
-          <Row>Size: {parseFloat(leftPair?.datum?.size.toString() || '').toFixed(1)}</Row>
-          {voted === leftPair.datum?.id && (
-            <div className={styles.pairTypeVoteCheck}>
-              <CheckCircleFilled style={{ fontSize: 21, color: '#2F80ED' }} />
+      <Skeleton active loading={voteLoading || false} />
+      {!voteLoading && (
+        <>
+          <Card
+            className={`${styles.pairTypeVoteCard} ${!!voted && styles.VotedPairBG}`}
+            hoverable={voted !== leftPair.datum?.id}
+            onClick={() => updateVote(voteId, leftPair.datum?.id || '')}
+          >
+            <div className={styles.pairTypeVoteContent}>
+              <Row>{leftPair?.user?.nickname}</Row>
+              <Row>
+                <a
+                  href={`https://github.com/${leftPair?.datum?.githubRepoOwner}/${leftPair?.datum?.githubRepoName}/issues/${leftPair?.datum?.githubIssueNumber}`}
+                  target="_blank"
+                >
+                  {leftPair?.datum?.title}
+                </a>
+              </Row>
+              <Row>Size: {parseFloat(leftPair?.datum?.size.toString() || '').toFixed(1)}</Row>
+              {voted === leftPair.datum?.id && (
+                <div className={styles.pairTypeVoteCheck}>
+                  <CheckCircleFilled style={{ fontSize: 21, color: '#2F80ED' }} />
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </Card>
-      <Card
-        className={styles.pairTypeVoteCard}
-        hoverable={voted !== rightPair.datum?.id}
-        onClick={() => updateVote(voteId, rightPair.datum?.id || '')}
-      >
-        <div className={styles.pairTypeVoteContent}>
-          <Row>{rightPair?.user?.nickname}</Row>
-          <Row>
-            <a
-              href={`https://github.com/${rightPair?.datum?.githubRepoOwner}/${rightPair?.datum?.githubRepoName}/issues/${rightPair?.datum?.githubIssueNumber}`}
-              target="_blank"
-            >
-              {rightPair?.datum?.title}
-            </a>
-          </Row>
-          <Row>Size: {parseFloat(rightPair?.datum?.size.toString() || '').toFixed(1)}</Row>
-          {voted === rightPair.datum?.id && (
-            <div className={styles.pairTypeVoteCheck}>
-              <CheckCircleFilled style={{ fontSize: 21, color: '#2F80ED' }} />
+          </Card>
+          <Card
+            className={`${styles.pairTypeVoteCard} ${!!voted && styles.VotedPairBG}`}
+            hoverable={voted !== rightPair.datum?.id}
+            onClick={() => updateVote(voteId, rightPair.datum?.id || '')}
+          >
+            <div className={styles.pairTypeVoteContent}>
+              <Row>{rightPair?.user?.nickname}</Row>
+              <Row>
+                <a
+                  href={`https://github.com/${rightPair?.datum?.githubRepoOwner}/${rightPair?.datum?.githubRepoName}/issues/${rightPair?.datum?.githubIssueNumber}`}
+                  target="_blank"
+                >
+                  {rightPair?.datum?.title}
+                </a>
+              </Row>
+              <Row>Size: {parseFloat(rightPair?.datum?.size.toString() || '').toFixed(1)}</Row>
+              {voted === rightPair.datum?.id && (
+                <div className={styles.pairTypeVoteCheck}>
+                  <CheckCircleFilled style={{ fontSize: 21, color: '#2F80ED' }} />
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </Card>
+          </Card>
+        </>
+      )}
     </div>
   );
 };
@@ -160,7 +170,7 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
   const { cycleId, daoId } = props.match.params;
   const intl = useIntl();
   const [confirmButtonLoading, setConfirmButtonLoading] = useState<boolean>(false);
-  const [voteLoading] = useState<Record<string, boolean>>({});
+  const [voteLoading, setVoteLoading] = useState<Record<string, boolean>>({});
   const { initialState } = useModel('@@initialState');
   const { isConnected, metamaskProvider, event$ } = useModel('useWalletModel');
   const [queryVariables, setQueryVariables] = useState<DaoCycleVoteListQueryVariables>({
@@ -168,7 +178,7 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
     first: pageSize,
     offset: 0,
   });
-  const { data, loading, error, refetch } = useDaoCycleVoteListQuery({
+  const { data, loading, refetch } = useDaoCycleVoteListQuery({
     variables: queryVariables,
     fetchPolicy: 'no-cache',
   });
@@ -183,13 +193,13 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
         return;
       }
       try {
+        setVoteLoading({ [voteId]: true });
         await updateAllVoteMutation({ variables: { voteId, vote: voted } });
-        await refetch();
       } catch (e) {
         console.log('Vote Failed');
       }
     },
-    [data?.cycle?.votes?.confirm, intl, refetch, updateAllVoteMutation],
+    [data?.cycle?.votes?.confirm, intl, updateAllVoteMutation],
   );
   const updatePairVote = useCallback(
     async (voteId: string, voteJobId: string) => {
@@ -198,21 +208,16 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
         return;
       }
       try {
+        setVoteLoading({ [voteId]: true });
         await updatePairVoteMutation({ variables: { voteId, voteJobId } });
-        await refetch();
       } catch (e) {
         console.log('Vote Failed');
       }
     },
-    [data?.cycle?.votes?.confirm, intl, refetch, updatePairVoteMutation],
+    [data?.cycle?.votes?.confirm, intl, updatePairVoteMutation],
   );
 
   useEffect(() => {
-    if (
-      updatePairVoteResult.data?.updatePairVote?.ok === true ||
-      updateAllVoteResult.data?.updateAllVote?.ok === true
-    )
-      message.success(intl.formatMessage({ id: 'pages.dao.vote.success' }));
     if (
       updatePairVoteResult.data?.updatePairVote?.ok === false ||
       updateAllVoteResult.data?.updateAllVote?.ok === false
@@ -223,6 +228,13 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
     updateAllVoteResult.data?.updateAllVote?.ok,
     updatePairVoteResult.data?.updatePairVote?.ok,
   ]);
+
+  useEffect(() => {
+    if (!updatePairVoteResult.loading || !updateAllVoteResult.loading)
+      refetch().then(() => {
+        setVoteLoading({});
+      });
+  }, [refetch, updateAllVoteResult.loading, updatePairVoteResult.loading]);
 
   const access = useAccess();
   const changePage = useCallback((page: number) => {
@@ -237,7 +249,7 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
     let lastV: number | undefined;
     data?.cycle?.votes?.nodes?.forEach((v) => {
       if (v?.datum?.voteType === 0) {
-        if (lastV === 1) {
+        if (lastV === 1 || lastV === undefined) {
           listDom.push(typeDesc(0));
         }
         listDom.push(
@@ -267,8 +279,9 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
       }
       lastV = v?.datum?.voteType;
     });
-    return listDom;
-  }, [data, updateAllVote, updatePairVote]);
+    if (listDom.length > 0) return listDom;
+    return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+  }, [data?.cycle?.votes?.nodes, updateAllVote, updatePairVote, voteLoading]);
 
   const handleSubmit = useCallback(async () => {
     if (!initialState) return;
@@ -315,20 +328,42 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
     return false;
   }, [data?.cycle?.votes?.confirm, data?.cycle?.votes?.nodes]);
 
-  if (!initialState || loading || error) {
+  const statCardData = useMemo(() => {
+    return [
+      {
+        title: intl.formatMessage({ id: 'pages.dao.vote.card.ticket' }),
+        number: data?.cycle?.votes?.total || 0,
+      },
+      {
+        title: intl.formatMessage({ id: 'pages.dao.vote.card.un_vote' }),
+        number: data?.cycle?.votes?.userUnVoteTotal || 0,
+      },
+      {
+        title: intl.formatMessage({ id: 'pages.dao.vote.card.voted' }),
+        number: data?.cycle?.votes?.userVotedTotal || 0,
+      },
+    ];
+  }, [
+    data?.cycle?.votes?.total,
+    data?.cycle?.votes?.userUnVoteTotal,
+    data?.cycle?.votes?.userVotedTotal,
+    intl,
+  ]);
+
+  const handlerFilterVote = useCallback((filter) => {
+    setQueryVariables((old) => ({
+      ...old,
+      voteFilter: filter,
+    }));
+  }, []);
+
+  if (!initialState) {
     return <PageLoading />;
   }
 
   if (!access.isIcpper()) {
     return <PermissionErrorPage />;
   }
-
-  const statCardData = [
-    {
-      title: intl.formatMessage({ id: 'pages.dao.vote.card.ticket' }),
-      number: data?.cycle?.votes?.total || 0,
-    },
-  ];
 
   const endLeftTimes = getTimeDistanceHumanize(data?.cycle?.datum?.voteEndAt || 0);
 
@@ -371,7 +406,19 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
             )}
           </Tooltip>
           <StatCard data={statCardData} />
-          {voteList()}
+          <div className={styles.VoteFilterSelect}>
+            <Select
+              defaultValue={CycleVoteFilterEnum.All}
+              onChange={handlerFilterVote}
+              style={{ width: 200 }}
+            >
+              <Select.Option value={CycleVoteFilterEnum.All}>ALL</Select.Option>
+              <Select.Option value={CycleVoteFilterEnum.UnVote}>TO VOTE</Select.Option>
+              <Select.Option value={CycleVoteFilterEnum.Voted}>VOTED</Select.Option>
+            </Select>
+          </div>
+          <Skeleton active loading={loading} />
+          {!loading && voteList()}
           <div className={styles.pagination}>
             <Pagination
               pageSize={pageSize}
