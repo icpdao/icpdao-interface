@@ -6,7 +6,7 @@ import { Card } from 'antd';
 import styles from '@/components/StatCard/index.less';
 
 export type StatCardDataItem = {
-  number: number | string;
+  number: number | string | ReactNode;
   title: string;
 };
 
