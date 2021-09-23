@@ -336,11 +336,15 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
       },
       {
         title: intl.formatMessage({ id: 'pages.dao.vote.card.un_vote' }),
-        number: data?.cycle?.votes?.userUnVoteTotal || 0,
+        number: (
+          <span className={styles.UnVoteCardColor}>{data?.cycle?.votes?.userUnVoteTotal || 0}</span>
+        ),
       },
       {
         title: intl.formatMessage({ id: 'pages.dao.vote.card.voted' }),
-        number: data?.cycle?.votes?.userVotedTotal || 0,
+        number: (
+          <span className={styles.VotedCardColor}>{data?.cycle?.votes?.userVotedTotal || 0}</span>
+        ),
       },
     ];
   }, [
