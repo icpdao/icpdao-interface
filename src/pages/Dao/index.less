@@ -1,3 +1,5 @@
+@import '~antd/es/style/themes/default.less';
+
 .skipButton {
   position: absolute;
   right: calc(50% - 600px);
@@ -49,6 +51,7 @@
   display: flex;
   width: 100%;
   height: 144px;
+  margin-bottom: 8px;
   place-items: center stretch;
   .allTypeVoteContent {
     margin-left: 42px;
@@ -81,6 +84,7 @@
   display: flex;
   justify-content: center;
   width: 100%;
+  margin-bottom: 8px;
   .pairTypeVoteCard {
     display: flex;
     width: 50%;
@@ -95,6 +99,14 @@
       }
     }
   }
+}
+
+.VotedPairBG {
+  background-color: @primary-1;
+}
+
+.VoteFilterSelect {
+  margin-top: 30px;
 }
 
 .voteDesc {
