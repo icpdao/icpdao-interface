@@ -546,7 +546,7 @@ query DAOProcessingCycle($daoId: String!) {
   }
 }
 
-query DAOCycleVoteList($cycleId: String!, $first: Int, $offset: Int) {
+query DAOCycleVoteList($cycleId: String!, $voteFilter: CycleVoteFilterEnum, $first: Int, $offset: Int) {
   cycle(id: $cycleId) {
     datum {
       beginAt
@@ -554,8 +554,10 @@ query DAOCycleVoteList($cycleId: String!, $first: Int, $offset: Int) {
       voteBeginAt
       voteEndAt
     }
-    votes(first: $first, offset: $offset, isMyself: true) {
+    votes(first: $first, offset: $offset, isMyself: true, filter: $voteFilter) {
       total
+      userUnVoteTotal
+      userVotedTotal
       confirm
       nodes {
         datum {

@@ -416,6 +416,8 @@ export default {
   'pages.dao.component.dao_list.table.action.unfollowing': 'Following',
   'pages.dao.component.dao_list.table.action.owner': 'Owner',
   'pages.dao.vote.card.ticket': 'Ticket',
+  'pages.dao.vote.card.un_vote': 'To Vote',
+  'pages.dao.vote.card.voted': 'Voted',
   'pages.dao.vote.submit': 'Signatures and submit',
   'pages.dao.vote.submit.tips':
     'Please Signatures and submit the results after voting，and the voting ends after {end_left_times}',
