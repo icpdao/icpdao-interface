@@ -31,7 +31,10 @@ const Content0: React.FC = () => {
           </div>
           <div className={styles.p1Content}>
             <Texty delay={400} mode={'sync'}>
-              {intl.formatMessage({ id: 'pages.home.p2' })}
+              {intl.formatMessage({ id: 'pages.home.p2.part1' })}
+            </Texty>
+            <Texty delay={400} mode={'sync'}>
+              {intl.formatMessage({ id: 'pages.home.p2.part2' })}
             </Texty>
           </div>
           <div className={styles.p1Link}>
@@ -41,7 +44,7 @@ const Content0: React.FC = () => {
             </a>{' '}
             /{' '}
             <a href="https://icpdao.gitbook.io/icpdao/" target={'_blank'}>
-              whitepaper(Ch)
+              白皮书(中文)
             </a>
             .
           </div>
