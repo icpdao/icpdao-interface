@@ -38,13 +38,13 @@ const Content0: React.FC = () => {
             </Texty>
           </div>
           <div className={styles.p1Link}>
-            We recommend you read the{' '}
+            {' '}
             <a href="https://icpdao-1.gitbook.io/icpdao/whitepaper" target={'_blank'}>
-              whitepaper(En)
+              whitepaper（En）
             </a>{' '}
             /{' '}
             <a href="https://icpdao.gitbook.io/icpdao/" target={'_blank'}>
-              白皮书(中文)
+              白皮书（中）
             </a>
             .
           </div>
