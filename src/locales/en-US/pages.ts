@@ -1,5 +1,5 @@
 export default {
-  'pages.home.mentor.warning.title': 'IN THE WORLF OF ICPDAO，EVERYONE WILL HAVE A MENTOR TO GUIDE',
+  'pages.home.mentor.warning.title': 'IN THE WORLD OF ICPDAO，EVERYONE WILL HAVE A MENTOR TO GUIDE',
   'pages.home.mentor.warning.p1.title': '<span style="color: #177DDC">WE BELIEVE</span>',
   'pages.home.mentor.warning.p1.content':
     'Everyone has the ability to contribute, it just needs to be the right project and the right way, even finding a bug can be rewarded',
@@ -29,8 +29,9 @@ export default {
   'pages.home.mentor.welcome.ok': "Okay, I accept Mentor's invitation",
   'pages.home.mentor.welcome.cancel': 'Let me think again',
   'pages.home.p1': 'Open The Infinite Game',
-  'pages.home.p2':
-    'Here is where interests are the way to realize financial freedom and dreams are the impulsion for people to converge.',
+  'pages.home.p2.part1':
+    'Here is where interests are the way to realize financial freedom and dreams',
+  'pages.home.p2.part2': 'are the impulsion for people to converge.',
   'pages.home.button1': 'EXPLORE DAO',
   'pages.home.button2': 'MARK JOB',
   'pages.home.p3.0.title': 'Listed First Then Business',
