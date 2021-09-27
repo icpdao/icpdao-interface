@@ -17,7 +17,7 @@ export default {
   'component.card.stat.job': 'Job',
   'component.card.stat.size': 'Size',
   'component.card.stat.icpper': 'Icpper',
-  'component.card.stat.dao': 'Dao',
+  'component.card.stat.dao': 'DAO',
   'component.card.stat.income': 'Income',
   'component.card.stat.token': 'Token',
 };

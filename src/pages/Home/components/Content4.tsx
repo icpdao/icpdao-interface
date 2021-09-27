@@ -19,7 +19,10 @@ const Content4: React.FC = () => {
         </div>
         <div className={styles.P11}>
           <Texty type={'top'} mode={'sync'} className={styles.P11Title}>
-            {intl.formatMessage({ id: 'pages.home.p11' })}
+            {intl.formatMessage({ id: 'pages.home.p11.part1' })}
+          </Texty>
+          <Texty type={'top'} mode={'sync'} className={styles.P11Title}>
+            {intl.formatMessage({ id: 'pages.home.p11.part2' })}
           </Texty>
         </div>
         <QueueAnim delay={300} interval={600} type={'bottom'} key="contactQueueAnim">

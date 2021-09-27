@@ -113,7 +113,7 @@ const Content1: React.FC<HomeProps> = ({ statsData }) => {
                         <Button
                           type="primary"
                           size="large"
-                          onClick={() => history.push('/dao/explore')}
+                          onClick={() => history.push('/dao/mine')}
                         >
                           {intl.formatMessage({ id: 'pages.dao.component.dao_list.create_dao' })}
                         </Button>
@@ -141,7 +141,7 @@ const Content1: React.FC<HomeProps> = ({ statsData }) => {
                         <Button
                           type="primary"
                           size="large"
-                          onClick={() => history.push('/dao/explore')}
+                          onClick={() => history.push('/dao/mine')}
                         >
                           {intl.formatMessage({ id: 'pages.dao.component.dao_list.create_dao' })}
                         </Button>
@@ -174,7 +174,7 @@ const Content1: React.FC<HomeProps> = ({ statsData }) => {
                         <Button
                           type="primary"
                           size="large"
-                          onClick={() => history.push('/dao/explore')}
+                          onClick={() => history.push('/dao/mine')}
                         >
                           {intl.formatMessage({ id: 'pages.dao.component.dao_list.create_dao' })}
                         </Button>

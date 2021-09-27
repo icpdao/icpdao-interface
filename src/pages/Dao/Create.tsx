@@ -120,13 +120,15 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ onUploadSuccess, initlogoUr
     return (
       <div>
         {uploading ? <LoadingOutlined /> : <PlusOutlined />}
-        <p>{intl.formatMessage({ id: 'pages.dao.create.form.item.logo.placeholder' })}</p>
+        <p className={styles.uploadPlaceholder}>
+          {intl.formatMessage({ id: 'pages.dao.create.form.item.logo.placeholder' })}
+        </p>
       </div>
     );
   }, [imageUrl, initlogoUrl, uploading, intl]);
 
   return (
-    <div style={{ height: 100, width: 100 }}>
+    <div className={styles.uploadBox}>
       <Dragger
         listType="picture-card"
         showUploadList={false}

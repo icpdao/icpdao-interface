@@ -5,13 +5,8 @@ export default () => {
   const intl = useIntl();
   const defaultMessage = intl.formatMessage({
     id: 'app.copyright.produced',
-    defaultMessage: 'icpdao',
+    defaultMessage: 'ICPDAO',
   });
   const date = new Date();
-  return (
-    <DefaultFooter
-      copyright={`${date.getFullYear()} ${defaultMessage}`}
-      links={[]}
-    />
-  );
+  return <DefaultFooter copyright={`${date.getFullYear()} ${defaultMessage}`} links={[]} />;
 };
