@@ -12,7 +12,7 @@ const MentorWarningModal: React.FC<MentorWarningModalProps> = ({ visible, setVis
   const intl = useIntl();
 
   const onOk = useCallback(() => {
-    window.open('https://discord.gg/yz7AWVdRmj', '_blank');
+    window.open('https://discord.gg/ACxJEUh68d', '_blank');
     setVisible(false);
   }, [setVisible]);
 
