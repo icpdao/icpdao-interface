@@ -7,14 +7,15 @@ import ERC20ABI from './abis/erc20.json';
 import { abi as IUniswapV3PoolABI } from '@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json';
 import { abi as INonfungiblePositionManagerABI } from '@uniswap/v3-periphery/artifacts/contracts/interfaces/INonfungiblePositionManager.sol/INonfungiblePositionManager.json';
 import { abi as IUniswapV3FactoryABI } from '@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Factory.sol/IUniswapV3Factory.json';
-
+import { getAddress } from '@ethersproject/address';
 import { getNetwork } from '@ethersproject/networks';
 import { EthereumChainId } from '@/utils/utils';
 import JSBI from 'jsbi';
+import { ADDRESS_ZERO } from '@uniswap/v3-sdk';
 
 export const DAOFactoryAddress = '0xE698080BD9832C9A6f545b55A34B7461969530dE';
 export const DAOStakingAddress = '0x8c85De9c4c19CA869438cD5cE317391C35E6C98d';
-export const ZeroAddress = '0x0000000000000000000000000000000000000000';
+export const ZeroAddress = ADDRESS_ZERO;
 export const BIG_INT_ZERO = JSBI.BigInt(0);
 export const UniswapPoolAddress = '0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8';
 export const UniswapV3PositionsAddress = '0xC36442b4a4522E871399CD717aBDD847Ab11FE88';
@@ -72,6 +73,14 @@ export function UniswapV3PoolContract(poolAddress: string, provider: any) {
 
 export function UniswapV3FactoryContract(factoryAddress: string, provider: any) {
   return new ethers.Contract(factoryAddress, IUniswapV3FactoryABI, provider);
+}
+
+export function isAddress(value: any): string | false {
+  try {
+    return getAddress(value);
+  } catch {
+    return false;
+  }
 }
 
 export class BaseEthereumConnect {

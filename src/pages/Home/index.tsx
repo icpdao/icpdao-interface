@@ -13,7 +13,6 @@ import Content3 from './components/Content3';
 import Content4 from './components/Content4';
 import Footer from '@/components/Footer';
 import { useHomeStatsQueryQuery } from '@/services/dao/generated';
-import { PageLoading } from '@ant-design/pro-layout';
 
 export default (): React.ReactNode => {
   const { profile } = getUserInfo();
@@ -31,9 +30,6 @@ export default (): React.ReactNode => {
   const [mentorWelcomeVisible, setMentorWelcomeVisible] = useState(defaultWelcome);
   const { refresh } = useModel('@@initialState');
   const { data, loading } = useHomeStatsQueryQuery();
-  if (loading) {
-    return <PageLoading />;
-  }
 
   const handleAccept = async () => {
     setMentorAcceptLoading(true);
@@ -135,7 +131,7 @@ export default (): React.ReactNode => {
   return (
     <>
       <Content0 />
-      <Content1 statsData={data?.stats} />
+      <Content1 statsData={data?.stats} loading={loading} />
       <Content2 />
       <Content3 />
       <Content4 />

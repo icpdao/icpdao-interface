@@ -14,6 +14,7 @@ import {
   Descriptions,
   Spin,
   Alert,
+  Skeleton,
 } from 'antd';
 import { UploadOutlined, ZoomInOutlined } from '@ant-design/icons';
 import { FormattedMessage } from 'umi';
@@ -26,9 +27,7 @@ import { ZeroAddress } from '@/services/ethereum-connect';
 import type { ETH_CONNECT } from '@/services/ethereum-connect/typings';
 import { useRequest } from '@@/plugin-request/request';
 import { useModel } from '@@/plugin-model/useModel';
-import { PageLoading } from '@ant-design/pro-layout';
 import { isAddress } from 'ethers/lib/utils';
-import { useUpdateDaoBaseInfoMutation } from '@/services/dao/generated';
 
 type ValidateStatus = Parameters<typeof Form.Item>[0]['validateStatus'];
 
@@ -86,7 +85,6 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
   const [confirmReCreateModal, setConfirmReCreateModal] = useState<boolean>(false);
   const [loadingDeployComplete, setLoadingDeployComplete] = useState<boolean>(false);
   const [disableConfirmReCreateButton, setDisableConfirmReCreateButton] = useState<boolean>(true);
-  const [updateDaoBaseInfo] = useUpdateDaoBaseInfoMutation();
 
   const { loading, run } = useRequest(
     async () => {
@@ -100,14 +98,6 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
         const deployEvent = receipt.events.pop();
         console.log(deployEvent.args);
         if (setTokenAddress && deployEvent.args && deployEvent.args.length > 0) {
-          await updateDaoBaseInfo({
-            variables: {
-              id: daoId,
-              tokenAddress: deployEvent.args[deployEvent.args.length - 1],
-              tokenName: createFormData.tokenName,
-              tokenSymbol: createFormData.tokenSymbol,
-            },
-          });
           setCreateFormData(defaultCreateForm);
           setTokenAddress(deployEvent.args[deployEvent.args.length - 1] || '');
         }
@@ -192,7 +182,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
   }, [handlerCheckCreateFrom]);
 
   if (!tokenAddress) {
-    return <PageLoading />;
+    return <Skeleton active />;
   }
 
   return (
@@ -268,10 +258,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
           >
             <InputNumber
               min={0}
-              max={100}
               defaultValue={createFormData.lpRatio}
-              formatter={(value) => `${value} %`}
-              parser={(value) => value?.replace(' %', '') as any}
               onChange={(value) => {
                 setCreateFormData((old) => ({
                   ...old,

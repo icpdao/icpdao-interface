@@ -1,9 +1,10 @@
 import type { DAOFactoryConnect } from './factory';
 import type { DAOStakingConnect } from './staking';
 import type { ethers } from 'ethers';
-import type { Token } from '@uniswap/sdk-core';
+import type { Currency, Token } from '@uniswap/sdk-core';
 import type { FeeAmount, Pool } from '@uniswap/v3-sdk';
-import type { UniswapField } from '@/services/ethereum-connect/uniswap';
+import type { BigNumber } from 'ethers';
+import type { Field } from '@/pages/Dao/hooks/useUniswap';
 
 export type ETHConnect = {
   network: string;
@@ -40,13 +41,13 @@ declare namespace ETH_CONNECT {
     mode?: string;
   };
   type CreateLPForm = {
-    baseToken?: Token;
-    quoteToken?: Token;
+    baseToken?: Currency;
+    quoteToken?: Currency;
     baseTokenAmount?: number;
     quoteTokenAmount?: number;
     fee?: FeeAmount;
     startingPrice?: number;
-    independentField?: UniswapField;
+    independentField?: Field;
     typedAmount?: number;
 
     minPrice: string | true;
@@ -97,7 +98,7 @@ declare namespace ETH_CONNECT {
     tokenA?: Token;
     tokenB?: Token;
     invertPrice?: boolean;
-    sqrtPriceX96?: number;
+    sqrtPriceX96?: BigNumber;
     tickLower?: number;
     tickUpper?: number;
   };

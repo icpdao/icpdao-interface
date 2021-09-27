@@ -107,7 +107,9 @@ export default (props: {
           {tab === 'job' && (
             <DAOJobConfig daoId={daoId} nextStep={status ? skipClick : undefined} />
           )}
-          {tab === 'token' && <TokenConfig daoId={daoId} />}
+          {tab === 'token' && (
+            <TokenConfig daoId={daoId} tokenSymbol={data?.dao?.datum?.tokenSymbol || ''} />
+          )}
         </div>
       </PageContainer>
     </>

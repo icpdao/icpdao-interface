@@ -69,8 +69,12 @@ const ApolloProviderRoot = ({ children, routes }: any) => {
   );
 };
 
+const ProviderRoot = ({ children, routes }: any) => {
+  return <>{ApolloProviderRoot({ children, routes })}</>;
+};
+
 export function rootContainer(container: any) {
-  return React.createElement(ApolloProviderRoot, null, container);
+  return React.createElement(ProviderRoot, null, container);
 }
 
 export const layout: RunTimeLayoutConfig = ({ initialState }) => {

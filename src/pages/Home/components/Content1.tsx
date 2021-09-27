@@ -5,7 +5,7 @@ import QueueAnim from 'rc-queue-anim';
 import ScrollAnim from 'rc-scroll-anim';
 import BannerAnim, { Element } from 'rc-banner-anim';
 import TweenOne from 'rc-tween-one';
-import { Button, Row, Col, Modal } from 'antd';
+import { Button, Row, Col, Modal, Skeleton } from 'antd';
 import homeImage2 from '../../../assets/image/home-image-2.png';
 import homeImage3 from '../../../assets/image/home-image-3.png';
 import homeImage4 from '../../../assets/image/home-image-4.png';
@@ -28,9 +28,10 @@ const statisticValueFormat = (title: string, value: string | number, unit: strin
 
 type HomeProps = {
   statsData: HomeStats | undefined | null;
+  loading: boolean;
 };
 
-const Content1: React.FC<HomeProps> = ({ statsData }) => {
+const Content1: React.FC<HomeProps> = ({ statsData, loading }) => {
   const intl = useIntl();
   const [bannerRef, setBannerRef] = useState<any>(null);
   const [currentBanner, setCurrentBanner] = useState<number>(0);
@@ -86,7 +87,8 @@ const Content1: React.FC<HomeProps> = ({ statsData }) => {
       </Modal>
       <ScrollAnim.OverPack id="statCards">
         <QueueAnim delay={300} interval={600} type={'left'} key="statQueueAnim">
-          {statCards}
+          {loading && <Skeleton active />}
+          {!loading && statCards}
           <div key={'introduceBanner'}>
             <BannerAnim
               autoPlay
