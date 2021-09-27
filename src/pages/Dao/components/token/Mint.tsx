@@ -16,9 +16,7 @@ import {
   useSyncTokenMintRecordEventMutation,
 } from '@/services/dao/generated';
 import { ZeroAddress } from '@/services/ethereum-connect';
-import { DAOTokenConnect } from '@/services/ethereum-connect/token';
 import { useModel } from '@@/plugin-model/useModel';
-import { PageLoading } from '@ant-design/pro-layout';
 import {
   Alert,
   Avatar,
@@ -29,11 +27,12 @@ import {
   message,
   Popconfirm,
   Popover,
+  Radio,
   Row,
   Select,
+  Skeleton,
   Space,
   Spin,
-  Switch,
   Table,
   Tag,
   Tooltip,
@@ -50,6 +49,9 @@ import {
 import GlobalModal from '@/components/Modal';
 import { LinkOutlined, UserOutlined } from '@ant-design/icons';
 import type { ETH_CONNECT } from '@/services/ethereum-connect/typings';
+import type { Currency, CurrencyAmount, Token } from '@uniswap/sdk-core';
+import type { FeeAmount, Pool } from '@uniswap/v3-sdk';
+import { Bound, Field, PoolState, useUniswap } from '@/pages/Dao/hooks/useUniswap';
 
 const previewTableColumns = [
   {
@@ -91,9 +93,11 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
   tokenAddress,
   setCurrentTab,
   daoId,
+  lpPoolAddress,
+  tokenContract,
 }) => {
   const intl = useIntl();
-
+  const { network, contract, account, chainId } = useModel('useWalletModel');
   const [cycles, setCycles] = useState<Record<string, CycleQuery>>({});
   const [selectCycles, setSelectCycles] = useState<CycleQuery[]>([]);
   const [currentSelectCycle, setCurrentSelectCycle] = useState<string>('');
@@ -105,32 +109,98 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
   const [mintButtonLoading, setMintButtonLoading] = useState<boolean>(false);
   const [currentMintBody, setCurrentMintBody] = useState<ETH_CONNECT.Mint>();
 
-  const [lpPoolAddress, setLPPoolAddress] = useState<string>('');
-
   const [loadingTransferComplete, setLoadingTransferComplete] = useState<boolean>(false);
 
-  const {
-    metamaskEvent$,
-    metamaskIsConnected,
-    network,
-    metamaskProvider,
-    formData,
-    setFormDataFast,
-    minPrice,
-    maxPrice,
-    minPriceChange,
-    maxPriceChange,
-    position,
-    contract,
-    setPoolInfo,
-  } = useModel('useUniswapModel');
+  // -----
+  const [baseCurrency, setBaseCurrency] = useState<Currency>();
+  const [quoteCurrency, setQuoteCurrency] = useState<Currency>();
+  const [maxBaseTokenAmount] = useState<CurrencyAmount<Currency>>();
+  const [maxQuoteTokenAmount] = useState<CurrencyAmount<Currency>>();
+  const [feeAmount, setFeeAmount] = useState<FeeAmount>();
+  useEffect(() => {
+    if (!lpPoolAddress || lpPoolAddress === ZeroAddress || !tokenAddress) return;
+    contract.uniswapPool.getPoolByAddress(lpPoolAddress, tokenAddress).then((pl) => {
+      setBaseCurrency(pl.tokenA?.address === tokenAddress ? pl.tokenA : pl.tokenB);
+      setQuoteCurrency(pl.tokenA?.address === tokenAddress ? pl.tokenB : pl.tokenA);
+      setFeeAmount(pl.pool.fee);
+    });
+  }, [contract.uniswapPool, lpPoolAddress, tokenAddress]);
 
-  const tokenContract = useMemo(() => {
-    if (tokenAddress && tokenAddress !== ZeroAddress) {
-      return new DAOTokenConnect(tokenAddress, network, metamaskProvider);
+  const transformed: [Token, Token, FeeAmount] | null = useMemo(() => {
+    if (!chainId || !baseCurrency || !quoteCurrency || !feeAmount) return null;
+    const ta = baseCurrency?.wrapped;
+    const tb = quoteCurrency?.wrapped;
+    if (!ta || !tb || ta.equals(tb)) return null;
+    const [token0, token1] = ta.sortsBefore(tb) ? [ta, tb] : [tb, ta];
+    return [token0, token1, feeAmount];
+  }, [chainId, feeAmount, baseCurrency, quoteCurrency]);
+
+  const [poolInfo, setPoolInfo] = useState<[PoolState, Pool | null]>();
+
+  useEffect(() => {
+    if (!transformed || !transformed[0] || !transformed[1] || !transformed[2]) {
+      setPoolInfo([PoolState.INVALID, null]);
+      return;
     }
-    return undefined;
-  }, [metamaskProvider, network, tokenAddress]);
+    contract.uniswapPool
+      .getPool(transformed[0], transformed[1], transformed[2])
+      .then(({ pool: pl, sqrtPriceX96 }) => {
+        if (!pl || !sqrtPriceX96 || sqrtPriceX96.eq(0)) {
+          setPoolInfo([PoolState.NOT_EXISTS, null]);
+          return;
+        }
+        setPoolInfo([PoolState.EXISTS, pl]);
+      });
+  }, [contract.uniswapPool, transformed]);
+
+  const [inputState, setInputState] =
+    useState<{ field: Field; typedValue: string; noLiquidity: boolean }>();
+  const [leftRangeState, setLeftRangeState] = useState<string | true>(true);
+  const [rightRangeState, setRightRangeState] = useState<string | true>(true);
+  const [startPriceState, setStartPriceState] = useState<string>();
+
+  const balances: (CurrencyAmount<Currency> | undefined)[] = useMemo(() => {
+    return [maxBaseTokenAmount, maxQuoteTokenAmount];
+  }, [maxBaseTokenAmount, maxQuoteTokenAmount]);
+
+  const {
+    price,
+    position,
+    noLiquidity,
+    invalidPool,
+    invertPrice,
+    ticksAtLimit,
+    onLeftRangeInput,
+    onRightRangeInput,
+    leftPrice,
+    rightPrice,
+    getDecrementLower,
+    getIncrementLower,
+    getDecrementUpper,
+    getIncrementUpper,
+    isSorted,
+  } = useUniswap(
+    { inputState, leftRangeState, rightRangeState, startPriceState },
+    { setInputState, setLeftRangeState, setRightRangeState, setStartPriceState },
+    balances,
+    poolInfo,
+    baseCurrency ?? undefined,
+    quoteCurrency ?? undefined,
+    feeAmount,
+    baseCurrency ?? undefined,
+    undefined,
+  );
+
+  const startPriceWithNoQuoteToken = useMemo(
+    () => (invertPrice ? price?.invert()?.toSignificant(5) : price?.toSignificant(5)),
+    [invertPrice, price],
+  );
+
+  useEffect(() => {
+    if (!startPriceWithNoQuoteToken) return;
+    console.log({ startPriceWithNoQuoteToken });
+    onLeftRangeInput(startPriceWithNoQuoteToken);
+  }, [invertPrice, onLeftRangeInput, price, startPriceWithNoQuoteToken]);
 
   const [queryDaoTokenMintRunning, daoTokenMintRunningResult] = useDaoTokenMintRunningLazyQuery({
     fetchPolicy: 'no-cache',
@@ -228,7 +298,6 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
     tokenContract.getMintAnchor().then((anc) => {
       console.log(anc);
       setAnchor(anc);
-      tokenContract.getLPPool().then((value) => setLPPoolAddress(value));
       queryCyclesByTokenUnreleasedList({
         variables: { daoId, lastTimestamp: anc.lastTimestamp.toString() },
       });
@@ -248,29 +317,6 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
       ),
     );
   }, [cyclesByTokenUnreleasedListResult.data?.cyclesByTokenUnreleased?.nodes]);
-
-  useEffect(() => {
-    if (!lpPoolAddress || lpPoolAddress === ZeroAddress || !tokenAddress) return;
-    contract.uniswapPool.getPoolByAddress(lpPoolAddress, tokenAddress).then((pool) => {
-      setPoolInfo(pool);
-      setFormDataFast({
-        fee: pool.pool?.fee,
-        baseToken: pool.tokenA?.address === tokenAddress ? pool.tokenA : pool.tokenB,
-        quoteToken: pool.tokenA?.address === tokenAddress ? pool.tokenB : pool.tokenA,
-        baseTokenAmount: 0,
-        quoteTokenAmount: 0,
-      });
-    });
-  }, [contract.uniswapPool, lpPoolAddress, setFormDataFast, setPoolInfo, tokenAddress]);
-
-  useEffect(() => {
-    if (!formData.startingPrice) return;
-    setFormDataFast({ minPrice: formData.startingPrice.toString() });
-  }, [formData.startingPrice, setFormDataFast]);
-
-  const handlerMetamaskConnect = useCallback(() => {
-    metamaskEvent$?.emit();
-  }, [metamaskEvent$]);
 
   const handlerPreviewMint = useCallback(() => {
     if (!daoId || !currentSelectCycle || selectCycles.length === 0 || !selectCycles[0].datum?.id)
@@ -353,7 +399,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
     if (!tokenContract || !currentMintBody || createTokenMintMutationResult.loading) return;
     const mintRecordId =
       createTokenMintMutationResult.data?.createTokenMintRecord?.tokenMintRecord?.id;
-    if (mintRecordId) {
+    if (mintRecordId && account) {
       tokenContract
         .mint(currentMintBody)
         .then((tx) => {
@@ -383,6 +429,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
       );
     }
   }, [
+    account,
     createTokenMintMutationResult.data?.createTokenMintRecord?.tokenMintRecord?.id,
     createTokenMintMutationResult.loading,
     currentMintBody,
@@ -594,7 +641,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
     daoTokenMintRunningResult.loading ||
     daoTokenMintRunningResult.error
   ) {
-    return <PageLoading />;
+    return <Skeleton active />;
   }
 
   return (
@@ -626,7 +673,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
         tip={intl.formatMessage({ id: 'pages.token.loading' })}
         spinning={loadingTransferComplete}
       >
-        <Form layout={'vertical'} name={'tokenMintForm'} wrapperCol={{ span: 16 }}>
+        <Form name={'tokenMintForm'} labelCol={{ span: 5 }} wrapperCol={{ span: 8 }}>
           <Form.Item
             label={intl.formatMessage({ id: 'pages.dao.config.tab.token.mint.form.end_cycle' })}
             tooltip={intl.formatMessage({
@@ -644,24 +691,27 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
               })}
             </Select>
           </Form.Item>
-          <Form.Item>
-            <Switch
-              checked={advancedOP}
-              onChange={(value) => {
-                setAdvancedOP(value);
-                console.log({ sp: formData.startingPrice?.toString() });
-                setFormDataFast({
-                  minPrice: formData.startingPrice?.toString() || true,
-                  maxPrice: true,
-                });
-              }}
-              disabled={!formData.startingPrice}
-              checkedChildren={intl.formatMessage({
-                id: 'pages.dao.config.tab.token.mint.form.advanced',
-              })}
-              unCheckedChildren=""
-            />
-          </Form.Item>
+          {!!lpPoolAddress && lpPoolAddress !== ZeroAddress && (
+            <Form.Item wrapperCol={{ offset: 5, span: 8 }}>
+              <Radio.Group
+                value={advancedOP ? 'advanced' : 'normal'}
+                buttonStyle="solid"
+                disabled={!feeAmount || invalidPool || (noLiquidity && !startPriceState)}
+                onChange={(v) => {
+                  setAdvancedOP(v.target.value === 'advanced');
+                  if (startPriceWithNoQuoteToken) onLeftRangeInput(startPriceWithNoQuoteToken);
+                  setRightRangeState(true);
+                }}
+              >
+                <Radio.Button value="normal">
+                  <FormattedMessage id={`pages.dao.config.tab.token.create.form.normal`} />
+                </Radio.Button>
+                <Radio.Button value="advanced">
+                  <FormattedMessage id={`pages.dao.config.tab.token.create_pool.form.advanced`} />
+                </Radio.Button>
+              </Radio.Group>
+            </Form.Item>
+          )}
           {advancedOP && (
             <Row>
               <Space>
@@ -674,16 +724,20 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
                   })}
                 >
                   <InputNumber
-                    style={{ width: '200px' }}
-                    value={minPrice}
-                    min={formData.startingPrice}
+                    style={{ width: '100%' }}
+                    disabled={!feeAmount || invalidPool || (noLiquidity && !startPriceState)}
+                    value={
+                      ticksAtLimit[isSorted ? Bound.LOWER : Bound.UPPER]
+                        ? '0'
+                        : leftPrice?.toSignificant(5) ?? ''
+                    }
+                    min={startPriceWithNoQuoteToken}
                     onChange={(value) => {
-                      setFormDataFast({
-                        minPrice: value?.toString() || formData.startingPrice?.toString() || true,
-                      });
+                      onLeftRangeInput(value);
                     }}
                     onStep={(_, info) => {
-                      setFormDataFast({ minPrice: minPriceChange(info) });
+                      if (info.type === 'up') getIncrementLower();
+                      if (info.type === 'down') getDecrementLower();
                     }}
                   />
                 </Form.Item>
@@ -696,34 +750,31 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
                   })}
                 >
                   <InputNumber
-                    style={{ width: '200px' }}
-                    value={maxPrice}
-                    min={formData.startingPrice}
+                    style={{ width: '100%' }}
+                    disabled={!feeAmount || invalidPool || (noLiquidity && !startPriceState)}
+                    value={
+                      ticksAtLimit[isSorted ? Bound.UPPER : Bound.LOWER]
+                        ? '∞'
+                        : rightPrice?.toSignificant(5) ?? ''
+                    }
+                    min={'∞'}
                     onChange={(value) => {
-                      setFormDataFast({ maxPrice: value?.toString() || true });
+                      onRightRangeInput(value);
                     }}
                     onStep={(_, info) => {
-                      setFormDataFast({ maxPrice: maxPriceChange(info) });
+                      if (info.type === 'up') getIncrementUpper();
+                      if (info.type === 'down') getDecrementUpper();
                     }}
                   />
                 </Form.Item>
               </Space>
             </Row>
           )}
-          <Form.Item>
-            {metamaskIsConnected && (
-              <Button type="primary" disabled={!currentSelectCycle} onClick={handlerPreviewMint}>
-                {/* <Button type="primary" onClick={handlerTestMint}> */}
-                {intl.formatMessage({ id: 'pages.dao.config.tab.token.mint.form.button.submit' })}
-              </Button>
-            )}
-            {!metamaskIsConnected && (
-              <Button type="primary" onClick={() => handlerMetamaskConnect()}>
-                {intl.formatMessage({
-                  id: 'pages.common.connect',
-                })}
-              </Button>
-            )}
+          <Form.Item wrapperCol={{ offset: 5, span: 8 }}>
+            <Button type="primary" disabled={!currentSelectCycle} onClick={handlerPreviewMint}>
+              {/* <Button type="primary" onClick={handlerTestMint}> */}
+              {intl.formatMessage({ id: 'pages.dao.config.tab.token.mint.form.button.submit' })}
+            </Button>
           </Form.Item>
         </Form>
       </Spin>

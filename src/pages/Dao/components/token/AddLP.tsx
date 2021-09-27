@@ -2,81 +2,159 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import type { TokenConfigComponentsProps } from '@/pages/Dao/components/TokenConfig';
 import { useIntl } from 'umi';
 import { useModel } from '@@/plugin-model/useModel';
-import { formatUnits } from 'ethers/lib/utils';
 import { ZeroAddress } from '@/services/ethereum-connect';
-import { DAOTokenConnect } from '@/services/ethereum-connect/token';
-import { Alert, Button, Descriptions, Form, InputNumber, Row, Space, Spin, Switch } from 'antd';
-import { PageLoading } from '@ant-design/pro-layout';
-import { formatTickPrice, UniswapBound, UniswapField } from '@/services/ethereum-connect/uniswap';
+import { Alert, Button, Descriptions, Form, InputNumber, Radio, Skeleton, Spin } from 'antd';
 import GlobalModal from '@/components/Modal';
 import type { ETH_CONNECT } from '@/services/ethereum-connect/typings';
 import { LinkOutlined } from '@ant-design/icons';
-import { BigNumber } from 'ethers';
+import { FormattedMessage } from '@@/plugin-locale/localeExports';
+import type { Currency, Token } from '@uniswap/sdk-core';
+import { CurrencyAmount } from '@uniswap/sdk-core';
+import type { FeeAmount, Pool } from '@uniswap/v3-sdk';
+import JSBI from 'jsbi';
+import { Bound, Field, formatTickPrice, PoolState, useUniswap } from '@/pages/Dao/hooks/useUniswap';
 
-const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress, setCurrentTab }) => {
+const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
+  tokenAddress,
+  setCurrentTab,
+  lpPoolAddress,
+  tokenContract,
+}) => {
   const intl = useIntl();
-
-  const {
-    metamaskEvent$,
-    metamaskIsConnected,
-    network,
-    metamaskProvider,
-    formData,
-    poolInfo,
-    accounts,
-    setFormDataFast,
-    minPrice,
-    maxPrice,
-    minPriceChange,
-    maxPriceChange,
-    formattedAmounts,
-    position,
-    ticksAtLimit,
-    lowerPrice,
-    upperPrice,
-    contract,
-    setPoolInfo,
-  } = useModel('useUniswapModel');
-
+  const { network, contract, account, chainId } = useModel('useWalletModel');
   const [loadingTransferComplete, setLoadingTransferComplete] = useState<boolean>(false);
   const [advancedOP, setAdvancedOP] = useState<boolean>(false);
   const [previewAddLP, setPreviewAddLP] = useState<boolean>(false);
   const [addLPButtonLoading, setAddLPButtonLoading] = useState<boolean>(false);
 
-  const [lpPoolAddress, setLPPoolAddress] = useState<string>('');
-  const [totalAmount, setTotalAmount] = useState<BigNumber>();
-
-  const tokenContract = useMemo(() => {
-    if (tokenAddress && tokenAddress !== ZeroAddress) {
-      return new DAOTokenConnect(tokenAddress, network, metamaskProvider);
-    }
-    return undefined;
-  }, [metamaskProvider, network, tokenAddress]);
-
-  const updatePoolInfo = useCallback(async () => {
+  const [baseCurrency, setBaseCurrency] = useState<Currency>();
+  const [quoteCurrency, setQuoteCurrency] = useState<Currency>();
+  const [maxBaseTokenAmount, setMaxBaseTokenAmount] = useState<CurrencyAmount<Currency>>();
+  const [maxQuoteTokenAmount, setMaxQuoteTokenAmount] = useState<CurrencyAmount<Currency>>();
+  const [feeAmount, setFeeAmount] = useState<FeeAmount>();
+  useEffect(() => {
     if (!lpPoolAddress || lpPoolAddress === ZeroAddress || !tokenAddress) return;
-    const pool = await contract.uniswapPool.getPoolByAddress(lpPoolAddress, tokenAddress);
-    setPoolInfo(pool);
-    setFormDataFast({
-      fee: pool.pool?.fee,
-      baseToken: pool.tokenA?.address === tokenAddress ? pool.tokenA : pool.tokenB,
-      quoteToken: pool.tokenA?.address === tokenAddress ? pool.tokenB : pool.tokenA,
-      baseTokenAmount: 0,
-      quoteTokenAmount: 0,
+    contract.uniswapPool.getPoolByAddress(lpPoolAddress, tokenAddress).then((pl) => {
+      setBaseCurrency(pl.tokenA?.address === tokenAddress ? pl.tokenA : pl.tokenB);
+      setQuoteCurrency(pl.tokenA?.address === tokenAddress ? pl.tokenB : pl.tokenA);
+      setFeeAmount(pl.pool.fee);
+      // quote token max value set 1
+      setMaxQuoteTokenAmount(
+        CurrencyAmount.fromRawAmount(
+          pl.tokenA?.address === tokenAddress ? pl.tokenB : pl.tokenA,
+          JSBI.BigInt(1),
+        ),
+      );
     });
-  }, [contract.uniswapPool, lpPoolAddress, setFormDataFast, setPoolInfo, tokenAddress]);
+  }, [contract.uniswapPool, lpPoolAddress, tokenAddress]);
+
+  useEffect(() => {
+    if (!baseCurrency) return;
+    tokenContract?.getTemporaryAmount().then((value) => {
+      if (!baseCurrency) return;
+      const amount = value ? JSBI.BigInt(value.toString()) : undefined;
+      if (amount) {
+        setMaxBaseTokenAmount(CurrencyAmount.fromRawAmount(baseCurrency, amount));
+      }
+    });
+  }, [baseCurrency, tokenContract]);
+
+  const transformed: [Token, Token, FeeAmount] | null = useMemo(() => {
+    if (!chainId || !baseCurrency || !quoteCurrency || !feeAmount) return null;
+    const ta = baseCurrency?.wrapped;
+    const tb = quoteCurrency?.wrapped;
+    if (!ta || !tb || ta.equals(tb)) return null;
+    const [token0, token1] = ta.sortsBefore(tb) ? [ta, tb] : [tb, ta];
+    return [token0, token1, feeAmount];
+  }, [chainId, feeAmount, baseCurrency, quoteCurrency]);
+
+  const [poolInfo, setPoolInfo] = useState<[PoolState, Pool | null]>();
+
+  useEffect(() => {
+    if (!transformed || !transformed[0] || !transformed[1] || !transformed[2]) {
+      setPoolInfo([PoolState.INVALID, null]);
+      return;
+    }
+    contract.uniswapPool
+      .getPool(transformed[0], transformed[1], transformed[2])
+      .then(({ pool: pl, sqrtPriceX96 }) => {
+        if (!pl || !sqrtPriceX96 || sqrtPriceX96.eq(0)) {
+          setPoolInfo([PoolState.NOT_EXISTS, null]);
+          return;
+        }
+        setPoolInfo([PoolState.EXISTS, pl]);
+      });
+  }, [contract.uniswapPool, transformed]);
+
+  const [inputState, setInputState] =
+    useState<{ field: Field; typedValue: string; noLiquidity: boolean }>();
+  const [leftRangeState, setLeftRangeState] = useState<string | true>(true);
+  const [rightRangeState, setRightRangeState] = useState<string | true>(true);
+  const [startPriceState, setStartPriceState] = useState<string>();
+
+  const balances: (CurrencyAmount<Currency> | undefined)[] = useMemo(() => {
+    return [maxBaseTokenAmount, maxQuoteTokenAmount];
+  }, [maxBaseTokenAmount, maxQuoteTokenAmount]);
+
+  const {
+    price,
+    position,
+    noLiquidity,
+    invalidPool,
+    invalidRange,
+    depositADisabled,
+    invertPrice,
+    ticksAtLimit,
+    onFieldAInput,
+    onLeftRangeInput,
+    onRightRangeInput,
+    leftPrice,
+    rightPrice,
+    getDecrementLower,
+    getIncrementLower,
+    getDecrementUpper,
+    getIncrementUpper,
+    formattedAmounts,
+    maxAmounts,
+    isSorted,
+    priceLower,
+    priceUpper,
+    tickLower,
+    tickUpper,
+  } = useUniswap(
+    { inputState, leftRangeState, rightRangeState, startPriceState },
+    { setInputState, setLeftRangeState, setRightRangeState, setStartPriceState },
+    balances,
+    poolInfo,
+    baseCurrency ?? undefined,
+    quoteCurrency ?? undefined,
+    feeAmount,
+    baseCurrency ?? undefined,
+    undefined,
+  );
+
+  const startPriceWithNoQuoteToken = useMemo(
+    () => (invertPrice ? price?.invert()?.toSignificant(5) : price?.toSignificant(5)),
+    [invertPrice, price],
+  );
+
+  useEffect(() => {
+    if (!startPriceWithNoQuoteToken) return;
+    console.log({ startPriceWithNoQuoteToken });
+    onLeftRangeInput(startPriceWithNoQuoteToken);
+  }, [invertPrice, onLeftRangeInput, price, startPriceWithNoQuoteToken]);
 
   const handlerAddLP = useCallback(async () => {
     if (!tokenContract) return;
-    if (!network || accounts.length === 0) return;
+    if (!network || !account) return;
     if (!position) return;
     console.log(position.mintAmounts.amount1.toString(), position.mintAmounts.amount0.toString());
-    const quoteTokenAmount = poolInfo.invertPrice
+    const quoteTokenAmount = invertPrice
       ? position.mintAmounts.amount0.toString()
       : position.mintAmounts.amount1.toString();
     if (quoteTokenAmount !== '0') return;
     const addLP: ETH_CONNECT.AddLP = {
-      baseTokenAmount: poolInfo.invertPrice
+      baseTokenAmount: invertPrice
         ? position.mintAmounts.amount1.toString()
         : position.mintAmounts.amount0.toString(),
       tickLower: position.tickLower,
@@ -90,50 +168,19 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress, setCur
 
       setLoadingTransferComplete(true);
       const deployEvent = (await tx.wait()).events.pop();
-      await updatePoolInfo();
       setLoadingTransferComplete(false);
       console.log(deployEvent.args);
-      setFormDataFast({
-        independentField: UniswapField.CURRENCY_A,
-        typedAmount: 0,
-      });
-      const amount = await tokenContract.getTemporaryAmount();
-      console.log({ newTa: formatUnits(amount) });
-      setTotalAmount(amount);
+      const value = await tokenContract.getTemporaryAmount();
+      const amount = value ? JSBI.BigInt(value.toString()) : undefined;
+      if (amount && baseCurrency) {
+        setMaxBaseTokenAmount(CurrencyAmount.fromRawAmount(baseCurrency, amount));
+        onFieldAInput('0');
+      }
     } catch (e) {
       setPreviewAddLP(false);
       setLoadingTransferComplete(false);
     }
-  }, [
-    accounts.length,
-    network,
-    poolInfo.invertPrice,
-    position,
-    setFormDataFast,
-    tokenContract,
-    updatePoolInfo,
-  ]);
-
-  useMemo(async () => {
-    if (!tokenContract) return;
-    setLPPoolAddress(await tokenContract.getLPPool());
-    const amount = await tokenContract.getTemporaryAmount();
-    console.log({ ta: formatUnits(amount) });
-    setTotalAmount(amount);
-  }, [tokenContract]);
-
-  useMemo(async () => {
-    await updatePoolInfo();
-  }, [updatePoolInfo]);
-
-  useEffect(() => {
-    if (!formData.startingPrice) return;
-    setFormDataFast({ minPrice: formData.startingPrice.toString() });
-  }, [formData.startingPrice, setFormDataFast]);
-
-  const handlerMetamaskConnect = useCallback(() => {
-    metamaskEvent$?.emit();
-  }, [metamaskEvent$]);
+  }, [account, baseCurrency, invertPrice, network, onFieldAInput, position, tokenContract]);
 
   if (lpPoolAddress === ZeroAddress) {
     return (
@@ -157,8 +204,8 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress, setCur
     );
   }
 
-  if (!tokenAddress || !lpPoolAddress || totalAmount === undefined || poolInfo.pool === undefined) {
-    return <PageLoading />;
+  if (!tokenAddress || !lpPoolAddress || !poolInfo || poolInfo[0] !== PoolState.EXISTS) {
+    return <Skeleton active />;
   }
 
   return (
@@ -167,7 +214,7 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress, setCur
         tip={intl.formatMessage({ id: 'pages.dao.config.tab.token.add_lp.loading' })}
         spinning={loadingTransferComplete}
       >
-        <Form layout={'vertical'} name={'tokenAddLP'}>
+        <Form labelCol={{ span: 5 }} wrapperCol={{ span: 8 }} name={'tokenAddLP'}>
           <Form.Item
             label={intl.formatMessage({
               id: 'pages.dao.config.tab.token.add_lp.form.total_amount',
@@ -176,8 +223,83 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress, setCur
               id: 'pages.dao.config.tab.token.add_lp.form.total_amount.desc',
             })}
           >
-            {formatUnits(totalAmount)}
+            {maxAmounts[Field.CURRENCY_A]?.toExact() ?? ''}
           </Form.Item>
+          <Form.Item wrapperCol={{ offset: 5, span: 8 }}>
+            <Radio.Group
+              value={advancedOP ? 'advanced' : 'normal'}
+              buttonStyle="solid"
+              disabled={!feeAmount || invalidPool || (noLiquidity && !startPriceState)}
+              onChange={(v) => {
+                setAdvancedOP(v.target.value === 'advanced');
+                if (startPriceWithNoQuoteToken) onLeftRangeInput(startPriceWithNoQuoteToken);
+                setRightRangeState(true);
+              }}
+            >
+              <Radio.Button value="normal">
+                <FormattedMessage id={`pages.dao.config.tab.token.create.form.normal`} />
+              </Radio.Button>
+              <Radio.Button value="advanced">
+                <FormattedMessage id={`pages.dao.config.tab.token.create_pool.form.advanced`} />
+              </Radio.Button>
+            </Radio.Group>
+          </Form.Item>
+          {advancedOP && (
+            <>
+              <Form.Item
+                label={intl.formatMessage({
+                  id: 'pages.dao.config.tab.token.add_lp.form.min_price',
+                })}
+                tooltip={intl.formatMessage({
+                  id: 'pages.dao.config.tab.token.add_lp.form.min_price.desc',
+                })}
+              >
+                <InputNumber
+                  style={{ width: '100%' }}
+                  disabled={!feeAmount || invalidPool || (noLiquidity && !startPriceState)}
+                  value={
+                    ticksAtLimit[isSorted ? Bound.LOWER : Bound.UPPER]
+                      ? '0'
+                      : leftPrice?.toSignificant(5) ?? ''
+                  }
+                  min={startPriceWithNoQuoteToken}
+                  onChange={(value) => {
+                    onLeftRangeInput(value);
+                  }}
+                  onStep={(_, info) => {
+                    if (info.type === 'up') getIncrementLower();
+                    if (info.type === 'down') getDecrementLower();
+                  }}
+                />
+              </Form.Item>
+              <Form.Item
+                label={intl.formatMessage({
+                  id: 'pages.dao.config.tab.token.add_lp.form.max_price',
+                })}
+                tooltip={intl.formatMessage({
+                  id: 'pages.dao.config.tab.token.add_lp.form.max_price.desc',
+                })}
+              >
+                <InputNumber
+                  style={{ width: '100%' }}
+                  disabled={!feeAmount || invalidPool || (noLiquidity && !startPriceState)}
+                  value={
+                    ticksAtLimit[isSorted ? Bound.UPPER : Bound.LOWER]
+                      ? '∞'
+                      : rightPrice?.toSignificant(5) ?? ''
+                  }
+                  min={'∞'}
+                  onChange={(value) => {
+                    onRightRangeInput(value);
+                  }}
+                  onStep={(_, info) => {
+                    if (info.type === 'up') getIncrementUpper();
+                    if (info.type === 'down') getDecrementUpper();
+                  }}
+                />
+              </Form.Item>
+            </>
+          )}
           <Form.Item
             label={intl.formatMessage({
               id: 'pages.dao.config.tab.token.add_lp.form.base_token_amount',
@@ -187,110 +309,36 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress, setCur
             })}
           >
             <InputNumber
-              style={{ width: '200px' }}
-              value={formattedAmounts[UniswapField.CURRENCY_A]}
-              onChange={(value) =>
-                setFormDataFast({
-                  independentField: UniswapField.CURRENCY_A,
-                  typedAmount: value,
-                })
+              style={{ width: '100%' }}
+              disabled={
+                depositADisabled ||
+                !feeAmount ||
+                invalidPool ||
+                (noLiquidity && !startPriceState) ||
+                tickLower === undefined ||
+                tickUpper === undefined ||
+                invalidPool ||
+                invalidRange
               }
-              min={0}
-              max={formatUnits(totalAmount)}
+              value={formattedAmounts[Field.CURRENCY_A]}
+              min={'0'}
+              max={maxAmounts[Field.CURRENCY_A]?.toExact() ?? ''}
               step={1}
-            />
-          </Form.Item>
-          <Form.Item>
-            <Switch
-              checked={advancedOP}
               onChange={(value) => {
-                setAdvancedOP(value);
-                console.log({ sp: formData.startingPrice?.toString() });
-                setFormDataFast({
-                  minPrice: formData.startingPrice?.toString() || true,
-                  maxPrice: true,
-                });
+                onFieldAInput(value);
               }}
-              disabled={!formData.startingPrice}
-              checkedChildren={intl.formatMessage({
-                id: 'pages.dao.config.tab.token.add_lp.form.advanced',
-              })}
-              unCheckedChildren=""
             />
+            <div>{formattedAmounts[Field.CURRENCY_B]}</div>
           </Form.Item>
-          {advancedOP && (
-            <Row>
-              <Space>
-                <Form.Item
-                  label={intl.formatMessage({
-                    id: 'pages.dao.config.tab.token.add_lp.form.min_price',
-                  })}
-                  tooltip={intl.formatMessage({
-                    id: 'pages.dao.config.tab.token.add_lp.form.min_price.desc',
-                  })}
-                >
-                  <InputNumber
-                    style={{ width: '200px' }}
-                    value={minPrice}
-                    min={formData.startingPrice}
-                    onChange={(value) => {
-                      setFormDataFast({
-                        minPrice: value?.toString() || formData.startingPrice?.toString() || true,
-                      });
-                    }}
-                    onStep={(_, info) => {
-                      setFormDataFast({ minPrice: minPriceChange(info) });
-                    }}
-                  />
-                </Form.Item>
-                <Form.Item
-                  label={intl.formatMessage({
-                    id: 'pages.dao.config.tab.token.add_lp.form.max_price',
-                  })}
-                  tooltip={intl.formatMessage({
-                    id: 'pages.dao.config.tab.token.add_lp.form.max_price.desc',
-                  })}
-                >
-                  <InputNumber
-                    style={{ width: '200px' }}
-                    value={maxPrice}
-                    min={formData.startingPrice}
-                    onChange={(value) => {
-                      setFormDataFast({ maxPrice: value?.toString() || true });
-                    }}
-                    onStep={(_, info) => {
-                      setFormDataFast({ maxPrice: maxPriceChange(info) });
-                    }}
-                  />
-                </Form.Item>
-              </Space>
-            </Row>
-          )}
-          <Form.Item>
-            {metamaskIsConnected && !!formData.quoteToken && !!formData.fee && (
+          <Form.Item wrapperCol={{ offset: 5, span: 8 }}>
+            {!!quoteCurrency && !!feeAmount && (
               <Button
                 type="primary"
-                disabled={
-                  !(
-                    formattedAmounts[UniswapField.CURRENCY_A] &&
-                    formattedAmounts[UniswapField.CURRENCY_B]
-                  )
-                }
+                disabled={!formattedAmounts[Field.CURRENCY_A]}
                 onClick={() => setPreviewAddLP(true)}
               >
                 {intl.formatMessage({
                   id: 'pages.dao.config.tab.token.create_pool.form.button.create',
-                })}
-              </Button>
-            )}
-            {!metamaskIsConnected && (
-              <Button
-                type="primary"
-                disabled={!formattedAmounts[UniswapField.CURRENCY_A]}
-                onClick={() => handlerMetamaskConnect()}
-              >
-                {intl.formatMessage({
-                  id: 'pages.common.connect',
                 })}
               </Button>
             )}
@@ -317,23 +365,21 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({ tokenAddress, setCur
               id: 'pages.dao.config.tab.token.create_pool.form.base_token',
             })}
           >
-            {poolInfo.invertPrice
-              ? position?.amount1.toSignificant(4)
-              : position?.amount0.toSignificant(4)}
+            {invertPrice ? position?.amount1.toSignificant(4) : position?.amount0.toSignificant(4)}
           </Descriptions.Item>
           <Descriptions.Item
             label={intl.formatMessage({
               id: 'pages.dao.config.tab.token.create_pool.form.min_price',
             })}
           >
-            {`${formatTickPrice(lowerPrice, ticksAtLimit, UniswapBound.LOWER)}`}
+            {`${formatTickPrice(priceLower, ticksAtLimit, Bound.LOWER)}`}
           </Descriptions.Item>
           <Descriptions.Item
             label={intl.formatMessage({
               id: 'pages.dao.config.tab.token.create_pool.form.max_price',
             })}
           >
-            {`${formatTickPrice(upperPrice, ticksAtLimit, UniswapBound.UPPER)}`}
+            {`${formatTickPrice(priceUpper, ticksAtLimit, Bound.UPPER)}`}
           </Descriptions.Item>
         </Descriptions>
       </GlobalModal>

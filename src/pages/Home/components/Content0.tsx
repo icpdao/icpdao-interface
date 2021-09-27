@@ -25,7 +25,14 @@ const Content0: React.FC = () => {
       <div className={styles.POne}>
         <Space direction="vertical">
           <div className={styles.p1Title}>
-            <Texty type={'top'} mode={'sync'}>
+            <Texty
+              type={'top'}
+              mode={'sync'}
+              split={(v) => {
+                console.log(v);
+                return v.split('');
+              }}
+            >
               {intl.formatMessage({ id: 'pages.home.p1' })}
             </Texty>
           </div>
@@ -33,7 +40,7 @@ const Content0: React.FC = () => {
             <Texty delay={400} mode={'sync'}>
               {intl.formatMessage({ id: 'pages.home.p2.part1' })}
             </Texty>
-            <Texty delay={400} mode={'sync'}>
+            <Texty delay={420} mode={'sync'}>
               {intl.formatMessage({ id: 'pages.home.p2.part2' })}
             </Texty>
           </div>

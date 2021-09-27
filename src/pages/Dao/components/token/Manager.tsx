@@ -1,10 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { TokenConfigComponentsProps } from '@/pages/Dao/components/TokenConfig';
-import { ZeroAddress } from '@/services/ethereum-connect';
-import { DAOTokenConnect } from '@/services/ethereum-connect/token';
-import { useModel } from '@@/plugin-model/useModel';
-import { PageLoading } from '@ant-design/pro-layout';
-import { Button, Form, Input, List, Spin } from 'antd';
+import type { TokenConfigComponentsProps } from '@/pages/Dao/components/TokenConfig';
+import { Button, Form, Input, List, Skeleton, Spin } from 'antd';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { DeleteOutlined } from '@ant-design/icons';
 import { isAddress } from 'ethers/lib/utils';
@@ -14,22 +10,14 @@ type validInfo = {
   help: string;
 };
 
-const TokenManager: React.FC<TokenConfigComponentsProps> = ({ tokenAddress }) => {
+const TokenManager: React.FC<TokenConfigComponentsProps> = ({ tokenContract }) => {
   const intl = useIntl();
-  const { event$, network, isConnected, metamaskProvider } = useModel('useWalletModel');
   const [managers, setManagers] = useState<string[]>();
   const [addManager, setAddManager] = useState<string>('');
   const [loadingTransferComplete, setLoadingTransferComplete] = useState<boolean>(false);
   const [addButtonLoading, setAddButtonLoading] = useState<boolean>(false);
   const [formValid, setFormValid] = useState<validInfo>();
   const [removeButtonLoading, setRemoveButtonLoading] = useState<Record<string, boolean>>({});
-
-  const tokenContract = useMemo(() => {
-    if (tokenAddress && tokenAddress !== ZeroAddress) {
-      return new DAOTokenConnect(tokenAddress, network, metamaskProvider);
-    }
-    return undefined;
-  }, [metamaskProvider, network, tokenAddress]);
 
   useMemo(async () => {
     if (!tokenContract) return;
@@ -76,12 +64,9 @@ const TokenManager: React.FC<TokenConfigComponentsProps> = ({ tokenAddress }) =>
     },
     [tokenContract],
   );
-  const handlerMetamaskConnect = useCallback(() => {
-    event$?.emit();
-  }, [event$]);
 
   if (managers === undefined) {
-    return <PageLoading />;
+    return <Skeleton active />;
   }
 
   return (
@@ -143,17 +128,9 @@ const TokenManager: React.FC<TokenConfigComponentsProps> = ({ tokenAddress }) =>
             />
           </Form.Item>
           <Form.Item>
-            {isConnected ? (
-              <Button type={'primary'} onClick={handlerAddManager} loading={addButtonLoading}>
-                {intl.formatMessage({ id: 'pages.dao.config.tab.token.manager.form.button.add' })}
-              </Button>
-            ) : (
-              <Button type="primary" onClick={() => handlerMetamaskConnect()}>
-                {intl.formatMessage({
-                  id: 'pages.common.connect',
-                })}
-              </Button>
-            )}
+            <Button type={'primary'} onClick={handlerAddManager} loading={addButtonLoading}>
+              {intl.formatMessage({ id: 'pages.dao.config.tab.token.manager.form.button.add' })}
+            </Button>
           </Form.Item>
         </Form>
       </Spin>

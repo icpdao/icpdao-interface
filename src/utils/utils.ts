@@ -223,6 +223,14 @@ export const EthereumNetwork = {
   '0x2a': 'kovan',
 };
 
+export const EthereumNetworkById = {
+  1: 'homestead',
+  3: 'ropsten',
+  4: 'rinkeby',
+  5: 'goerli',
+  42: 'kovan',
+};
+
 export const EthereumChainId = {
   homestead: 1,
   ropsten: 3,
