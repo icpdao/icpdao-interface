@@ -50,7 +50,7 @@ const Content2: React.FC = () => {
                 <BgElement key="wg0" className={styles.P6ContentBg} />
                 <TweenOne animation={{ y: 30, opacity: 0, type: 'from' }}>
                   <Row className={styles.P6ContentLayout} justify={'center'}>
-                    <Col xs={20} md={16} lg={12}>
+                    <Col xs={20} md={16} xxl={12}>
                       <Row justify={'space-between'}>
                         <Col xs={0} lg={14} className={styles.P6ContentLeft}>
                           <img
@@ -87,7 +87,7 @@ const Content2: React.FC = () => {
                 <BgElement key="wg1" className={styles.P6ContentBg} />
                 <TweenOne animation={{ y: 30, opacity: 0, type: 'from' }}>
                   <Row className={styles.P6ContentLayout} justify={'center'}>
-                    <Col xs={20} md={16} lg={12}>
+                    <Col xs={20} md={16} xxl={12}>
                       <Row justify={'space-between'}>
                         <Col xs={0} lg={14} className={styles.P6ContentLeft}>
                           <img
@@ -114,7 +114,7 @@ const Content2: React.FC = () => {
                 <BgElement key="wg2" className={styles.P6ContentBg} />
                 <TweenOne animation={{ y: 30, opacity: 0, type: 'from' }}>
                   <Row className={styles.P6ContentLayout} justify={'center'}>
-                    <Col xs={20} md={16} lg={12}>
+                    <Col xs={20} md={16} xxl={12}>
                       <Row justify={'space-between'}>
                         <Col xs={0} lg={14} className={styles.P6ContentLeft}>
                           <img
@@ -146,7 +146,7 @@ const Content2: React.FC = () => {
                 <BgElement key="wg3" className={styles.P6ContentBg} />
                 <TweenOne animation={{ y: 30, opacity: 0, type: 'from' }}>
                   <Row className={styles.P6ContentLayout} justify={'center'}>
-                    <Col xs={20} md={16} lg={12}>
+                    <Col xs={20} md={16} xxl={12}>
                       <Row justify={'space-between'}>
                         <Col xs={0} lg={14} className={styles.P6ContentLeft}>
                           <img
@@ -173,7 +173,7 @@ const Content2: React.FC = () => {
                 <BgElement key="wg4" className={styles.P6ContentBg} />
                 <TweenOne animation={{ y: 30, opacity: 0, type: 'from' }}>
                   <Row className={styles.P6ContentLayout} justify={'center'}>
-                    <Col xs={20} md={16} lg={12}>
+                    <Col xs={20} md={16} xxl={12}>
                       <Row justify={'space-between'}>
                         <Col xs={0} lg={14} className={styles.P6ContentLeft}>
                           <img
@@ -200,7 +200,7 @@ const Content2: React.FC = () => {
                 <BgElement key="wg5" className={styles.P6ContentBg} />
                 <TweenOne animation={{ y: 30, opacity: 0, type: 'from' }}>
                   <Row className={styles.P6ContentLayout} justify={'center'}>
-                    <Col xs={20} md={16} lg={12}>
+                    <Col xs={20} md={16} xxl={12}>
                       <Row justify={'space-between'}>
                         <Col xs={0} lg={14} className={styles.P6ContentLeft}>
                           <img

@@ -141,7 +141,7 @@ const Content1: React.FC<HomeProps> = ({ statsData, loading }) => {
                         </Col>
                         <Col xs={0} lg={10} className={styles.P3ContentRight}>
                           <img
-                            style={{ height: '250px', float: 'right' }}
+                            style={{ maxWidth: '431px', maxHeight: '282px', float: 'right' }}
                             alt={'homeImage2'}
                             src={homeImage2}
                           />
@@ -180,7 +180,12 @@ const Content1: React.FC<HomeProps> = ({ statsData, loading }) => {
                         <Col xs={0} lg={10} className={styles.P3ContentRight}>
                           <img
                             onClick={() => setVideoModalVisible(true)}
-                            style={{ height: '250px', cursor: 'pointer', float: 'right' }}
+                            style={{
+                              maxWidth: '431px',
+                              maxHeight: '282px',
+                              cursor: 'pointer',
+                              float: 'right',
+                            }}
                             alt={'homeImage4'}
                             src={homeImage4}
                           />
@@ -219,7 +224,12 @@ const Content1: React.FC<HomeProps> = ({ statsData, loading }) => {
                         <Col xs={0} lg={10} className={styles.P3ContentRight}>
                           <img
                             onClick={() => window.open('https://g.icpdao.co/', '_blank')}
-                            style={{ height: '250px', cursor: 'pointer', float: 'right' }}
+                            style={{
+                              maxWidth: '431px',
+                              maxHeight: '282px',
+                              cursor: 'pointer',
+                              float: 'right',
+                            }}
                             alt={'homeImage3'}
                             src={homeImage3}
                           />
