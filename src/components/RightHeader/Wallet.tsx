@@ -99,7 +99,6 @@ const Wallet: React.FC = () => {
           fontWeight: 400,
           padding: '62px 30px 20px 30px',
         }}
-        width={'32%'}
         centered
         footer={null}
         onOk={() => {}}

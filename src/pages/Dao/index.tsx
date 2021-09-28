@@ -443,7 +443,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
       >
         {noVoteAlert}
         <Row className={styles.headerRow}>
-          <Col span={12}>
+          <Col xs={24} sm={12}>
             <Space size={30} className={styles.headerSpace}>
               {userRole === 'owner' && (
                 <DaoAvatar
@@ -467,7 +467,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
               <span className={styles.headerTitle}>{dao.name}</span>
             </Space>
           </Col>
-          <Col span={12} className={styles.headerCol}>
+          <Col xs={24} sm={12} className={styles.headerCol}>
             <Space size={10} className={styles.headerSpaceRight}>
               <Button
                 href={`https://github.com/${dao.name}`}

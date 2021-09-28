@@ -14,27 +14,45 @@
 
 .POne {
   position: absolute;
-  top: 23%;
+  top: 10%;
   right: 0;
   left: 0;
   display: inline-block;
-  width: 1000px;
+  width: 100%;
   margin: auto;
+  @media (min-width: @screen-sm) {
+    top: 23%;
+  }
 }
 
 .p1Title {
+  margin-right: 60px;
+  margin-left: 60px;
   color: #010101;
   font-weight: 400;
-  font-size: 48px;
-  word-break: break-word;
+  font-size: 2.4rem;
+  @media (min-width: @screen-sm) {
+    font-size: 2.4rem;
+  }
+  @media (min-width: @screen-md) {
+    font-size: 3.4rem;
+  }
+  @media (min-width: @screen-lg) {
+    font-size: 3.4rem;
+  }
 }
 
 .p1Content {
   margin-top: 60px;
+  margin-right: 30px;
+  margin-left: 30px;
   color: #555;
-  font-size: 24px;
+  font-size: 1.7rem;
   line-height: 34.5px;
   word-break: break-word;
+  @media (min-width: @screen-md) {
+    font-size: 1.7rem;
+  }
 }
 
 .p1Link {
@@ -47,6 +65,13 @@
 
 .p1Button {
   margin-top: 25px;
+}
+
+.p1Buttons {
+  margin-top: 55px;
+  @media (min-width: @screen-sm) {
+    margin-top: 85px;
+  }
 }
 
 .modalContentTitle {
@@ -76,12 +101,21 @@
   position: relative;
   width: 100%;
   min-height: 580px;
+  @media (min-width: @screen-md) {
+    min-height: 500px;
+  }
+  @media (min-width: @screen-lg) {
+    min-height: 580px;
+  }
 }
 
 .ContentThree {
   position: relative;
   width: 100%;
-  min-height: 620px;
+  min-height: 300px;
+  @media (min-width: @screen-lg) {
+    min-height: 620px;
+  }
 }
 
 .ContentFour {
@@ -154,18 +188,30 @@
 
 .P2StatValue {
   font-weight: 700;
-  font-size: 3em;
+  font-size: 2rem;
+  text-align: center;
+  @media (min-width: @screen-sm) {
+    font-size: 2.1rem;
+  }
+  @media (min-width: @screen-md) {
+    font-size: 2.2rem;
+  }
+  @media (min-width: @screen-lg) {
+    font-size: 2.3rem;
+  }
 }
 
 .P2StatSuffix {
   font-weight: 700;
-  font-size: 1em;
+  font-size: 2rem;
 }
 
 .P2StatTitle {
-  margin-left: 10px;
+  display: inline-block;
+  width: 100%;
   color: #333;
   font-size: 1em;
+  text-align: center;
 }
 
 .P2 {
@@ -183,13 +229,31 @@
 
 .P4 {
   margin-top: 300px;
+  @media (min-width: @screen-md) {
+    margin-top: 250px;
+  }
+  @media (min-width: @screen-lg) {
+    margin-top: 350px;
+  }
 }
 
 .P5 {
-  margin-top: 6rem;
+  margin-top: 3rem;
   color: #eb4336;
-  font-size: 2.3rem;
+  font-size: 2rem;
   text-align: center;
+  @media (min-width: @screen-sm) {
+    margin-top: 4rem;
+    font-size: 2.1rem;
+  }
+  @media (min-width: @screen-md) {
+    margin-top: 5rem;
+    font-size: 2.2rem;
+  }
+  @media (min-width: @screen-lg) {
+    margin-top: 6rem;
+    font-size: 2.3rem;
+  }
 }
 
 .P6 {
@@ -200,15 +264,35 @@
 }
 
 .P7 {
-  margin-top: 450px;
+  margin-top: 180px;
+  @media (min-width: @screen-md) {
+    margin-top: 180px;
+  }
+  @media (min-width: @screen-lg) {
+    margin-top: 450px;
+  }
 }
 
 .P8 {
   display: grid;
-  margin-top: 6rem;
-  font-size: 2.3rem;
+  margin-top: 3rem;
+  margin-right: 2rem;
+  margin-left: 2rem;
+  font-size: 2rem;
   text-align: center;
   place-items: center;
+  @media (min-width: @screen-sm) {
+    margin-top: 4rem;
+    font-size: 2.1rem;
+  }
+  @media (min-width: @screen-md) {
+    margin-top: 5rem;
+    font-size: 2.2rem;
+  }
+  @media (min-width: @screen-lg) {
+    margin-top: 6rem;
+    font-size: 2.3rem;
+  }
 }
 
 .P9 {
@@ -218,19 +302,37 @@
 
 .P10 {
   display: grid;
-  margin-top: 6rem;
-  font-size: 2.3rem;
+  margin-top: 1rem;
+  font-size: 2rem;
   text-align: center;
   place-items: center;
+  @media (min-width: @screen-sm) {
+    margin-top: 2rem;
+    font-size: 2.1rem;
+  }
+  @media (min-width: @screen-md) {
+    margin-top: 3rem;
+    font-size: 2.2rem;
+  }
+  @media (min-width: @screen-lg) {
+    margin-top: 4rem;
+    font-size: 2.3rem;
+  }
 }
 
 .P11 {
   display: grid;
   margin-top: 30px;
   color: #555;
-  font-size: 24px;
+  font-size: 1.2rem;
   text-align: center;
   place-items: center;
+  @media (min-width: @screen-md) {
+    font-size: 1.2rem;
+  }
+  @media (min-width: @screen-lg) {
+    font-size: 1.7rem;
+  }
 }
 
 .P12 {
@@ -286,7 +388,13 @@
   width: 100%;
   .P3ContentLeft {
     .P3ContentLeftTitle {
-      font-size: 25px;
+      font-size: 1.7rem;
+      @media (min-width: @screen-md) {
+        font-size: 1.2rem;
+      }
+      @media (min-width: @screen-lg) {
+        font-size: 1.7rem;
+      }
     }
     .P3ContentLeftLine {
       width: 40px;
@@ -295,14 +403,22 @@
       background: #dc9305;
     }
     .P3ContentLeftDesc {
-      max-height: 60px;
       margin-top: 20px;
-      margin-bottom: 45px;
+      margin-bottom: 35px;
       color: #6b6b6b;
-      font-size: 18px;
+      font-size: 1.1rem;
+      @media (min-width: @screen-md) {
+        margin-bottom: 20px;
+        font-size: 1rem;
+      }
+      @media (min-width: @screen-lg) {
+        margin-bottom: 35px;
+        font-size: 1.1rem;
+      }
     }
   }
   .P3ContentRight {
+    margin-left: 50px;
     text-align: center;
   }
 }
@@ -310,23 +426,49 @@
 .P6ContentLayout {
   width: 100%;
   .P6ContentRight {
+    text-align: center;
     .P6ContentRightTitle {
-      margin-top: 110px;
-      font-size: 25px;
+      font-size: 1.7rem;
+      @media (min-width: @screen-md) {
+        font-size: 1.2rem;
+      }
+      @media (min-width: @screen-lg) {
+        margin-top: 110px;
+        font-size: 1.7rem;
+      }
     }
     .P6ContentRightLine {
       width: 40px;
       height: 4px;
       margin-top: 5px;
+      margin-right: auto;
+      margin-left: auto;
       background: #52c41a;
+      @media (min-width: @screen-md) {
+        margin-right: 0;
+        margin-left: 0;
+      }
+      @media (min-width: @screen-lg) {
+        display: inline-block;
+      }
     }
     .P6ContentRightDesc {
-      max-width: 600px;
-      max-height: 60px;
       margin-top: 20px;
       margin-bottom: 45px;
       color: #6b6b6b;
-      font-size: 18px;
+      font-size: 1.1rem;
+      @media (min-width: @screen-md) {
+        font-size: 1rem;
+      }
+      @media (min-width: @screen-lg) {
+        font-size: 1.1rem;
+      }
+    }
+    @media (min-width: @screen-md) {
+      text-align: left;
+    }
+    @media (min-width: @screen-lg) {
+      text-align: left;
     }
   }
   .P6ContentLeft {
@@ -394,12 +536,12 @@
 .P4Button {
   position: relative;
   display: grid;
-  width: 250px;
-  height: 100px;
+  width: 50px;
+  height: 8px;
+  margin-top: 100px;
   padding: 4px 15px;
   color: rgba(0, 0, 0, 0.85);
-  font-weight: 400;
-  font-size: 14px;
+  font-size: 0.1rem;
   line-height: 1.5715;
   text-align: center;
   background: #fff;
@@ -411,7 +553,7 @@
   touch-action: manipulation;
   place-items: center;
   div {
-    display: block;
+    display: none;
     width: auto;
     overflow: hidden;
     font-weight: 520;
@@ -419,6 +561,25 @@
     white-space: pre-wrap;
     word-wrap: break-word;
     word-break: break-word;
+  }
+  @media (min-width: @screen-md) {
+    display: grid;
+    width: 50px;
+    height: 8px;
+    margin-top: 0;
+    font-weight: 400;
+    font-size: 1rem;
+  }
+  @media (min-width: @screen-lg) {
+    display: grid;
+    width: 250px;
+    height: 100px;
+    margin-top: 0;
+    font-weight: 400;
+    font-size: 1rem;
+    div {
+      display: block;
+    }
   }
 }
 
@@ -430,12 +591,12 @@
 .P7Button {
   position: relative;
   display: grid;
-  width: 160px;
-  height: 60px;
+  width: 120px;
+  height: 30px;
+  margin-bottom: 10px;
   padding: 4px 15px;
   color: rgba(0, 0, 0, 0.85);
   font-weight: 400;
-  font-size: 14px;
   line-height: 1.5715;
   text-align: center;
   background: #fff;
@@ -450,11 +611,33 @@
     display: block;
     width: auto;
     overflow: hidden;
-    font-weight: 520;
-    font-size: 18px;
+    font-size: 0.5rem;
     white-space: pre-wrap;
     word-wrap: break-word;
     word-break: break-word;
+  }
+  @media (min-width: @screen-md) {
+    display: grid;
+    width: 50px;
+    height: 8px;
+    margin-top: 0;
+    font-weight: 400;
+    font-size: 1rem;
+    div {
+      display: none;
+    }
+  }
+  @media (min-width: @screen-lg) {
+    display: grid;
+    width: 160px;
+    height: 60px;
+    margin-top: 0;
+    font-weight: 400;
+    font-size: 1rem;
+    div {
+      display: block;
+      font-size: 1.3rem;
+    }
   }
 }
 
@@ -464,10 +647,7 @@
 }
 
 .P9Map {
-  position: absolute;
-  top: 160px;
-  left: calc(50% - 550px);
-  width: 1100px;
+  width: 100%;
   height: 800px;
   cursor: unset !important;
 }
@@ -516,8 +696,9 @@
 
 .P12Card {
   display: grid;
-  width: 260px;
-  height: 261px;
+  width: 219px;
+  height: 220px;
+  margin-bottom: 20px;
   margin-left: 10px;
   background: #fafafa;
   border-radius: 4px;

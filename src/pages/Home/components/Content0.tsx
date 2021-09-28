@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Space } from 'antd';
+import { Button, Col, Row, Space } from 'antd';
 import styles from '../index.less';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { history } from '@@/core/history';
@@ -25,23 +25,13 @@ const Content0: React.FC = () => {
       <div className={styles.POne}>
         <Space direction="vertical">
           <div className={styles.p1Title}>
-            <Texty
-              type={'top'}
-              mode={'sync'}
-              split={(v) => {
-                console.log(v);
-                return v.split('');
-              }}
-            >
+            <Texty type={'top'} mode={'sync'} split={(v) => v.split(' ').map((s) => `${s} `)}>
               {intl.formatMessage({ id: 'pages.home.p1' })}
             </Texty>
           </div>
           <div className={styles.p1Content}>
-            <Texty delay={400} mode={'sync'}>
-              {intl.formatMessage({ id: 'pages.home.p2.part1' })}
-            </Texty>
-            <Texty delay={420} mode={'sync'}>
-              {intl.formatMessage({ id: 'pages.home.p2.part2' })}
+            <Texty delay={400} mode={'sync'} split={(v) => v.split(' ').map((s) => `${s} `)}>
+              {intl.formatMessage({ id: 'pages.home.p2' })}
             </Texty>
           </div>
           <div className={styles.p1Link}>
@@ -54,29 +44,33 @@ const Content0: React.FC = () => {
             </a>
           </div>
         </Space>
-        <Space style={{ marginTop: 85 }} size={30}>
-          <Button
-            key="exploreDao"
-            style={{ width: 200 }}
-            size={'large'}
-            type="primary"
-            onClick={() => history.push('/dao/explore')}
-          >
-            <FormattedMessage id={'pages.home.button1'} />
-          </Button>
-          <AccessButton
-            key="markJob"
-            style={{ width: 200 }}
-            allow={AccessEnum.PREICPPER}
-            defaultWarningModal={defaultWarning}
-            delayWarningModal={1000}
-            size={'large'}
-            type="primary"
-            onClick={handleMarkJob}
-          >
-            <FormattedMessage id={'pages.home.button2'} />
-          </AccessButton>
-        </Space>
+        <Row className={styles.p1Buttons} gutter={30} justify={'center'}>
+          <Col span={'250px'}>
+            <Button
+              style={{ width: '250px', marginBottom: '10px' }}
+              key="exploreDao"
+              size={'large'}
+              type="primary"
+              onClick={() => history.push('/dao/explore')}
+            >
+              <FormattedMessage id={'pages.home.button1'} />
+            </Button>
+          </Col>
+          <Col span={'250px'}>
+            <AccessButton
+              style={{ width: '250px', marginBottom: '10px' }}
+              key="markJob"
+              allow={AccessEnum.PREICPPER}
+              defaultWarningModal={defaultWarning}
+              delayWarningModal={1000}
+              size={'large'}
+              type="primary"
+              onClick={handleMarkJob}
+            >
+              <FormattedMessage id={'pages.home.button2'} />
+            </AccessButton>
+          </Col>
+        </Row>
       </div>
     </div>
   );

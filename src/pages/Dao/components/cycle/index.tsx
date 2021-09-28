@@ -52,7 +52,7 @@ const DaoCycleIndex: React.FC<DaoCycleProps> = ({
       number: parseFloat(data?.cycle?.stat?.size || '').toFixed(1) || 0,
     },
     {
-      title: tokenSymbol,
+      title: tokenSymbol || intl.formatMessage({ id: 'component.card.stat.income' }),
       number: parseFloat(data?.cycle?.stat?.income || '').toFixed(2) || 0,
     },
   ];

@@ -27,7 +27,12 @@ const Content2: React.FC = () => {
   return (
     <div className={styles.ContentThree}>
       <ScrollAnim.OverPack id="works">
-        <Texty type={'top'} mode={'sync'} className={styles.P5}>
+        <Texty
+          type={'top'}
+          mode={'sync'}
+          className={styles.P5}
+          split={(v) => v.split(' ').map((s) => `${s} `)}
+        >
           {intl.formatMessage({ id: 'pages.home.p5' })}
         </Texty>
         <QueueAnim delay={300} interval={600} type={'left'} key="worksQueueAnim">
@@ -45,9 +50,9 @@ const Content2: React.FC = () => {
                 <BgElement key="wg0" className={styles.P6ContentBg} />
                 <TweenOne animation={{ y: 30, opacity: 0, type: 'from' }}>
                   <Row className={styles.P6ContentLayout} justify={'center'}>
-                    <Col span={20}>
-                      <Row justify={'center'}>
-                        <Col span={10} className={styles.P6ContentLeft}>
+                    <Col xs={20} md={16} lg={12}>
+                      <Row justify={'space-between'}>
+                        <Col xs={0} lg={14} className={styles.P6ContentLeft}>
                           <img
                             alt={'homeImage60'}
                             src={homeImage60}
@@ -64,7 +69,7 @@ const Content2: React.FC = () => {
                             className={styles.P6ContentImage2}
                           />
                         </Col>
-                        <Col span={6} className={styles.P6ContentRight}>
+                        <Col xs={24} lg={10} className={styles.P6ContentRight}>
                           <div className={styles.P6ContentRightTitle}>
                             {intl.formatMessage({ id: 'pages.home.p6.0.title' })}
                           </div>
@@ -82,16 +87,16 @@ const Content2: React.FC = () => {
                 <BgElement key="wg1" className={styles.P6ContentBg} />
                 <TweenOne animation={{ y: 30, opacity: 0, type: 'from' }}>
                   <Row className={styles.P6ContentLayout} justify={'center'}>
-                    <Col span={20}>
-                      <Row justify={'center'}>
-                        <Col span={10} className={styles.P6ContentLeft}>
+                    <Col xs={20} md={16} lg={12}>
+                      <Row justify={'space-between'}>
+                        <Col xs={0} lg={14} className={styles.P6ContentLeft}>
                           <img
                             alt={'homeImage63'}
                             src={homeImage63}
                             className={styles.P6ContentImage3}
                           />
                         </Col>
-                        <Col span={6} className={styles.P6ContentRight}>
+                        <Col xs={24} lg={10} className={styles.P6ContentRight}>
                           <div className={styles.P6ContentRightTitle}>
                             {intl.formatMessage({ id: 'pages.home.p6.1.title' })}
                           </div>
@@ -109,9 +114,9 @@ const Content2: React.FC = () => {
                 <BgElement key="wg2" className={styles.P6ContentBg} />
                 <TweenOne animation={{ y: 30, opacity: 0, type: 'from' }}>
                   <Row className={styles.P6ContentLayout} justify={'center'}>
-                    <Col span={20}>
-                      <Row justify={'center'}>
-                        <Col span={10} className={styles.P6ContentLeft}>
+                    <Col xs={20} md={16} lg={12}>
+                      <Row justify={'space-between'}>
+                        <Col xs={0} lg={14} className={styles.P6ContentLeft}>
                           <img
                             alt={'homeImage64'}
                             src={homeImage64}
@@ -123,7 +128,7 @@ const Content2: React.FC = () => {
                             className={styles.P6ContentImage5}
                           />
                         </Col>
-                        <Col span={6} className={styles.P6ContentRight}>
+                        <Col xs={24} lg={10} className={styles.P6ContentRight}>
                           <div className={styles.P6ContentRightTitle}>
                             {intl.formatMessage({ id: 'pages.home.p6.2.title' })}
                           </div>
@@ -141,16 +146,16 @@ const Content2: React.FC = () => {
                 <BgElement key="wg3" className={styles.P6ContentBg} />
                 <TweenOne animation={{ y: 30, opacity: 0, type: 'from' }}>
                   <Row className={styles.P6ContentLayout} justify={'center'}>
-                    <Col span={20}>
-                      <Row justify={'center'}>
-                        <Col span={10} className={styles.P6ContentLeft}>
+                    <Col xs={20} md={16} lg={12}>
+                      <Row justify={'space-between'}>
+                        <Col xs={0} lg={14} className={styles.P6ContentLeft}>
                           <img
                             alt={'homeImage66'}
                             src={homeImage66}
                             className={styles.P6ContentImage6}
                           />
                         </Col>
-                        <Col span={6} className={styles.P6ContentRight}>
+                        <Col xs={24} lg={10} className={styles.P6ContentRight}>
                           <div className={styles.P6ContentRightTitle}>
                             {intl.formatMessage({ id: 'pages.home.p6.3.title' })}
                           </div>
@@ -168,16 +173,16 @@ const Content2: React.FC = () => {
                 <BgElement key="wg4" className={styles.P6ContentBg} />
                 <TweenOne animation={{ y: 30, opacity: 0, type: 'from' }}>
                   <Row className={styles.P6ContentLayout} justify={'center'}>
-                    <Col span={20}>
-                      <Row justify={'center'}>
-                        <Col span={10} className={styles.P6ContentLeft}>
+                    <Col xs={20} md={16} lg={12}>
+                      <Row justify={'space-between'}>
+                        <Col xs={0} lg={14} className={styles.P6ContentLeft}>
                           <img
                             alt={'homeImage67'}
                             src={homeImage67}
                             className={styles.P6ContentImage7}
                           />
                         </Col>
-                        <Col span={6} className={styles.P6ContentRight}>
+                        <Col xs={24} lg={10} className={styles.P6ContentRight}>
                           <div className={styles.P6ContentRightTitle}>
                             {intl.formatMessage({ id: 'pages.home.p6.4.title' })}
                           </div>
@@ -195,16 +200,16 @@ const Content2: React.FC = () => {
                 <BgElement key="wg5" className={styles.P6ContentBg} />
                 <TweenOne animation={{ y: 30, opacity: 0, type: 'from' }}>
                   <Row className={styles.P6ContentLayout} justify={'center'}>
-                    <Col span={20}>
-                      <Row justify={'center'}>
-                        <Col span={10} className={styles.P6ContentLeft}>
+                    <Col xs={20} md={16} lg={12}>
+                      <Row justify={'space-between'}>
+                        <Col xs={0} lg={14} className={styles.P6ContentLeft}>
                           <img
                             alt={'homeImage68'}
                             src={homeImage68}
                             className={styles.P6ContentImage8}
                           />
                         </Col>
-                        <Col span={6} className={styles.P6ContentRight}>
+                        <Col xs={24} lg={10} className={styles.P6ContentRight}>
                           <div className={styles.P6ContentRightTitle}>
                             {intl.formatMessage({ id: 'pages.home.p6.5.title' })}
                           </div>
@@ -221,7 +226,7 @@ const Content2: React.FC = () => {
             </BannerAnim>
           </div>
           <Row className={styles.P7} key="worksBannerButton" justify={'center'} gutter={8}>
-            <Col span={20}>
+            <Col span={16}>
               <Row justify={'space-between'}>
                 <Col>
                   <div
