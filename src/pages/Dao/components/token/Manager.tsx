@@ -4,6 +4,7 @@ import { Button, Form, Input, List, Skeleton, Spin } from 'antd';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { DeleteOutlined } from '@ant-design/icons';
 import { isAddress } from 'ethers/lib/utils';
+import IconFont from '@/components/IconFont';
 
 type validInfo = {
   status: Parameters<typeof Form.Item>[0]['validateStatus'];
@@ -104,9 +105,12 @@ const TokenManager: React.FC<TokenConfigComponentsProps> = ({ tokenContract }) =
         <Form layout={'inline'} name={'tokenManager'}>
           <Form.Item
             label={intl.formatMessage({ id: 'pages.dao.config.tab.token.manager.form.add' })}
-            tooltip={intl.formatMessage({
-              id: 'pages.dao.config.tab.token.manager.form.add.desc',
-            })}
+            tooltip={{
+              title: intl.formatMessage({
+                id: 'pages.dao.config.tab.token.manager.form.add.desc',
+              }),
+              icon: <IconFont type={'icon-question'} />,
+            }}
             validateStatus={formValid?.status}
             help={formValid?.help}
           >

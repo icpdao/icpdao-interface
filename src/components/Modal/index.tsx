@@ -19,18 +19,17 @@ const GlobalModal: React.FC<GlobalModalProps> = ({
   <Modal
     maskClosable={true}
     destroyOnClose={true}
-    maskStyle={{ top: 64, height: 'calc(100% - 130px)' }}
     bodyStyle={{
       paddingTop: 62,
       textAlign: 'center',
       fontWeight: 400,
       padding: '62px 30px 20px 30px',
     }}
-    width={493}
+    width={'32%'}
     centered
     footer={
       <Row justify={'center'}>
-        <Col>
+        <Col span={20}>
           <Space direction={'vertical'} className={styles.globalModalButtonSpace}>
             <Button
               block

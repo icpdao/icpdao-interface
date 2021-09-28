@@ -38,6 +38,7 @@ import { BigNumber } from 'ethers';
 import JSBI from 'jsbi';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { ETH_CONNECT } from '@/services/ethereum-connect/typings';
+import IconFont from '@/components/IconFont';
 
 type TokenToSelect = {
   address: string;
@@ -528,9 +529,12 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
             label={intl.formatMessage({
               id: 'pages.dao.config.tab.token.create_pool.form.base_token',
             })}
-            tooltip={intl.formatMessage({
-              id: 'pages.dao.config.tab.token.create_pool.form.base_token.desc',
-            })}
+            tooltip={{
+              title: intl.formatMessage({
+                id: 'pages.dao.config.tab.token.create_pool.form.base_token.desc',
+              }),
+              icon: <IconFont type={'icon-question'} />,
+            }}
           >
             <Input style={{ width: '100%' }} disabled={true} value={baseCurrency?.symbol || ''} />
           </Form.Item>
@@ -538,9 +542,12 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
             label={intl.formatMessage({
               id: 'pages.dao.config.tab.token.create_pool.form.quote_token',
             })}
-            tooltip={intl.formatMessage({
-              id: 'pages.dao.config.tab.token.create_pool.form.quote_token.desc',
-            })}
+            tooltip={{
+              title: intl.formatMessage({
+                id: 'pages.dao.config.tab.token.create_pool.form.quote_token.desc',
+              }),
+              icon: <IconFont type={'icon-question'} />,
+            }}
           >
             <Select
               showSearch
@@ -561,9 +568,12 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
           </Form.Item>
           <Form.Item
             label={intl.formatMessage({ id: 'pages.dao.config.tab.token.create_pool.form.fee' })}
-            tooltip={intl.formatMessage({
-              id: 'pages.dao.config.tab.token.create_pool.form.fee.desc',
-            })}
+            tooltip={{
+              title: intl.formatMessage({
+                id: 'pages.dao.config.tab.token.create_pool.form.fee.desc',
+              }),
+              icon: <IconFont type={'icon-question'} />,
+            }}
           >
             <Radio.Group
               buttonStyle="solid"
@@ -582,9 +592,12 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
             label={intl.formatMessage({
               id: 'pages.dao.config.tab.token.create_pool.form.set_starting_price',
             })}
-            tooltip={intl.formatMessage({
-              id: 'pages.dao.config.tab.token.create_pool.form.set_starting_price.desc',
-            })}
+            tooltip={{
+              title: intl.formatMessage({
+                id: 'pages.dao.config.tab.token.create_pool.form.set_starting_price.desc',
+              }),
+              icon: <IconFont type={'icon-question'} />,
+            }}
           >
             <InputNumber
               style={{ width: '100%' }}
@@ -630,9 +643,12 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
                 label={intl.formatMessage({
                   id: 'pages.dao.config.tab.token.create_pool.form.min_price',
                 })}
-                tooltip={intl.formatMessage({
-                  id: 'pages.dao.config.tab.token.create_pool.form.min_price.desc',
-                })}
+                tooltip={{
+                  title: intl.formatMessage({
+                    id: 'pages.dao.config.tab.token.create_pool.form.min_price.desc',
+                  }),
+                  icon: <IconFont type={'icon-question'} />,
+                }}
               >
                 <InputNumber
                   style={{ width: '100%' }}
@@ -656,9 +672,12 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
                 label={intl.formatMessage({
                   id: 'pages.dao.config.tab.token.create_pool.form.max_price',
                 })}
-                tooltip={intl.formatMessage({
-                  id: 'pages.dao.config.tab.token.create_pool.form.max_price.desc',
-                })}
+                tooltip={{
+                  title: intl.formatMessage({
+                    id: 'pages.dao.config.tab.token.create_pool.form.max_price.desc',
+                  }),
+                  icon: <IconFont type={'icon-question'} />,
+                }}
               >
                 <InputNumber
                   style={{ width: '100%' }}
@@ -684,9 +703,12 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
             label={intl.formatMessage({
               id: 'pages.dao.config.tab.token.create_pool.form.base_token_amount',
             })}
-            tooltip={intl.formatMessage({
-              id: 'pages.dao.config.tab.token.create_pool.form.base_token_amount.desc',
-            })}
+            tooltip={{
+              title: intl.formatMessage({
+                id: 'pages.dao.config.tab.token.create_pool.form.base_token_amount.desc',
+              }),
+              icon: <IconFont type={'icon-question'} />,
+            }}
           >
             <InputNumber
               style={{ width: '100%' }}
@@ -713,9 +735,12 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
             label={intl.formatMessage({
               id: 'pages.dao.config.tab.token.create_pool.form.quote_token_amount',
             })}
-            tooltip={intl.formatMessage({
-              id: 'pages.dao.config.tab.token.create_pool.form.quote_token_amount.desc',
-            })}
+            tooltip={{
+              title: intl.formatMessage({
+                id: 'pages.dao.config.tab.token.create_pool.form.quote_token_amount.desc',
+              }),
+              icon: <IconFont type={'icon-question'} />,
+            }}
           >
             <InputNumber
               style={{ width: '100%' }}

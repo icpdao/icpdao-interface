@@ -1,4 +1,4 @@
-import { Button, Col, Modal, Row, Space } from 'antd';
+import { Button, Col, Modal, Row } from 'antd';
 import React, { useCallback } from 'react';
 import styles from './MentorWarningModal.less';
 import { useIntl } from '@@/plugin-locale/localeExports';
@@ -20,24 +20,21 @@ const MentorWarningModal: React.FC<MentorWarningModalProps> = ({ visible, setVis
     <Modal
       maskClosable={true}
       destroyOnClose={true}
-      maskStyle={{ top: 64, height: 'calc(100% - 130px)' }}
       bodyStyle={{
         paddingTop: 62,
         textAlign: 'center',
         fontWeight: 400,
         padding: '62px 30px 20px 30px',
       }}
-      width={493}
+      width={'32%'}
       centered
       visible={visible}
       footer={
         <Row justify={'center'}>
-          <Col>
-            <Space direction={'vertical'} className={styles.ModalButtonSpace}>
-              <Button block key={'submit'} type={'primary'} size={'large'} onClick={onOk}>
-                {intl.formatMessage({ id: 'pages.home.mentor.warning.ok' })}
-              </Button>
-            </Space>
+          <Col span={20}>
+            <Button block key={'submit'} type={'primary'} size={'large'} onClick={onOk}>
+              {intl.formatMessage({ id: 'pages.home.mentor.warning.ok' })}
+            </Button>
           </Col>
         </Row>
       }

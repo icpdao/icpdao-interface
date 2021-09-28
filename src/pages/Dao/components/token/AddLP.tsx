@@ -13,6 +13,7 @@ import { CurrencyAmount } from '@uniswap/sdk-core';
 import type { FeeAmount, Pool } from '@uniswap/v3-sdk';
 import JSBI from 'jsbi';
 import { Bound, Field, formatTickPrice, PoolState, useUniswap } from '@/pages/Dao/hooks/useUniswap';
+import IconFont from '@/components/IconFont';
 
 const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
   tokenAddress,
@@ -219,9 +220,12 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
             label={intl.formatMessage({
               id: 'pages.dao.config.tab.token.add_lp.form.total_amount',
             })}
-            tooltip={intl.formatMessage({
-              id: 'pages.dao.config.tab.token.add_lp.form.total_amount.desc',
-            })}
+            tooltip={{
+              title: intl.formatMessage({
+                id: 'pages.dao.config.tab.token.add_lp.form.total_amount.desc',
+              }),
+              icon: <IconFont type={'icon-question'} />,
+            }}
           >
             {maxAmounts[Field.CURRENCY_A]?.toExact() ?? ''}
           </Form.Item>
@@ -250,9 +254,12 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
                 label={intl.formatMessage({
                   id: 'pages.dao.config.tab.token.add_lp.form.min_price',
                 })}
-                tooltip={intl.formatMessage({
-                  id: 'pages.dao.config.tab.token.add_lp.form.min_price.desc',
-                })}
+                tooltip={{
+                  title: intl.formatMessage({
+                    id: 'pages.dao.config.tab.token.add_lp.form.min_price.desc',
+                  }),
+                  icon: <IconFont type={'icon-question'} />,
+                }}
               >
                 <InputNumber
                   style={{ width: '100%' }}
@@ -276,9 +283,12 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
                 label={intl.formatMessage({
                   id: 'pages.dao.config.tab.token.add_lp.form.max_price',
                 })}
-                tooltip={intl.formatMessage({
-                  id: 'pages.dao.config.tab.token.add_lp.form.max_price.desc',
-                })}
+                tooltip={{
+                  title: intl.formatMessage({
+                    id: 'pages.dao.config.tab.token.add_lp.form.max_price.desc',
+                  }),
+                  icon: <IconFont type={'icon-question'} />,
+                }}
               >
                 <InputNumber
                   style={{ width: '100%' }}
@@ -304,9 +314,12 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
             label={intl.formatMessage({
               id: 'pages.dao.config.tab.token.add_lp.form.base_token_amount',
             })}
-            tooltip={intl.formatMessage({
-              id: 'pages.dao.config.tab.token.add_lp.form.base_token_amount.desc',
-            })}
+            tooltip={{
+              title: intl.formatMessage({
+                id: 'pages.dao.config.tab.token.add_lp.form.base_token_amount.desc',
+              }),
+              icon: <IconFont type={'icon-question'} />,
+            }}
           >
             <InputNumber
               style={{ width: '100%' }}

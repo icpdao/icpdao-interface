@@ -68,6 +68,13 @@ const Content3: React.FC = () => {
             maxZoom: 1,
             dragPan: false,
             dragRotate: false,
+            resizeEnable: false,
+            dragEnable: false,
+            keyboardEnable: false,
+            doubleClickZoom: false,
+            zoomEnable: false,
+            rotateEnable: false,
+            scrollZoom: false,
           }}
           className={styles.P9Map}
         >
