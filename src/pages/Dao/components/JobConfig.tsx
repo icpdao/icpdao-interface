@@ -12,6 +12,7 @@ import momentTZ from 'moment-timezone';
 import styles from './index.less';
 import DayHourCascader from '@/pages/Dao/components/DayHourCascader';
 import { getFormatTime } from '@/utils/utils';
+import IconFont from '@/components/IconFont';
 
 type JobConfigProps = {
   daoId: string;
@@ -280,6 +281,7 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
               tooltip={{
                 title: intl.formatMessage({ id: 'pages.dao.config.tab.job.form.deadline.desc' }),
                 placement: 'right',
+                icon: <IconFont type={'icon-question'} />,
               }}
               name="deadline"
             >
@@ -292,6 +294,7 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
               tooltip={{
                 title: intl.formatMessage({ id: 'pages.dao.config.tab.job.form.pairing.desc' }),
                 placement: 'right',
+                icon: <IconFont type={'icon-question'} />,
               }}
             >
               <Form.Item name="pairBegin" className={styles.inlineFormSelect}>
@@ -309,6 +312,7 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
               tooltip={{
                 title: intl.formatMessage({ id: 'pages.dao.config.tab.job.form.pairing.desc' }),
                 placement: 'right',
+                icon: <IconFont type={'icon-question'} />,
               }}
             >
               <Form.Item name="votingBegin" className={styles.inlineFormSelect}>

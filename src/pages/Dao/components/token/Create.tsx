@@ -28,6 +28,7 @@ import type { ETH_CONNECT } from '@/services/ethereum-connect/typings';
 import { useRequest } from '@@/plugin-request/request';
 import { useModel } from '@@/plugin-model/useModel';
 import { isAddress } from 'ethers/lib/utils';
+import IconFont from '@/components/IconFont';
 
 type ValidateStatus = Parameters<typeof Form.Item>[0]['validateStatus'];
 
@@ -213,9 +214,12 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
         <Form labelCol={{ span: 4 }} wrapperCol={{ span: 16 }} name={'tokenCreate'}>
           <Form.Item
             label={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.form.genesis' })}
-            tooltip={intl.formatMessage({
-              id: 'pages.dao.config.tab.token.create.form.genesis.desc',
-            })}
+            tooltip={{
+              title: intl.formatMessage({
+                id: 'pages.dao.config.tab.token.create.form.genesis.desc',
+              }),
+              icon: <IconFont type={'icon-question'} />,
+            }}
             validateStatus={createFormValidMsg?.genesis?.validateStatus}
             help={createFormValidMsg?.genesis?.help}
           >
@@ -250,9 +254,12 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
           </Form.Item>
           <Form.Item
             label={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.form.lp_ratio' })}
-            tooltip={intl.formatMessage({
-              id: 'pages.dao.config.tab.token.create.form.lp_ratio.desc',
-            })}
+            tooltip={{
+              title: intl.formatMessage({
+                id: 'pages.dao.config.tab.token.create.form.lp_ratio.desc',
+              }),
+              icon: <IconFont type={'icon-question'} />,
+            }}
             validateStatus={createFormValidMsg?.lpRatio?.validateStatus}
             help={createFormValidMsg?.lpRatio?.help}
           >
@@ -271,9 +278,12 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
             label={intl.formatMessage({
               id: 'pages.dao.config.tab.token.create.form.owner_address',
             })}
-            tooltip={intl.formatMessage({
-              id: 'pages.dao.config.tab.token.create.form.owner_address.desc',
-            })}
+            tooltip={{
+              title: intl.formatMessage({
+                id: 'pages.dao.config.tab.token.create.form.owner_address.desc',
+              }),
+              icon: <IconFont type={'icon-question'} />,
+            }}
             validateStatus={createFormValidMsg?.ownerAddress?.validateStatus}
             help={createFormValidMsg?.ownerAddress?.help}
           >
@@ -305,9 +315,12 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
           </Form.Item>
           <Form.Item
             label={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.form.token_name' })}
-            tooltip={intl.formatMessage({
-              id: 'pages.dao.config.tab.token.create.form.token_name.desc',
-            })}
+            tooltip={{
+              title: intl.formatMessage({
+                id: 'pages.dao.config.tab.token.create.form.token_name.desc',
+              }),
+              icon: <IconFont type={'icon-question'} />,
+            }}
             validateStatus={createFormValidMsg?.tokenName?.validateStatus}
             help={createFormValidMsg?.tokenName?.help}
           >
@@ -341,9 +354,12 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
             label={intl.formatMessage({
               id: 'pages.dao.config.tab.token.create.form.token_symbol',
             })}
-            tooltip={intl.formatMessage({
-              id: 'pages.dao.config.tab.token.create.form.token_symbol.desc',
-            })}
+            tooltip={{
+              title: intl.formatMessage({
+                id: 'pages.dao.config.tab.token.create.form.token_symbol.desc',
+              }),
+              icon: <IconFont type={'icon-question'} />,
+            }}
             validateStatus={createFormValidMsg?.tokenSymbol?.validateStatus}
             help={createFormValidMsg?.tokenSymbol?.help}
           >
@@ -398,9 +414,12 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
                 label={intl.formatMessage({
                   id: 'pages.dao.config.tab.token.create.form.mint_value',
                 })}
-                tooltip={intl.formatMessage({
-                  id: 'pages.dao.config.tab.token.create.form.mint_value.desc',
-                })}
+                tooltip={{
+                  title: intl.formatMessage({
+                    id: 'pages.dao.config.tab.token.create.form.mint_value.desc',
+                  }),
+                  icon: <IconFont type={'icon-question'} />,
+                }}
                 validateStatus={createFormValidMsg?.mintValue?.validateStatus}
                 help={createFormValidMsg?.mintValue?.help}
               >
@@ -420,9 +439,12 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
                 label={intl.formatMessage({
                   id: 'pages.dao.config.tab.token.create.form.mint_change_days',
                 })}
-                tooltip={intl.formatMessage({
-                  id: 'pages.dao.config.tab.token.create.form.mint_change_days.desc',
-                })}
+                tooltip={{
+                  title: intl.formatMessage({
+                    id: 'pages.dao.config.tab.token.create.form.mint_change_days.desc',
+                  }),
+                  icon: <IconFont type={'icon-question'} />,
+                }}
                 validateStatus={createFormValidMsg?.mintChangeDays?.validateStatus}
                 help={createFormValidMsg?.mintChangeDays?.help}
               >
@@ -442,9 +464,12 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
                 label={intl.formatMessage({
                   id: 'pages.dao.config.tab.token.create.form.mint_change_value',
                 })}
-                tooltip={intl.formatMessage({
-                  id: 'pages.dao.config.tab.token.create.form.mint_change_value.desc',
-                })}
+                tooltip={{
+                  title: intl.formatMessage({
+                    id: 'pages.dao.config.tab.token.create.form.mint_change_value.desc',
+                  }),
+                  icon: <IconFont type={'icon-question'} />,
+                }}
                 validateStatus={createFormValidMsg?.mintChangeValue?.validateStatus}
                 help={createFormValidMsg?.mintChangeValue?.help}
               >
@@ -466,9 +491,12 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
           {createFormData.mode === 'expert' && (
             <Form.Item
               label={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.form.mint_args' })}
-              tooltip={intl.formatMessage({
-                id: 'pages.dao.config.tab.token.create.form.mint_args.desc',
-              })}
+              tooltip={{
+                title: intl.formatMessage({
+                  id: 'pages.dao.config.tab.token.create.form.mint_args.desc',
+                }),
+                icon: <IconFont type={'icon-question'} />,
+              }}
               validateStatus={createFormValidMsg?.mintArgs?.validateStatus}
               help={createFormValidMsg?.mintArgs?.help}
             >
@@ -633,7 +661,6 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
         visible={previewGenesis}
         maskClosable={true}
         destroyOnClose={true}
-        maskStyle={{ top: 64, height: 'calc(100% - 130px)' }}
         bodyStyle={{
           paddingTop: 62,
           textAlign: 'center',
@@ -830,7 +857,6 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
         visible={confirmReCreateModal}
         maskClosable={true}
         destroyOnClose={true}
-        maskStyle={{ top: 64, height: 'calc(100% - 130px)' }}
         bodyStyle={{
           paddingTop: 32,
           textAlign: 'center',

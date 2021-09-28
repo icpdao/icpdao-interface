@@ -14,6 +14,7 @@ import { getTimeZone, getTimeZoneOffset } from '@/utils/utils';
 import { useModel } from '@@/plugin-model/useModel';
 import { PageLoading } from '@ant-design/pro-layout';
 import PermissionErrorPage from '@/pages/Result/403';
+import IconFont from '@/components/IconFont';
 
 const { Dragger } = Upload;
 
@@ -429,6 +430,7 @@ export default (): React.ReactNode => {
             tooltip={{
               title: intl.formatMessage({ id: 'pages.dao.create.form.item.org_url.tooltip' }),
               placement: 'right',
+              icon: <IconFont type={'icon-question'} />,
             }}
             rules={[
               {
