@@ -52,6 +52,7 @@ import type { ETH_CONNECT } from '@/services/ethereum-connect/typings';
 import type { Currency, CurrencyAmount, Token } from '@uniswap/sdk-core';
 import type { FeeAmount, Pool } from '@uniswap/v3-sdk';
 import { Bound, Field, PoolState, useUniswap } from '@/pages/Dao/hooks/useUniswap';
+import IconFont from '@/components/IconFont';
 
 const previewTableColumns = [
   {
@@ -676,9 +677,12 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
         <Form name={'tokenMintForm'} labelCol={{ span: 5 }} wrapperCol={{ span: 8 }}>
           <Form.Item
             label={intl.formatMessage({ id: 'pages.dao.config.tab.token.mint.form.end_cycle' })}
-            tooltip={intl.formatMessage({
-              id: 'pages.dao.config.tab.token.mint.form.end_cycle.desc',
-            })}
+            tooltip={{
+              title: intl.formatMessage({
+                id: 'pages.dao.config.tab.token.mint.form.end_cycle.desc',
+              }),
+              icon: <IconFont type={'icon-question'} />,
+            }}
           >
             <Select onChange={(v: string) => setCurrentSelectCycle(v)} style={{ width: 450 }}>
               {selectCycles.map((c) => {
@@ -719,9 +723,12 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
                   label={intl.formatMessage({
                     id: 'pages.dao.config.tab.token.mint.form.min_price',
                   })}
-                  tooltip={intl.formatMessage({
-                    id: 'pages.dao.config.tab.token.mint.form.min_price.desc',
-                  })}
+                  tooltip={{
+                    title: intl.formatMessage({
+                      id: 'pages.dao.config.tab.token.mint.form.min_price.desc',
+                    }),
+                    icon: <IconFont type={'icon-question'} />,
+                  }}
                 >
                   <InputNumber
                     style={{ width: '100%' }}
@@ -745,9 +752,12 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
                   label={intl.formatMessage({
                     id: 'pages.dao.config.tab.token.mint.form.max_price',
                   })}
-                  tooltip={intl.formatMessage({
-                    id: 'pages.dao.config.tab.token.mint.form.max_price.desc',
-                  })}
+                  tooltip={{
+                    title: intl.formatMessage({
+                      id: 'pages.dao.config.tab.token.mint.form.max_price.desc',
+                    }),
+                    icon: <IconFont type={'icon-question'} />,
+                  }}
                 >
                   <InputNumber
                     style={{ width: '100%' }}

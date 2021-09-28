@@ -29,6 +29,7 @@ import { formatUnits, isAddress, parseUnits } from 'ethers/lib/utils';
 import { DeleteOutlined } from '@ant-design/icons';
 import GlobalModal from '@/components/Modal';
 import { DAOStakingAddress } from '@/services/ethereum-connect';
+import IconFont from '@/components/IconFont';
 
 const { TabPane } = Tabs;
 
@@ -265,7 +266,10 @@ export default (): ReactNode => {
                     <Form layout={'vertical'} name={'stakeForm'}>
                       <Form.Item
                         label={intl.formatMessage({ id: 'pages.staking.input.stake' })}
-                        tooltip={intl.formatMessage({ id: 'pages.staking.input.stake.desc' })}
+                        tooltip={{
+                          title: intl.formatMessage({ id: 'pages.staking.input.stake.desc' }),
+                          icon: <IconFont type={'icon-question'} />,
+                        }}
                       >
                         <InputNumber
                           size={'large'}
@@ -329,7 +333,10 @@ export default (): ReactNode => {
                     <Form layout={'vertical'} name={'unStakeForm'}>
                       <Form.Item
                         label={intl.formatMessage({ id: 'pages.staking.input.un_stake' })}
-                        tooltip={intl.formatMessage({ id: 'pages.staking.input.un_stake.desc' })}
+                        tooltip={{
+                          title: intl.formatMessage({ id: 'pages.staking.input.un_stake.desc' }),
+                          icon: <IconFont type={'icon-question'} />,
+                        }}
                       >
                         <InputNumber
                           size={'large'}

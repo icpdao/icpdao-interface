@@ -45,15 +45,13 @@ const Content0: React.FC = () => {
             </Texty>
           </div>
           <div className={styles.p1Link}>
-            {' '}
             <a href="https://icpdao-1.gitbook.io/icpdao/whitepaper" target={'_blank'}>
-              whitepaper（En）
-            </a>{' '}
-            /{' '}
-            <a href="https://icpdao.gitbook.io/icpdao/" target={'_blank'}>
-              白皮书（中）
+              white paper (EN)
             </a>
-            .
+            &nbsp;/&nbsp;
+            <a href="https://icpdao.gitbook.io/icpdao/" target={'_blank'}>
+              白皮书 (中)
+            </a>
           </div>
         </Space>
         <Space style={{ marginTop: 85 }} size={30}>
