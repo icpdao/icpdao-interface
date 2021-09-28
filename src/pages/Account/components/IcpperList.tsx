@@ -223,11 +223,16 @@ const IcpperList: React.FC = () => {
   const invited = [];
   const relationIcpper = [];
   const unrelationIcpper = [];
-  if (data) {
-    for (let i: number = 0; i < data.length; i += 1) {
-      if (data[i].progress === 0 || data[i].status === 1) {
-        const datum = data[i];
-        const timeDistance = getTimeDistance(new Date().getTime() / 1000, data[i].create_at || 0);
+  const icpperships = data?.icpperships;
+  const preMentorIcppershipCountLimit = data?.pre_mentor_icppership_count_limit;
+  if (icpperships) {
+    for (let i: number = 0; i < icpperships.length; i += 1) {
+      if (icpperships[i].progress === 0 || icpperships[i].status === 1) {
+        const datum = icpperships[i];
+        const timeDistance = getTimeDistance(
+          new Date().getTime() / 1000,
+          icpperships[i].create_at || 0,
+        );
         const waitMsg =
           datum.progress === 0 ? (
             <FormattedMessage id={'pages.account.icpper.input.invite.wait'} />
@@ -263,13 +268,13 @@ const IcpperList: React.FC = () => {
           </ProDescriptions.Item>,
         );
       }
-      if (data[i].progress === 1 && data[i].status === 2) {
-        const datum = data[i];
+      if (icpperships[i].progress === 1 && icpperships[i].status === 2) {
+        const datum = icpperships[i];
         const beMentorDays = getTimeDistanceDays(
           new Date().getTime() / 1000,
-          data[i].accept_at || 0,
+          icpperships[i].accept_at || 0,
         );
-        const acceptTime = getFormatTime(data[i].accept_at || 0, 'LL');
+        const acceptTime = getFormatTime(icpperships[i].accept_at || 0, 'LL');
         if (datum.relation === true)
           relationIcpper.push({
             key: i,
@@ -300,7 +305,7 @@ const IcpperList: React.FC = () => {
   return (
     <>
       <ProDescriptions key={'preicpper'} className={styles.first} column={1} title={preIcpperTitle}>
-        {invited.length < 2 && (
+        {invited.length < preMentorIcppershipCountLimit && (
           <ProDescriptions.Item key={'input'} valueType="text">
             <ProForm<{ githubLogin: string }>
               submitter={{
@@ -361,7 +366,11 @@ const IcpperList: React.FC = () => {
           setInviteCancelModalRemoveLoading(true);
           await handleRemoveInvite(inviteCancelId);
           mutate((oldData) => {
-            return oldData?.filter((d) => d.id !== inviteCancelId);
+            const newData = oldData;
+            if (newData?.icpperships) {
+              newData.icpperships = newData?.icpperships.filter((d) => d.id !== inviteCancelId);
+            }
+            return newData;
           });
           setInviteCancelModalRemoveLoading(false);
           setInviteCancelModalVisible(false);
@@ -404,7 +413,7 @@ const IcpperList: React.FC = () => {
           setInviteModalSendLoading(true);
           const { data: newItem } = await handleSendInvite(inviteGithubLogin);
           if (newItem) {
-            data?.push(newItem);
+            data?.icpperships.push(newItem);
             mutate(data);
           }
           setInviteModalSendLoading(false);
