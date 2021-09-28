@@ -44,6 +44,11 @@ declare namespace API {
     total_value?: number;
   };
 
+  type IcppershipsListResult = {
+    icpperships?: InviteResults;
+    pre_mentor_icppership_count_limit?: number;
+  };
+
   type InviteResults = InviteResult[];
 
   type InviteResult = {
@@ -92,7 +97,7 @@ declare namespace API {
 
   type inlineResponse2003 = {
     success?: boolean;
-    data?: InviteResults;
+    data?: IcppershipsListResult;
   };
 
   type body1 = {
