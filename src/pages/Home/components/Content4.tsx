@@ -31,7 +31,7 @@ const Content4: React.FC = () => {
           <Row key={'contactCards'} justify={'center'}>
             <Col span={16}>
               <Row justify={'space-between'} className={styles.P12}>
-                <Col className={styles.P12Card}>
+                <Col xs={23} sm={11} lg={5} className={styles.P12Card}>
                   <a
                     href="https://twitter.com/icpdao"
                     style={{ color: 'inherit' }}
@@ -48,7 +48,7 @@ const Content4: React.FC = () => {
                     </Space>
                   </a>
                 </Col>
-                <Col className={styles.P12Card}>
+                <Col xs={23} sm={11} lg={5} className={styles.P12Card}>
                   <a
                     href="https://discord.com/invite/yz7AWVdRmj"
                     style={{ color: 'inherit' }}
@@ -65,7 +65,7 @@ const Content4: React.FC = () => {
                     </Space>
                   </a>
                 </Col>
-                <Col className={styles.P12Card}>
+                <Col xs={23} sm={11} lg={5} className={styles.P12Card}>
                   <a
                     href="mailto:icpdao06@gmail.com"
                     style={{ color: 'inherit' }}
@@ -82,7 +82,7 @@ const Content4: React.FC = () => {
                     </Space>
                   </a>
                 </Col>
-                <Col className={styles.P12Card}>
+                <Col xs={23} sm={11} lg={5} className={styles.P12Card}>
                   <a
                     href="https://www.youtube.com/channel/UC9vo3RcUbA6V4V6ouYR8nqg"
                     style={{ color: 'inherit' }}
