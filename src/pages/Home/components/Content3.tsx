@@ -51,10 +51,7 @@ const Content3: React.FC = () => {
   return (
     <div className={styles.ContentFour}>
       <div key={'usersTitle'} className={styles.P8}>
-        <div
-          style={{ width: '800px' }}
-          dangerouslySetInnerHTML={{ __html: intl.formatMessage({ id: 'pages.home.p8' }) }}
-        />
+        <div dangerouslySetInnerHTML={{ __html: intl.formatMessage({ id: 'pages.home.p8' }) }} />
       </div>
       <div key={'worksBanner'} className={styles.P9}>
         <MapboxScene

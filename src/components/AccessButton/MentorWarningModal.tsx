@@ -26,7 +26,7 @@ const MentorWarningModal: React.FC<MentorWarningModalProps> = ({ visible, setVis
         fontWeight: 400,
         padding: '62px 30px 20px 30px',
       }}
-      width={'32%'}
+      className={styles.Modal}
       centered
       visible={visible}
       footer={
