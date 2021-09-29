@@ -139,9 +139,9 @@ const Content1: React.FC<HomeProps> = ({ statsData, loading }) => {
                             </Button>
                           </div>
                         </Col>
-                        <Col xs={0} lg={10} className={styles.P3ContentRight}>
+                        <Col xs={0} lg={12} className={styles.P3ContentRight}>
                           <img
-                            style={{ maxWidth: '431px', maxHeight: '282px', float: 'right' }}
+                            style={{ width: '431px', float: 'right' }}
                             alt={'homeImage2'}
                             src={homeImage2}
                           />
@@ -177,12 +177,11 @@ const Content1: React.FC<HomeProps> = ({ statsData, loading }) => {
                             </Button>
                           </div>
                         </Col>
-                        <Col xs={0} lg={10} className={styles.P3ContentRight}>
+                        <Col xs={0} lg={12} className={styles.P3ContentRight}>
                           <img
                             onClick={() => setVideoModalVisible(true)}
                             style={{
-                              maxWidth: '431px',
-                              maxHeight: '282px',
+                              width: '431px',
                               cursor: 'pointer',
                               float: 'right',
                             }}
@@ -221,12 +220,11 @@ const Content1: React.FC<HomeProps> = ({ statsData, loading }) => {
                             </Button>
                           </div>
                         </Col>
-                        <Col xs={0} lg={10} className={styles.P3ContentRight}>
+                        <Col xs={0} lg={12} className={styles.P3ContentRight}>
                           <img
                             onClick={() => window.open('https://g.icpdao.co/', '_blank')}
                             style={{
-                              maxWidth: '431px',
-                              maxHeight: '282px',
+                              width: '431px',
                               cursor: 'pointer',
                               float: 'right',
                             }}
