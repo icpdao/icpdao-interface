@@ -13,23 +13,25 @@ const Content4: React.FC = () => {
     <div className={styles.ContentFive}>
       <ScrollAnim.OverPack id="contactCards">
         <div className={styles.P10}>
-          <Texty type={'top'} mode={'sync'}>
+          <Texty type={'top'} mode={'sync'} split={(v) => v.split(' ').map((s) => `${s} `)}>
             {intl.formatMessage({ id: 'pages.home.p10' })}
           </Texty>
         </div>
         <div className={styles.P11}>
-          <Texty type={'top'} mode={'sync'} className={styles.P11Title}>
-            {intl.formatMessage({ id: 'pages.home.p11.part1' })}
-          </Texty>
-          <Texty type={'top'} mode={'sync'} className={styles.P11Title}>
-            {intl.formatMessage({ id: 'pages.home.p11.part2' })}
+          <Texty
+            type={'top'}
+            mode={'sync'}
+            className={styles.P11Title}
+            split={(v) => v.split(' ').map((s) => `${s} `)}
+          >
+            {intl.formatMessage({ id: 'pages.home.p11' })}
           </Texty>
         </div>
         <QueueAnim delay={300} interval={600} type={'bottom'} key="contactQueueAnim">
           <Row key={'contactCards'} justify={'center'}>
-            <Col span={20}>
+            <Col span={16}>
               <Row justify={'space-between'} className={styles.P12}>
-                <Col className={styles.P12Card}>
+                <Col xs={23} sm={11} lg={5} className={styles.P12Card}>
                   <a
                     href="https://twitter.com/icpdao"
                     style={{ color: 'inherit' }}
@@ -46,7 +48,7 @@ const Content4: React.FC = () => {
                     </Space>
                   </a>
                 </Col>
-                <Col className={styles.P12Card}>
+                <Col xs={23} sm={11} lg={5} className={styles.P12Card}>
                   <a
                     href="https://discord.com/invite/yz7AWVdRmj"
                     style={{ color: 'inherit' }}
@@ -63,7 +65,7 @@ const Content4: React.FC = () => {
                     </Space>
                   </a>
                 </Col>
-                <Col className={styles.P12Card}>
+                <Col xs={23} sm={11} lg={5} className={styles.P12Card}>
                   <a
                     href="mailto:icpdao06@gmail.com"
                     style={{ color: 'inherit' }}
@@ -80,7 +82,7 @@ const Content4: React.FC = () => {
                     </Space>
                   </a>
                 </Col>
-                <Col className={styles.P12Card}>
+                <Col xs={23} sm={11} lg={5} className={styles.P12Card}>
                   <a
                     href="https://www.youtube.com/channel/UC9vo3RcUbA6V4V6ouYR8nqg"
                     style={{ color: 'inherit' }}

@@ -29,9 +29,8 @@ export default {
   'pages.home.mentor.welcome.ok': "Okay, I accept Mentor's invitation",
   'pages.home.mentor.welcome.cancel': 'Let me think again',
   'pages.home.p1': 'Open The Infinite Game',
-  'pages.home.p2.part1':
-    'Here is where interests are the way to realize financial freedom and dreams are',
-  'pages.home.p2.part2': 'the impulsion for people to converge.',
+  'pages.home.p2':
+    'Here is where interests are the way to realize financial freedom and dreams are the impulsion for people to converge.',
   'pages.home.button1': 'EXPLORE DAO',
   'pages.home.button2': 'MARK JOB',
   'pages.home.p3.0.title': 'Listed First Then Business',
@@ -71,9 +70,8 @@ export default {
   'pages.home.p8':
     'What motivates users to <span style="color: #1890ff">explore dao</span> and <span style="color: #1890ff">mark job</span> ?',
   'pages.home.p10': 'We are developing...',
-  'pages.home.p11.part1':
-    'Learn more about ICPDAO, chat with the team, others in the community, and',
-  'pages.home.p11.part2': 'have your say in shaping the future of the ICPDAO protocol.',
+  'pages.home.p11':
+    'Learn more about ICPDAO, chat with the team, others in the community, and have your say in shaping the future of the ICPDAO protocol.',
   'pages.home.p12.0': 'Follow @ICPDAO for updates and news.',
   'pages.home.p12.1': 'Chat in real time with the ICPDAO community.',
   'pages.home.p12.2': 'Send email to icpdao06@gmail.com',

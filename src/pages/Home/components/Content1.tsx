@@ -37,30 +37,31 @@ const Content1: React.FC<HomeProps> = ({ statsData, loading }) => {
   const [bannerRef, setBannerRef] = useState<any>(null);
   const [currentBanner, setCurrentBanner] = useState<number>(0);
   const [videoModalVisible, setVideoModalVisible] = useState<boolean>(false);
+
   const statCards = useMemo(() => {
     return (
       <Row className={styles.P2} justify={'center'}>
-        <Col span={20}>
+        <Col span={16}>
           <Row justify={'space-between'}>
-            <Col span={'250px'}>
+            <Col xs={12} lg={6}>
               {statisticValueFormat(
                 intl.formatMessage({ id: 'component.card.stat.dao' }),
                 statsData?.dao || 0,
               )}
             </Col>
-            <Col span={'250px'}>
+            <Col xs={12} lg={6}>
               {statisticValueFormat(
                 intl.formatMessage({ id: 'component.card.stat.icpper' }),
                 statsData?.icpper || 0,
               )}
             </Col>
-            <Col span={'250px'}>
+            <Col xs={12} lg={6}>
               {statisticValueFormat(
                 intl.formatMessage({ id: 'component.card.stat.size' }),
                 parseFloat(statsData?.size).toFixed(0) || 0,
               )}
             </Col>
-            <Col span={'250px'}>
+            <Col xs={12} lg={6}>
               {statisticValueFormat(
                 intl.formatMessage({ id: 'component.card.stat.income' }),
                 parseFloat(statsData?.income).toFixed(0) || 0,
@@ -116,9 +117,9 @@ const Content1: React.FC<HomeProps> = ({ statsData, loading }) => {
                 <BgElement key="bg0" className={styles.P3ContentBg} />
                 <TweenOne animation={{ y: 30, opacity: 0, type: 'from' }}>
                   <Row className={styles.P3ContentLayout} justify={'center'}>
-                    <Col span={20}>
+                    <Col span={16}>
                       <Row justify={'center'}>
-                        <Col span={12} className={styles.P3ContentLeft}>
+                        <Col xs={24} lg={10} className={styles.P3ContentLeft}>
                           <div className={styles.P3ContentLeftTitle}>
                             {intl.formatMessage({ id: 'pages.home.p3.0.title' })}
                           </div>
@@ -138,9 +139,9 @@ const Content1: React.FC<HomeProps> = ({ statsData, loading }) => {
                             </Button>
                           </div>
                         </Col>
-                        <Col span={'250px'} className={styles.P3ContentRight}>
+                        <Col xs={0} lg={10} className={styles.P3ContentRight}>
                           <img
-                            style={{ width: '100%', height: '250px' }}
+                            style={{ maxWidth: '431px', maxHeight: '282px', float: 'right' }}
                             alt={'homeImage2'}
                             src={homeImage2}
                           />
@@ -154,9 +155,9 @@ const Content1: React.FC<HomeProps> = ({ statsData, loading }) => {
                 <BgElement key="bg1" className={styles.P3ContentBg} />
                 <TweenOne animation={{ y: 30, opacity: 0, type: 'from' }}>
                   <Row className={styles.P3ContentLayout} justify={'center'}>
-                    <Col span={20}>
+                    <Col span={16}>
                       <Row justify={'center'}>
-                        <Col span={12} className={styles.P3ContentLeft}>
+                        <Col xs={24} lg={10} className={styles.P3ContentLeft}>
                           <div className={styles.P3ContentLeftTitle}>
                             {intl.formatMessage({ id: 'pages.home.p3.1.title' })}
                           </div>
@@ -176,10 +177,15 @@ const Content1: React.FC<HomeProps> = ({ statsData, loading }) => {
                             </Button>
                           </div>
                         </Col>
-                        <Col span={'250px'} className={styles.P3ContentRight}>
+                        <Col xs={0} lg={10} className={styles.P3ContentRight}>
                           <img
                             onClick={() => setVideoModalVisible(true)}
-                            style={{ width: '100%', height: '250px', cursor: 'pointer' }}
+                            style={{
+                              maxWidth: '431px',
+                              maxHeight: '282px',
+                              cursor: 'pointer',
+                              float: 'right',
+                            }}
                             alt={'homeImage4'}
                             src={homeImage4}
                           />
@@ -193,9 +199,9 @@ const Content1: React.FC<HomeProps> = ({ statsData, loading }) => {
                 <BgElement key="bg2" className={styles.P3ContentBg} />
                 <TweenOne animation={{ y: 30, opacity: 0, type: 'from' }}>
                   <Row className={styles.P3ContentLayout} justify={'center'}>
-                    <Col span={20}>
+                    <Col span={16}>
                       <Row justify={'center'}>
-                        <Col span={12} className={styles.P3ContentLeft}>
+                        <Col xs={24} lg={10} className={styles.P3ContentLeft}>
                           <div className={styles.P3ContentLeftTitle}>
                             {intl.formatMessage({ id: 'pages.home.p3.2.title' })}
                           </div>
@@ -215,10 +221,15 @@ const Content1: React.FC<HomeProps> = ({ statsData, loading }) => {
                             </Button>
                           </div>
                         </Col>
-                        <Col span={'250px'} className={styles.P3ContentRight}>
+                        <Col xs={0} lg={10} className={styles.P3ContentRight}>
                           <img
                             onClick={() => window.open('https://g.icpdao.co/', '_blank')}
-                            style={{ width: '100%', height: '250px', cursor: 'pointer' }}
+                            style={{
+                              maxWidth: '431px',
+                              maxHeight: '282px',
+                              cursor: 'pointer',
+                              float: 'right',
+                            }}
                             alt={'homeImage3'}
                             src={homeImage3}
                           />
@@ -231,7 +242,7 @@ const Content1: React.FC<HomeProps> = ({ statsData, loading }) => {
             </BannerAnim>
           </div>
           <Row className={styles.P4} key="introduceBannerButton" justify={'center'}>
-            <Col span={20}>
+            <Col span={16}>
               <Row justify={'space-between'}>
                 <Col span={'250px'}>
                   <div
