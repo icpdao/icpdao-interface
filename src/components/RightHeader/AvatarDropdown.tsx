@@ -18,6 +18,7 @@ import {
   getAuthorizationExpiresAt,
   getCurrentTimestamps,
   githubCallback,
+  setRedirectURL,
 } from '@/utils/utils';
 
 export const getGithubOAuthUrl = () => {
@@ -33,6 +34,14 @@ export const LoginButton: React.FC = () => {
     id: 'component.header.button.login',
   });
   const githubOAuth = getGithubOAuthUrl();
+  useEffect(() => {
+    if (
+      history.location.pathname === '/home' ||
+      history.location.pathname === '/login/auth_callback'
+    )
+      return;
+    setRedirectURL(`${history.location.pathname}${history.location.search}`);
+  }, []);
   return (
     <div className={styles.loginButton}>
       <Button href={githubOAuth} icon={<GithubOutlined style={{ fontSize: 17 }} />} block>

@@ -46,13 +46,13 @@ const configTab = (
 const firstConfigStep = ['job', 'token'];
 
 export default (props: {
-  match: { params: { daoId: string } };
-  location: { query: { status: string | undefined } };
+  match: { params: { daoId: string; configType?: string } };
+  location: { query: { status?: string } };
 }): ReactNode => {
   const { isDaoOwner } = useAccess();
-  const { daoId } = props.match.params;
+  const { daoId, configType } = props.match.params;
   const { status } = props.location.query;
-  const [tab, setTab] = useState<string>(status || 'job');
+  const [tab, setTab] = useState<string>(configType || 'job');
 
   const { data, loading, error } = useDaoQuery({
     variables: { id: daoId },
@@ -89,7 +89,7 @@ export default (props: {
 
   return (
     <>
-      {status && (
+      {status === 'create' && (
         <Button type="link" className={styles.skipButton} onClick={skipClick}>
           <FormattedMessage id={`pages.dao.config.tab.skip`} />
         </Button>

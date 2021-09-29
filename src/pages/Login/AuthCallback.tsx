@@ -2,7 +2,12 @@ import React, { useEffect, useRef } from 'react';
 import { PageLoading } from '@ant-design/pro-layout';
 import { history, useAccess } from 'umi';
 import { githubCallback } from '@/services/icpdao-interface/login';
-import { setAuthorization, setAuthorizationExpiresAt } from '@/utils/utils';
+import {
+  getRedirectURL,
+  setAuthorization,
+  setAuthorizationExpiresAt,
+  setRedirectURL,
+} from '@/utils/utils';
 import { useModel } from '@@/plugin-model/useModel';
 import { useUserVotingCycleQuery } from '@/services/dao/generated';
 
@@ -46,7 +51,14 @@ const AuthCallback: React.FC<any> = (props) => {
         if (initialState && initialState.fetchUserInfo) {
           await initialState.fetchUserInfo();
           await refresh();
-          history.replace('/');
+          const re = getRedirectURL();
+          if (re && re !== '') {
+            setRedirectURL('');
+            console.log({ re });
+            history.push(re);
+          } else {
+            history.replace('/');
+          }
         }
       }
     })();
