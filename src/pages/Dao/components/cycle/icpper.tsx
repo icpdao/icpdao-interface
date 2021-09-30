@@ -22,7 +22,6 @@ import type {
 import {
   CycleIcpperStatSortedEnum,
   CycleIcpperStatSortedTypeEnum,
-  CycleStepEnum,
   CycleVoteResultPublishTaskStatusEnum,
   CycleVoteResultStatTaskStatusEnum,
   useBeginCycleVoteResultTaskMutation,
@@ -52,7 +51,7 @@ const ownerColumns = (
   canUpdateOwnerEI: boolean,
   updateOwnerEI: (ownerEI: number) => void,
   beginOrEndEditing: (recordId: string) => void,
-  stepStatus: CycleStepEnum,
+  isVoteResult: boolean,
 ) => {
   return [
     {
@@ -94,8 +93,8 @@ const ownerColumns = (
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.ie" />,
       dataIndex: ['datum', 'ei'],
       render: (_: any, record: IcpperStatQuery) => {
-        if (stepStatus !== CycleStepEnum.VoteEnd) return <>-</>;
-        if (!record?.datum?.voteEi) return <>-</>;
+        if (!isVoteResult || record.datum?.ei === null || record.datum?.ei === undefined)
+          return <>-</>;
         const tips: string[] = [];
         let color: string = 'inherit';
         if (record.datum.ei < 0.4) {
@@ -168,7 +167,7 @@ const ownerColumns = (
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.last_ie" />,
       dataIndex: 'lastEi',
       render: (_: any, record: IcpperStatQuery) => {
-        if (!record?.lastEi) return <>-</>;
+        if (record?.lastEi === null || record.lastEi === undefined) return <>-</>;
         return (
           <>
             <span style={{ color: getEIColor(record.lastEi) }}>{record.lastEi}</span>
@@ -179,7 +178,7 @@ const ownerColumns = (
   ];
 };
 
-const columns = (intl: any, daoId: string, stepStatus: CycleStepEnum) => {
+const columns = (intl: any, daoId: string, isVoteResult: boolean) => {
   return [
     {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.icpper" />,
@@ -220,7 +219,8 @@ const columns = (intl: any, daoId: string, stepStatus: CycleStepEnum) => {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.ie" />,
       dataIndex: ['datum', 'ei'],
       render: (_: any, record: IcpperStatQuery) => {
-        if (stepStatus !== CycleStepEnum.VoteEnd) return <>-</>;
+        if (!isVoteResult || record.datum?.ei === null || record.datum?.ei === undefined)
+          return <>-</>;
         return renderEi(intl, record);
       },
     },
@@ -228,7 +228,7 @@ const columns = (intl: any, daoId: string, stepStatus: CycleStepEnum) => {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.last_ie" />,
       dataIndex: 'lastEi',
       render: (_: any, record: IcpperStatQuery) => {
-        if (!record?.lastEi) return <>-</>;
+        if (record?.lastEi === null || record?.lastEi === undefined) return <>-</>;
         return (
           <>
             <span style={{ color: getEIColor(record.lastEi) }}>{record.lastEi}</span>
@@ -492,7 +492,7 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
           canUpdateOwnerEI,
           changeEditingOwnerEI,
           beginOrEndEditing,
-          data?.cycle?.step?.status || CycleStepEnum.Job,
+          voteResultStatus === CycleVoteResultStatTaskStatusEnum.Success,
         )}
         loading={loading}
         rowKey={(record) => record?.datum?.id || ''}
@@ -553,7 +553,11 @@ export const DaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycleId, daoId }) => {
   return (
     <>
       <Table<IcpperStatQuery>
-        columns={columns(intl, daoId || '', data?.cycle?.step?.status || CycleStepEnum.Job)}
+        columns={columns(
+          intl,
+          daoId || '',
+          data?.cycle?.voteResultStatTask?.status === CycleVoteResultStatTaskStatusEnum.Success,
+        )}
         loading={loading}
         rowKey={(record) => record?.datum?.id || ''}
         dataSource={data?.cycle?.icpperStats?.nodes as any}
