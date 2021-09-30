@@ -13,7 +13,7 @@ export const colorTooltip = (color: string, tipsText: string) => {
 };
 
 export const renderSize = (intl: any, record: IcpperStatQuery) => {
-  if (!record?.datum?.size) return <>-</>;
+  if (record?.datum?.size === undefined || record?.datum?.size === null) return <>-</>;
   let color = '#262626';
   const tips: string[] = [];
   if (record.datum.haveTwoTimesLt08)
@@ -35,7 +35,7 @@ export const renderSize = (intl: any, record: IcpperStatQuery) => {
 };
 
 export const renderEi = (intl: any, record: IcpperStatQuery) => {
-  if (!record?.datum?.ei) {
+  if (record?.datum?.ei === undefined || record.datum.ei === null) {
     return <>-</>;
   }
 
