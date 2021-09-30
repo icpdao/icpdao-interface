@@ -1,12 +1,23 @@
 import type { Dispatch, SetStateAction } from 'react';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import type { TablePaginationConfig } from 'antd';
 import { Form, Popconfirm, Space, Table, Typography } from 'antd';
 import type { Job, JobListQueryVariables } from '@/services/dao/generated';
-import { JobSortedEnum, SortedTypeEnum, useDeleteJobMutation } from '@/services/dao/generated';
+import {
+  JobSortedEnum,
+  SortedTypeEnum,
+  useDeleteJobMutation,
+  useSyncJobMutation,
+} from '@/services/dao/generated';
 import { PageLoading } from '@ant-design/pro-layout';
 import { useIntl } from '@@/plugin-locale/localeExports';
-import { ArrowDownOutlined, DeleteFilled, EditFilled, EyeOutlined } from '@ant-design/icons';
+import {
+  ArrowDownOutlined,
+  DeleteFilled,
+  EditFilled,
+  EyeOutlined,
+  SyncOutlined,
+} from '@ant-design/icons';
 import { useModel } from '@@/plugin-model/useModel';
 import { getCurrentPage } from '@/utils/utils';
 import { renderJobTag } from '@/utils/pageHelper';
@@ -21,6 +32,19 @@ interface JobTableProps {
   openViewModal: (record: Job) => void;
   openAdjustSizeModal: (record: Job, status: 'increase' | 'decrease') => void;
 }
+
+const SyncJobButton: React.FC<{ jobId: string }> = ({ jobId }) => {
+  const [syncJob, syncJobMutationResult] = useSyncJobMutation();
+  return (
+    <Typography.Link
+      onClick={async () => {
+        await syncJob({ variables: { jobId } });
+      }}
+    >
+      <SyncOutlined spin={syncJobMutationResult.loading} />
+    </Typography.Link>
+  );
+};
 
 const OwnerJobTable: React.FC<JobTableProps> = ({
   jobQueryVar,
@@ -72,100 +96,112 @@ const OwnerJobTable: React.FC<JobTableProps> = ({
     },
     [deleteJob, getJobList, jobQueryVar],
   );
+
+  const columns = useMemo(() => {
+    return [
+      {
+        title: intl.formatMessage({ id: 'pages.job.table.title' }),
+        dataIndex: ['node', 'title'],
+        render: (_: any, record: Job) => {
+          return (
+            <a
+              target={'_blank'}
+              href={`https://github.com/${record?.node?.githubRepoOwner}/${record?.node?.githubRepoName}/issues/${record?.node?.githubIssueNumber}`}
+              style={{ marginRight: 8 }}
+            >
+              {record.node?.title}
+            </a>
+          );
+        },
+      },
+      {
+        title: intl.formatMessage({ id: 'pages.job.table.size' }),
+        dataIndex: ['node', 'size'],
+        sorter: true,
+      },
+      {
+        title: intl.formatMessage({ id: 'pages.job.table.status' }),
+        dataIndex: ['node', 'status'],
+        render: (_: any, record: Job) => {
+          return renderJobTag(intl, record.node?.status);
+        },
+      },
+      {
+        title: intl.formatMessage({ id: 'pages.job.table.income' }),
+        dataIndex: ['node', 'income'],
+        render: (_: any, record: Job) => {
+          if (record.node?.income) return <>{record.node.income}</>;
+          return <>-</>;
+        },
+      },
+      {
+        title: intl.formatMessage({ id: 'pages.job.table.operation' }),
+        dataIndex: 'operation',
+        render: (_: any, record: Job) => {
+          return (
+            <Space>
+              {record.node?.status !== undefined && record.node.status === 0 && (
+                <Typography.Link onClick={() => openEditModal(record)}>
+                  <EditFilled />
+                </Typography.Link>
+              )}
+              {record.node?.status !== undefined && record.node.status === 1 && (
+                <Typography.Link onClick={() => openAdjustSizeModal(record, 'decrease')}>
+                  <ArrowDownOutlined />
+                </Typography.Link>
+              )}
+              <Typography.Link onClick={() => openViewModal(record)}>
+                <EyeOutlined />
+              </Typography.Link>
+              {record.node?.status === 0 && (
+                <Popconfirm
+                  placement={'right'}
+                  title={intl.formatMessage({ id: 'pages.job.table.delete.pop_confirm' })}
+                  okText="Yes"
+                  cancelText="No"
+                  visible={jobDeleteVisible[record.node?.id || ''] || false}
+                  okButtonProps={{ loading: jobDeleteLoading[record.node?.id || ''] || false }}
+                  onConfirm={async () => {
+                    try {
+                      setJobDeleteLoading((old) => ({ ...old, [record.node?.id || '']: true }));
+                      await remove(record);
+                    } finally {
+                      setJobDeleteLoading((old) => ({ ...old, [record.node?.id || '']: false }));
+                      setJobDeleteVisible((old) => ({ ...old, [record.node?.id || '']: false }));
+                    }
+                  }}
+                  onCancel={() =>
+                    setJobDeleteVisible((old) => ({ ...old, [record.node?.id || '']: false }))
+                  }
+                >
+                  <Typography.Link
+                    onClick={() =>
+                      setJobDeleteVisible((old) => ({ ...old, [record.node?.id || '']: true }))
+                    }
+                  >
+                    <DeleteFilled />
+                  </Typography.Link>
+                </Popconfirm>
+              )}
+              {record.node?.status === 0 && <SyncJobButton jobId={record?.node?.id || ''} />}
+            </Space>
+          );
+        },
+      },
+    ];
+  }, [
+    intl,
+    jobDeleteLoading,
+    jobDeleteVisible,
+    openAdjustSizeModal,
+    openEditModal,
+    openViewModal,
+    remove,
+  ]);
+
   if (!initialState) {
     return <PageLoading />;
   }
-
-  const columns = [
-    {
-      title: intl.formatMessage({ id: 'pages.job.table.title' }),
-      dataIndex: ['node', 'title'],
-      render: (_: any, record: Job) => {
-        return (
-          <a
-            target={'_blank'}
-            href={`https://github.com/${record?.node?.githubRepoOwner}/${record?.node?.githubRepoName}/issues/${record?.node?.githubIssueNumber}`}
-            style={{ marginRight: 8 }}
-          >
-            {record.node?.title}
-          </a>
-        );
-      },
-    },
-    {
-      title: intl.formatMessage({ id: 'pages.job.table.size' }),
-      dataIndex: ['node', 'size'],
-      sorter: true,
-    },
-    {
-      title: intl.formatMessage({ id: 'pages.job.table.status' }),
-      dataIndex: ['node', 'status'],
-      render: (_: any, record: Job) => {
-        return renderJobTag(intl, record.node?.status);
-      },
-    },
-    {
-      title: intl.formatMessage({ id: 'pages.job.table.income' }),
-      dataIndex: ['node', 'income'],
-      render: (_: any, record: Job) => {
-        if (record.node?.income) return <>{record.node.income}</>;
-        return <>-</>;
-      },
-    },
-    {
-      title: intl.formatMessage({ id: 'pages.job.table.operation' }),
-      dataIndex: 'operation',
-      render: (_: any, record: Job) => {
-        return (
-          <Space>
-            {record.node?.status !== undefined && record.node.status === 0 && (
-              <Typography.Link onClick={() => openEditModal(record)}>
-                <EditFilled />
-              </Typography.Link>
-            )}
-            {record.node?.status !== undefined && record.node.status === 1 && (
-              <Typography.Link onClick={() => openAdjustSizeModal(record, 'decrease')}>
-                <ArrowDownOutlined />
-              </Typography.Link>
-            )}
-            <Typography.Link onClick={() => openViewModal(record)}>
-              <EyeOutlined />
-            </Typography.Link>
-            {record.node?.status === 0 && (
-              <Popconfirm
-                placement={'right'}
-                title={intl.formatMessage({ id: 'pages.job.table.delete.pop_confirm' })}
-                okText="Yes"
-                cancelText="No"
-                visible={jobDeleteVisible[record.node?.id || ''] || false}
-                okButtonProps={{ loading: jobDeleteLoading[record.node?.id || ''] || false }}
-                onConfirm={async () => {
-                  try {
-                    setJobDeleteLoading((old) => ({ ...old, [record.node?.id || '']: true }));
-                    await remove(record);
-                  } finally {
-                    setJobDeleteLoading((old) => ({ ...old, [record.node?.id || '']: false }));
-                    setJobDeleteVisible((old) => ({ ...old, [record.node?.id || '']: false }));
-                  }
-                }}
-                onCancel={() =>
-                  setJobDeleteVisible((old) => ({ ...old, [record.node?.id || '']: false }))
-                }
-              >
-                <Typography.Link
-                  onClick={() =>
-                    setJobDeleteVisible((old) => ({ ...old, [record.node?.id || '']: true }))
-                  }
-                >
-                  <DeleteFilled />
-                </Typography.Link>
-              </Popconfirm>
-            )}
-          </Space>
-        );
-      },
-    },
-  ];
 
   return (
     <>
