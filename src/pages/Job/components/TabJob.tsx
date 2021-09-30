@@ -543,6 +543,10 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
 
   const newOrEditJobModal = useCallback(
     (type: 'new_job' | 'edit_job') => {
+      const simpleModeDisabled =
+        !expert &&
+        !newOrEditOrViewJobFormData.autoCreatePR &&
+        (!newOrEditOrViewJobFormData.prs || newOrEditOrViewJobFormData.prs?.length === 0);
       return (
         <Modal
           destroyOnClose={true}
@@ -571,6 +575,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
                     block
                     key={'back'}
                     type={'primary'}
+                    disabled={simpleModeDisabled}
                     loading={okContinueButtonLoading}
                     onClick={() => handlerNewJob(true)}
                   >
@@ -581,6 +586,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
                     key={'submit'}
                     type={'primary'}
                     loading={okButtonLoading}
+                    disabled={simpleModeDisabled}
                     onClick={() => handlerNewJob(false)}
                   >
                     {intl.formatMessage({ id: 'pages.job.modal.button.ok' })}
