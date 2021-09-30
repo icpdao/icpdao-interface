@@ -36,7 +36,7 @@
     component: './Dao/Create',
   },
   {
-    path: '/dao/:daoId/config',
+    path: '/dao/:daoId/config/:configType?',
     component: './Dao/Config',
   },
   {

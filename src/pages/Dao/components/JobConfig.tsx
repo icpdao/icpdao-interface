@@ -1,12 +1,12 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import type { DaoJobConfigQuery } from '@/services/dao/generated';
 import {
   useDaoJobConfigQuery,
   useUpdateDaoJobConfigMutation,
   useDaoJobConfigPreviewNextCycleQuery,
+  useUpdateDaoJobConfigManualMutation,
 } from '@/services/dao/generated';
-import { PageLoading } from '@ant-design/pro-layout';
-import { Form, Button, Select, Row, Col, message, Space } from 'antd';
+import { Form, Button, Select, Row, Col, message, Space, Skeleton, Radio } from 'antd';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import momentTZ from 'moment-timezone';
 import styles from './index.less';
@@ -38,6 +38,7 @@ type JobConfigData = {
   pairEnd?: any[];
   votingBegin?: any[];
   votingEnd?: any[];
+  manual?: boolean;
 };
 
 const timeZoneOptions = momentTZ.tz.names().map((v) => {
@@ -59,6 +60,7 @@ const formatJobConfigData = (data: DaoJobConfigQuery | undefined): JobConfigData
       data.daoJobConfig?.datum?.votingBeginHour,
     ],
     votingEnd: [data.daoJobConfig?.datum?.votingEndDay, data.daoJobConfig?.datum?.votingEndHour],
+    manual: data.daoJobConfig?.datum?.manual || false,
   };
 };
 
@@ -77,6 +79,7 @@ const formatSubmitJobConfigData = (data: any) => {
     votingBeginHour: data.votingBegin[1],
     votingEndDay: data.votingEnd[0],
     votingEndHour: data.votingEnd[1],
+    manual: data.manual,
   };
 
   const validPair =
@@ -161,13 +164,23 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
   const [showPreview, setShowPreview] = useState(false);
   const [form] = Form.useForm();
   const [updateDaoJobConfig] = useUpdateDaoJobConfigMutation();
+  const [updateDaoJobConfigManual] = useUpdateDaoJobConfigManualMutation();
   const [saveLoading, setSaveLoading] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
   const { data, loading, error, refetch } = useDaoJobConfigQuery({
     variables: { daoId },
   });
 
-  const formInitData = formatJobConfigData(data);
+  const [manual, setManual] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!data?.daoJobConfig?.datum?.manual) return;
+    setManual(data.daoJobConfig.datum.manual);
+  }, [data?.daoJobConfig?.datum?.manual]);
+
+  const formInitData = useMemo(() => {
+    return formatJobConfigData(data);
+  }, [data]);
 
   const existedLastCycle = useMemo(() => {
     return data?.daoJobConfig?.existedLastCycle;
@@ -177,7 +190,7 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
     return data?.daoJobConfig?.getNextCycle;
   }, [data]);
 
-  const prvewNextCycleQuery = useDaoJobConfigPreviewNextCycleQuery({
+  const previewNextCycleQuery = useDaoJobConfigPreviewNextCycleQuery({
     skip: true,
     fetchPolicy: 'no-cache',
   });
@@ -195,9 +208,10 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
       message.error(intl.formatMessage({ id: 'pages.dao.config.tab.job.form.error' }));
       return false;
     }
+    if (!updateData) return false;
     try {
       updateData.daoId = daoId;
-      const res = await prvewNextCycleQuery.refetch({
+      const res = await previewNextCycleQuery.refetch({
         daoId: updateData.daoId,
         timeZone: updateData.timeZone,
         deadlineDay: updateData.deadlineDay,
@@ -216,7 +230,7 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
       setPreviewLoading(false);
     }
     return true;
-  }, [daoId, form, intl, prvewNextCycleQuery]);
+  }, [daoId, form, intl, previewNextCycleQuery]);
 
   const showNextCycle = useMemo(() => {
     if (showPreview) {
@@ -226,8 +240,9 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
   }, [nextCycle, previewNextCycle, showPreview]);
 
   if (loading || error) {
-    return <PageLoading />;
+    return <Skeleton active />;
   }
+
   return (
     <>
       <div className={styles.desc}>
@@ -239,6 +254,14 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
         initialValues={formInitData}
         onFinish={async (values) => {
           setSaveLoading(true);
+          if (values.manual) {
+            await updateDaoJobConfigManual({ variables: { daoId, manual: values.manual } });
+            await refetch();
+            message.success(intl.formatMessage({ id: 'pages.dao.config.tab.job.form.success' }));
+            setShowPreview(false);
+            setSaveLoading(false);
+            return true;
+          }
           const { valid, config: updateData } = formatSubmitJobConfigData(values);
           if (!valid) {
             form.resetFields();
@@ -261,108 +284,130 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
           return true;
         }}
       >
-        <Form.Item
-          label={intl.formatMessage({ id: 'pages.dao.config.tab.job.form.timezone' })}
-          name="timeZoneRegion"
-        >
-          <Select
-            showSearch
-            options={timeZoneOptions}
-            style={{ width: 200 }}
-            filterOption={(input, option) =>
-              option?.value.toLowerCase().indexOf(input.toLowerCase()) !== -1
-            }
-          />
+        <Form.Item name="manual">
+          <Radio.Group onChange={(e) => setManual(!!e.target.value)}>
+            <Radio value={true}>
+              {intl.formatMessage({ id: 'pages.dao.config.tab.job.form.manual' })}
+            </Radio>
+            <Radio value={false}>
+              {intl.formatMessage({ id: 'pages.dao.config.tab.job.form.un_manual' })}
+            </Radio>
+          </Radio.Group>
         </Form.Item>
-        <Row className={styles.inlineFormRow} gutter={24}>
-          <Col span={6}>
+        {!manual && (
+          <>
             <Form.Item
-              label={intl.formatMessage({ id: 'pages.dao.config.tab.job.form.deadline' })}
-              tooltip={{
-                title: intl.formatMessage({ id: 'pages.dao.config.tab.job.form.deadline.desc' }),
-                placement: 'right',
-                icon: <IconFont type={'icon-question'} />,
-              }}
-              name="deadline"
+              label={intl.formatMessage({ id: 'pages.dao.config.tab.job.form.timezone' })}
+              name="timeZoneRegion"
             >
-              <DayHourCascader />
+              <Select
+                showSearch
+                options={timeZoneOptions}
+                style={{ width: 200 }}
+                filterOption={(input, option) =>
+                  option?.value.toLowerCase().indexOf(input.toLowerCase()) !== -1
+                }
+              />
             </Form.Item>
-          </Col>
-          <Col span={9}>
-            <Form.Item
-              label={intl.formatMessage({ id: 'pages.dao.config.tab.job.form.pairing' })}
-              tooltip={{
-                title: intl.formatMessage({ id: 'pages.dao.config.tab.job.form.pairing.desc' }),
-                placement: 'right',
-                icon: <IconFont type={'icon-question'} />,
-              }}
-            >
-              <Form.Item name="pairBegin" className={styles.inlineFormSelect}>
-                <DayHourCascader />
-              </Form.Item>
-              <span className={styles.inlineFormSpaceMark}>-</span>
-              <Form.Item name="pairEnd" className={styles.inlineFormSelect}>
-                <DayHourCascader />
-              </Form.Item>
-            </Form.Item>
-          </Col>
-          <Col span={9}>
-            <Form.Item
-              label={intl.formatMessage({ id: 'pages.dao.config.tab.job.form.voting' })}
-              tooltip={{
-                title: intl.formatMessage({ id: 'pages.dao.config.tab.job.form.pairing.desc' }),
-                placement: 'right',
-                icon: <IconFont type={'icon-question'} />,
-              }}
-            >
-              <Form.Item name="votingBegin" className={styles.inlineFormSelect}>
-                <DayHourCascader />
-              </Form.Item>
-              <span className={styles.inlineFormSpaceMark}>-</span>
-              <Form.Item name="votingEnd" className={styles.inlineFormSelect}>
-                <DayHourCascader />
-              </Form.Item>
-            </Form.Item>
-          </Col>
-        </Row>
+            <Row className={styles.inlineFormRow} gutter={24}>
+              <Col span={6}>
+                <Form.Item
+                  label={intl.formatMessage({ id: 'pages.dao.config.tab.job.form.deadline' })}
+                  tooltip={{
+                    title: intl.formatMessage({
+                      id: 'pages.dao.config.tab.job.form.deadline.desc',
+                    }),
+                    placement: 'right',
+                    icon: <IconFont type={'icon-question'} />,
+                  }}
+                  name="deadline"
+                >
+                  <DayHourCascader />
+                </Form.Item>
+              </Col>
+              <Col span={9}>
+                <Form.Item
+                  label={intl.formatMessage({ id: 'pages.dao.config.tab.job.form.pairing' })}
+                  tooltip={{
+                    title: intl.formatMessage({ id: 'pages.dao.config.tab.job.form.pairing.desc' }),
+                    placement: 'right',
+                    icon: <IconFont type={'icon-question'} />,
+                  }}
+                >
+                  <Form.Item name="pairBegin" className={styles.inlineFormSelect}>
+                    <DayHourCascader />
+                  </Form.Item>
+                  <span className={styles.inlineFormSpaceMark}>-</span>
+                  <Form.Item name="pairEnd" className={styles.inlineFormSelect}>
+                    <DayHourCascader />
+                  </Form.Item>
+                </Form.Item>
+              </Col>
+              <Col span={9}>
+                <Form.Item
+                  label={intl.formatMessage({ id: 'pages.dao.config.tab.job.form.voting' })}
+                  tooltip={{
+                    title: intl.formatMessage({ id: 'pages.dao.config.tab.job.form.pairing.desc' }),
+                    placement: 'right',
+                    icon: <IconFont type={'icon-question'} />,
+                  }}
+                >
+                  <Form.Item name="votingBegin" className={styles.inlineFormSelect}>
+                    <DayHourCascader />
+                  </Form.Item>
+                  <span className={styles.inlineFormSpaceMark}>-</span>
+                  <Form.Item name="votingEnd" className={styles.inlineFormSelect}>
+                    <DayHourCascader />
+                  </Form.Item>
+                </Form.Item>
+              </Col>
+            </Row>
+          </>
+        )}
         <Form.Item>
           <Button htmlType="submit" type="primary" loading={saveLoading}>
             {intl.formatMessage({ id: 'pages.dao.config.tab.job.form.save' })}
           </Button>
-          <Button
-            type="primary"
-            style={{ margin: '0 8px' }}
-            loading={previewLoading}
-            onClick={handlePreviewNextCycle}
-          >
-            {intl.formatMessage({ id: 'pages.dao.config.tab.job.form.preview' })}
-          </Button>
+          {!manual && (
+            <Button
+              type="primary"
+              style={{ margin: '0 8px' }}
+              loading={previewLoading}
+              onClick={handlePreviewNextCycle}
+            >
+              {intl.formatMessage({ id: 'pages.dao.config.tab.job.form.preview' })}
+            </Button>
+          )}
         </Form.Item>
       </Form>
-      <CycleInfo
-        title={intl.formatMessage({
-          id: 'pages.dao.config.tab.job.cycle.existed_last_cycle.title',
-        })}
-        loading={false}
-        hasData={!!existedLastCycle}
-        beginAt={existedLastCycle?.beginAt || 0}
-        endAt={existedLastCycle?.endAt || 0}
-        pairBeginAt={existedLastCycle?.pairBeginAt || 0}
-        pairEndAt={existedLastCycle?.pairEndAt || 0}
-        voteBeginAt={existedLastCycle?.voteBeginAt || 0}
-        voteEndAt={existedLastCycle?.voteEndAt || 0}
-      />
-      <CycleInfo
-        title={intl.formatMessage({ id: 'pages.dao.config.tab.job.cycle.next_cycle.title' })}
-        loading={showPreview && previewLoading}
-        hasData={!!showNextCycle}
-        beginAt={showNextCycle?.beginAt || 0}
-        endAt={showNextCycle?.endAt || 0}
-        pairBeginAt={showNextCycle?.pairBeginAt || 0}
-        pairEndAt={showNextCycle?.pairEndAt || 0}
-        voteBeginAt={showNextCycle?.voteBeginAt || 0}
-        voteEndAt={showNextCycle?.voteEndAt || 0}
-      />
+      {!manual && (
+        <>
+          <CycleInfo
+            title={intl.formatMessage({
+              id: 'pages.dao.config.tab.job.cycle.existed_last_cycle.title',
+            })}
+            loading={false}
+            hasData={!!existedLastCycle}
+            beginAt={existedLastCycle?.beginAt || 0}
+            endAt={existedLastCycle?.endAt || 0}
+            pairBeginAt={existedLastCycle?.pairBeginAt || 0}
+            pairEndAt={existedLastCycle?.pairEndAt || 0}
+            voteBeginAt={existedLastCycle?.voteBeginAt || 0}
+            voteEndAt={existedLastCycle?.voteEndAt || 0}
+          />
+          <CycleInfo
+            title={intl.formatMessage({ id: 'pages.dao.config.tab.job.cycle.next_cycle.title' })}
+            loading={showPreview && previewLoading}
+            hasData={!!showNextCycle}
+            beginAt={showNextCycle?.beginAt || 0}
+            endAt={showNextCycle?.endAt || 0}
+            pairBeginAt={showNextCycle?.pairBeginAt || 0}
+            pairEndAt={showNextCycle?.pairEndAt || 0}
+            voteBeginAt={showNextCycle?.voteBeginAt || 0}
+            voteEndAt={showNextCycle?.voteEndAt || 0}
+          />
+        </>
+      )}
     </>
   );
 };

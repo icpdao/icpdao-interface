@@ -13,6 +13,7 @@ import {
   Select,
   Space,
   Spin,
+  Switch,
   Table,
   Tag,
   TimePicker,
@@ -39,6 +40,7 @@ import { PlusOutlined, QuestionOutlined } from '@ant-design/icons';
 import { useRequest } from '@@/plugin-request/request';
 import { renderJobTag } from '@/utils/pageHelper';
 import { defaultPageSize } from '@/pages/Job/components/OtherUserJobTable';
+import { clearNewJobExpertMode, getNewJobExpertMode, setNewJobExpertMode } from '@/utils/utils';
 
 type TabJobProps = {
   daoId?: string;
@@ -82,6 +84,15 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
   const intl = useIntl();
   const [newOrEditJobForm] = Form.useForm();
   const [adjustJobSizeForm] = Form.useForm();
+  const [expert, setExpert] = useState<boolean>(false);
+  useEffect(() => {
+    setExpert(getNewJobExpertMode());
+  }, []);
+  const handlerExpertMode = useCallback((checked: boolean) => {
+    setExpert(checked);
+    if (checked) setNewJobExpertMode();
+    else clearNewJobExpertMode();
+  }, []);
   const [newOrEditOrViewJobFormData, setNewOrEditOrViewJobFormData] = useState<newJobFormData>({
     issue: '',
     size: undefined,
@@ -137,7 +148,30 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
   });
 
   const [getUserOpenPR, { data: userOpenPR, loading: getUserOpenPRLoading }] =
-    useUserOpenPrLazyQuery({ fetchPolicy: 'no-cache' });
+    useUserOpenPrLazyQuery({
+      fetchPolicy: 'no-cache',
+      onCompleted: (data) => {
+        if (expert) return;
+        const userUnMergePR = JSON.parse(data.openGithub?.data);
+        if (userUnMergePR && userUnMergePR.items && userUnMergePR.items.length > 0) {
+          const upr = userUnMergePR.items[0];
+          setNewOrEditOrViewJobFormData((old) => ({
+            ...old,
+            autoCreatePR: false,
+            prs: [
+              {
+                id: upr.id || 0,
+                title: upr.title || '',
+                htmlUrl: upr.html_url || '',
+                type: 'open',
+              },
+            ],
+          }));
+        } else {
+          setNewOrEditOrViewJobFormData((old) => ({ ...old, autoCreatePR: true, prs: [] }));
+        }
+      },
+    });
   const [getIssueInfo, { data: issueInfo, loading: getIssueInfoLoading }] = useIssueInfoLazyQuery({
     fetchPolicy: 'no-cache',
   });
@@ -267,6 +301,22 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
 
   const handlerModalCancel = useCallback(
     async (type: 'new_job' | 'edit_job' | 'view_job', closeModal: boolean = true) => {
+      const clearFormData = {
+        issue: '',
+        size: undefined,
+        autoCreatePR: false,
+        prs: [],
+      };
+      setNewOrEditOrViewJobFormData(clearFormData);
+      await newOrEditJobForm.setFieldsValue({
+        [`${type}issue`]: clearFormData.issue,
+        [`${type}size`]: clearFormData.size,
+        [`${type}autoCreatePR`]: clearFormData.autoCreatePR,
+      });
+      await newOrEditJobForm.resetFields();
+      setChoosePRData([]);
+      setBackupChoosePRData([]);
+
       if (closeModal) {
         if (type === 'new_job') {
           setNewJobModalVisible(false);
@@ -277,21 +327,6 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
         }
       }
       await daoListReFetch();
-      const clearFormData = {
-        issue: '',
-        size: undefined,
-        autoCreatePR: false,
-        prs: [],
-      };
-      setNewOrEditOrViewJobFormData(clearFormData);
-      setChoosePRData([]);
-      setBackupChoosePRData([]);
-      await newOrEditJobForm.setFieldsValue({
-        [`${type}issue`]: clearFormData.issue,
-        [`${type}size`]: clearFormData.size,
-        [`${type}autoCreatePR`]: clearFormData.autoCreatePR,
-      });
-      await newOrEditJobForm.resetFields();
     },
     [daoListReFetch, newOrEditJobForm],
   );
@@ -317,12 +352,12 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
   }, [daoListReFetch, adjustJobSizeForm]);
 
   const choosePRTableRowSelection = useMemo(() => {
-    console.log(newOrEditOrViewJobFormData.prs?.map((v) => v.id.toString()));
+    const selectedRowKeys = newOrEditOrViewJobFormData.prs?.map((v) => v.id);
     return {
-      onChange: (selectedRowKeys: React.Key[], selectedRows: choosePR[]) => {
+      onChange: (_: React.Key[], selectedRows: choosePR[]) => {
         setNewOrEditOrViewJobFormData((old) => ({ ...old, prs: selectedRows }));
       },
-      selectedRowKeys: newOrEditOrViewJobFormData.prs?.map((v) => v.id),
+      selectedRowKeys,
       getCheckboxProps: (record: choosePR) => ({
         name: record.id.toString(),
         disabled:
@@ -396,10 +431,12 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
     async (cont: boolean) => {
       try {
         const checkedData = await newOrEditJobForm.validateFields();
-
+        if (!newOrEditOrViewJobFormData.size || newOrEditOrViewJobFormData.size === 0) {
+          console.error('find size 0');
+          return;
+        }
         if (cont) setOkContinueButtonLoading(true);
         else setOkButtonLoading(true);
-
         console.log(checkedData, newOrEditOrViewJobFormData);
         await createJob({
           variables: {
@@ -409,7 +446,6 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
             PRList: newOrEditOrViewJobFormData.prs?.map((p) => ({ id: p.id, htmlUrl: p.htmlUrl })),
           },
         });
-
         if (cont) setOkContinueButtonLoading(false);
         else setOkButtonLoading(false);
         await getJobList({ variables: jobQueryVar });
@@ -512,7 +548,18 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
           destroyOnClose={true}
           width={700}
           visible={type === 'new_job' ? newJobModalVisible : editJobModalVisible}
-          title={intl.formatMessage({ id: `pages.job.modal.${type}.title` })}
+          title={
+            <Space size={30}>
+              <div>{intl.formatMessage({ id: `pages.job.modal.${type}.title` })}</div>
+              <div>
+                <Switch
+                  defaultChecked={expert}
+                  onChange={handlerExpertMode}
+                  checkedChildren={intl.formatMessage({ id: 'pages.job.modal.expert.mode' })}
+                />
+              </div>
+            </Space>
+          }
           footer={
             <Space direction={'horizontal'} className={styles.globalModalButtonSpace}>
               <Button block key={'back'} onClick={() => handlerModalCancel(type)}>
@@ -639,89 +686,101 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
                 </Col>
               </Row>
               <Row gutter={30}>
-                <Col span={17}>
-                  <Form.Item name={`${type}searchPR`}>
-                    <Input
-                      allowClear
-                      disabled={newOrEditOrViewJobFormData.autoCreatePR}
-                      onPressEnter={() => {
-                        if (choosePRData.length > 0)
-                          setNewOrEditOrViewJobFormData((old) => ({
-                            ...old,
-                            prs: [choosePRData[0]],
-                          }));
-                      }}
-                      onChange={async (event) => {
-                        const v = event.target.value;
-                        if (githubPRLinkReg.test(v)) {
-                          await getInputPR(v);
-                        } else {
-                          handlerSearchChoosePR(v);
-                        }
-                      }}
-                      placeholder={intl.formatMessage({ id: 'pages.job.modal.new_job.pr.pla' })}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={7}>
-                  <Form.Item name={`${type}autoCreatePR`}>
-                    <Checkbox
-                      checked={newOrEditOrViewJobFormData.autoCreatePR}
-                      onChange={(v) => {
-                        if (v.target.checked) {
-                          setNewOrEditOrViewJobFormData((old) => ({
-                            ...old,
-                            autoCreatePR: true,
-                            prs: [],
-                          }));
-                        } else {
-                          if (type === 'edit_job') {
-                            message.info(
-                              intl.formatMessage({
-                                id: 'pages.job.modal.edit_job.warn.auto_create_pr',
-                              }),
-                            );
-                            return;
+                {expert && (
+                  <Col span={17}>
+                    <Form.Item name={`${type}searchPR`}>
+                      <Input
+                        allowClear
+                        disabled={newOrEditOrViewJobFormData.autoCreatePR}
+                        onPressEnter={() => {
+                          if (choosePRData.length > 0)
+                            setNewOrEditOrViewJobFormData((old) => ({
+                              ...old,
+                              prs: [choosePRData[0]],
+                            }));
+                        }}
+                        onChange={async (event) => {
+                          const v = event.target.value;
+                          if (githubPRLinkReg.test(v)) {
+                            await getInputPR(v);
+                          } else {
+                            handlerSearchChoosePR(v);
                           }
-                          setNewOrEditOrViewJobFormData((old) => ({ ...old, autoCreatePR: false }));
-                        }
-                      }}
-                    >
-                      {intl.formatMessage({ id: 'pages.job.modal.new_job.auto_create_pr' })}
-                    </Checkbox>
-                  </Form.Item>
-                </Col>
+                        }}
+                        placeholder={intl.formatMessage({ id: 'pages.job.modal.new_job.pr.pla' })}
+                      />
+                    </Form.Item>
+                  </Col>
+                )}
+                {(expert || newOrEditOrViewJobFormData.autoCreatePR) && (
+                  <Col span={7} style={!expert ? { float: 'right', marginLeft: 'auto' } : {}}>
+                    <Form.Item name={`${type}autoCreatePR`}>
+                      <Checkbox
+                        checked={newOrEditOrViewJobFormData.autoCreatePR}
+                        onChange={(v) => {
+                          if (v.target.checked) {
+                            setNewOrEditOrViewJobFormData((old) => ({
+                              ...old,
+                              autoCreatePR: true,
+                              prs: [],
+                            }));
+                          } else {
+                            if (type === 'edit_job') {
+                              message.info(
+                                intl.formatMessage({
+                                  id: 'pages.job.modal.edit_job.warn.auto_create_pr',
+                                }),
+                              );
+                              return;
+                            }
+                            setNewOrEditOrViewJobFormData((old) => ({
+                              ...old,
+                              autoCreatePR: false,
+                            }));
+                          }
+                        }}
+                      >
+                        {intl.formatMessage({ id: 'pages.job.modal.new_job.auto_create_pr' })}
+                      </Checkbox>
+                    </Form.Item>
+                  </Col>
+                )}
               </Row>
             </Form>
-            {choosePRTable}
+            {(expert ||
+              (newOrEditOrViewJobFormData.prs && newOrEditOrViewJobFormData.prs.length > 0)) &&
+              choosePRTable}
             {modalTag}
           </Spin>
         </Modal>
       );
     },
     [
-      newJobModalVisible,
-      editJobModalVisible,
-      intl,
-      okContinueButtonLoading,
-      okButtonLoading,
-      saveButtonLoading,
-      handlerSaveJob,
-      createJobLoading,
-      updateJobLoading,
-      newOrEditJobForm,
-      newOrEditOrViewJobFormData.issue,
-      newOrEditOrViewJobFormData.size,
-      newOrEditOrViewJobFormData.autoCreatePR,
+      choosePRData,
       choosePRTable,
-      modalTag,
+      createJobLoading,
+      editJobModalVisible,
+      expert,
+      getChoosePRs,
+      getInputPR,
+      handlerExpertMode,
       handlerModalCancel,
       handlerNewJob,
-      getChoosePRs,
-      userName,
-      choosePRData,
-      getInputPR,
+      handlerSaveJob,
       handlerSearchChoosePR,
+      intl,
+      modalTag,
+      newJobModalVisible,
+      newOrEditJobForm,
+      newOrEditOrViewJobFormData.autoCreatePR,
+      newOrEditOrViewJobFormData.issue,
+      newOrEditOrViewJobFormData.prs,
+      newOrEditOrViewJobFormData.size,
+      okButtonLoading,
+      okContinueButtonLoading,
+      saveButtonLoading,
+      updateJobLoading,
+      userName,
     ],
   );
 
@@ -1059,15 +1118,14 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
     getJobList,
   ]);
 
-  const searchFormSpan = useMemo(() => {
-    if (isMy) return [18, 6];
-    return [21, 3];
-  }, [isMy]);
+  const handlerOpenNewJobModal = useCallback(() => {
+    setNewJobModalVisible(true);
+  }, []);
 
   const searchFormButton = useMemo(() => {
     if (isMy)
       return (
-        <Space size={'middle'} style={{ width: '100%' }}>
+        <Space size={'middle'} style={{ float: 'right', marginLeft: 'auto' }}>
           <Button
             href={workInfoURL}
             target={'_blank'}
@@ -1083,7 +1141,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
               block
               size={'large'}
               icon={<PlusOutlined />}
-              onClick={() => setNewJobModalVisible(true)}
+              onClick={handlerOpenNewJobModal}
             >
               {intl.formatMessage({ id: 'pages.job.table.button' })}
             </Button>
@@ -1095,13 +1153,13 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
         {intl.formatMessage({ id: 'pages.job.table.info' })}
       </Button>
     );
-  }, [intl, isMy]);
+  }, [handlerOpenNewJobModal, intl, isMy]);
 
   const searchForm = useMemo(() => {
     return (
       <div key={'searchForm'} className={styles.SearchForm}>
-        <Row>
-          <Col span={searchFormSpan[0]}>
+        <Row justify={'space-between'}>
+          <Col>
             <Space direction={'horizontal'}>
               <Select
                 size={'large'}
@@ -1158,7 +1216,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
               />
             </Space>
           </Col>
-          <Col span={searchFormSpan[1]}>{searchFormButton}</Col>
+          <Col>{searchFormButton}</Col>
         </Row>
       </div>
     );
@@ -1169,7 +1227,6 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
     parseTime,
     searchDateType,
     searchFormButton,
-    searchFormSpan,
   ]);
 
   const stat = useMemo(() => {

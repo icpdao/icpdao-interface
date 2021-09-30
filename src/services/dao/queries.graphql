@@ -38,6 +38,7 @@ query DAOJobConfig($daoId: String!) {
       votingBeginHour
       votingEndDay
       votingEndHour
+      manual
     }
     existedLastCycle {
       timeZone
@@ -351,6 +352,9 @@ query CycleIcpperList($cycleId: String!, $first: Int, $offset: Int, $sorted: Cyc
       }
       total
     }
+    step {
+      status
+    }
   }
 }
 
@@ -389,6 +393,9 @@ query OwnerCycleIcpperList($cycleId: String!, $first: Int, $offset: Int, $sorted
         }
       }
       total
+    }
+    step {
+      status
     }
   }
 }
@@ -830,5 +837,38 @@ query HomeStatsQuery {
     icpper
     size
     income
+  }
+}
+
+query DAOLastCycleStatus ($daoId: String!) {
+  dao(id: $daoId) {
+    lastCycle {
+      pairTask {
+        status
+      }
+      voteResultPublishTask {
+        status
+      }
+      voteResultStatTask {
+        status
+      }
+      datum {
+        id
+        timeZone
+        beginAt
+        endAt
+        pairBeginAt
+        pairEndAt
+        pairedAt
+        voteBeginAt
+        voteEndAt
+        voteResultPublishedAt
+        voteResultStatAt
+        tokenReleasedAt
+      }
+      step {
+        status
+      }
+    }
   }
 }

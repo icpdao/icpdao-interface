@@ -18,6 +18,26 @@ export const setMetamaskConnect = () => {
   return window.localStorage.setItem('metamask', 'connect');
 };
 
+export const setRedirectURL = (redirect: string) => {
+  return window.localStorage.setItem('redirect', redirect);
+};
+
+export const getRedirectURL = () => {
+  return window.localStorage.getItem('redirect');
+};
+
+export const setNewJobExpertMode = () => {
+  return window.localStorage.setItem('new_job_expert_mode', '1');
+};
+
+export const clearNewJobExpertMode = () => {
+  return window.localStorage.setItem('new_job_expert_mode', '');
+};
+
+export const getNewJobExpertMode = () => {
+  return !!window.localStorage.getItem('new_job_expert_mode');
+};
+
 export const getMetamask = () => {
   return window.localStorage.getItem('metamask');
 };

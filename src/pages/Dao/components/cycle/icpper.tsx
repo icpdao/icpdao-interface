@@ -1,6 +1,16 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import type { TablePaginationConfig } from 'antd';
-import { Avatar, Button, Space, Table, InputNumber, message, Progress, Tooltip } from 'antd';
+import {
+  Avatar,
+  Button,
+  InputNumber,
+  message,
+  Progress,
+  Skeleton,
+  Space,
+  Table,
+  Tooltip,
+} from 'antd';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { FormattedMessage } from 'umi';
 import type { DaoCycleProps } from '@/pages/Dao/components/cycle/index';
@@ -12,6 +22,7 @@ import type {
 import {
   CycleIcpperStatSortedEnum,
   CycleIcpperStatSortedTypeEnum,
+  CycleStepEnum,
   CycleVoteResultPublishTaskStatusEnum,
   CycleVoteResultStatTaskStatusEnum,
   useBeginCycleVoteResultTaskMutation,
@@ -22,8 +33,7 @@ import {
   useOwnerCycleIcpperListQuery,
   useUpdateOwnerEiMutation,
 } from '@/services/dao/generated';
-import { PageLoading } from '@ant-design/pro-layout';
-import { UserOutlined, ControlTwoTone } from '@ant-design/icons';
+import { ControlTwoTone, UserOutlined } from '@ant-design/icons';
 import { history } from '@@/core/history';
 import { getCurrentPage, getEIColor } from '@/utils/utils';
 import styles from './index.less';
@@ -42,6 +52,7 @@ const ownerColumns = (
   canUpdateOwnerEI: boolean,
   updateOwnerEI: (ownerEI: number) => void,
   beginOrEndEditing: (recordId: string) => void,
+  stepStatus: CycleStepEnum,
 ) => {
   return [
     {
@@ -83,7 +94,8 @@ const ownerColumns = (
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.ie" />,
       dataIndex: ['datum', 'ei'],
       render: (_: any, record: IcpperStatQuery) => {
-        if (!record?.datum?.voteEi) return <></>;
+        if (stepStatus !== CycleStepEnum.VoteEnd) return <>-</>;
+        if (!record?.datum?.voteEi) return <>-</>;
         const tips: string[] = [];
         let color: string = 'inherit';
         if (record.datum.ei < 0.4) {
@@ -167,7 +179,7 @@ const ownerColumns = (
   ];
 };
 
-const columns = (intl: any, daoId: string) => {
+const columns = (intl: any, daoId: string, stepStatus: CycleStepEnum) => {
   return [
     {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.icpper" />,
@@ -208,6 +220,7 @@ const columns = (intl: any, daoId: string) => {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.ie" />,
       dataIndex: ['datum', 'ei'],
       render: (_: any, record: IcpperStatQuery) => {
+        if (stepStatus !== CycleStepEnum.VoteEnd) return <>-</>;
         return renderEi(intl, record);
       },
     },
@@ -368,7 +381,7 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
     setCanUpdateOwnerEI(!!cycle && !!cycle.voteResultStatAt && !cycle.voteResultPublishedAt);
   }, [cycle]);
   if (loading || error) {
-    return <PageLoading />;
+    return <Skeleton active />;
   }
 
   const voteResultStatus = voteResultData?.cycle?.voteResultStatTask?.status;
@@ -479,6 +492,7 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
           canUpdateOwnerEI,
           changeEditingOwnerEI,
           beginOrEndEditing,
+          data?.cycle?.step?.status || CycleStepEnum.Job,
         )}
         loading={loading}
         rowKey={(record) => record?.datum?.id || ''}
@@ -533,13 +547,13 @@ export const DaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycleId, daoId }) => {
   }, []);
 
   if (loading || error) {
-    return <PageLoading />;
+    return <Skeleton active />;
   }
 
   return (
     <>
       <Table<IcpperStatQuery>
-        columns={columns(intl, daoId || '')}
+        columns={columns(intl, daoId || '', data?.cycle?.step?.status || CycleStepEnum.Job)}
         loading={loading}
         rowKey={(record) => record?.datum?.id || ''}
         dataSource={data?.cycle?.icpperStats?.nodes as any}
