@@ -248,3 +248,9 @@ mutation UpdateDAOLastCycleStep($daoId: String!, $nextStatus: UpdateDaoLastCycle
     }
   }
 }
+
+mutation SyncJob($jobId: String!) {
+  refreshJob(id: $jobId) {
+    ok
+  }
+}
