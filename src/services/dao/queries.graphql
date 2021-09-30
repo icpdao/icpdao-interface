@@ -355,6 +355,9 @@ query CycleIcpperList($cycleId: String!, $first: Int, $offset: Int, $sorted: Cyc
     step {
       status
     }
+    voteResultStatTask {
+      status
+    }
   }
 }
 
