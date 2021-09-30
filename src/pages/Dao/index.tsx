@@ -2,7 +2,6 @@ import type { ReactNode } from 'react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { PageContainer, PageLoading } from '@ant-design/pro-layout';
 import {
-  Alert,
   Avatar,
   Button,
   Col,
@@ -12,7 +11,6 @@ import {
   Space,
   Tabs,
   Tag,
-  Tooltip,
   Typography,
   Upload,
 } from 'antd';
@@ -33,7 +31,7 @@ import {
   useFollowDaoMutation,
   useUpdateDaoBaseInfoMutation,
 } from '@/services/dao/generated';
-import { getCurrentTimestamps, getFormatTime, getTimeDistanceHumanize } from '@/utils/utils';
+import { getFormatTime } from '@/utils/utils';
 import { useIntl } from '@@/plugin-locale/localeExports';
 
 import DaoIcpperStat from '@/pages/Dao/components/DaoIcpperStat';
@@ -44,8 +42,7 @@ import * as AWS from '@aws-sdk/client-s3';
 import { ApolloQueryResult } from '@apollo/client/core/types';
 import { ApolloError } from '@apollo/client';
 import { getGithubOAuthUrl } from '@/components/RightHeader/AvatarDropdown';
-import AccessButton from '@/components/AccessButton';
-import { AccessEnum } from '@/access';
+import DaoStepStatus from '@/pages/Dao/components/DaoStepStatus';
 
 const { TabPane } = Tabs;
 
@@ -197,13 +194,13 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
   const access = useAccess();
   const intl = useIntl();
   const [followedButtonLoading, setFollowedButtonLoading] = useState(false);
-  const [showNoVoteAlert, setShowNoVoteAlert] = useState(false);
+  // const [showNoVoteAlert, setShowNoVoteAlert] = useState(false);
 
   if (!initialState) {
     return <PageLoading />;
   }
   const { daoId } = props.match.params;
-  const nowAt = getCurrentTimestamps();
+  // const nowAt = getCurrentTimestamps();
 
   let data: DaoHomeWithLoginQueryQuery | undefined;
   let loading: boolean;
@@ -230,123 +227,123 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
   }
 
   // 正在投票中，距离投票结束最近的一个周期
-  const nearVotingCycle = useMemo(() => {
-    let result;
-    const votingList = data?.dao?.cycles?.nodes?.filter((item) => {
-      if (item) {
-        return (
-          item.datum?.voteBeginAt &&
-          item.datum?.voteEndAt &&
-          item.datum?.voteBeginAt <= nowAt &&
-          item.datum?.voteEndAt > nowAt
-        );
-      }
-      return false;
-    });
-    votingList?.sort((item1, item2) => {
-      return (item1?.datum?.voteEndAt || 0) - (item2?.datum?.voteEndAt || 0);
-    });
-
-    if (votingList && votingList.length > 0) {
-      // eslint-disable-next-line prefer-destructuring
-      result = votingList[0];
-    }
-    return result;
-  }, [data, nowAt]);
+  // const nearVotingCycle = useMemo(() => {
+  //   let result;
+  //   const votingList = data?.dao?.cycles?.nodes?.filter((item) => {
+  //     if (item) {
+  //       return (
+  //         item.datum?.voteBeginAt &&
+  //         item.datum?.voteEndAt &&
+  //         item.datum?.voteBeginAt <= nowAt &&
+  //         item.datum?.voteEndAt > nowAt
+  //       );
+  //     }
+  //     return false;
+  //   });
+  //   votingList?.sort((item1, item2) => {
+  //     return (item1?.datum?.voteEndAt || 0) - (item2?.datum?.voteEndAt || 0);
+  //   });
+  //
+  //   if (votingList && votingList.length > 0) {
+  //     // eslint-disable-next-line prefer-destructuring
+  //     result = votingList[0];
+  //   }
+  //   return result;
+  // }, [data, nowAt]);
 
   // 正在进行中的，距离 deadline 最近的一个周期
-  const processingCycle = useMemo(() => {
-    let result;
-    const processingCycleList = data?.dao?.cycles?.nodes?.filter((item) => {
-      if (item) {
-        return (
-          item.datum?.beginAt &&
-          item.datum?.endAt &&
-          item.datum?.beginAt <= nowAt &&
-          item.datum?.endAt > nowAt
-        );
-      }
-      return false;
-    });
-    processingCycleList?.sort((item1, item2) => {
-      return (item1?.datum?.endAt || 0) - (item2?.datum?.endAt || 0);
-    });
+  // const processingCycle = useMemo(() => {
+  //   let result;
+  //   const processingCycleList = data?.dao?.cycles?.nodes?.filter((item) => {
+  //     if (item) {
+  //       return (
+  //         item.datum?.beginAt &&
+  //         item.datum?.endAt &&
+  //         item.datum?.beginAt <= nowAt &&
+  //         item.datum?.endAt > nowAt
+  //       );
+  //     }
+  //     return false;
+  //   });
+  //   processingCycleList?.sort((item1, item2) => {
+  //     return (item1?.datum?.endAt || 0) - (item2?.datum?.endAt || 0);
+  //   });
+  //
+  //   if (processingCycleList && processingCycleList.length > 0) {
+  //     // eslint-disable-next-line prefer-destructuring
+  //     result = processingCycleList[0];
+  //   }
+  //   return result;
+  // }, [data, nowAt]);
+  //
+  // // 未完成的，继续投票开始最近的周期
+  // const nearPreVoteCycle = useMemo(() => {
+  //   let result;
+  //   const preVoteList = data?.dao?.cycles?.nodes?.filter((item) => {
+  //     if (item) {
+  //       return item.datum?.voteBeginAt && item.datum?.voteBeginAt > nowAt;
+  //     }
+  //     return false;
+  //   });
+  //   preVoteList?.sort((item1, item2) => {
+  //     return (item1?.datum?.voteBeginAt || 0) - (item2?.datum?.voteBeginAt || 0);
+  //   });
+  //
+  //   if (preVoteList && preVoteList.length > 0) {
+  //     // eslint-disable-next-line prefer-destructuring
+  //     result = preVoteList[0];
+  //   }
+  //   return result;
+  // }, [data, nowAt]);
 
-    if (processingCycleList && processingCycleList.length > 0) {
-      // eslint-disable-next-line prefer-destructuring
-      result = processingCycleList[0];
-    }
-    return result;
-  }, [data, nowAt]);
+  // const markJobButtonTipTitle = useMemo(() => {
+  //   if (processingCycle && processingCycle.datum?.endAt) {
+  //     return intl.formatMessage(
+  //       { id: 'pages.dao.home.button.mark.tips' },
+  //       { date_string: getFormatTime(processingCycle?.datum?.endAt, 'LL') },
+  //     );
+  //   }
+  //   return '';
+  // }, [intl, processingCycle]);
+  //
+  // const goVoteButtonTipTitle = useMemo(() => {
+  //   if (nearVotingCycle && nearVotingCycle.datum?.voteEndAt) {
+  //     return intl.formatMessage(
+  //       { id: 'pages.dao.home.button.vote.tips.time_left' },
+  //       { date_string: getTimeDistanceHumanize(nearVotingCycle.datum?.voteEndAt) },
+  //     );
+  //   }
+  //
+  //   if (nearPreVoteCycle && nearPreVoteCycle.datum?.voteBeginAt) {
+  //     return intl.formatMessage(
+  //       { id: 'pages.dao.home.button.vote.tips.time_start' },
+  //       { date_string: getTimeDistanceHumanize(nearPreVoteCycle.datum?.voteBeginAt) },
+  //     );
+  //   }
+  //
+  //   return '';
+  // }, [intl, nearPreVoteCycle, nearVotingCycle]);
 
-  // 未完成的，继续投票开始最近的周期
-  const nearPreVoteCycle = useMemo(() => {
-    let result;
-    const preVoteList = data?.dao?.cycles?.nodes?.filter((item) => {
-      if (item) {
-        return item.datum?.voteBeginAt && item.datum?.voteBeginAt > nowAt;
-      }
-      return false;
-    });
-    preVoteList?.sort((item1, item2) => {
-      return (item1?.datum?.voteBeginAt || 0) - (item2?.datum?.voteBeginAt || 0);
-    });
+  // const nearVotingCycleHasVote = useMemo(() => {
+  //   if (nearVotingCycle) {
+  //     const total = nearVotingCycle?.votes?.total || 0;
+  //     return total > 0;
+  //   }
+  //   return false;
+  // }, [nearVotingCycle]);
 
-    if (preVoteList && preVoteList.length > 0) {
-      // eslint-disable-next-line prefer-destructuring
-      result = preVoteList[0];
-    }
-    return result;
-  }, [data, nowAt]);
-
-  const markJobButtonTipTitle = useMemo(() => {
-    if (processingCycle && processingCycle.datum?.endAt) {
-      return intl.formatMessage(
-        { id: 'pages.dao.home.button.mark.tips' },
-        { date_string: getFormatTime(processingCycle?.datum?.endAt, 'LL') },
-      );
-    }
-    return '';
-  }, [intl, processingCycle]);
-
-  const goVoteButtonTipTitle = useMemo(() => {
-    if (nearVotingCycle && nearVotingCycle.datum?.voteEndAt) {
-      return intl.formatMessage(
-        { id: 'pages.dao.home.button.vote.tips.time_left' },
-        { date_string: getTimeDistanceHumanize(nearVotingCycle.datum?.voteEndAt) },
-      );
-    }
-
-    if (nearPreVoteCycle && nearPreVoteCycle.datum?.voteBeginAt) {
-      return intl.formatMessage(
-        { id: 'pages.dao.home.button.vote.tips.time_start' },
-        { date_string: getTimeDistanceHumanize(nearPreVoteCycle.datum?.voteBeginAt) },
-      );
-    }
-
-    return '';
-  }, [intl, nearPreVoteCycle, nearVotingCycle]);
-
-  const nearVotingCycleHasVote = useMemo(() => {
-    if (nearVotingCycle) {
-      const total = nearVotingCycle?.votes?.total || 0;
-      return total > 0;
-    }
-    return false;
-  }, [nearVotingCycle]);
-
-  const noVoteAlert = useMemo(() => {
-    if (showNoVoteAlert) {
-      return (
-        <Alert
-          message={intl.formatMessage({ id: 'pages.dao.home.alert.no_vote' })}
-          type="error"
-          showIcon
-        />
-      );
-    }
-    return null;
-  }, [intl, showNoVoteAlert]);
+  // const noVoteAlert = useMemo(() => {
+  //   if (showNoVoteAlert) {
+  //     return (
+  //       <Alert
+  //         message={intl.formatMessage({ id: 'pages.dao.home.alert.no_vote' })}
+  //         type="error"
+  //         showIcon
+  //       />
+  //     );
+  //   }
+  //   return null;
+  // }, [intl, showNoVoteAlert]);
 
   const [updateFollowDao] = useFollowDaoMutation();
   const [updateDaoBaseInfo] = useUpdateDaoBaseInfoMutation();
@@ -419,17 +416,17 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
 
   const defaultActiveKey = 'icpperStat';
 
-  const handleMarkJob = useCallback(() => {
-    history.push(`/job?daoId=${daoId}`);
-  }, [daoId]);
-
-  const handleGoVote = useCallback(() => {
-    if (nearVotingCycleHasVote) {
-      history.push(`/dao/${daoId}/${nearVotingCycle?.datum?.id}/vote`);
-    } else {
-      setShowNoVoteAlert(true);
-    }
-  }, [daoId, nearVotingCycle, nearVotingCycleHasVote]);
+  // const handleMarkJob = useCallback(() => {
+  //   history.push(`/job?daoId=${daoId}`);
+  // }, [daoId]);
+  //
+  // const handleGoVote = useCallback(() => {
+  //   if (nearVotingCycleHasVote) {
+  //     history.push(`/dao/${daoId}/${nearVotingCycle?.datum?.id}/vote`);
+  //   } else {
+  //     setShowNoVoteAlert(true);
+  //   }
+  // }, [daoId, nearVotingCycle, nearVotingCycleHasVote]);
 
   if (loading || error) {
     return <PageLoading />;
@@ -441,7 +438,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
         ghost
         header={{ breadcrumbRender: () => <GlobalBreadcrumb routes={breadcrumb(daoId)} /> }}
       >
-        {noVoteAlert}
+        {/*  {noVoteAlert}  */}
         <Row className={styles.headerRow}>
           <Col xs={24} sm={12}>
             <Space size={30} className={styles.headerSpace}>
@@ -521,31 +518,33 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
           </Tag>
         </Space>
         <Divider />
-        <Space size={22} className={styles.buttonSpace}>
-          <Tooltip placement="right" title={markJobButtonTipTitle}>
-            <AccessButton
-              allow={AccessEnum.PREICPPER}
-              size={'large'}
-              type={'primary'}
-              onClick={handleMarkJob}
-            >
-              <FormattedMessage id={`pages.dao.home.button.mark`} />
-            </AccessButton>
-          </Tooltip>
-          <Tooltip placement="right" title={goVoteButtonTipTitle}>
-            <AccessButton
-              allow={AccessEnum.PREICPPER}
-              size={'large'}
-              type={'primary'}
-              danger
-              disabled={!nearVotingCycle}
-              onClick={handleGoVote}
-            >
-              <FormattedMessage id={`pages.dao.home.button.vote`} />
-            </AccessButton>
-          </Tooltip>
-        </Space>
+        {/*  <Space size={22} className={styles.buttonSpace}>  */}
+        {/*    <Tooltip placement="right" title={markJobButtonTipTitle}>  */}
+        {/*      <AccessButton  */}
+        {/*        allow={AccessEnum.PREICPPER}  */}
+        {/*        size={'large'}  */}
+        {/*        type={'primary'}  */}
+        {/*        onClick={handleMarkJob}  */}
+        {/*      >  */}
+        {/*        <FormattedMessage id={`pages.dao.home.button.mark`} />  */}
+        {/*      </AccessButton>  */}
+        {/*    </Tooltip>  */}
+        {/*    <Tooltip placement="right" title={goVoteButtonTipTitle}>  */}
+        {/*      <AccessButton  */}
+        {/*        allow={AccessEnum.PREICPPER}  */}
+        {/*        size={'large'}  */}
+        {/*        type={'primary'}  */}
+        {/*        danger  */}
+        {/*        disabled={!nearVotingCycle}  */}
+        {/*        onClick={handleGoVote}  */}
+        {/*      >  */}
+        {/*        <FormattedMessage id={`pages.dao.home.button.vote`} />  */}
+        {/*      </AccessButton>  */}
+        {/*    </Tooltip>  */}
+        {/*  </Space>  */}
 
+        <DaoStepStatus daoId={daoId} isOwner={userRole === 'owner'} />
+        <Divider />
         <Tabs defaultActiveKey={defaultActiveKey}>
           <TabPane tab={<FormattedMessage id={'pages.dao.home.tab.icpperStat'} />} key="icpperStat">
             <DaoIcpperStat daoId={daoId} tokenSymbol={data?.dao?.datum?.tokenSymbol || ''} />

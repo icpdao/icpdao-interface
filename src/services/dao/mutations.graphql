@@ -36,7 +36,16 @@ mutation UpdateDAOJobConfig(
     votingEndDay: $votingEndDay,
     votingEndHour: $votingEndHour,
     timeZone: $timeZone,
-    timeZoneRegion: $timeZoneRegion
+    timeZoneRegion: $timeZoneRegion,
+  ) {
+    ok
+  }
+}
+
+mutation UpdateDaoJobConfigManual($daoId: String!, $manual: Boolean) {
+  updateDaoJobConfig(
+    daoId: $daoId,
+    manual: $manual
   ) {
     ok
   }
@@ -202,5 +211,40 @@ mutation FindLostTxForDropTokenMintRecord($daoId: String!, $tokenContractAddress
 mutation UpdateVoteConfirm($cycleId: String!, $signatureAddress: String!, $signatureMsg: String!, $signature: String!) {
   updateVoteConfirm(cycleId: $cycleId, signatureAddress: $signatureAddress, signatureMsg: $signatureMsg, signature: $signature) {
     ok
+  }
+}
+
+mutation UpdateDAOLastCycleStep($daoId: String!, $nextStatus: UpdateDaoLastCycleStepEnum) {
+  updateDaoLastCycleStep(daoId: $daoId, nextStep: $nextStatus) {
+    dao {
+      lastCycle {
+        step {
+          status
+        }
+        pairTask {
+          status
+        }
+        voteResultPublishTask {
+          status
+        }
+        voteResultStatTask {
+          status
+        }
+        datum {
+          id
+          timeZone
+          beginAt
+          endAt
+          pairBeginAt
+          pairEndAt
+          pairedAt
+          voteBeginAt
+          voteEndAt
+          voteResultPublishedAt
+          voteResultStatAt
+          tokenReleasedAt
+        }
+      }
+    }
   }
 }
