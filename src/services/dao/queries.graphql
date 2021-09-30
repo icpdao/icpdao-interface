@@ -852,6 +852,9 @@ query DAOLastCycleStatus ($daoId: String!) {
       voteResultStatTask {
         status
       }
+      jobs {
+        total
+      }
       datum {
         id
         timeZone
