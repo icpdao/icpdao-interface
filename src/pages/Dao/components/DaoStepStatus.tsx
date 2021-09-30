@@ -112,13 +112,13 @@ const DaoStepStatus: React.FC<{ daoId: string; isOwner: boolean }> = ({ daoId, i
         placement="right"
         title={intl.formatMessage({ id: 'pages.dao.home.step.end_job.tips' })}
         onConfirm={handlerEndJob}
-        disabled={!currentCycle?.datum?.beginAt}
+        disabled={currentCycle?.jobs?.total === undefined || currentCycle?.jobs?.total === 0}
         okButtonProps={{ loading: mutationUpdateDaoLastCycleStepResult.loading }}
       >
         <Button
           size={'large'}
           block
-          disabled={!currentCycle?.datum?.beginAt}
+          disabled={currentCycle?.jobs?.total === undefined || currentCycle?.jobs?.total === 0}
           loading={mutationUpdateDaoLastCycleStepResult.loading || false}
         >
           <FormattedMessage id={`pages.dao.home.step.end_job`} />
@@ -126,7 +126,7 @@ const DaoStepStatus: React.FC<{ daoId: string; isOwner: boolean }> = ({ daoId, i
       </Popconfirm>
     );
   }, [
-    currentCycle?.datum?.beginAt,
+    currentCycle?.jobs?.total,
     daoId,
     intl,
     mutationUpdateDaoLastCycleStepResult.loading,
