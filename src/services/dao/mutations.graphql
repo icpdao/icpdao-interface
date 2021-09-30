@@ -221,6 +221,29 @@ mutation UpdateDAOLastCycleStep($daoId: String!, $nextStatus: UpdateDaoLastCycle
         step {
           status
         }
+        pairTask {
+          status
+        }
+        voteResultPublishTask {
+          status
+        }
+        voteResultStatTask {
+          status
+        }
+        datum {
+          id
+          timeZone
+          beginAt
+          endAt
+          pairBeginAt
+          pairEndAt
+          pairedAt
+          voteBeginAt
+          voteEndAt
+          voteResultPublishedAt
+          voteResultStatAt
+          tokenReleasedAt
+        }
       }
     }
   }

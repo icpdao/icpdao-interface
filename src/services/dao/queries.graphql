@@ -352,6 +352,9 @@ query CycleIcpperList($cycleId: String!, $first: Int, $offset: Int, $sorted: Cyc
       }
       total
     }
+    step {
+      status
+    }
   }
 }
 
@@ -390,6 +393,9 @@ query OwnerCycleIcpperList($cycleId: String!, $first: Int, $offset: Int, $sorted
         }
       }
       total
+    }
+    step {
+      status
     }
   }
 }

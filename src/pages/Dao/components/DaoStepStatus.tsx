@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Col, Row, Skeleton, Steps, Tooltip } from 'antd';
+import { Button, Col, Popconfirm, Row, Skeleton, Steps, Tooltip } from 'antd';
+import type { CycleQuery } from '@/services/dao/generated';
 import {
-  CycleQuery,
   CycleStepEnum,
   UpdateDaoLastCycleStepEnum,
   useDaoLastCycleStatusQuery,
@@ -14,7 +14,6 @@ import { getFormatTime, getTimeDistanceHumanize } from '@/utils/utils';
 import { useIntl } from 'umi';
 import { history } from '@@/core/history';
 import StepPairing from '@/pages/Dao/components/step/pairing';
-import StepStat from '@/pages/Dao/components/step/stat';
 import { LoadingOutlined } from '@ant-design/icons';
 
 const { Step } = Steps;
@@ -28,7 +27,7 @@ const currentIndex = {
 
 const DaoStepStatus: React.FC<{ daoId: string; isOwner: boolean }> = ({ daoId, isOwner }) => {
   const intl = useIntl();
-  const { data, loading } = useDaoLastCycleStatusQuery({ variables: { daoId } });
+  const { data, loading, refetch } = useDaoLastCycleStatusQuery({ variables: { daoId } });
   const [currentCycle, setCurrentCycle] = useState<CycleQuery>();
   const [updateDaoLastCycleStepMutation, mutationUpdateDaoLastCycleStepResult] =
     useUpdateDaoLastCycleStepMutation();
@@ -39,9 +38,9 @@ const DaoStepStatus: React.FC<{ daoId: string; isOwner: boolean }> = ({ daoId, i
   }, [data?.dao?.lastCycle]);
 
   useEffect(() => {
-    if (!mutationUpdateDaoLastCycleStepResult.data?.updateDaoLastCycleStep?.dao?.lastCycle) return;
     setCurrentCycle(
-      mutationUpdateDaoLastCycleStepResult.data?.updateDaoLastCycleStep.dao.lastCycle,
+      mutationUpdateDaoLastCycleStepResult.data?.updateDaoLastCycleStep?.dao
+        ?.lastCycle as CycleQuery,
     );
   }, [mutationUpdateDaoLastCycleStepResult?.data?.updateDaoLastCycleStep?.dao?.lastCycle]);
 
@@ -109,27 +108,35 @@ const DaoStepStatus: React.FC<{ daoId: string; isOwner: boolean }> = ({ daoId, i
       });
     };
     return (
-      <Tooltip
+      <Popconfirm
         placement="right"
         title={intl.formatMessage({ id: 'pages.dao.home.step.end_job.tips' })}
+        onConfirm={handlerEndJob}
+        disabled={!currentCycle?.datum?.beginAt}
+        okButtonProps={{ loading: mutationUpdateDaoLastCycleStepResult.loading }}
       >
         <Button
           size={'large'}
-          onClick={handlerEndJob}
           block
           disabled={!currentCycle?.datum?.beginAt}
           loading={mutationUpdateDaoLastCycleStepResult.loading || false}
         >
           <FormattedMessage id={`pages.dao.home.step.end_job`} />
         </Button>
-      </Tooltip>
+      </Popconfirm>
     );
-  }, [daoId, intl, mutationUpdateDaoLastCycleStepResult.loading, updateDaoLastCycleStepMutation]);
+  }, [
+    currentCycle?.datum?.beginAt,
+    daoId,
+    intl,
+    mutationUpdateDaoLastCycleStepResult.loading,
+    updateDaoLastCycleStepMutation,
+  ]);
 
   const pairingButton = useMemo(() => {
     if (!currentCycle) return <></>;
-    return <StepPairing currentCycle={currentCycle} />;
-  }, [currentCycle]);
+    return <StepPairing refetch={refetch} currentCycle={currentCycle} />;
+  }, [currentCycle, refetch]);
 
   const endPairButton = useMemo(() => {
     const handlerEndPair = () => {
@@ -137,22 +144,32 @@ const DaoStepStatus: React.FC<{ daoId: string; isOwner: boolean }> = ({ daoId, i
         variables: { daoId, nextStatus: UpdateDaoLastCycleStepEnum.Vote },
       });
     };
+    const disableEndPair = !currentCycle?.datum?.pairedAt || false;
     return (
-      <Tooltip
+      <Popconfirm
         placement="right"
         title={intl.formatMessage({ id: 'pages.dao.home.step.end_pair.tips' })}
+        onConfirm={handlerEndPair}
+        disabled={disableEndPair}
+        okButtonProps={{ loading: mutationUpdateDaoLastCycleStepResult.loading }}
       >
         <Button
           size={'large'}
-          onClick={handlerEndPair}
           block
+          disabled={disableEndPair}
           loading={mutationUpdateDaoLastCycleStepResult.loading || false}
         >
           <FormattedMessage id={`pages.dao.home.step.end_pair`} />
         </Button>
-      </Tooltip>
+      </Popconfirm>
     );
-  }, [daoId, intl, mutationUpdateDaoLastCycleStepResult.loading, updateDaoLastCycleStepMutation]);
+  }, [
+    currentCycle?.datum?.pairedAt,
+    daoId,
+    intl,
+    mutationUpdateDaoLastCycleStepResult.loading,
+    updateDaoLastCycleStepMutation,
+  ]);
 
   const goVoteButton = useMemo(() => {
     return (
@@ -179,38 +196,39 @@ const DaoStepStatus: React.FC<{ daoId: string; isOwner: boolean }> = ({ daoId, i
       });
     };
     return (
-      <Tooltip
+      <Popconfirm
         placement="right"
         title={intl.formatMessage({ id: 'pages.dao.home.step.end_vote.tips' })}
+        onConfirm={handlerEndVote}
+        okButtonProps={{ loading: mutationUpdateDaoLastCycleStepResult.loading }}
       >
         <Button
           size={'large'}
-          onClick={handlerEndVote}
           block
           loading={mutationUpdateDaoLastCycleStepResult.loading || false}
         >
           <FormattedMessage id={`pages.dao.home.step.end_vote`} />
         </Button>
-      </Tooltip>
+      </Popconfirm>
     );
   }, [daoId, intl, mutationUpdateDaoLastCycleStepResult.loading, updateDaoLastCycleStepMutation]);
 
-  const voteOpButton = useMemo(() => {
-    if (!currentCycle) return <></>;
-    return <StepStat currentCycle={currentCycle} />;
-  }, [currentCycle]);
+  // const voteOpButton = useMemo(() => {
+  //   if (!currentCycle) return <></>;
+  //   return <StepStat currentCycle={currentCycle} />;
+  // }, [currentCycle]);
 
   const buttons = useMemo(() => {
     if (current === CycleStepEnum.Job) {
       return (
-        <Row justify={'center'} gutter={60} style={{ marginTop: '50px' }}>
+        <Row justify={'center'} gutter={60} style={{ marginTop: '50px', marginBottom: '50px' }}>
           <Col span={5}>{markJobButton}</Col>
         </Row>
       );
     }
     if (current === CycleStepEnum.Vote) {
       return (
-        <Row justify={'center'} gutter={60} style={{ marginTop: '50px' }}>
+        <Row justify={'center'} gutter={60} style={{ marginTop: '50px', marginBottom: '50px' }}>
           <Col span={5}>{goVoteButton}</Col>
         </Row>
       );
@@ -221,7 +239,7 @@ const DaoStepStatus: React.FC<{ daoId: string; isOwner: boolean }> = ({ daoId, i
   const ownerButtons = useMemo(() => {
     if (current === CycleStepEnum.Job) {
       return (
-        <Row justify={'center'} gutter={60} style={{ marginTop: '50px' }}>
+        <Row justify={'center'} gutter={60} style={{ marginTop: '50px', marginBottom: '50px' }}>
           <Col span={5}>{markJobButton}</Col>
           <Col span={5}>{endJobButton}</Col>
         </Row>
@@ -229,7 +247,7 @@ const DaoStepStatus: React.FC<{ daoId: string; isOwner: boolean }> = ({ daoId, i
     }
     if (current === CycleStepEnum.Pair) {
       return (
-        <Row justify={'center'} gutter={60} style={{ marginTop: '50px' }}>
+        <Row justify={'center'} gutter={60} style={{ marginTop: '50px', marginBottom: '50px' }}>
           <Col span={5}>{pairingButton}</Col>
           <Col span={5}>{endPairButton}</Col>
         </Row>
@@ -237,19 +255,19 @@ const DaoStepStatus: React.FC<{ daoId: string; isOwner: boolean }> = ({ daoId, i
     }
     if (current === CycleStepEnum.Vote) {
       return (
-        <Row justify={'center'} gutter={60} style={{ marginTop: '50px' }}>
+        <Row justify={'center'} gutter={60} style={{ marginTop: '50px', marginBottom: '50px' }}>
           <Col span={5}>{goVoteButton}</Col>
           <Col span={5}>{endVoteButton}</Col>
         </Row>
       );
     }
-    if (current === CycleStepEnum.VoteEnd) {
-      return (
-        <Row justify={'center'} gutter={60} style={{ marginTop: '50px' }}>
-          <Col span={8}>{voteOpButton}</Col>
-        </Row>
-      );
-    }
+    // if (current === CycleStepEnum.VoteEnd) {
+    //   return (
+    //     <Row justify={'center'} gutter={60} style={{ marginTop: '50px', marginBottom: '50px' }}>
+    //       <Col span={8}>{voteOpButton}</Col>
+    //     </Row>
+    //   );
+    // }
     return <></>;
   }, [
     current,
@@ -259,7 +277,6 @@ const DaoStepStatus: React.FC<{ daoId: string; isOwner: boolean }> = ({ daoId, i
     goVoteButton,
     markJobButton,
     pairingButton,
-    voteOpButton,
   ]);
 
   const handlerStepStatus = useCallback(
@@ -273,35 +290,30 @@ const DaoStepStatus: React.FC<{ daoId: string; isOwner: boolean }> = ({ daoId, i
 
   const stepJobDesc = useMemo(() => {
     let res = '';
-    if (currentCycle?.datum?.beginAt) res += getFormatTime(currentCycle?.datum?.beginAt, 'LL');
-    if (currentCycle?.datum?.endAt) res += ` - ${getFormatTime(currentCycle?.datum?.endAt, 'LL')}`;
+    if (currentCycle?.datum?.beginAt !== undefined)
+      res += getFormatTime(currentCycle?.datum?.beginAt, 'L');
+    if (currentCycle?.datum?.endAt !== undefined)
+      res += ` - ${getFormatTime(currentCycle?.datum?.endAt, 'L')}`;
     return res;
   }, [currentCycle?.datum?.beginAt, currentCycle?.datum?.endAt]);
 
   const stepPairDesc = useMemo(() => {
     let res = '';
-    if (currentCycle?.datum?.pairBeginAt)
-      res += getFormatTime(currentCycle?.datum?.pairBeginAt, 'LL');
-    if (currentCycle?.datum?.pairEndAt)
-      res += ` - ${getFormatTime(currentCycle?.datum?.pairEndAt, 'LL')}`;
+    if (currentCycle?.datum?.pairBeginAt !== undefined)
+      res += getFormatTime(currentCycle?.datum?.pairBeginAt, 'L');
+    if (currentCycle?.datum?.pairEndAt !== undefined)
+      res += ` - ${getFormatTime(currentCycle?.datum?.pairEndAt, 'L')}`;
     return res;
   }, [currentCycle?.datum?.pairBeginAt, currentCycle?.datum?.pairEndAt]);
 
   const stepVoteDesc = useMemo(() => {
     let res = '';
-    if (currentCycle?.datum?.voteBeginAt)
-      res += getFormatTime(currentCycle?.datum?.voteBeginAt, 'LL');
-    if (currentCycle?.datum?.voteEndAt)
-      res += ` - ${getFormatTime(currentCycle?.datum?.voteEndAt, 'LL')}`;
+    if (currentCycle?.datum?.voteBeginAt !== undefined)
+      res += getFormatTime(currentCycle?.datum?.voteBeginAt, 'L');
+    if (currentCycle?.datum?.voteEndAt !== undefined)
+      res += ` - ${getFormatTime(currentCycle?.datum?.voteEndAt, 'L')}`;
     return res;
   }, [currentCycle?.datum?.voteBeginAt, currentCycle?.datum?.voteEndAt]);
-
-  const stepVoteEndDesc = useMemo(() => {
-    let res = '';
-    if (currentCycle?.datum?.voteEndAt)
-      res += `Cycle End: ${getFormatTime(currentCycle?.datum?.voteEndAt, 'LL')}`;
-    return res;
-  }, [currentCycle?.datum?.voteEndAt]);
 
   if (loading) return <Skeleton active />;
 
@@ -326,12 +338,6 @@ const DaoStepStatus: React.FC<{ daoId: string; isOwner: boolean }> = ({ daoId, i
             status={handlerStepStatus(2)}
             description={stepVoteDesc}
             icon={current === CycleStepEnum.Vote && <LoadingOutlined />}
-          />
-          <Step
-            title={CycleStepEnum.VoteEnd}
-            status={handlerStepStatus(3)}
-            description={stepVoteEndDesc}
-            icon={current === CycleStepEnum.VoteEnd && <LoadingOutlined />}
           />
         </Steps>
       </Row>

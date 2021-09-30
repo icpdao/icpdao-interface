@@ -289,7 +289,7 @@ export default {
   'pages.dao.home.tab.jobStat': 'Job',
   'pages.dao.home.tab.cycle': 'Cycle',
   'pages.dao.home.step.pairing.pair.tips': 'Pairs Jobs at random',
-  'pages.dao.home.step.pairing.re_pair.tips':
+  'pages.dao.home.step.pairing.repair.tips':
     'If you are not satisfied with the result, you can make a new pair.',
   'pages.dao.home.step.pairing.button.pair': 'Make pair',
   'pages.dao.home.step.pairing.button.repair': 'Re-pairing',

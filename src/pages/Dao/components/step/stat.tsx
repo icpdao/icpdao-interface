@@ -56,7 +56,7 @@ const StepStat: React.FC<{ currentCycle: CycleQuery }> = ({ currentCycle }) => {
   const beginVoteResultStat = useCallback(async () => {
     try {
       setResultPercent(resultPercent + 6);
-      await queryCycleVoteResultStatus();
+      await queryCycleVoteResultStatus({ variables: { cycleId } });
     } catch (e) {
       setResultPercent(0);
       setStatusProps({ status: 'exception' });
@@ -130,6 +130,7 @@ const StepStat: React.FC<{ currentCycle: CycleQuery }> = ({ currentCycle }) => {
           <Button
             type="primary"
             size="large"
+            block
             disabled={disablePublishButton}
             className={styles.ownerButton}
             onClick={() => setPublishModalVisible(true)}
@@ -147,6 +148,7 @@ const StepStat: React.FC<{ currentCycle: CycleQuery }> = ({ currentCycle }) => {
           <Button
             type="primary"
             size="large"
+            block
             loading={loadingCountEIButton}
             disabled={disableCountEIButton}
             className={styles.ownerButton}

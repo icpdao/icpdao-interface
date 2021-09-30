@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import type { CycleQuery } from '@/services/dao/generated';
 import {
-  CycleQuery,
   CycleVotePairTaskStatusEnum,
   useBeginCyclePairTaskMutation,
   useCyclePairStatusLazyQuery,
@@ -11,7 +11,10 @@ import moment from 'moment';
 import { useIntl } from 'umi';
 import GlobalModal from '@/components/Modal';
 
-const StepPairing: React.FC<{ currentCycle: CycleQuery }> = ({ currentCycle }) => {
+const StepPairing: React.FC<{ currentCycle: CycleQuery; refetch: any }> = ({
+  currentCycle,
+  refetch,
+}) => {
   const intl = useIntl();
   const [pairingModalVisible, setPairingModalVisible] = useState(false);
   const [pairing, setPairing] = useState<Record<string, any>>({});
@@ -32,12 +35,12 @@ const StepPairing: React.FC<{ currentCycle: CycleQuery }> = ({ currentCycle }) =
   const beginPairing = useCallback(async () => {
     try {
       setPairingPercent(pairingPercent + 6);
-      await queryCyclePairStatus();
+      await queryCyclePairStatus({ variables: { cycleId: currentCycle.datum?.id || '' } });
     } catch (e) {
       setPairingPercent(0);
       setStatusProps({ status: 'exception' });
     }
-  }, [pairingPercent, queryCyclePairStatus]);
+  }, [currentCycle.datum?.id, pairingPercent, queryCyclePairStatus]);
 
   useEffect(() => {
     if (!cyclePairStatusResult.data?.cycle?.pairTask?.status) return;
@@ -46,6 +49,7 @@ const StepPairing: React.FC<{ currentCycle: CycleQuery }> = ({ currentCycle }) =
     if (ss === CycleVotePairTaskStatusEnum.Success) {
       setPairingPercent(100);
       setStatusProps({ status: 'success' });
+      refetch();
     } else if (ss === CycleVotePairTaskStatusEnum.Fail) {
       setPairingPercent(100);
       setStatusProps({ status: 'exception' });
@@ -75,6 +79,7 @@ const StepPairing: React.FC<{ currentCycle: CycleQuery }> = ({ currentCycle }) =
           <Button
             type="primary"
             size="large"
+            block
             disabled={disablePairingButton}
             onClick={() => setPairingModalVisible(true)}
             className={styles.ownerButton}
@@ -93,6 +98,7 @@ const StepPairing: React.FC<{ currentCycle: CycleQuery }> = ({ currentCycle }) =
             type="primary"
             loading={true}
             size="large"
+            block
             disabled={disablePairingButton}
             className={styles.ownerButton}
           >
@@ -109,6 +115,7 @@ const StepPairing: React.FC<{ currentCycle: CycleQuery }> = ({ currentCycle }) =
           <Button
             type="primary"
             size="large"
+            block
             disabled={disablePairingButton}
             onClick={() => setPairingModalVisible(true)}
             className={styles.ownerButton}
@@ -122,7 +129,7 @@ const StepPairing: React.FC<{ currentCycle: CycleQuery }> = ({ currentCycle }) =
         onOk={async () => {
           setPairing({ footer: null });
           await beginCyclePairTaskMutation({ variables: { cycleId } });
-          await beginPairing();
+          beginPairing();
         }}
         destroyOnClose={true}
         onCancel={() => {
