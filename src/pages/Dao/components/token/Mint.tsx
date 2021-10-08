@@ -164,7 +164,6 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
   }, [maxBaseTokenAmount, maxQuoteTokenAmount]);
 
   const {
-    position,
     noLiquidity,
     invalidPool,
     invertPrice,
@@ -180,6 +179,8 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
     isSorted,
     getNoQuoteTokenPrice,
     pool,
+    tickLower,
+    tickUpper,
   } = useUniswap(
     { inputState, leftRangeState, rightRangeState, startPriceState },
     { setInputState, setLeftRangeState, setRightRangeState, setStartPriceState },
@@ -371,8 +372,8 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
         mintTokenAmountRatioList: splitInfos.map((pd) => pd?.ratio || 0),
         startTimestamp: anchor.lastTimestamp.toNumber(),
         endTimestamp: getTimestampByZone(previewMintEndTime[0], previewMintEndTime[1]),
-        tickLower: position?.tickLower || 0,
-        tickUpper: position?.tickUpper || 0,
+        tickLower: tickLower || 0,
+        tickUpper: tickUpper || 0,
       };
       setCurrentMintBody(mintBody);
       await mutationCreateTokenMintMutation({
@@ -401,10 +402,10 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
     daoTokenMintSplitInfoResult.data?.dao?.tokenMintSplitInfo?.splitInfos,
     mutationCreateTokenMintMutation,
     network,
-    position?.tickLower,
-    position?.tickUpper,
     previewMintEndTime,
     selectCycles,
+    tickLower,
+    tickUpper,
     tokenAddress,
     tokenContract,
   ]);
@@ -792,7 +793,16 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
             </>
           )}
           <Form.Item wrapperCol={{ offset: 3, span: 8 }}>
-            <Button type="primary" disabled={!currentSelectCycle} onClick={handlerPreviewMint}>
+            <Button
+              type="primary"
+              disabled={
+                !currentSelectCycle ||
+                (!!lpPoolAddress &&
+                  lpPoolAddress !== ZeroAddress &&
+                  (!feeAmount || invalidPool || (noLiquidity && !startPriceState)))
+              }
+              onClick={handlerPreviewMint}
+            >
               {/* <Button type="primary" onClick={handlerTestMint}> */}
               {intl.formatMessage({ id: 'pages.dao.config.tab.token.mint.form.button.submit' })}
             </Button>
