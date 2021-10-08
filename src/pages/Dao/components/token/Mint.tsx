@@ -164,7 +164,6 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
   }, [maxBaseTokenAmount, maxQuoteTokenAmount]);
 
   const {
-    price,
     position,
     noLiquidity,
     invalidPool,
@@ -179,6 +178,8 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
     getDecrementUpper,
     getIncrementUpper,
     isSorted,
+    getNoQuoteTokenPrice,
+    pool,
   } = useUniswap(
     { inputState, leftRangeState, rightRangeState, startPriceState },
     { setInputState, setLeftRangeState, setRightRangeState, setStartPriceState },
@@ -191,16 +192,29 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
     undefined,
   );
 
-  const startPriceWithNoQuoteToken = useMemo(
-    () => (invertPrice ? price?.invert()?.toSignificant(5) : price?.toSignificant(5)),
-    [invertPrice, price],
-  );
+  const noQuoteTokenPrice = useMemo(() => {
+    const currentTick = pool?.tickCurrent;
+    console.log({ currentTick });
+    if (!currentTick) return undefined;
+    return getNoQuoteTokenPrice(currentTick);
+  }, [getNoQuoteTokenPrice, pool?.tickCurrent]);
+
+  const setNoQuoteTokenPriceRange = useCallback(() => {
+    if (!noQuoteTokenPrice) return;
+    console.log(noQuoteTokenPrice[Bound.LOWER]?.toSignificant(10));
+    console.log(noQuoteTokenPrice[Bound.UPPER]?.toSignificant(10));
+    if (invertPrice) {
+      onLeftRangeInput('');
+      onRightRangeInput(noQuoteTokenPrice[Bound.UPPER]?.toSignificant(10) || '');
+    } else {
+      onLeftRangeInput(noQuoteTokenPrice[Bound.LOWER]?.toSignificant(10) || '');
+      onRightRangeInput('');
+    }
+  }, [invertPrice, noQuoteTokenPrice, onLeftRangeInput, onRightRangeInput]);
 
   useEffect(() => {
-    if (!startPriceWithNoQuoteToken) return;
-    console.log({ startPriceWithNoQuoteToken });
-    onLeftRangeInput(startPriceWithNoQuoteToken);
-  }, [invertPrice, onLeftRangeInput, price, startPriceWithNoQuoteToken]);
+    setNoQuoteTokenPriceRange();
+  }, [setNoQuoteTokenPriceRange]);
 
   const [queryDaoTokenMintRunning, daoTokenMintRunningResult] = useDaoTokenMintRunningLazyQuery({
     fetchPolicy: 'no-cache',
@@ -664,16 +678,18 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
           style={{ marginBottom: 30 }}
         />
       )}
-      <div style={{ marginBottom: 30 }}>
-        <Button type={'primary'} onClick={handlerOpenMintRecordView}>
-          {intl.formatMessage({ id: 'pages.dao.config.tab.token.mint.record.button' })}
-        </Button>
-      </div>
+      <Form name={'tokenMintRecord'}>
+        <Form.Item wrapperCol={{ offset: 3, span: 4 }}>
+          <Button type={'primary'} onClick={handlerOpenMintRecordView} block>
+            {intl.formatMessage({ id: 'pages.dao.config.tab.token.mint.record.button' })}
+          </Button>
+        </Form.Item>
+      </Form>
       <Spin
         tip={intl.formatMessage({ id: 'pages.token.loading' })}
         spinning={loadingTransferComplete}
       >
-        <Form name={'tokenMintForm'} labelCol={{ span: 5 }} wrapperCol={{ span: 8 }}>
+        <Form name={'tokenMintForm'} labelCol={{ span: 3 }} wrapperCol={{ span: 8 }}>
           <Form.Item
             label={intl.formatMessage({ id: 'pages.dao.config.tab.token.mint.form.end_cycle' })}
             tooltip={{
@@ -695,14 +711,14 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
             </Select>
           </Form.Item>
           {!!lpPoolAddress && lpPoolAddress !== ZeroAddress && (
-            <Form.Item wrapperCol={{ offset: 5, span: 8 }}>
+            <Form.Item wrapperCol={{ offset: 3, span: 8 }}>
               <Radio.Group
                 value={advancedOP ? 'advanced' : 'normal'}
                 buttonStyle="solid"
                 disabled={!feeAmount || invalidPool || (noLiquidity && !startPriceState)}
                 onChange={(v) => {
                   setAdvancedOP(v.target.value === 'advanced');
-                  if (startPriceWithNoQuoteToken) onLeftRangeInput(startPriceWithNoQuoteToken);
+                  setNoQuoteTokenPriceRange();
                   setRightRangeState(true);
                 }}
               >
@@ -736,7 +752,6 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
                       ? '0'
                       : leftPrice?.toSignificant(5) ?? ''
                   }
-                  min={startPriceWithNoQuoteToken}
                   onChange={(value) => {
                     onLeftRangeInput(value);
                   }}
@@ -765,7 +780,6 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
                       ? '∞'
                       : rightPrice?.toSignificant(5) ?? ''
                   }
-                  min={'∞'}
                   onChange={(value) => {
                     onRightRangeInput(value);
                   }}
@@ -777,7 +791,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
               </Form.Item>
             </>
           )}
-          <Form.Item wrapperCol={{ offset: 5, span: 8 }}>
+          <Form.Item wrapperCol={{ offset: 3, span: 8 }}>
             <Button type="primary" disabled={!currentSelectCycle} onClick={handlerPreviewMint}>
               {/* <Button type="primary" onClick={handlerTestMint}> */}
               {intl.formatMessage({ id: 'pages.dao.config.tab.token.mint.form.button.submit' })}

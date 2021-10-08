@@ -12,12 +12,14 @@ import TokenManager from '@/pages/Dao/components/token/Manager';
 import TokenMint from '@/pages/Dao/components/token/Mint';
 import { DAOTokenConnect } from '@/services/ethereum-connect/token';
 import { ZeroAddress } from '@/services/ethereum-connect';
+import { history } from 'umi';
 
 const { TabPane } = Tabs;
 
 type TokenConfigProps = {
   daoId: string;
   tokenSymbol: string;
+  subType?: string;
 };
 
 export type TokenConfigComponentsProps = {
@@ -31,14 +33,22 @@ export type TokenConfigComponentsProps = {
   setCurrentTab?: (value: string) => void;
 };
 
-const TokenConfig: React.FC<TokenConfigProps> = ({ daoId, tokenSymbol }) => {
+const TokenConfig: React.FC<TokenConfigProps> = ({ daoId, tokenSymbol, subType }) => {
   const intl = useIntl();
   const { data, loading, error } = useDaoTokenConfigQuery({ variables: { daoId } });
   const [tokenAddress, setTokenAddress] = useState<string>();
   const [lpPoolAddress, setLPPoolAddress] = useState<string>('');
-  const [currentTab, setCurrentTab] = useState<string>('create');
+  const [currentTab, setCurrentTab] = useState<string>(subType || 'create');
   const { contract, network, metamaskProvider, isConnected, event$ } = useModel('useWalletModel');
   const [updateDaoBaseInfo] = useUpdateDaoBaseInfoMutation();
+
+  const goCurrentTab = useCallback(
+    (nextType) => {
+      history.push(`/dao/${daoId}/config/token/${nextType}`);
+      setCurrentTab(nextType);
+    },
+    [daoId],
+  );
 
   useEffect(() => {
     if (!data?.daoTokenConfig?.ethDaoId) return;
@@ -61,8 +71,9 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId, tokenSymbol }) => {
   }, [tokenContract]);
 
   useEffect(() => {
-    if (!tokenContract || tokenSymbol !== '') return;
+    if (!tokenContract) return;
     tokenContract.getToken().then((tokenInfo) => {
+      if (tokenSymbol === tokenInfo.symbol) return;
       updateDaoBaseInfo({
         variables: {
           id: daoId,
@@ -102,7 +113,7 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId, tokenSymbol }) => {
           className={styles.tokenConfigTabs}
           activeKey={currentTab}
           tabPosition={'left'}
-          onChange={setCurrentTab}
+          onChange={goCurrentTab}
         >
           <TabPane
             tab={intl.formatMessage({ id: 'pages.dao.config.tab.token.create' })}
@@ -146,7 +157,7 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId, tokenSymbol }) => {
                 lpPoolAddress={lpPoolAddress}
                 tokenContract={tokenContract}
                 tokenAddress={tokenAddress}
-                setCurrentTab={setCurrentTab}
+                setCurrentTab={goCurrentTab}
               />
             )}
           </TabPane>
@@ -165,7 +176,7 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId, tokenSymbol }) => {
             {currentTab === 'mint' && (
               <TokenMint
                 tokenAddress={tokenAddress}
-                setCurrentTab={setCurrentTab}
+                setCurrentTab={goCurrentTab}
                 daoId={daoId}
                 lpPoolAddress={lpPoolAddress}
                 tokenContract={tokenContract}

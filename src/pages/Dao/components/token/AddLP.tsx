@@ -98,7 +98,6 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
   }, [maxBaseTokenAmount, maxQuoteTokenAmount]);
 
   const {
-    price,
     position,
     noLiquidity,
     invalidPool,
@@ -122,6 +121,8 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
     priceUpper,
     tickLower,
     tickUpper,
+    getNoQuoteTokenPrice,
+    pool,
   } = useUniswap(
     { inputState, leftRangeState, rightRangeState, startPriceState },
     { setInputState, setLeftRangeState, setRightRangeState, setStartPriceState },
@@ -134,16 +135,29 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
     undefined,
   );
 
-  const startPriceWithNoQuoteToken = useMemo(
-    () => (invertPrice ? price?.invert()?.toSignificant(5) : price?.toSignificant(5)),
-    [invertPrice, price],
-  );
+  const noQuoteTokenPrice = useMemo(() => {
+    const currentTick = pool?.tickCurrent;
+    console.log({ currentTick });
+    if (!currentTick) return undefined;
+    return getNoQuoteTokenPrice(currentTick);
+  }, [getNoQuoteTokenPrice, pool?.tickCurrent]);
+
+  const setNoQuoteTokenPriceRange = useCallback(() => {
+    if (!noQuoteTokenPrice) return;
+    console.log(noQuoteTokenPrice[Bound.LOWER]?.toSignificant(10));
+    console.log(noQuoteTokenPrice[Bound.UPPER]?.toSignificant(10));
+    if (invertPrice) {
+      onLeftRangeInput('');
+      onRightRangeInput(noQuoteTokenPrice[Bound.UPPER]?.toSignificant(10) || '');
+    } else {
+      onLeftRangeInput(noQuoteTokenPrice[Bound.LOWER]?.toSignificant(10) || '');
+      onRightRangeInput('');
+    }
+  }, [invertPrice, noQuoteTokenPrice, onLeftRangeInput, onRightRangeInput]);
 
   useEffect(() => {
-    if (!startPriceWithNoQuoteToken) return;
-    console.log({ startPriceWithNoQuoteToken });
-    onLeftRangeInput(startPriceWithNoQuoteToken);
-  }, [invertPrice, onLeftRangeInput, price, startPriceWithNoQuoteToken]);
+    setNoQuoteTokenPriceRange();
+  }, [setNoQuoteTokenPriceRange]);
 
   const handlerAddLP = useCallback(async () => {
     if (!tokenContract) return;
@@ -227,7 +241,7 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
               icon: <IconFont type={'icon-question'} />,
             }}
           >
-            {maxAmounts[Field.CURRENCY_A]?.toExact() ?? ''}
+            {maxAmounts[Field.CURRENCY_A]?.toSignificant(10) ?? ''}
           </Form.Item>
           <Form.Item wrapperCol={{ offset: 5, span: 8 }}>
             <Radio.Group
@@ -236,7 +250,7 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
               disabled={!feeAmount || invalidPool || (noLiquidity && !startPriceState)}
               onChange={(v) => {
                 setAdvancedOP(v.target.value === 'advanced');
-                if (startPriceWithNoQuoteToken) onLeftRangeInput(startPriceWithNoQuoteToken);
+                setNoQuoteTokenPriceRange();
                 setRightRangeState(true);
               }}
             >
@@ -269,7 +283,6 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
                       ? '0'
                       : leftPrice?.toSignificant(5) ?? ''
                   }
-                  min={startPriceWithNoQuoteToken}
                   onChange={(value) => {
                     onLeftRangeInput(value);
                   }}
@@ -298,7 +311,6 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
                       ? '∞'
                       : rightPrice?.toSignificant(5) ?? ''
                   }
-                  min={'∞'}
                   onChange={(value) => {
                     onRightRangeInput(value);
                   }}
@@ -335,19 +347,20 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
               }
               value={formattedAmounts[Field.CURRENCY_A]}
               min={'0'}
-              max={maxAmounts[Field.CURRENCY_A]?.toExact() ?? ''}
+              max={maxAmounts[Field.CURRENCY_A]?.toSignificant(10) ?? ''}
               step={1}
               onChange={(value) => {
                 onFieldAInput(value);
               }}
             />
-            <div>{formattedAmounts[Field.CURRENCY_B]}</div>
           </Form.Item>
           <Form.Item wrapperCol={{ offset: 5, span: 8 }}>
             {!!quoteCurrency && !!feeAmount && (
               <Button
                 type="primary"
-                disabled={!formattedAmounts[Field.CURRENCY_A]}
+                disabled={
+                  !formattedAmounts[Field.CURRENCY_A] || !!formattedAmounts[Field.CURRENCY_B]
+                }
                 onClick={() => setPreviewAddLP(true)}
               >
                 {intl.formatMessage({
