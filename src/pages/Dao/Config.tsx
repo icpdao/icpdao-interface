@@ -46,13 +46,21 @@ const configTab = (
 const firstConfigStep = ['job', 'token'];
 
 export default (props: {
-  match: { params: { daoId: string; configType?: string } };
+  match: { params: { daoId: string; configType?: string; subType?: string } };
   location: { query: { status?: string } };
 }): ReactNode => {
   const { isDaoOwner } = useAccess();
-  const { daoId, configType } = props.match.params;
+  const { daoId, configType, subType } = props.match.params;
   const { status } = props.location.query;
   const [tab, setTab] = useState<string>(configType || 'job');
+
+  const goTab = useCallback(
+    (nextTab) => {
+      history.push(`/dao/${daoId}/config/${nextTab}`);
+      setTab(nextTab);
+    },
+    [daoId],
+  );
 
   const { data, loading, error } = useDaoQuery({
     variables: { id: daoId },
@@ -68,8 +76,8 @@ export default (props: {
       history.push(`/dao/${daoId}`);
     } else {
       const nextStep = firstConfigStep[(nowIndex + 1) % 2];
-      if (nextStep.startsWith('job')) setTab('job');
-      if (nextStep.startsWith('token')) setTab('token');
+      if (nextStep.startsWith('job')) goTab('job');
+      if (nextStep.startsWith('token')) goTab('token');
       history.push({
         pathname: `/dao/${daoId}/config`,
         query: {
@@ -77,7 +85,7 @@ export default (props: {
         },
       });
     }
-  }, [daoId, status]);
+  }, [daoId, goTab, status]);
 
   if (loading || error) {
     return <PageLoading />;
@@ -89,7 +97,7 @@ export default (props: {
 
   return (
     <>
-      {status === 'create' && (
+      {!!status && (
         <Button type="link" className={styles.skipButton} onClick={skipClick}>
           <FormattedMessage id={`pages.dao.config.tab.skip`} />
         </Button>
@@ -100,7 +108,7 @@ export default (props: {
       >
         <div className={styles.first}>
           {!status && (
-            <Tabs defaultActiveKey={tab} onChange={setTab}>
+            <Tabs defaultActiveKey={tab} onChange={goTab}>
               {configTab}
             </Tabs>
           )}
@@ -108,7 +116,11 @@ export default (props: {
             <DAOJobConfig daoId={daoId} nextStep={status ? skipClick : undefined} />
           )}
           {tab === 'token' && (
-            <TokenConfig daoId={daoId} tokenSymbol={data?.dao?.datum?.tokenSymbol || ''} />
+            <TokenConfig
+              daoId={daoId}
+              tokenSymbol={data?.dao?.datum?.tokenSymbol || ''}
+              subType={subType || 'create'}
+            />
           )}
         </div>
       </PageContainer>
