@@ -28,7 +28,6 @@ import {
   Popconfirm,
   Popover,
   Radio,
-  Row,
   Select,
   Skeleton,
   Space,
@@ -717,68 +716,66 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
             </Form.Item>
           )}
           {advancedOP && (
-            <Row>
-              <Space>
-                <Form.Item
-                  label={intl.formatMessage({
-                    id: 'pages.dao.config.tab.token.mint.form.min_price',
-                  })}
-                  tooltip={{
-                    title: intl.formatMessage({
-                      id: 'pages.dao.config.tab.token.mint.form.min_price.desc',
-                    }),
-                    icon: <IconFont type={'icon-question'} />,
+            <>
+              <Form.Item
+                label={intl.formatMessage({
+                  id: 'pages.dao.config.tab.token.mint.form.min_price',
+                })}
+                tooltip={{
+                  title: intl.formatMessage({
+                    id: 'pages.dao.config.tab.token.mint.form.min_price.desc',
+                  }),
+                  icon: <IconFont type={'icon-question'} />,
+                }}
+              >
+                <InputNumber
+                  style={{ width: '100%' }}
+                  disabled={!feeAmount || invalidPool || (noLiquidity && !startPriceState)}
+                  value={
+                    ticksAtLimit[isSorted ? Bound.LOWER : Bound.UPPER]
+                      ? '0'
+                      : leftPrice?.toSignificant(5) ?? ''
+                  }
+                  min={startPriceWithNoQuoteToken}
+                  onChange={(value) => {
+                    onLeftRangeInput(value);
                   }}
-                >
-                  <InputNumber
-                    style={{ width: '100%' }}
-                    disabled={!feeAmount || invalidPool || (noLiquidity && !startPriceState)}
-                    value={
-                      ticksAtLimit[isSorted ? Bound.LOWER : Bound.UPPER]
-                        ? '0'
-                        : leftPrice?.toSignificant(5) ?? ''
-                    }
-                    min={startPriceWithNoQuoteToken}
-                    onChange={(value) => {
-                      onLeftRangeInput(value);
-                    }}
-                    onStep={(_, info) => {
-                      if (info.type === 'up') getIncrementLower();
-                      if (info.type === 'down') getDecrementLower();
-                    }}
-                  />
-                </Form.Item>
-                <Form.Item
-                  label={intl.formatMessage({
-                    id: 'pages.dao.config.tab.token.mint.form.max_price',
-                  })}
-                  tooltip={{
-                    title: intl.formatMessage({
-                      id: 'pages.dao.config.tab.token.mint.form.max_price.desc',
-                    }),
-                    icon: <IconFont type={'icon-question'} />,
+                  onStep={(_, info) => {
+                    if (info.type === 'up') getIncrementLower();
+                    if (info.type === 'down') getDecrementLower();
                   }}
-                >
-                  <InputNumber
-                    style={{ width: '100%' }}
-                    disabled={!feeAmount || invalidPool || (noLiquidity && !startPriceState)}
-                    value={
-                      ticksAtLimit[isSorted ? Bound.UPPER : Bound.LOWER]
-                        ? '∞'
-                        : rightPrice?.toSignificant(5) ?? ''
-                    }
-                    min={'∞'}
-                    onChange={(value) => {
-                      onRightRangeInput(value);
-                    }}
-                    onStep={(_, info) => {
-                      if (info.type === 'up') getIncrementUpper();
-                      if (info.type === 'down') getDecrementUpper();
-                    }}
-                  />
-                </Form.Item>
-              </Space>
-            </Row>
+                />
+              </Form.Item>
+              <Form.Item
+                label={intl.formatMessage({
+                  id: 'pages.dao.config.tab.token.mint.form.max_price',
+                })}
+                tooltip={{
+                  title: intl.formatMessage({
+                    id: 'pages.dao.config.tab.token.mint.form.max_price.desc',
+                  }),
+                  icon: <IconFont type={'icon-question'} />,
+                }}
+              >
+                <InputNumber
+                  style={{ width: '100%' }}
+                  disabled={!feeAmount || invalidPool || (noLiquidity && !startPriceState)}
+                  value={
+                    ticksAtLimit[isSorted ? Bound.UPPER : Bound.LOWER]
+                      ? '∞'
+                      : rightPrice?.toSignificant(5) ?? ''
+                  }
+                  min={'∞'}
+                  onChange={(value) => {
+                    onRightRangeInput(value);
+                  }}
+                  onStep={(_, info) => {
+                    if (info.type === 'up') getIncrementUpper();
+                    if (info.type === 'down') getDecrementUpper();
+                  }}
+                />
+              </Form.Item>
+            </>
           )}
           <Form.Item wrapperCol={{ offset: 5, span: 8 }}>
             <Button type="primary" disabled={!currentSelectCycle} onClick={handlerPreviewMint}>
