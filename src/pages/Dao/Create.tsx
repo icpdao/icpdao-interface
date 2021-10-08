@@ -329,7 +329,7 @@ export default (): React.ReactNode => {
       },
     });
     if (!data.errors) {
-      history.push(`/dao/${data.data?.createDao?.dao?.id}/config?status=create`);
+      history.push(`/dao/${data.data?.createDao?.dao?.id}/config?status=job`);
     }
   }, [createDaoMutation]);
 

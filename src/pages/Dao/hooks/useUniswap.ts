@@ -319,6 +319,9 @@ export function useUniswap(
   priceUpper: Price<Token, Token> | undefined;
   tickLower: number | undefined;
   tickUpper: number | undefined;
+  getNoQuoteTokenPrice: (
+    currentTick: any,
+  ) => { [bound in Bound]?: Price<Token, Token> | undefined };
 } {
   const {
     inputState,
@@ -755,6 +758,49 @@ export function useUniswap(
     [isSorted, priceLower, priceUpper],
   );
 
+  const maxTick = useMemo(() => {
+    if (!feeAmount) return undefined;
+    return Math.floor(TickMath.MAX_TICK / TICK_SPACINGS[feeAmount]) * TICK_SPACINGS[feeAmount];
+  }, [feeAmount]);
+
+  const minTick = useMemo(() => {
+    if (!feeAmount) return undefined;
+    return Math.ceil(TickMath.MIN_TICK / TICK_SPACINGS[feeAmount]) * TICK_SPACINGS[feeAmount];
+  }, [feeAmount]);
+
+  const getNearestTickLower = useCallback(
+    (currentTick) => {
+      if (!maxTick || !feeAmount) return undefined;
+      const tickSpacing = TICK_SPACINGS[feeAmount];
+      const bei = Math.floor((maxTick - currentTick) / tickSpacing);
+      return maxTick - tickSpacing * bei;
+    },
+    [feeAmount, maxTick],
+  );
+
+  const getNearestTickUpper = useCallback(
+    (currentTick) => {
+      if (!minTick || !feeAmount) return undefined;
+      const tickSpacing = TICK_SPACINGS[feeAmount];
+      const bei = Math.floor((currentTick - minTick) / tickSpacing);
+      return minTick + tickSpacing * bei;
+    },
+    [feeAmount, minTick],
+  );
+
+  const getNoQuoteTokenPrice = useCallback(
+    (currentTick) => {
+      if (invertPrice)
+        return {
+          [Bound.UPPER]: getTickToPrice(token0, token1, getNearestTickUpper(currentTick)),
+        };
+      return {
+        [Bound.LOWER]: getTickToPrice(token0, token1, getNearestTickLower(currentTick)),
+      };
+    },
+    [getNearestTickLower, getNearestTickUpper, invertPrice, token0, token1],
+  );
+
   const getDecrementLower = useCallback(() => {
     if (currencyA?.wrapped && currencyB?.wrapped && typeof tickLower === 'number' && feeAmount) {
       const newPrice = tickToPrice(
@@ -929,6 +975,7 @@ export function useUniswap(
     priceUpper,
     tickLower,
     tickUpper,
+    getNoQuoteTokenPrice,
   };
 }
 

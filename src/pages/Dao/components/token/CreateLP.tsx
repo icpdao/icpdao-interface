@@ -724,7 +724,7 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
               }
               value={formattedAmounts[Field.CURRENCY_A]}
               min={'0'}
-              max={maxAmounts[Field.CURRENCY_A]?.toExact() ?? ''}
+              max={maxAmounts[Field.CURRENCY_A]?.toSignificant(10) ?? ''}
               step={1}
               onChange={(value) => {
                 onFieldAInput(value);
@@ -756,7 +756,7 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
               }
               value={formattedAmounts[Field.CURRENCY_B]}
               min={'0'}
-              max={maxAmounts[Field.CURRENCY_B]?.toExact() ?? ''}
+              max={maxAmounts[Field.CURRENCY_B]?.toSignificant(10) ?? ''}
               step={1}
               onChange={(value) => {
                 onFieldBInput(value);
