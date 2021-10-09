@@ -49,7 +49,7 @@ export class DAOFactoryConnect extends BaseEthereumConnect {
       body.lpRatio,
       body.ownerAddress,
       {
-        p: mintArgs.p,
+        p: ethers.utils.parseUnits(mintArgs.p?.toString() || '0', 18),
         aNumerator: mintArgs.aNumerator,
         aDenominator: mintArgs.aDenominator,
         bNumerator: mintArgs.bNumerator,
