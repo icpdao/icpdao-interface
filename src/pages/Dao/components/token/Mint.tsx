@@ -166,7 +166,6 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
   const {
     noLiquidity,
     invalidPool,
-    invertPrice,
     ticksAtLimit,
     onLeftRangeInput,
     onRightRangeInput,
@@ -181,6 +180,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
     pool,
     tickLower,
     tickUpper,
+    getNoQuoteTokenTick,
   } = useUniswap(
     { inputState, leftRangeState, rightRangeState, startPriceState },
     { setInputState, setLeftRangeState, setRightRangeState, setStartPriceState },
@@ -200,18 +200,21 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
     return getNoQuoteTokenPrice(currentTick);
   }, [getNoQuoteTokenPrice, pool?.tickCurrent]);
 
+  const noQuoteTokenTick = useMemo(() => {
+    const currentTick = pool?.tickCurrent;
+    if (!currentTick) return undefined;
+    return getNoQuoteTokenTick(currentTick);
+  }, [getNoQuoteTokenTick, pool?.tickCurrent]);
+
+  console.log({ noQuoteTokenTick });
+
   const setNoQuoteTokenPriceRange = useCallback(() => {
     if (!noQuoteTokenPrice) return;
-    console.log(noQuoteTokenPrice[Bound.LOWER]?.toSignificant(10));
-    console.log(noQuoteTokenPrice[Bound.UPPER]?.toSignificant(10));
-    if (invertPrice) {
-      onLeftRangeInput('');
-      onRightRangeInput(noQuoteTokenPrice[Bound.UPPER]?.toSignificant(10) || '');
-    } else {
-      onLeftRangeInput(noQuoteTokenPrice[Bound.LOWER]?.toSignificant(10) || '');
-      onRightRangeInput('');
-    }
-  }, [invertPrice, noQuoteTokenPrice, onLeftRangeInput, onRightRangeInput]);
+    console.log('no quote price lower', noQuoteTokenPrice[Bound.LOWER]?.toSignificant(10));
+    console.log('no quote price upper', noQuoteTokenPrice[Bound.UPPER]?.toSignificant(10));
+    onLeftRangeInput(noQuoteTokenPrice[Bound.LOWER]?.toSignificant(10) || '');
+    onRightRangeInput(noQuoteTokenPrice[Bound.UPPER]?.toSignificant(10) || '');
+  }, [noQuoteTokenPrice, onLeftRangeInput, onRightRangeInput]);
 
   useEffect(() => {
     setNoQuoteTokenPriceRange();
@@ -355,7 +358,8 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
       !tokenContract ||
       !daoId ||
       !anchor ||
-      !daoTokenMintSplitInfoResult.data?.dao?.tokenMintSplitInfo?.splitInfos
+      !daoTokenMintSplitInfoResult.data?.dao?.tokenMintSplitInfo?.splitInfos ||
+      !noQuoteTokenTick
     )
       return;
     try {
@@ -372,8 +376,8 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
         mintTokenAmountRatioList: splitInfos.map((pd) => pd?.ratio || 0),
         startTimestamp: anchor.lastTimestamp.toNumber(),
         endTimestamp: getTimestampByZone(previewMintEndTime[0], previewMintEndTime[1]),
-        tickLower: tickLower || 0,
-        tickUpper: tickUpper || 0,
+        tickLower: (advancedOP ? tickLower : noQuoteTokenTick[Bound.LOWER]) || 0,
+        tickUpper: (advancedOP ? tickUpper : noQuoteTokenTick[Bound.UPPER]) || 0,
       };
       setCurrentMintBody(mintBody);
       await mutationCreateTokenMintMutation({
@@ -395,6 +399,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
       setLoadingTransferComplete(false);
     }
   }, [
+    advancedOP,
     anchor,
     createTokenMintMutationResult,
     currentSelectCycle,
@@ -402,6 +407,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
     daoTokenMintSplitInfoResult.data?.dao?.tokenMintSplitInfo?.splitInfos,
     mutationCreateTokenMintMutation,
     network,
+    noQuoteTokenTick,
     previewMintEndTime,
     selectCycles,
     tickLower,

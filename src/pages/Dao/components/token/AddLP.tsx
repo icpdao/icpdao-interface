@@ -212,6 +212,12 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
     tokenContract,
   ]);
 
+  const disabledButton = useMemo(() => {
+    return (
+      !formattedAmounts[Field.CURRENCY_A] || (advancedOP && !!formattedAmounts[Field.CURRENCY_B])
+    );
+  }, [advancedOP, formattedAmounts]);
+
   if (lpPoolAddress === ZeroAddress) {
     return (
       <>
@@ -376,10 +382,7 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
             {!!quoteCurrency && !!feeAmount && (
               <Button
                 type="primary"
-                disabled={
-                  !formattedAmounts[Field.CURRENCY_A] ||
-                  (advancedOP && !!formattedAmounts[Field.CURRENCY_B])
-                }
+                disabled={disabledButton}
                 onClick={() => setPreviewAddLP(true)}
               >
                 {intl.formatMessage({
