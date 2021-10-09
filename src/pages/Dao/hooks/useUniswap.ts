@@ -456,7 +456,7 @@ export function useUniswap(
     if (typeof existingPosition?.tickLower === 'number') {
       bl = existingPosition.tickLower;
     } else if (
-      (invertPrice && false) ||
+      (invertPrice && typeof rightRangeTypedValue === 'boolean') ||
       (!invertPrice && typeof leftRangeTypedValue === 'boolean')
     ) {
       bl = tickSpaceLimits[Bound.LOWER];
