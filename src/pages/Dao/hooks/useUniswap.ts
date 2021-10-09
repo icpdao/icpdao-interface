@@ -322,6 +322,7 @@ export function useUniswap(
   getNoQuoteTokenPrice: (
     currentTick: any,
   ) => { [bound in Bound]?: Price<Token, Token> | undefined };
+  getNoQuoteTokenTick: (currentTick: any) => { [bound in Bound]?: number | undefined };
 } {
   const {
     inputState,
@@ -456,7 +457,7 @@ export function useUniswap(
     if (typeof existingPosition?.tickLower === 'number') {
       bl = existingPosition.tickLower;
     } else if (
-      (invertPrice && false) ||
+      (invertPrice && typeof rightRangeTypedValue === 'boolean') ||
       (!invertPrice && typeof leftRangeTypedValue === 'boolean')
     ) {
       bl = tickSpaceLimits[Bound.LOWER];
@@ -792,13 +793,30 @@ export function useUniswap(
     (currentTick) => {
       if (invertPrice)
         return {
+          [Bound.LOWER]: getTickToPrice(token0, token1, minTick),
           [Bound.UPPER]: getTickToPrice(token0, token1, getNearestTickUpper(currentTick)),
         };
       return {
         [Bound.LOWER]: getTickToPrice(token0, token1, getNearestTickLower(currentTick)),
+        [Bound.UPPER]: getTickToPrice(token0, token1, maxTick),
       };
     },
-    [getNearestTickLower, getNearestTickUpper, invertPrice, token0, token1],
+    [getNearestTickLower, getNearestTickUpper, invertPrice, maxTick, minTick, token0, token1],
+  );
+
+  const getNoQuoteTokenTick = useCallback(
+    (currentTick) => {
+      if (invertPrice)
+        return {
+          [Bound.LOWER]: minTick,
+          [Bound.UPPER]: getNearestTickUpper(currentTick),
+        };
+      return {
+        [Bound.LOWER]: getNearestTickLower(currentTick),
+        [Bound.UPPER]: maxTick,
+      };
+    },
+    [getNearestTickLower, getNearestTickUpper, invertPrice, maxTick, minTick],
   );
 
   const getDecrementLower = useCallback(() => {
@@ -976,6 +994,7 @@ export function useUniswap(
     tickLower,
     tickUpper,
     getNoQuoteTokenPrice,
+    getNoQuoteTokenTick,
   };
 }
 
