@@ -223,6 +223,8 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
     return <Skeleton active />;
   }
 
+  console.log('console', !formattedAmounts[Field.CURRENCY_A], !!formattedAmounts[Field.CURRENCY_B]);
+
   return (
     <>
       <Spin
