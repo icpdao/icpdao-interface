@@ -517,7 +517,18 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
       </>
     );
   }
-
+  console.log(
+    'console',
+    depositADisabled,
+    !feeAmount,
+    invalidPool,
+    noLiquidity && !startPriceState,
+    startPriceState,
+    tickLower === undefined,
+    tickUpper === undefined,
+    invalidPool,
+    invalidRange,
+  );
   return (
     <>
       <Spin

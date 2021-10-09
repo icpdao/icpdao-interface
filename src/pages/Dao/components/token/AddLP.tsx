@@ -122,6 +122,7 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
     tickLower,
     tickUpper,
     getNoQuoteTokenPrice,
+    getNoQuoteTokenTick,
     pool,
   } = useUniswap(
     { inputState, leftRangeState, rightRangeState, startPriceState },
@@ -142,17 +143,21 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
     return getNoQuoteTokenPrice(currentTick);
   }, [getNoQuoteTokenPrice, pool?.tickCurrent]);
 
+  const noQuoteTokenTick = useMemo(() => {
+    const currentTick = pool?.tickCurrent;
+    if (!currentTick) return undefined;
+    return getNoQuoteTokenTick(currentTick);
+  }, [getNoQuoteTokenTick, pool?.tickCurrent]);
+
+  console.log({ noQuoteTokenTick });
+
   const setNoQuoteTokenPriceRange = useCallback(() => {
     if (!noQuoteTokenPrice) return;
-    console.log(noQuoteTokenPrice[Bound.LOWER]?.toSignificant(10));
-    console.log(noQuoteTokenPrice[Bound.UPPER]?.toSignificant(10));
-    if (invertPrice) {
-      onLeftRangeInput('');
-      onRightRangeInput(noQuoteTokenPrice[Bound.UPPER]?.toSignificant(10) || '');
-    } else {
-      onLeftRangeInput(noQuoteTokenPrice[Bound.LOWER]?.toSignificant(10) || '');
-      onRightRangeInput('');
-    }
+    console.log('invertPrice', invertPrice);
+    console.log('no quote price lower', noQuoteTokenPrice[Bound.LOWER]?.toSignificant(10));
+    console.log('no quote price upper', noQuoteTokenPrice[Bound.UPPER]?.toSignificant(10));
+    onLeftRangeInput(noQuoteTokenPrice[Bound.LOWER]?.toSignificant(10) || '');
+    onRightRangeInput(noQuoteTokenPrice[Bound.UPPER]?.toSignificant(10) || '');
   }, [invertPrice, noQuoteTokenPrice, onLeftRangeInput, onRightRangeInput]);
 
   useEffect(() => {
@@ -162,19 +167,17 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
   const handlerAddLP = useCallback(async () => {
     if (!tokenContract) return;
     if (!network || !account) return;
-    if (!position) return;
+    if (!position || !noQuoteTokenTick) return;
     console.log(position.mintAmounts.amount1.toString(), position.mintAmounts.amount0.toString());
-    const quoteTokenAmount = invertPrice
-      ? position.mintAmounts.amount0.toString()
-      : position.mintAmounts.amount1.toString();
-    if (quoteTokenAmount !== '0') return;
+
     const addLP: ETH_CONNECT.AddLP = {
       baseTokenAmount: invertPrice
         ? position.mintAmounts.amount1.toString()
         : position.mintAmounts.amount0.toString(),
-      tickLower: position.tickLower,
-      tickUpper: position.tickUpper,
+      tickLower: advancedOP ? position.tickLower : noQuoteTokenTick[Bound.LOWER] || 0,
+      tickUpper: advancedOP ? position.tickUpper : noQuoteTokenTick[Bound.UPPER] || 0,
     };
+    console.log({ addLP });
     try {
       setAddLPButtonLoading(true);
       const tx = await tokenContract.updateLPPool(addLP);
@@ -192,10 +195,28 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
         onFieldAInput('0');
       }
     } catch (e) {
+      console.log({ e });
+      setAddLPButtonLoading(false);
       setPreviewAddLP(false);
       setLoadingTransferComplete(false);
     }
-  }, [account, baseCurrency, invertPrice, network, onFieldAInput, position, tokenContract]);
+  }, [
+    account,
+    advancedOP,
+    baseCurrency,
+    invertPrice,
+    network,
+    noQuoteTokenTick,
+    onFieldAInput,
+    position,
+    tokenContract,
+  ]);
+
+  const disabledButton = useMemo(() => {
+    return (
+      !formattedAmounts[Field.CURRENCY_A] || (advancedOP && !!formattedAmounts[Field.CURRENCY_B])
+    );
+  }, [advancedOP, formattedAmounts]);
 
   if (lpPoolAddress === ZeroAddress) {
     return (
@@ -222,6 +243,9 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
   if (!tokenAddress || !lpPoolAddress || !poolInfo || poolInfo[0] !== PoolState.EXISTS) {
     return <Skeleton active />;
   }
+
+  console.log('console', !formattedAmounts[Field.CURRENCY_A], !!formattedAmounts[Field.CURRENCY_B]);
+  console.log('console', formattedAmounts[Field.CURRENCY_A], formattedAmounts[Field.CURRENCY_B]);
 
   return (
     <>
@@ -358,9 +382,7 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
             {!!quoteCurrency && !!feeAmount && (
               <Button
                 type="primary"
-                disabled={
-                  !formattedAmounts[Field.CURRENCY_A] || !!formattedAmounts[Field.CURRENCY_B]
-                }
+                disabled={disabledButton}
                 onClick={() => setPreviewAddLP(true)}
               >
                 {intl.formatMessage({
