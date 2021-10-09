@@ -376,8 +376,8 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
         mintTokenAmountRatioList: splitInfos.map((pd) => pd?.ratio || 0),
         startTimestamp: anchor.lastTimestamp.toNumber(),
         endTimestamp: getTimestampByZone(previewMintEndTime[0], previewMintEndTime[1]),
-        tickLower: (advancedOP ? tickLower : noQuoteTokenTick[Bound.LOWER]) || 0,
-        tickUpper: (advancedOP ? tickUpper : noQuoteTokenTick[Bound.UPPER]) || 0,
+        tickLower: tickLower || 0,
+        tickUpper: tickUpper || 0,
       };
       setCurrentMintBody(mintBody);
       await mutationCreateTokenMintMutation({
@@ -399,7 +399,6 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
       setLoadingTransferComplete(false);
     }
   }, [
-    advancedOP,
     anchor,
     createTokenMintMutationResult,
     currentSelectCycle,
