@@ -692,7 +692,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
         </Form.Item>
       </Form>
       <Spin
-        tip={intl.formatMessage({ id: 'pages.token.loading' })}
+        tip={intl.formatMessage({ id: 'pages.token.mint.pending' })}
         spinning={loadingTransferComplete}
       >
         <Form name={'tokenMintForm'} labelCol={{ span: 3 }} wrapperCol={{ span: 8 }}>
