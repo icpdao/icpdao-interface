@@ -60,7 +60,7 @@ const Content0: React.FC = () => {
             <AccessButton
               style={{ width: '250px', marginBottom: '10px' }}
               key="markJob"
-              allow={AccessEnum.PREICPPER}
+              allow={AccessEnum.NOMARL}
               defaultWarningModal={defaultWarning}
               delayWarningModal={1000}
               size={'large'}
