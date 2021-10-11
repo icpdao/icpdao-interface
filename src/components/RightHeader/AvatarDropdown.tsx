@@ -134,12 +134,10 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = () => {
           <DeploymentUnitOutlined />
           {intl.formatMessage({ id: 'component.globalHeader.avatar.dropdown.dao' })}
         </Menu.Item>
-        {access.isPreIcpperOrIcpper() && (
-          <Menu.Item key="/job">
-            <DeploymentUnitOutlined />
-            {intl.formatMessage({ id: 'component.globalHeader.avatar.dropdown.job' })}
-          </Menu.Item>
-        )}
+        <Menu.Item key="/job">
+          <DeploymentUnitOutlined />
+          {intl.formatMessage({ id: 'component.globalHeader.avatar.dropdown.job' })}
+        </Menu.Item>
         <Menu.Item key="/account/logout">
           <UnlockOutlined />
           {intl.formatMessage({ id: 'component.globalHeader.avatar.dropdown.logout' })}

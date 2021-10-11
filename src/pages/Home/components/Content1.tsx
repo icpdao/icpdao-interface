@@ -5,12 +5,14 @@ import QueueAnim from 'rc-queue-anim';
 import ScrollAnim from 'rc-scroll-anim';
 import BannerAnim, { Element } from 'rc-banner-anim';
 import TweenOne from 'rc-tween-one';
-import { Button, Row, Col, Modal } from 'antd';
+import { Row, Col, Modal } from 'antd';
 import homeImage2 from '../../../assets/image/home-image-2.png';
 import homeImage3 from '../../../assets/image/home-image-3.png';
 import homeImage4 from '../../../assets/image/home-image-4.png';
 import type { HomeStats } from '@/services/dao/generated';
 import { PageLoading } from '@ant-design/pro-layout';
+import { AccessEnum } from '@/access';
+import AccessButton from '@/components/AccessButton';
 
 const { BgElement } = Element;
 
@@ -128,15 +130,16 @@ const Content1: React.FC<HomeProps> = ({ statsData, loading }) => {
                             {intl.formatMessage({ id: 'pages.home.p3.0.desc' })}
                           </div>
                           <div>
-                            <Button
+                            <AccessButton
+                              allow={AccessEnum.NOMARL}
                               type="primary"
                               size="large"
-                              onClick={() => history.push('/dao/mine')}
+                              onClick={() => history.push('/dao/create')}
                             >
                               {intl.formatMessage({
                                 id: 'pages.dao.component.dao_list.create_dao',
                               })}
-                            </Button>
+                            </AccessButton>
                           </div>
                         </Col>
                         <Col xs={0} lg={12} className={styles.P3ContentRight}>
@@ -166,15 +169,16 @@ const Content1: React.FC<HomeProps> = ({ statsData, loading }) => {
                             {intl.formatMessage({ id: 'pages.home.p3.1.desc' })}
                           </div>
                           <div>
-                            <Button
+                            <AccessButton
+                              allow={AccessEnum.NOMARL}
                               type="primary"
                               size="large"
-                              onClick={() => history.push('/dao/mine')}
+                              onClick={() => history.push('/dao/create')}
                             >
                               {intl.formatMessage({
                                 id: 'pages.dao.component.dao_list.create_dao',
                               })}
-                            </Button>
+                            </AccessButton>
                           </div>
                         </Col>
                         <Col xs={0} lg={12} className={styles.P3ContentRight}>
@@ -209,15 +213,16 @@ const Content1: React.FC<HomeProps> = ({ statsData, loading }) => {
                             {intl.formatMessage({ id: 'pages.home.p3.2.desc' })}
                           </div>
                           <div>
-                            <Button
+                            <AccessButton
+                              allow={AccessEnum.NOMARL}
                               type="primary"
                               size="large"
-                              onClick={() => history.push('/dao/mine')}
+                              onClick={() => history.push('/dao/create')}
                             >
                               {intl.formatMessage({
                                 id: 'pages.dao.component.dao_list.create_dao',
                               })}
-                            </Button>
+                            </AccessButton>
                           </div>
                         </Col>
                         <Col xs={0} lg={12} className={styles.P3ContentRight}>

@@ -60,7 +60,7 @@ export default (props: {
   const userName = queryUserName || currentLoginUserName;
   const isMy = userName === currentLoginUserName;
 
-  if (!access.isPreIcpperOrIcpper()) {
+  if (access.noLogin()) {
     if (!queryUserName || queryUserName === currentLoginUserName) {
       return <PermissionErrorPage />;
     }
