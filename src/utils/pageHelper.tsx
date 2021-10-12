@@ -28,7 +28,7 @@ export const renderSize = (intl: any, record: IcpperStatQuery) => {
   if (tips.length > 0) color = '#ED6C6C';
   return (
     <>
-      <span style={{ color }}>{parseFloat(record.datum?.size.toString() || '').toFixed(1)}</span>
+      <span style={{ color }}>{parseFloat(record.datum?.size.toString() || '0').toFixed(1)}</span>
       {colorTooltip(color, tipsText)}
     </>
   );

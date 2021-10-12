@@ -58,13 +58,13 @@ const Content1: React.FC<HomeProps> = ({ statsData, loading }) => {
             <Col xs={12} lg={6}>
               {statisticValueFormat(
                 intl.formatMessage({ id: 'component.card.stat.size' }),
-                parseFloat(statsData?.size).toFixed(0) || 0,
+                parseFloat(statsData?.size || '0').toFixed(0) || 0,
               )}
             </Col>
             <Col xs={12} lg={6}>
               {statisticValueFormat(
                 intl.formatMessage({ id: 'component.card.stat.income' }),
-                parseFloat(statsData?.income).toFixed(0) || 0,
+                parseFloat(statsData?.income || '0').toFixed(0) || 0,
               )}
             </Col>
           </Row>
