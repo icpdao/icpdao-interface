@@ -6,6 +6,13 @@ import { message } from 'antd';
 import { getLocale } from 'umi';
 
 import { getAuthorization } from '@/utils/utils';
+import enLocales from '../locales/en-US';
+import zhLocales from '../locales/zh-CN';
+
+const locales = {
+  'en-US': enLocales,
+  'zh-CN': zhLocales,
+}[getLocale() || 'en-US'];
 
 const customFetch = (uri: string, options: any) => {
   const { service } = options.headers;
@@ -38,18 +45,15 @@ const authLink = setContext((_, context) => {
 const errorLink = onError(({ graphQLErrors, networkError, response, operation }) => {
   if (response === undefined) return;
   if (operation?.getContext()?.errorPolicy === 'ignore') return;
-  const intl = getLocale();
-  import(`../locales/${intl}`).then((locales) => {
-    if (graphQLErrors) {
-      if (graphQLErrors.length > 0) {
-        const { message: msg, locations, path } = graphQLErrors[0];
-        console.warn(`[GraphQL error]: Message: ${msg}, Location: ${locations}, Path: ${path}`);
-        message.error(locales.default[msg] || msg);
-      }
-    } else if (networkError) {
-      message.error(`[Network error]: ${networkError}`);
+  if (graphQLErrors) {
+    if (graphQLErrors.length > 0) {
+      const { message: msg, locations, path } = graphQLErrors[0];
+      console.warn(`[GraphQL error]: Message: ${msg}, Location: ${locations}, Path: ${path}`);
+      message.error(locales[msg] || msg);
     }
-  });
+  } else if (networkError) {
+    message.error(`[Network error]: ${networkError}`);
+  }
 });
 
 const client = new ApolloClient({
