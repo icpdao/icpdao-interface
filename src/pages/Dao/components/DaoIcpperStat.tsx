@@ -89,13 +89,13 @@ const DaoIcpperStat: React.FC<DaoIcpperStatProps> = ({ daoId, tokenSymbol }) => 
       title: <FormattedMessage id="pages.dao.component.dao_icpper.table.head.size" />,
       dataIndex: 'size',
       sorter: true,
-      render: (_: any, record: IcpperQuery) => <>{parseFloat(record.size || '').toFixed(1)}</>,
+      render: (_: any, record: IcpperQuery) => <>{parseFloat(record.size || '0').toFixed(1)}</>,
     },
     {
       title: <FormattedMessage id="pages.dao.component.dao_icpper.table.head.income" />,
       dataIndex: 'income',
       sorter: true,
-      render: (_: any, record: IcpperQuery) => <>{parseFloat(record.income || '').toFixed(2)}</>,
+      render: (_: any, record: IcpperQuery) => <>{parseFloat(record.income || '0').toFixed(2)}</>,
     },
     {
       title: <FormattedMessage id="pages.dao.component.dao_icpper.table.head.join_time" />,
@@ -116,11 +116,11 @@ const DaoIcpperStat: React.FC<DaoIcpperStatProps> = ({ daoId, tokenSymbol }) => 
     },
     {
       title: intl.formatMessage({ id: 'pages.dao.component.dao_icpper.stat.size' }),
-      number: parseFloat(data?.dao?.icppers?.stat?.size || '').toFixed(1) || 0,
+      number: parseFloat(data?.dao?.icppers?.stat?.size || '0').toFixed(1) || 0,
     },
     {
       title: tokenSymbol || intl.formatMessage({ id: 'component.card.stat.income' }),
-      number: parseFloat(data?.dao?.icppers?.stat?.income || '').toFixed(2) || 0,
+      number: parseFloat(data?.dao?.icppers?.stat?.income || '0').toFixed(2) || 0,
     },
   ];
   const dataSource = data?.dao?.icppers?.nodes || [];
@@ -136,9 +136,9 @@ const DaoIcpperStat: React.FC<DaoIcpperStatProps> = ({ daoId, tokenSymbol }) => 
         dataSource={dataSource as IcpperQuery[]}
         onChange={(pagination, filters, sorter) => tableChange(pagination, sorter)}
         pagination={{
-          pageSize: 10,
+          pageSize: queryVariable.first,
           total: data?.dao?.icppers?.total || 0,
-          current: getCurrentPage(queryVariable.offset || 0, 10),
+          current: getCurrentPage(queryVariable.offset || 0, queryVariable.first),
         }}
       />
     </>

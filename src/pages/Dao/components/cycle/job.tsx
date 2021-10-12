@@ -345,9 +345,9 @@ export const OwnerDaoCycleJob: React.FC<DaoCycleProps> = ({ cycleId, cycle, daoI
           tableChange(pagination, filters, sorter);
         }}
         pagination={{
-          pageSize: 10,
+          pageSize: queryVariables.first || 10,
           total: data?.cycle?.jobs?.total || 0,
-          current: getCurrentPage(queryVariables.offset || 0, 10),
+          current: getCurrentPage(queryVariables.offset || 0, queryVariables.first || 10),
         }}
       />
     </>
@@ -401,9 +401,9 @@ export const DaoCycleJob: React.FC<DaoCycleProps> = ({ cycleId, daoId }) => {
           tableChange(pagination, sorter);
         }}
         pagination={{
-          pageSize: 10,
+          pageSize: queryVariables.first || 10,
           total: data?.cycle?.jobs?.total || 0,
-          current: getCurrentPage(queryVariables.offset || 0, 10),
+          current: getCurrentPage(queryVariables.offset || 0, queryVariables.first || 10),
         }}
       />
     </>

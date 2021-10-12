@@ -497,7 +497,7 @@ export default {
   'pages.staking.button.withdraw': 'Withdraw Bonus',
   'pages.staking.balance': 'Account Deposit ICPD',
   'pages.token.loading': 'Waiting for the transaction to complete...',
-  'pages.token.mint.pending':
-    'Please refresh the page to see the mining results after the contract is executed successfully',
+  'pages.token.mint.pending': 'Mint data synchronization...',
+  'pages.token.mint.complete': 'Please refresh the page later...',
   'pages.common.connect': 'Connect Wallet',
 };

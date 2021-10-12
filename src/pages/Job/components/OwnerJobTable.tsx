@@ -21,7 +21,6 @@ import {
 import { useModel } from '@@/plugin-model/useModel';
 import { getCurrentPage } from '@/utils/utils';
 import { renderJobTag } from '@/utils/pageHelper';
-import { defaultPageSize } from '@/pages/Job/components/OtherUserJobTable';
 
 interface JobTableProps {
   jobQueryVar: JobListQueryVariables;
@@ -216,9 +215,9 @@ const OwnerJobTable: React.FC<JobTableProps> = ({
             tableChange(pagination, sorter);
           }}
           pagination={{
-            pageSize: defaultPageSize,
+            pageSize: jobQueryVar.first || 10,
             total: jobList?.data?.data?.jobs?.total || 0,
-            current: getCurrentPage(jobQueryVar.offset || 0, defaultPageSize),
+            current: getCurrentPage(jobQueryVar.offset || 0, jobQueryVar.first || 10),
           }}
         />
       </Form>

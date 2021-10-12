@@ -501,9 +501,9 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
           tableChange(pagination, sorter);
         }}
         pagination={{
-          pageSize: 10,
+          pageSize: queryVariable.first || 10,
           total: data?.cycle?.icpperStats?.total || 0,
-          current: getCurrentPage(queryVariable.offset || 0, 10),
+          current: getCurrentPage(queryVariable.offset || 0, queryVariable.first || 10),
         }}
       />
     </>
@@ -565,9 +565,9 @@ export const DaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycleId, daoId }) => {
           tableChange(pagination, sorter);
         }}
         pagination={{
-          pageSize: 10,
+          pageSize: queryVariable.first || 10,
           total: data?.cycle?.icpperStats?.total || 0,
-          current: getCurrentPage(queryVariable.offset || 0, 10),
+          current: getCurrentPage(queryVariable.offset || 0, queryVariable.first || 10),
         }}
       />
     </>
