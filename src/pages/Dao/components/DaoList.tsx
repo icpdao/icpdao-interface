@@ -371,6 +371,7 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
           pageSize,
           total: daoDataTotalCount,
           current: daoTableParams.current,
+          showSizeChanger: false,
         }}
       />
     </>

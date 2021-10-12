@@ -136,9 +136,9 @@ const DaoIcpperStat: React.FC<DaoIcpperStatProps> = ({ daoId, tokenSymbol }) => 
         dataSource={dataSource as IcpperQuery[]}
         onChange={(pagination, filters, sorter) => tableChange(pagination, sorter)}
         pagination={{
-          pageSize: 10,
+          pageSize: queryVariable.first,
           total: data?.dao?.icppers?.total || 0,
-          current: getCurrentPage(queryVariable.offset || 0, 10),
+          current: getCurrentPage(queryVariable.offset || 0, queryVariable.first),
         }}
       />
     </>

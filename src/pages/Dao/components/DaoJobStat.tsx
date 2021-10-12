@@ -56,14 +56,14 @@ const DaoJobStat: React.FC<DaoJobSatProps> = ({ daoId, tokenSymbol }) => {
     [setQueryVariable, searchDateType],
   );
   const tableChange = useCallback((pagination: TablePaginationConfig, sorter: any) => {
-    let sorted: JobsQuerySortedEnum;
+    let sorted: JobsQuerySortedEnum = JobsQuerySortedEnum.Size;
     if (sorter && sorter.field && sorter.field.includes('size')) {
       sorted = JobsQuerySortedEnum.Size;
     }
     if (sorter && sorter.field && sorter.field.includes('income')) {
       sorted = JobsQuerySortedEnum.Income;
     }
-    let sortedType: JobsQuerySortedTypeEnum;
+    let sortedType: JobsQuerySortedTypeEnum = JobsQuerySortedTypeEnum.Asc;
     if (sorter && sorter.order === 'ascend') {
       sortedType = JobsQuerySortedTypeEnum.Asc;
     }
@@ -167,9 +167,9 @@ const DaoJobStat: React.FC<DaoJobSatProps> = ({ daoId, tokenSymbol }) => {
         dataSource={data?.dao?.jobs?.nodes as JobQuery[]}
         onChange={(pagination, filters, sorter) => tableChange(pagination, sorter)}
         pagination={{
-          pageSize: 10,
+          pageSize: queryVariable.first,
           total: data?.dao?.jobs?.total || 0,
-          current: getCurrentPage(queryVariable.offset || 0, 10),
+          current: getCurrentPage(queryVariable.offset || 0, queryVariable.first),
         }}
       />
     </>
