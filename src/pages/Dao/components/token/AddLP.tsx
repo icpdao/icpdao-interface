@@ -136,6 +136,8 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
     undefined,
   );
 
+  console.log({ priceLower, priceUpper });
+
   const noQuoteTokenPrice = useMemo(() => {
     const currentTick = pool?.tickCurrent;
     console.log({ currentTick });
@@ -156,8 +158,12 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
     console.log('invertPrice', invertPrice);
     console.log('no quote price lower', noQuoteTokenPrice[Bound.LOWER]?.toSignificant(10));
     console.log('no quote price upper', noQuoteTokenPrice[Bound.UPPER]?.toSignificant(10));
-    onLeftRangeInput(noQuoteTokenPrice[Bound.LOWER]?.toSignificant(10) || '');
-    onRightRangeInput(noQuoteTokenPrice[Bound.UPPER]?.toSignificant(10) || '');
+    onLeftRangeInput(
+      noQuoteTokenPrice[!invertPrice ? Bound.LOWER : Bound.UPPER]?.toSignificant(10) || '',
+    );
+    onRightRangeInput(
+      noQuoteTokenPrice[!invertPrice ? Bound.UPPER : Bound.LOWER]?.toSignificant(10) || '',
+    );
   }, [invertPrice, noQuoteTokenPrice, onLeftRangeInput, onRightRangeInput]);
 
   useEffect(() => {
@@ -305,7 +311,7 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
                   value={
                     ticksAtLimit[isSorted ? Bound.LOWER : Bound.UPPER]
                       ? '0'
-                      : leftPrice?.toSignificant(5) ?? ''
+                      : leftPrice?.toSignificant(10) ?? ''
                   }
                   onChange={(value) => {
                     onLeftRangeInput(value);
@@ -333,7 +339,7 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
                   value={
                     ticksAtLimit[isSorted ? Bound.UPPER : Bound.LOWER]
                       ? '∞'
-                      : rightPrice?.toSignificant(5) ?? ''
+                      : rightPrice?.toSignificant(10) ?? ''
                   }
                   onChange={(value) => {
                     onRightRangeInput(value);
@@ -413,21 +419,31 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
               id: 'pages.dao.config.tab.token.create_pool.form.base_token',
             })}
           >
-            {invertPrice ? position?.amount1.toSignificant(4) : position?.amount0.toSignificant(4)}
+            {(invertPrice
+              ? position?.amount1.toSignificant(10)
+              : position?.amount0.toSignificant(10)) || '0'}
           </Descriptions.Item>
           <Descriptions.Item
             label={intl.formatMessage({
               id: 'pages.dao.config.tab.token.create_pool.form.min_price',
             })}
           >
-            {`${formatTickPrice(priceLower, ticksAtLimit, Bound.LOWER)}`}
+            {`${formatTickPrice(
+              isSorted ? priceLower : priceUpper?.invert(),
+              ticksAtLimit,
+              Bound.LOWER,
+            )}`}
           </Descriptions.Item>
           <Descriptions.Item
             label={intl.formatMessage({
               id: 'pages.dao.config.tab.token.create_pool.form.max_price',
             })}
           >
-            {`${formatTickPrice(priceUpper, ticksAtLimit, Bound.UPPER)}`}
+            {`${formatTickPrice(
+              isSorted ? priceUpper : priceLower?.invert(),
+              ticksAtLimit,
+              Bound.UPPER,
+            )}`}
           </Descriptions.Item>
         </Descriptions>
       </GlobalModal>

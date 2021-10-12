@@ -793,8 +793,8 @@ export function useUniswap(
     (currentTick) => {
       if (invertPrice)
         return {
-          [Bound.LOWER]: getTickToPrice(token0, token1, minTick),
-          [Bound.UPPER]: getTickToPrice(token0, token1, getNearestTickUpper(currentTick)),
+          [Bound.LOWER]: getTickToPrice(token1, token0, minTick),
+          [Bound.UPPER]: getTickToPrice(token1, token0, getNearestTickUpper(currentTick)),
         };
       return {
         [Bound.LOWER]: getTickToPrice(token0, token1, getNearestTickLower(currentTick)),

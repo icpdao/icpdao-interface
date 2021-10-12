@@ -181,6 +181,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
     tickLower,
     tickUpper,
     getNoQuoteTokenTick,
+    invertPrice,
   } = useUniswap(
     { inputState, leftRangeState, rightRangeState, startPriceState },
     { setInputState, setLeftRangeState, setRightRangeState, setStartPriceState },
@@ -212,9 +213,13 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
     if (!noQuoteTokenPrice) return;
     console.log('no quote price lower', noQuoteTokenPrice[Bound.LOWER]?.toSignificant(10));
     console.log('no quote price upper', noQuoteTokenPrice[Bound.UPPER]?.toSignificant(10));
-    onLeftRangeInput(noQuoteTokenPrice[Bound.LOWER]?.toSignificant(10) || '');
-    onRightRangeInput(noQuoteTokenPrice[Bound.UPPER]?.toSignificant(10) || '');
-  }, [noQuoteTokenPrice, onLeftRangeInput, onRightRangeInput]);
+    onLeftRangeInput(
+      noQuoteTokenPrice[!invertPrice ? Bound.LOWER : Bound.UPPER]?.toSignificant(10) || '',
+    );
+    onRightRangeInput(
+      noQuoteTokenPrice[!invertPrice ? Bound.UPPER : Bound.LOWER]?.toSignificant(10) || '',
+    );
+  }, [invertPrice, noQuoteTokenPrice, onLeftRangeInput, onRightRangeInput]);
 
   useEffect(() => {
     setNoQuoteTokenPriceRange();
@@ -376,8 +381,10 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
         mintTokenAmountRatioList: splitInfos.map((pd) => pd?.ratio || 0),
         startTimestamp: anchor.lastTimestamp.toNumber(),
         endTimestamp: getTimestampByZone(previewMintEndTime[0], previewMintEndTime[1]),
-        tickLower: tickLower || 0,
-        tickUpper: tickUpper || 0,
+        tickLower: (advancedOP ? tickLower : noQuoteTokenTick[Bound.LOWER]) || 0,
+        tickUpper: (advancedOP ? tickUpper : noQuoteTokenTick[Bound.UPPER]) || 0,
+        // tickLower: tickLower || 0,
+        // tickUpper: tickUpper || 0,
       };
       setCurrentMintBody(mintBody);
       await mutationCreateTokenMintMutation({
@@ -399,6 +406,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
       setLoadingTransferComplete(false);
     }
   }, [
+    advancedOP,
     anchor,
     createTokenMintMutationResult,
     currentSelectCycle,
@@ -756,7 +764,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
                   value={
                     ticksAtLimit[isSorted ? Bound.LOWER : Bound.UPPER]
                       ? '0'
-                      : leftPrice?.toSignificant(5) ?? ''
+                      : leftPrice?.toSignificant(10) ?? ''
                   }
                   onChange={(value) => {
                     onLeftRangeInput(value);
@@ -784,7 +792,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
                   value={
                     ticksAtLimit[isSorted ? Bound.UPPER : Bound.LOWER]
                       ? '∞'
-                      : rightPrice?.toSignificant(5) ?? ''
+                      : rightPrice?.toSignificant(10) ?? ''
                   }
                   onChange={(value) => {
                     onRightRangeInput(value);
