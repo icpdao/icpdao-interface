@@ -107,6 +107,9 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
   const [previewMint, setPreviewMint] = useState<boolean>(false);
   const [mintRecordModal, setMintRecordModal] = useState<boolean>(false);
   const [mintButtonLoading, setMintButtonLoading] = useState<boolean>(false);
+
+  const [showCompleteAlert, setShowCompleteAlert] = useState<boolean>(false);
+
   const [currentMintBody, setCurrentMintBody] = useState<ETH_CONNECT.Mint>();
 
   const [loadingTransferComplete, setLoadingTransferComplete] = useState<boolean>(false);
@@ -441,6 +444,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
               clearCacheMintRecordBingTxHash();
               tx.wait().then((receipt: any) => {
                 console.log(receipt);
+                setShowCompleteAlert(true);
                 // setLoadingTransferComplete(false);
               });
             },
@@ -674,6 +678,15 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
 
   return (
     <>
+      {showCompleteAlert && (
+        <Alert
+          message="Warning"
+          description={<>{intl.formatMessage({ id: 'pages.token.mint.complete' })}</>}
+          type="warning"
+          showIcon
+          style={{ marginBottom: 30 }}
+        />
+      )}
       {lpPoolAddress === ZeroAddress && (
         <Alert
           message="Warning"

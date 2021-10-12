@@ -63,7 +63,7 @@ const IcpperList: React.FC = () => {
         dataIndex: 'total_value',
         key: 'totalValue',
         render: (_: any, record: any) => (
-          <>{parseFloat(record.total_value.toString() || '').toFixed(2) || 0}</>
+          <>{parseFloat(record.total_value.toString() || '0').toFixed(2) || 0}</>
         ),
         width: 60,
       },
@@ -224,7 +224,7 @@ const IcpperList: React.FC = () => {
   const relationIcpper = [];
   const unrelationIcpper = [];
   const icpperships = data?.icpperships;
-  const preMentorIcppershipCountLimit = data?.pre_mentor_icppership_count_limit;
+  const preMentorIcppershipCountLimit = data?.pre_mentor_icppership_count_limit || 2;
   if (icpperships) {
     for (let i: number = 0; i < icpperships.length; i += 1) {
       if (icpperships[i].progress === 0 || icpperships[i].status === 1) {
@@ -413,7 +413,7 @@ const IcpperList: React.FC = () => {
           setInviteModalSendLoading(true);
           const { data: newItem } = await handleSendInvite(inviteGithubLogin);
           if (newItem) {
-            data?.icpperships.push(newItem);
+            data?.icpperships?.push(newItem);
             mutate(data);
           }
           setInviteModalSendLoading(false);

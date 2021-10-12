@@ -135,9 +135,9 @@ const OtherUserJobTable: React.FC<JobTableProps> = ({
             tableChange(pagination, sorter);
           }}
           pagination={{
-            pageSize: defaultPageSize,
+            pageSize: jobQueryVar.first || 10,
             total: jobList?.data?.jobs?.total || 0,
-            current: getCurrentPage(jobQueryVar.offset || 0, defaultPageSize),
+            current: getCurrentPage(jobQueryVar.offset || 0, jobQueryVar.first || 10),
           }}
         />
       </Form>
