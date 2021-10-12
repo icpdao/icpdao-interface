@@ -613,7 +613,7 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
             <InputNumber
               style={{ width: '100%' }}
               disabled={!feeAmount || !baseCurrency || !quoteCurrency}
-              value={invertPrice ? price?.invert().toSignificant(6) : price?.toSignificant(6)}
+              value={invertPrice ? price?.invert().toSignificant(10) : price?.toSignificant(10)}
               onChange={(value) => onStartPriceInput(value)}
             />
             {!!quoteCurrency?.symbol && (
@@ -624,7 +624,7 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
             {!!quoteCurrency?.symbol && !invalidPool && !(noLiquidity && !startPriceState) && (
               <div className={styles.StartPriceTips}>
                 Current {baseCurrency?.symbol} Price:{' '}
-                {invertPrice ? price?.invert()?.toSignificant(5) : price?.toSignificant(5)}{' '}
+                {invertPrice ? price?.invert()?.toSignificant(10) : price?.toSignificant(10)}{' '}
                 {quoteCurrency?.symbol}
               </div>
             )}
@@ -667,7 +667,7 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
                   value={
                     ticksAtLimit[isSorted ? Bound.LOWER : Bound.UPPER]
                       ? '0'
-                      : leftPrice?.toSignificant(5) ?? ''
+                      : leftPrice?.toSignificant(10) ?? ''
                   }
                   min={'0'}
                   onChange={(value) => {
@@ -696,7 +696,7 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
                   value={
                     ticksAtLimit[isSorted ? Bound.UPPER : Bound.LOWER]
                       ? '∞'
-                      : rightPrice?.toSignificant(5) ?? ''
+                      : rightPrice?.toSignificant(10) ?? ''
                   }
                   min={'∞'}
                   onChange={(value) => {
@@ -797,7 +797,9 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
               id: 'pages.dao.config.tab.token.create_pool.form.base_token',
             })}
           >
-            {invertPrice ? position?.amount1.toSignificant(4) : position?.amount0.toSignificant(4)}
+            {invertPrice
+              ? position?.amount1.toSignificant(10)
+              : position?.amount0.toSignificant(10)}
           </Descriptions.Item>
           <Descriptions.Item
             span={2}
@@ -805,7 +807,9 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
               id: 'pages.dao.config.tab.token.create_pool.form.quote_token',
             })}
           >
-            {invertPrice ? position?.amount0.toSignificant(4) : position?.amount1.toSignificant(4)}
+            {invertPrice
+              ? position?.amount0.toSignificant(10)
+              : position?.amount1.toSignificant(10)}
           </Descriptions.Item>
           <Descriptions.Item
             span={2}
@@ -818,14 +822,22 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
               id: 'pages.dao.config.tab.token.create_pool.form.min_price',
             })}
           >
-            {`${formatTickPrice(priceLower, ticksAtLimit, Bound.LOWER)}`}
+            {`${formatTickPrice(
+              isSorted ? priceLower : priceUpper?.invert(),
+              ticksAtLimit,
+              Bound.LOWER,
+            )}`}
           </Descriptions.Item>
           <Descriptions.Item
             label={intl.formatMessage({
               id: 'pages.dao.config.tab.token.create_pool.form.max_price',
             })}
           >
-            {`${formatTickPrice(priceUpper, ticksAtLimit, Bound.UPPER)}`}
+            {`${formatTickPrice(
+              isSorted ? priceUpper : priceLower?.invert(),
+              ticksAtLimit,
+              Bound.UPPER,
+            )}`}
           </Descriptions.Item>
           <Descriptions.Item
             span={2}
@@ -833,7 +845,7 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
               id: 'pages.dao.config.tab.token.create_pool.form.current_price',
             })}
           >
-            {`${position?.pool.priceOf(position.pool.token0).toSignificant(5)} `}
+            {`${position?.pool.priceOf(position.pool.token0).toSignificant(10)} `}
           </Descriptions.Item>
         </Descriptions>
       </GlobalModal>
