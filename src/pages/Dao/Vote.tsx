@@ -5,7 +5,6 @@ import GlobalBreadcrumb from '@/components/Breadcrumb';
 import { CheckCircleFilled, FrownOutlined, HomeOutlined, SmileOutlined } from '@ant-design/icons';
 import { useModel } from '@@/plugin-model/useModel';
 
-import PermissionErrorPage from '@/pages/Result/403';
 import styles from './index.less';
 import type { JobItemQuery, DaoCycleVoteListQueryVariables } from '@/services/dao/generated';
 import {
@@ -24,6 +23,7 @@ import { getCurrentPage, getTimeDistanceHumanize } from '@/utils/utils';
 import { getMetamaskProvider } from '@/services/ethereum-connect';
 import moment from 'moment';
 import { updateUserProfile } from '@/services/icpdao-interface/user';
+import MentorWarningModal from '@/components/AccessButton/MentorWarningModal';
 
 const breadcrumb = (daoId: string, cycleId: string) => [
   { icon: <HomeOutlined />, path: '', breadcrumbName: 'HOME', menuId: 'home' },
@@ -63,7 +63,7 @@ const allTypeVote = (
   }
 
   return (
-    <>
+    <div key={voteId}>
       <Skeleton active loading={voteLoading || false} />
       {!voteLoading && (
         <Card className={`${styles.allTypeVoteCard} ${!!voted && styles.VotedPairBG}`} key={voteId}>
@@ -95,7 +95,7 @@ const allTypeVote = (
           </div>
         </Card>
       )}
-    </>
+    </div>
   );
 };
 
@@ -186,8 +186,26 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
   const [updatePairVoteMutation, updatePairVoteResult] = useUpdatePairVoteMutation();
   const [updateVoteConfirm] = useUpdateVoteConfirmMutation();
 
+  const access = useAccess();
+
+  const [warningModalVisible, setWarningModalVisible] = useState(false);
+
+  const warningModal = useMemo(() => {
+    return (
+      <MentorWarningModal
+        key={'warningModal'}
+        visible={warningModalVisible}
+        setVisible={setWarningModalVisible}
+      />
+    );
+  }, [warningModalVisible]);
+
   const updateAllVote = useCallback(
     async (voteId: string, voted: boolean) => {
+      if (access.isNormal()) {
+        setWarningModalVisible(true);
+        return;
+      }
       if (data?.cycle?.votes?.confirm === true) {
         message.warn(intl.formatMessage({ id: 'pages.dao.vote.already_confirm' }));
         return;
@@ -203,6 +221,10 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
   );
   const updatePairVote = useCallback(
     async (voteId: string, voteJobId: string) => {
+      if (access.isNormal()) {
+        setWarningModalVisible(true);
+        return;
+      }
       if (data?.cycle?.votes?.confirm === true) {
         message.warn(intl.formatMessage({ id: 'pages.dao.vote.already_confirm' }));
         return;
@@ -236,7 +258,6 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
       });
   }, [refetch, updateAllVoteResult.loading, updatePairVoteResult.loading]);
 
-  const access = useAccess();
   const changePage = useCallback((page: number) => {
     setQueryVariables((old) => ({
       ...old,
@@ -365,10 +386,6 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
     return <PageLoading />;
   }
 
-  if (!access.isIcpper()) {
-    return <PermissionErrorPage />;
-  }
-
   const endLeftTimes = getTimeDistanceHumanize(data?.cycle?.datum?.voteEndAt || 0);
 
   return (
@@ -432,6 +449,7 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
             />
           </div>
         </div>
+        {warningModal}
       </PageContainer>
     </>
   );

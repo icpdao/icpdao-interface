@@ -162,7 +162,7 @@ export default (): React.ReactNode => {
   }
 
   const intl = useIntl();
-  const { isPreIcpperOrIcpper } = useAccess();
+  const { noLogin } = useAccess();
   const draftValue = useMemo(() => {
     const value = localStorage.getItem('dao.create.draft');
     if (value) {
@@ -398,7 +398,7 @@ export default (): React.ReactNode => {
     updateSubmitStatus();
   }, [updateSubmitStatus]);
 
-  if (!isPreIcpperOrIcpper()) {
+  if (noLogin()) {
     return <PermissionErrorPage />;
   }
 
