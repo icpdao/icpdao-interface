@@ -14,6 +14,10 @@ import { FormattedMessage } from 'umi';
 import { UserOutlined } from '@ant-design/icons';
 import { history } from '@@/core/history';
 import styles from './index.less';
+import { useModel } from '@@/plugin-model/useModel';
+import { useTokenPrice } from '@/pages/Dao/hooks/useTokenPrice';
+import { renderIncomes } from '@/utils/pageHelper';
+import IncomesPopover from '@/components/IncomesPopover';
 
 type DaoIcpperStatProps = {
   daoId: string;
@@ -22,14 +26,17 @@ type DaoIcpperStatProps = {
 
 const DaoIcpperStat: React.FC<DaoIcpperStatProps> = ({ daoId, tokenSymbol }) => {
   const intl = useIntl();
+  const { chainId } = useModel('useWalletModel');
   const [queryVariable, setQueryVariable] = useState<DaoIcppersQueryVariables>({
     daoId,
     sorted: IcppersQuerySortedEnum.JoinTime,
     sortedType: IcppersQuerySortedTypeEnum.Desc,
     first: 10,
     offset: 0,
+    tokenChainId: chainId?.toString() || '1',
   });
   const { data, loading } = useDaoIcppersQuery({ variables: queryVariable });
+  const { tokenPrice } = useTokenPrice(data?.dao?.icppers?.stat?.incomes || []);
 
   const tableChange = useCallback((pagination: TablePaginationConfig, sorter: any) => {
     let sorted: IcppersQuerySortedEnum;
@@ -93,9 +100,11 @@ const DaoIcpperStat: React.FC<DaoIcpperStatProps> = ({ daoId, tokenSymbol }) => 
     },
     {
       title: <FormattedMessage id="pages.dao.component.dao_icpper.table.head.income" />,
-      dataIndex: 'income',
-      sorter: true,
-      render: (_: any, record: IcpperQuery) => <>{parseFloat(record.income || '0').toFixed(2)}</>,
+      key: 'income',
+      sorter: false,
+      render: (_: any, record: IcpperQuery) => (
+        <IncomesPopover incomes={record.incomes || []} chainId={chainId} tokenPrice={tokenPrice} />
+      ),
     },
     {
       title: <FormattedMessage id="pages.dao.component.dao_icpper.table.head.join_time" />,
@@ -120,7 +129,7 @@ const DaoIcpperStat: React.FC<DaoIcpperStatProps> = ({ daoId, tokenSymbol }) => 
     },
     {
       title: tokenSymbol || intl.formatMessage({ id: 'component.card.stat.income' }),
-      number: parseFloat(data?.dao?.icppers?.stat?.income || '0').toFixed(2) || 0,
+      number: renderIncomes(data?.dao?.icppers?.stat?.incomes || [], tokenPrice),
     },
   ];
   const dataSource = data?.dao?.icppers?.nodes || [];

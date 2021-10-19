@@ -1,4 +1,4 @@
-import type { IcpperStatQuery } from '@/services/dao/generated';
+import type { IcpperStatQuery, Maybe, TokenIncomeSchema } from '@/services/dao/generated';
 import { getEIColor } from '@/utils/utils';
 import { Tag, Tooltip } from 'antd';
 import { ExclamationCircleFilled } from '@ant-design/icons';
@@ -134,4 +134,21 @@ export const renderJobTag = (intl: any, status: number | undefined) => {
         </Tooltip>
       );
   }
+};
+
+export const renderIncomes = (
+  incomes: Maybe<TokenIncomeSchema>[],
+  tokenPrice: Record<string, number>,
+) => {
+  let allIncome = 0;
+  let allPrice = 0;
+  incomes.forEach((ins) => {
+    if (ins?.tokenAddress && ins?.income) {
+      allIncome += ins.income;
+      if (tokenPrice[ins.tokenAddress]) {
+        allPrice += tokenPrice[ins.tokenAddress] * ins.income;
+      }
+    }
+  });
+  return `${allIncome.toFixed(2)}/$${allPrice.toFixed(2)}`;
 };

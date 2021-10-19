@@ -1,0 +1,18 @@
+overwrite: true
+schema:
+  - https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3
+documents: "src/services/uniswap-v3/*.graphql"
+generates:
+  src/services/uniswap-v3/generated.ts:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
+    config:
+      defaultBaseOptions:
+        context:
+          service: "uniswap-v3"
+  src/services/uniswap-v3/graphql.schema.json:
+    plugins:
+      - "introspection"
+

@@ -172,8 +172,8 @@ query DAOFollowInfo($id: String!, $userId: String!) {
   }
 }
 
-query DAOList($filter: DAOsFilterEnum, $sorted: DAOsSortedEnum, $sortedType: DAOsSortedTypeEnum, $search: String, $first: Int, $offset: Int) {
-  daos(filter: $filter, sorted: $sorted, sortedType: $sortedType, search: $search, offset: $offset, first: $first){
+query DAOList($tokenChainId: String!, $filter: DAOsFilterEnum, $sorted: DAOsSortedEnum, $sortedType: DAOsSortedTypeEnum, $search: String, $first: Int, $offset: Int) {
+  daos(filter: $filter, sorted: $sorted, sortedType: $sortedType, search: $search, offset: $offset, first: $first, tokenChainId: $tokenChainId){
     dao{
       datum{
         createAt
@@ -184,19 +184,29 @@ query DAOList($filter: DAOsFilterEnum, $sorted: DAOsSortedEnum, $sortedType: DAO
         ownerId
         updateAt
       }
-      stat{
+      stat (tokenChainId: $tokenChainId) {
         following
         job
         size
-        token
+        incomes {
+          tokenChainId
+          tokenAddress
+          tokenSymbol
+          income
+        }
       }
       isFollowing
       isOwner
     }
-    stat{
+    stat {
       icpper
       size
-      income
+      incomes {
+        tokenChainId
+        tokenAddress
+        tokenSymbol
+        income
+      }
     }
     total
   }
@@ -491,13 +501,18 @@ query DAOCycle($daoId: String!) {
   }
 }
 
-query CycleStatData($cycleId: String!) {
+query CycleStatData($cycleId: String!, $tokenChainId: String!) {
   cycle(id: $cycleId) {
     stat {
       icpperCount
       jobCount
       size
-      income
+      incomes (tokenChainId: $tokenChainId) {
+        tokenChainId
+        tokenAddress
+        tokenSymbol
+        income
+      }
     }
   }
 }
@@ -769,9 +784,9 @@ query DAOTokenMintDrop($daoId: String!, $tokenContractAddress: String!, $chainId
   }
 }
 
-query DAOIcppers($daoId: String!, $sorted: IcppersQuerySortedEnum!, $sortedType: IcppersQuerySortedTypeEnum!, $first: Int!, $offset: Int!) {
+query DAOIcppers($tokenChainId: String!, $daoId: String!, $sorted: IcppersQuerySortedEnum!, $sortedType: IcppersQuerySortedTypeEnum!, $first: Int!, $offset: Int!) {
   dao(id: $daoId) {
-    icppers(sorted: $sorted, sortedType: $sortedType, first: $first, offset: $offset) {
+    icppers(sorted: $sorted, sortedType: $sortedType, first: $first, offset: $offset, tokenChainId: $tokenChainId) {
       nodes {
         user {
           id
@@ -780,23 +795,34 @@ query DAOIcppers($daoId: String!, $sorted: IcppersQuerySortedEnum!, $sortedType:
         }
         jobCount
         size
-        income
+        incomeSum
+        incomes {
+          tokenChainId
+          tokenAddress
+          tokenSymbol
+          income
+        }
         joinTime
       }
       stat {
         icpperCount
         jobCount
         size
-        income
+        incomes {
+          tokenChainId
+          tokenAddress
+          tokenSymbol
+          income
+        }
       }
       total
     }
   }
 }
 
-query DAOJobs($daoId: String!, $sorted: JobsQuerySortedEnum!, $sortedType: JobsQuerySortedTypeEnum!, $first: Int!, $offset: Int!) {
+query DAOJobs($tokenChainId: String!, $daoId: String!, $sorted: JobsQuerySortedEnum!, $sortedType: JobsQuerySortedTypeEnum!, $first: Int!, $offset: Int!) {
   dao(id: $daoId) {
-    jobs(sorted: $sorted, sortedType: $sortedType, first: $first, offset: $offset) {
+    jobs(sorted: $sorted, sortedType: $sortedType, first: $first, offset: $offset, tokenChainId: $tokenChainId) {
       nodes {
         datum {
           id
@@ -818,7 +844,12 @@ query DAOJobs($daoId: String!, $sorted: JobsQuerySortedEnum!, $sortedType: JobsQ
         icpperCount
         jobCount
         size
-        income
+        incomes {
+          tokenChainId
+          tokenAddress
+          tokenSymbol
+          income
+        }
       }
       total
     }
@@ -834,12 +865,18 @@ query UserVotingCycle {
   }
 }
 
-query HomeStatsQuery {
+query HomeStatsQuery($tokenChainId: String) {
   stats {
     dao
     icpper
     size
-    income
+    incomes(tokenChainId: $tokenChainId) {
+      tokenChainId
+      tokenAddress
+      tokenSymbol
+      income
+    }
+    incomeSum(tokenChainId: $tokenChainId)
   }
 }
 
