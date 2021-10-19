@@ -95,6 +95,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
   daoId,
   lpPoolAddress,
   tokenContract,
+  tokenSymbol,
 }) => {
   const intl = useIntl();
   const { network, contract, account, chainId } = useModel('useWalletModel');
@@ -400,7 +401,8 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
           endTimestamp: mintBody.endTimestamp,
           tickLower: mintBody.tickLower,
           tickUpper: mintBody.tickUpper,
-          chainId: EthereumChainId[network].toString(),
+          chainId: EthereumChainId[network]?.toString() || '1',
+          tokenSymbol: tokenSymbol || '',
         },
       });
       console.log({ createTokenMintMutationResult });
@@ -409,6 +411,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
       setLoadingTransferComplete(false);
     }
   }, [
+    tokenSymbol,
     advancedOP,
     anchor,
     createTokenMintMutationResult,

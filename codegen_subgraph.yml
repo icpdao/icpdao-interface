@@ -1,0 +1,18 @@
+overwrite: true
+schema:
+  - https://api.thegraph.com/subgraphs/name/icpdao/v1-subgraph
+documents: "src/services/subgraph-v1/*.graphql"
+generates:
+  src/services/subgraph-v1/generated.ts:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
+    config:
+      defaultBaseOptions:
+        context:
+          service: "subgraph-v1"
+  src/services/subgraph-v1/graphql.schema.json:
+    plugins:
+      - "introspection"
+

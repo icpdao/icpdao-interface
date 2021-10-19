@@ -21,6 +21,30 @@ const customFetch = (uri: string, options: any) => {
   if (REACT_APP_ICPDAO_MOCK_URL) {
     return fetch(REACT_APP_ICPDAO_MOCK_URL, options);
   }
+  if (service === 'uniswap-v3') {
+    delete headers.authorization;
+    return fetch(`https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3`, {
+      ...options,
+      headers: {
+        ...headers,
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'cross-site',
+      },
+    });
+  }
+  if (service === 'subgraph-v1') {
+    delete headers.authorization;
+    return fetch(`https://api.thegraph.com/subgraphs/name/icpdao/v1-subgraph`, {
+      ...options,
+      headers: {
+        ...headers,
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'cross-site',
+      },
+    });
+  }
   return fetch(
     `${REACT_APP_ICPDAO_BACKEND_BASE_URL}/${REACT_APP_ICPDAO_BACKEND_VERSION}/${service}/graph`,
     options,

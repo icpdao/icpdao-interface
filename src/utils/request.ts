@@ -40,7 +40,10 @@ const request: RequestConfig = {
       ) {
         clearAuthorization();
         history.replace('/');
-        return resData;
+        return {
+          success: true,
+          data: {},
+        };
       }
       if (resData?.success === false && resData?.errorMessage) {
         return {

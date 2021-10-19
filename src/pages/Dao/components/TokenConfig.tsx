@@ -26,6 +26,7 @@ export type TokenConfigComponentsProps = {
   daoId?: string;
   ethDAOId?: string;
   tokenAddress?: string;
+  tokenSymbol?: string;
   lpPoolAddress?: string;
   tokenContract?: DAOTokenConnect;
   setTokenAddress?: (value: string) => void;
@@ -37,6 +38,7 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId, tokenSymbol, subType }
   const intl = useIntl();
   const { data, loading, error } = useDaoTokenConfigQuery({ variables: { daoId } });
   const [tokenAddress, setTokenAddress] = useState<string>();
+  const [currentTokenSymbol, setCurrentTokenSymbol] = useState<string>();
   const [lpPoolAddress, setLPPoolAddress] = useState<string>('');
   const [currentTab, setCurrentTab] = useState<string>(subType || 'create');
   const { contract, network, metamaskProvider, isConnected, event$ } = useModel('useWalletModel');
@@ -73,6 +75,7 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId, tokenSymbol, subType }
   useEffect(() => {
     if (!tokenContract) return;
     tokenContract.getToken().then((tokenInfo) => {
+      setCurrentTokenSymbol(tokenInfo.symbol);
       if (tokenSymbol === tokenInfo.symbol) return;
       updateDaoBaseInfo({
         variables: {
@@ -176,6 +179,7 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId, tokenSymbol, subType }
             {currentTab === 'mint' && (
               <TokenMint
                 tokenAddress={tokenAddress}
+                tokenSymbol={currentTokenSymbol}
                 setCurrentTab={goCurrentTab}
                 daoId={daoId}
                 lpPoolAddress={lpPoolAddress}

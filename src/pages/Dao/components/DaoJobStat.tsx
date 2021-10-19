@@ -15,6 +15,10 @@ import { getCurrentPage } from '@/utils/utils';
 import { FormattedMessage } from 'umi';
 import { UserOutlined } from '@ant-design/icons';
 import { history } from '@@/core/history';
+import { useModel } from '@@/plugin-model/useModel';
+import { useTokenPrice } from '@/pages/Dao/hooks/useTokenPrice';
+import IncomesPopover from '@/components/IncomesPopover';
+import { renderIncomes } from '@/utils/pageHelper';
 
 type DaoJobSatProps = {
   daoId: string;
@@ -29,12 +33,14 @@ function PickerWithType({ type, onChange }: any) {
 
 const DaoJobStat: React.FC<DaoJobSatProps> = ({ daoId, tokenSymbol }) => {
   const intl = useIntl();
+  const { chainId } = useModel('useWalletModel');
   const [queryVariable, setQueryVariable] = useState<DaoJobsQueryVariables>({
     daoId,
     sorted: JobsQuerySortedEnum.Size,
     sortedType: JobsQuerySortedTypeEnum.Asc,
     first: 10,
     offset: 0,
+    tokenChainId: chainId?.toString() || '1',
   });
   const [searchDateType, setSearchDateType] = useState<string>('date');
   const parseTime = useCallback(
@@ -60,9 +66,9 @@ const DaoJobStat: React.FC<DaoJobSatProps> = ({ daoId, tokenSymbol }) => {
     if (sorter && sorter.field && sorter.field.includes('size')) {
       sorted = JobsQuerySortedEnum.Size;
     }
-    if (sorter && sorter.field && sorter.field.includes('income')) {
-      sorted = JobsQuerySortedEnum.Income;
-    }
+    // if (sorter && sorter.field && sorter.field.includes('income')) {
+    //   sorted = JobsQuerySortedEnum.Income;
+    // }
     let sortedType: JobsQuerySortedTypeEnum = JobsQuerySortedTypeEnum.Asc;
     if (sorter && sorter.order === 'ascend') {
       sortedType = JobsQuerySortedTypeEnum.Asc;
@@ -79,6 +85,7 @@ const DaoJobStat: React.FC<DaoJobSatProps> = ({ daoId, tokenSymbol }) => {
     }));
   }, []);
   const { data, loading } = useDaoJobsQuery({ variables: queryVariable });
+  const { tokenPrice } = useTokenPrice(data?.dao?.jobs?.stat?.incomes || []);
 
   const columns = [
     {
@@ -118,9 +125,15 @@ const DaoJobStat: React.FC<DaoJobSatProps> = ({ daoId, tokenSymbol }) => {
     },
     {
       title: <FormattedMessage id="pages.dao.component.dao_job.table.head.income" />,
-      dataIndex: ['datum', 'income'],
-      key: 'income',
-      sorter: true,
+      key: 'incomes',
+      sorter: false,
+      render: (_: any, record: JobQuery) => (
+        <IncomesPopover
+          incomes={record.datum?.incomes || []}
+          chainId={chainId}
+          tokenPrice={tokenPrice}
+        />
+      ),
     },
   ];
   const statCardData = [
@@ -138,7 +151,7 @@ const DaoJobStat: React.FC<DaoJobSatProps> = ({ daoId, tokenSymbol }) => {
     },
     {
       title: tokenSymbol || intl.formatMessage({ id: 'component.card.stat.income' }),
-      number: parseFloat(data?.dao?.jobs?.stat?.income || '0').toFixed(2) || 0,
+      number: renderIncomes(data?.dao?.jobs?.stat?.incomes || [], tokenPrice),
     },
   ];
   return (

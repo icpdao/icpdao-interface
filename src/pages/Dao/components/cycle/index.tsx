@@ -10,6 +10,9 @@ import styles from './index.less';
 import type { CycleSchema } from '@/services/dao/generated';
 import { useCycleStatDataQuery } from '@/services/dao/generated';
 import { PageLoading } from '@ant-design/pro-layout';
+import { useModel } from '@@/plugin-model/useModel';
+import { renderIncomes } from '@/utils/pageHelper';
+import { useTokenPrice } from '@/pages/Dao/hooks/useTokenPrice';
 
 const { TabPane } = Tabs;
 
@@ -31,8 +34,12 @@ const DaoCycleIndex: React.FC<DaoCycleProps> = ({
   tokenSymbol,
 }) => {
   const intl = useIntl();
+  const { chainId } = useModel('useWalletModel');
   const [currentTab, setCurrentTab] = useState<string>(activeTab || 'icpper');
-  const { data, loading, error } = useCycleStatDataQuery({ variables: { cycleId } });
+  const { data, loading, error } = useCycleStatDataQuery({
+    variables: { cycleId, tokenChainId: chainId?.toString() || '1' },
+  });
+  const { tokenPrice } = useTokenPrice(data?.cycle?.stat?.incomes || []);
 
   if (loading || error) {
     return <PageLoading />;
@@ -53,7 +60,7 @@ const DaoCycleIndex: React.FC<DaoCycleProps> = ({
     },
     {
       title: tokenSymbol || intl.formatMessage({ id: 'component.card.stat.income' }),
-      number: parseFloat(data?.cycle?.stat?.income || '0').toFixed(2) || 0,
+      number: renderIncomes(data?.cycle?.stat?.incomes || [], tokenPrice),
     },
   ];
 

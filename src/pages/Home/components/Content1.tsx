@@ -31,10 +31,11 @@ const statisticValueFormat = (title: string, value: string | number, unit: strin
 
 type HomeProps = {
   statsData: HomeStats | undefined | null;
+  incomePrices: string;
   loading: boolean;
 };
 
-const Content1: React.FC<HomeProps> = ({ statsData, loading }) => {
+const Content1: React.FC<HomeProps> = ({ statsData, loading, incomePrices }) => {
   const intl = useIntl();
   const [bannerRef, setBannerRef] = useState<any>(null);
   const [currentBanner, setCurrentBanner] = useState<number>(0);
@@ -66,14 +67,23 @@ const Content1: React.FC<HomeProps> = ({ statsData, loading }) => {
             <Col xs={12} lg={6}>
               {statisticValueFormat(
                 intl.formatMessage({ id: 'component.card.stat.income' }),
-                parseFloat(statsData?.income || '0').toFixed(0) || 0,
+                `${parseFloat(statsData?.incomeSum || '0').toFixed(0) || 0}${
+                  incomePrices && incomePrices !== '0' ? ` $${incomePrices}` : ''
+                }`,
               )}
             </Col>
           </Row>
         </Col>
       </Row>
     );
-  }, [intl, statsData?.dao, statsData?.icpper, statsData?.income, statsData?.size]);
+  }, [
+    incomePrices,
+    intl,
+    statsData?.dao,
+    statsData?.icpper,
+    statsData?.incomeSum,
+    statsData?.size,
+  ]);
   return (
     <div className={styles.ContentTwo}>
       <Modal
