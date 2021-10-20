@@ -685,8 +685,8 @@ query UserCycleIcpperStatList($daoName: String!, $userName: String!, $first: Int
   }
 }
 
-query CyclesByTokenUnreleasedList($daoId: String!, $lastTimestamp: Int!) {
-  cyclesByTokenUnreleased(daoId: $daoId, lastTimestamp: $lastTimestamp) {
+query CyclesByTokenUnreleasedList($daoId: String!, $lastTimestamp: Int!, $tokenChainId: String!, $tokenAddress: String!) {
+  cyclesByTokenUnreleased(daoId: $daoId, lastTimestamp: $lastTimestamp, tokenChainId: $tokenChainId, tokenAddress: $tokenAddress) {
     nodes {
       datum {
         id
