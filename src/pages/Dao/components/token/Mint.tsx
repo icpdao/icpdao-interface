@@ -321,15 +321,20 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
   ]);
 
   useEffect(() => {
-    if (!tokenContract || !daoId) return;
+    if (!tokenContract || !daoId || !tokenAddress) return;
     tokenContract.getMintAnchor().then((anc) => {
       console.log(anc);
       setAnchor(anc);
       queryCyclesByTokenUnreleasedList({
-        variables: { daoId, lastTimestamp: anc.lastTimestamp.toString() },
+        variables: {
+          daoId,
+          lastTimestamp: anc.lastTimestamp.toString(),
+          tokenChainId: chainId?.toString() || '1',
+          tokenAddress,
+        },
       });
     });
-  }, [daoId, queryCyclesByTokenUnreleasedList, tokenContract]);
+  }, [chainId, daoId, queryCyclesByTokenUnreleasedList, tokenAddress, tokenContract]);
 
   useEffect(() => {
     const unreleasedCycle: Record<string, CycleQuery> = {};
