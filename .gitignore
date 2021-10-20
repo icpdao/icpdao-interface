@@ -41,5 +41,5 @@ build
 
 .env
 
-src/services/dao/generated.ts
-src/services/dao/graphql.schema.json
+src/services/**/generated.ts
+src/services/**/graphql.schema.json

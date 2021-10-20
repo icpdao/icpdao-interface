@@ -1,0 +1,5 @@
+{
+  "name": "Subgraph GraphQL Schema",
+  "schemaPath": "graphql.schema.json",
+  "extensions": {}
+}

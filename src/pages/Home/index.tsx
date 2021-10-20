@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import GlobalModal from '@/components/Modal';
 import { FormattedMessage, history, useIntl } from 'umi';
 import styles from './index.less';
@@ -13,6 +13,7 @@ import Content3 from './components/Content3';
 import Content4 from './components/Content4';
 import Footer from '@/components/Footer';
 import { useHomeStatsQueryQuery } from '@/services/dao/generated';
+import { useUniswapV3TokenListQuery } from '@/services/uniswap-v3/generated';
 
 export default (): React.ReactNode => {
   const { profile } = getUserInfo();
@@ -29,7 +30,48 @@ export default (): React.ReactNode => {
 
   const [mentorWelcomeVisible, setMentorWelcomeVisible] = useState(defaultWelcome);
   const { refresh } = useModel('@@initialState');
-  const { data, loading } = useHomeStatsQueryQuery();
+  const { chainId } = useModel('useWalletModel');
+  const { data, loading } = useHomeStatsQueryQuery({
+    variables: { tokenChainId: chainId?.toString() || '1' },
+  });
+
+  const queryTokenIds = useMemo(() => {
+    const cid = chainId?.toString() || '1';
+    if (cid !== '1') return [];
+    return (
+      data?.stats?.incomes
+        ?.filter((ic) => ic?.tokenChainId === cid)
+        .map((ic) => {
+          return ic?.tokenAddress || '';
+        })
+        .filter((ic) => !!ic) || []
+    );
+  }, [chainId, data?.stats?.incomes]);
+
+  console.log({ queryTokenIds });
+
+  const { data: uniswapV3Tokens } = useUniswapV3TokenListQuery({
+    variables: { tokenIds: queryTokenIds },
+  });
+
+  const incomePrices = useMemo(() => {
+    const cid = chainId?.toString() || '1';
+    let prices = 0;
+    const uniswapPrice: Record<string, number> = {};
+    uniswapV3Tokens?.tokens.forEach((tk) => {
+      uniswapPrice[tk.id] = tk.volumeUSD / tk.volume;
+    });
+    console.log({ uniswapPrice });
+    data?.stats?.incomes
+      ?.filter((ic) => ic?.tokenChainId === cid)
+      .forEach((ic) => {
+        if (!ic?.income || !ic?.tokenAddress || !uniswapPrice[ic.tokenAddress]) return;
+        prices += uniswapPrice[ic.tokenAddress] * ic.income;
+      });
+    return prices.toFixed(2);
+  }, [chainId, data?.stats?.incomes, uniswapV3Tokens?.tokens]);
+
+  console.log({ incomePrices });
 
   const handleAccept = async () => {
     setMentorAcceptLoading(true);
@@ -131,7 +173,7 @@ export default (): React.ReactNode => {
   return (
     <>
       <Content0 />
-      <Content1 statsData={data?.stats} loading={loading} />
+      <Content1 statsData={data?.stats} incomePrices={incomePrices} loading={loading} />
       <Content2 />
       <Content3 />
       <Content4 />

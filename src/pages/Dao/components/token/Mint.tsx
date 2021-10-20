@@ -95,6 +95,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
   daoId,
   lpPoolAddress,
   tokenContract,
+  tokenSymbol,
 }) => {
   const intl = useIntl();
   const { network, contract, account, chainId } = useModel('useWalletModel');
@@ -320,15 +321,20 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
   ]);
 
   useEffect(() => {
-    if (!tokenContract || !daoId) return;
+    if (!tokenContract || !daoId || !tokenAddress) return;
     tokenContract.getMintAnchor().then((anc) => {
       console.log(anc);
       setAnchor(anc);
       queryCyclesByTokenUnreleasedList({
-        variables: { daoId, lastTimestamp: anc.lastTimestamp.toString() },
+        variables: {
+          daoId,
+          lastTimestamp: anc.lastTimestamp.toString(),
+          tokenChainId: chainId?.toString() || '1',
+          tokenAddress,
+        },
       });
     });
-  }, [daoId, queryCyclesByTokenUnreleasedList, tokenContract]);
+  }, [chainId, daoId, queryCyclesByTokenUnreleasedList, tokenAddress, tokenContract]);
 
   useEffect(() => {
     const unreleasedCycle: Record<string, CycleQuery> = {};
@@ -400,7 +406,8 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
           endTimestamp: mintBody.endTimestamp,
           tickLower: mintBody.tickLower,
           tickUpper: mintBody.tickUpper,
-          chainId: EthereumChainId[network].toString(),
+          chainId: EthereumChainId[network]?.toString() || '1',
+          tokenSymbol: tokenSymbol || '',
         },
       });
       console.log({ createTokenMintMutationResult });
@@ -409,6 +416,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
       setLoadingTransferComplete(false);
     }
   }, [
+    tokenSymbol,
     advancedOP,
     anchor,
     createTokenMintMutationResult,

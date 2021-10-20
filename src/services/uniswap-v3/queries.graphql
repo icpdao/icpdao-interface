@@ -1,0 +1,19 @@
+query UniswapV3TokenList($tokenIds: [ID!]) {
+  tokens(
+    where: {id_in: $tokenIds}
+    orderBy: totalValueLockedUSD
+    orderDirection: desc
+  ) {
+    id
+    symbol
+    name
+    derivedETH
+    volumeUSD
+    volume
+    txCount
+    totalValueLocked
+    feesUSD
+    totalValueLockedUSD
+    __typename
+  }
+}

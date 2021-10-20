@@ -1,0 +1,14 @@
+query SubgraphV1TokenListByDAOId($tokenIds: [ID!]) {
+  tokens(
+    where: {id_in: $tokenIds}
+    orderBy: createdAtTimestamp
+    orderDirection: desc
+  ) {
+    id
+    symbol
+    name
+    owner
+    createdAtBlockNumber
+    createdAtTimestamp
+  }
+}

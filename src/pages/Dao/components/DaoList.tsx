@@ -14,6 +14,10 @@ import { useAccess } from '@@/plugin-access/access';
 import { getGithubOAuthUrl } from '@/components/RightHeader/AvatarDropdown';
 import AccessButton from '@/components/AccessButton';
 import { AccessEnum } from '@/access';
+import { useModel } from '@@/plugin-model/useModel';
+import { useUniswapV3TokenListQuery } from '@/services/uniswap-v3/generated';
+import { renderIncomes } from '@/utils/pageHelper';
+import IncomesPopover from '@/components/IncomesPopover';
 
 const { Search } = Input;
 
@@ -54,7 +58,11 @@ export type DaoListProps = {
   menuList: SelectDropdownMenu[];
 };
 
-const columns = (renderAction: (record: any) => ReactNode) => {
+const columns = (
+  renderAction: (record: any) => ReactNode,
+  chainId: number,
+  tokenPrice: Record<string, number>,
+) => {
   return [
     {
       title: <FormattedMessage id="pages.dao.component.dao_list.table.head.dao_name" />,
@@ -99,6 +107,9 @@ const columns = (renderAction: (record: any) => ReactNode) => {
       dataIndex: 'token',
       key: 'token',
       sorter: true,
+      render: (_: any, record: any) => (
+        <IncomesPopover incomes={record.token || []} chainId={chainId} tokenPrice={tokenPrice} />
+      ),
     },
     {
       title: '',
@@ -138,8 +149,10 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
     pageSize,
   });
 
+  const { chainId } = useModel('useWalletModel');
+
   const daoQueryParams = useMemo<DaoQueryParams>(() => {
-    const tmp: any = { ...daoTableParams };
+    const tmp: any = { tokenChainId: chainId || '1', ...daoTableParams };
     if (daoTableParams.current && daoTableParams.pageSize) {
       tmp.first = daoTableParams.pageSize;
       tmp.offset = daoTableParams.pageSize * (daoTableParams.current - 1);
@@ -147,7 +160,7 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
       delete tmp.pageSize;
     }
     return tmp;
-  }, [daoTableParams]);
+  }, [chainId, daoTableParams]);
 
   const onMenuClick = useCallback((e: any) => {
     setDaoTableParams((oldParams) => {
@@ -209,6 +222,27 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
     variables: daoQueryParams as any,
     fetchPolicy: 'no-cache',
   });
+
+  const tokens = useMemo(() => {
+    const ts: string[] = [];
+    data?.daos?.stat?.incomes?.forEach((ins) => {
+      if (ins?.tokenAddress) ts.push(ins.tokenAddress);
+    });
+    return ts;
+  }, [data?.daos?.stat?.incomes]);
+
+  const { data: uniswapV3TokenData } = useUniswapV3TokenListQuery({
+    variables: { tokenIds: tokens },
+  });
+
+  const tokenPrice: Record<string, number> = useMemo(() => {
+    const obj = {};
+    uniswapV3TokenData?.tokens.forEach((ts) => {
+      obj[ts.id] = ts.volumeUSD / ts.volume;
+    });
+    return obj;
+  }, [uniswapV3TokenData?.tokens]);
+
   const [followDao] = useFollowDaoMutation();
 
   const [daoFollowedStatus, setDaoFollowedStatus] = useState<Record<string, boolean>>({});
@@ -290,7 +324,7 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
         following: item?.stat?.following,
         job: item?.stat?.job,
         size: parseFloat(item?.stat?.size || '0').toFixed(1),
-        token: parseFloat(item?.stat?.token || '0').toFixed(2),
+        token: item?.stat?.incomes,
         isFollowing: item?.isFollowing,
         isOwner: item?.isOwner,
       };
@@ -298,7 +332,7 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
   }, [data]);
 
   const statCardData: any[] = useMemo(() => {
-    if (!data?.daos?.dao) {
+    if (!data?.daos?.stat) {
       return [
         {
           title: intl.formatMessage({ id: 'pages.dao.component.dao_list.stat.card.dao' }),
@@ -333,10 +367,10 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
       },
       {
         title: intl.formatMessage({ id: 'pages.dao.component.dao_list.stat.card.income' }),
-        number: parseFloat(data.daos.stat?.income || '0').toFixed(2),
+        number: renderIncomes(data.daos.stat?.incomes || [], tokenPrice),
       },
     ];
-  }, [data, intl]);
+  }, [data?.daos?.stat, data?.daos?.total, intl, tokenPrice]);
 
   return (
     <>
@@ -362,7 +396,7 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
       </div>
 
       <Table
-        columns={columns(renderFollowColumn)}
+        columns={columns(renderFollowColumn, chainId || 1, tokenPrice)}
         loading={loading}
         rowKey="name"
         dataSource={daoData}
