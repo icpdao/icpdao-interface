@@ -1,330 +1,104 @@
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
 import styles from '../index.less';
 import { useIntl } from 'umi';
-import QueueAnim from 'rc-queue-anim';
-import ScrollAnim from 'rc-scroll-anim';
-import BannerAnim, { Element } from 'rc-banner-anim';
-import TweenOne from 'rc-tween-one';
 import { Row, Col } from 'antd';
-import homeImage60 from '../../../assets/image/home-image-6-0.png';
-import homeImage61 from '../../../assets/image/home-image-6-1.png';
-import homeImage62 from '../../../assets/image/home-image-6-2.png';
-import homeImage63 from '../../../assets/image/home-image-6-3.png';
-import homeImage64 from '../../../assets/image/home-image-6-4.png';
-import homeImage65 from '../../../assets/image/home-image-6-5.png';
-import homeImage66 from '../../../assets/image/home-image-6-6.png';
-import homeImage67 from '../../../assets/image/home-image-6-7.png';
-import homeImage68 from '../../../assets/image/home-image-6-8.png';
-import Texty from 'rc-texty';
+import type { HomeStats } from '@/services/dao/generated';
+import TweenOne from 'rc-tween-one';
+import { OverPack } from 'rc-scroll-anim';
 
-const { BgElement } = Element;
+const Children = require('rc-tween-one/lib/plugin/ChildrenPlugin');
 
-const Content2: React.FC = () => {
-  const intl = useIntl();
-  const [bannerRef, setBannerRef] = useState<any>(null);
-  const [currentBanner, setCurrentBanner] = useState<number>(0);
+TweenOne.plugins.push(Children);
 
+const cardValueShort = (value: number) => {
+  // if (value >= 1000000) return {value: value / 10000, suffix: 'M'}
+  if (value >= 10000) return { value: value / 1000, suffix: 'K' };
+  return { value, suffix: '' };
+};
+
+const statisticValueFormat = (
+  title: string,
+  value: number,
+  unit: string = '',
+  formatMoney: boolean = false,
+) => {
+  const { value: shortValue, suffix } = cardValueShort(value);
+  const animationArgs: any = {
+    Children: { value: shortValue, floatLength: 0 },
+    duration: 1000,
+  };
+  if (formatMoney) {
+    animationArgs.Children.formatMoney = { thousand: ',', decimal: '.' };
+    animationArgs.Children.floatLength = 2;
+  }
   return (
-    <div className={styles.ContentThree}>
-      <ScrollAnim.OverPack id="works">
-        <Texty
-          type={'top'}
-          mode={'sync'}
-          className={styles.P5}
-          split={(v) => v.split(' ').map((s) => `${s} `)}
-        >
-          {intl.formatMessage({ id: 'pages.home.p5' })}
-        </Texty>
-        <QueueAnim delay={300} interval={600} type={'left'} key="worksQueueAnim">
-          <div key={'worksBanner'}>
-            <BannerAnim
-              autoPlay
-              type={'across'}
-              prefixCls={styles.P6}
-              ref={setBannerRef}
-              onChange={(_, current) => {
-                setCurrentBanner(current);
-              }}
-            >
-              <Element prefixCls={styles.P6Content} key="0">
-                <BgElement key="wg0" className={styles.P6ContentBg} />
-                <TweenOne animation={{ y: 30, opacity: 0, type: 'from' }}>
-                  <Row className={styles.P6ContentLayout} justify={'center'}>
-                    <Col xs={20} md={16} xxl={12}>
-                      <Row justify={'space-between'}>
-                        <Col xs={0} lg={14} className={styles.P6ContentLeft}>
-                          <img
-                            alt={'homeImage60'}
-                            src={homeImage60}
-                            className={styles.P6ContentImage0}
-                          />
-                          <img
-                            alt={'homeImage61'}
-                            src={homeImage61}
-                            className={styles.P6ContentImage1}
-                          />
-                          <img
-                            alt={'homeImage62'}
-                            src={homeImage62}
-                            className={styles.P6ContentImage2}
-                          />
-                        </Col>
-                        <Col xs={24} lg={10} className={styles.P6ContentRight}>
-                          <div className={styles.P6ContentRightTitle}>
-                            {intl.formatMessage({ id: 'pages.home.p6.0.title' })}
-                          </div>
-                          <div className={styles.P6ContentRightLine} />
-                          <div className={styles.P6ContentRightDesc}>
-                            {intl.formatMessage({ id: 'pages.home.p6.0.desc' })}
-                          </div>
-                        </Col>
-                      </Row>
-                    </Col>
-                  </Row>
-                </TweenOne>
-              </Element>
-              <Element prefixCls={styles.P6Content} key="1">
-                <BgElement key="wg1" className={styles.P6ContentBg} />
-                <TweenOne animation={{ y: 30, opacity: 0, type: 'from' }}>
-                  <Row className={styles.P6ContentLayout} justify={'center'}>
-                    <Col xs={20} md={16} xxl={12}>
-                      <Row justify={'space-between'}>
-                        <Col xs={0} lg={14} className={styles.P6ContentLeft}>
-                          <img
-                            alt={'homeImage63'}
-                            src={homeImage63}
-                            className={styles.P6ContentImage3}
-                          />
-                        </Col>
-                        <Col xs={24} lg={10} className={styles.P6ContentRight}>
-                          <div className={styles.P6ContentRightTitle}>
-                            {intl.formatMessage({ id: 'pages.home.p6.1.title' })}
-                          </div>
-                          <div className={styles.P6ContentRightLine} />
-                          <div className={styles.P6ContentRightDesc}>
-                            {intl.formatMessage({ id: 'pages.home.p6.1.desc' })}
-                          </div>
-                        </Col>
-                      </Row>
-                    </Col>
-                  </Row>
-                </TweenOne>
-              </Element>
-              <Element prefixCls={styles.P6Content} key="2">
-                <BgElement key="wg2" className={styles.P6ContentBg} />
-                <TweenOne animation={{ y: 30, opacity: 0, type: 'from' }}>
-                  <Row className={styles.P6ContentLayout} justify={'center'}>
-                    <Col xs={20} md={16} xxl={12}>
-                      <Row justify={'space-between'}>
-                        <Col xs={0} lg={14} className={styles.P6ContentLeft}>
-                          <img
-                            alt={'homeImage64'}
-                            src={homeImage64}
-                            className={styles.P6ContentImage4}
-                          />
-                          <img
-                            alt={'homeImage65'}
-                            src={homeImage65}
-                            className={styles.P6ContentImage5}
-                          />
-                        </Col>
-                        <Col xs={24} lg={10} className={styles.P6ContentRight}>
-                          <div className={styles.P6ContentRightTitle}>
-                            {intl.formatMessage({ id: 'pages.home.p6.2.title' })}
-                          </div>
-                          <div className={styles.P6ContentRightLine} />
-                          <div className={styles.P6ContentRightDesc}>
-                            {intl.formatMessage({ id: 'pages.home.p6.2.desc' })}
-                          </div>
-                        </Col>
-                      </Row>
-                    </Col>
-                  </Row>
-                </TweenOne>
-              </Element>
-              <Element prefixCls={styles.P6Content} key="3">
-                <BgElement key="wg3" className={styles.P6ContentBg} />
-                <TweenOne animation={{ y: 30, opacity: 0, type: 'from' }}>
-                  <Row className={styles.P6ContentLayout} justify={'center'}>
-                    <Col xs={20} md={16} xxl={12}>
-                      <Row justify={'space-between'}>
-                        <Col xs={0} lg={14} className={styles.P6ContentLeft}>
-                          <img
-                            alt={'homeImage66'}
-                            src={homeImage66}
-                            className={styles.P6ContentImage6}
-                          />
-                        </Col>
-                        <Col xs={24} lg={10} className={styles.P6ContentRight}>
-                          <div className={styles.P6ContentRightTitle}>
-                            {intl.formatMessage({ id: 'pages.home.p6.3.title' })}
-                          </div>
-                          <div className={styles.P6ContentRightLine} />
-                          <div className={styles.P6ContentRightDesc}>
-                            {intl.formatMessage({ id: 'pages.home.p6.3.desc' })}
-                          </div>
-                        </Col>
-                      </Row>
-                    </Col>
-                  </Row>
-                </TweenOne>
-              </Element>
-              <Element prefixCls={styles.P6Content} key="4">
-                <BgElement key="wg4" className={styles.P6ContentBg} />
-                <TweenOne animation={{ y: 30, opacity: 0, type: 'from' }}>
-                  <Row className={styles.P6ContentLayout} justify={'center'}>
-                    <Col xs={20} md={16} xxl={12}>
-                      <Row justify={'space-between'}>
-                        <Col xs={0} lg={14} className={styles.P6ContentLeft}>
-                          <img
-                            alt={'homeImage67'}
-                            src={homeImage67}
-                            className={styles.P6ContentImage7}
-                          />
-                        </Col>
-                        <Col xs={24} lg={10} className={styles.P6ContentRight}>
-                          <div className={styles.P6ContentRightTitle}>
-                            {intl.formatMessage({ id: 'pages.home.p6.4.title' })}
-                          </div>
-                          <div className={styles.P6ContentRightLine} />
-                          <div className={styles.P6ContentRightDesc}>
-                            {intl.formatMessage({ id: 'pages.home.p6.4.desc' })}
-                          </div>
-                        </Col>
-                      </Row>
-                    </Col>
-                  </Row>
-                </TweenOne>
-              </Element>
-              <Element prefixCls={styles.P6Content} key="5">
-                <BgElement key="wg5" className={styles.P6ContentBg} />
-                <TweenOne animation={{ y: 30, opacity: 0, type: 'from' }}>
-                  <Row className={styles.P6ContentLayout} justify={'center'}>
-                    <Col xs={20} md={16} xxl={12}>
-                      <Row justify={'space-between'}>
-                        <Col xs={0} lg={14} className={styles.P6ContentLeft}>
-                          <img
-                            alt={'homeImage68'}
-                            src={homeImage68}
-                            className={styles.P6ContentImage8}
-                          />
-                        </Col>
-                        <Col xs={24} lg={10} className={styles.P6ContentRight}>
-                          <div className={styles.P6ContentRightTitle}>
-                            {intl.formatMessage({ id: 'pages.home.p6.5.title' })}
-                          </div>
-                          <div className={styles.P6ContentRightLine} />
-                          <div className={styles.P6ContentRightDesc}>
-                            {intl.formatMessage({ id: 'pages.home.p6.5.desc' })}
-                          </div>
-                        </Col>
-                      </Row>
-                    </Col>
-                  </Row>
-                </TweenOne>
-              </Element>
-            </BannerAnim>
-          </div>
-          <Row className={styles.P7} key="worksBannerButton" justify={'center'} gutter={8}>
-            <Col span={16}>
-              <Row justify={'space-between'}>
-                <Col>
-                  <div
-                    className={`${styles.P7Button} ${currentBanner === 0 && styles.P7ButtonHover}`}
-                    onMouseEnter={() => {
-                      bannerRef?.slickGoTo(0);
-                      setCurrentBanner(0);
-                      (TweenOne as any).ticker.clear(bannerRef?.autoPlayId);
-                    }}
-                    onMouseLeave={() => {
-                      bannerRef?.autoPlay();
-                    }}
-                  >
-                    <div>{intl.formatMessage({ id: 'pages.home.p7.0' })}</div>
-                  </div>
-                </Col>
-                <Col>
-                  <div
-                    className={`${styles.P7Button} ${currentBanner === 1 && styles.P7ButtonHover}`}
-                    onMouseEnter={() => {
-                      bannerRef?.slickGoTo(1);
-                      setCurrentBanner(1);
-                      (TweenOne as any).ticker.clear(bannerRef?.autoPlayId);
-                    }}
-                    onMouseLeave={() => {
-                      bannerRef?.autoPlay();
-                    }}
-                  >
-                    <div>{intl.formatMessage({ id: 'pages.home.p7.1' })}</div>
-                  </div>
-                </Col>
-                <Col>
-                  <div
-                    className={`${styles.P7Button} ${currentBanner === 2 && styles.P7ButtonHover}`}
-                    onMouseEnter={() => {
-                      bannerRef?.slickGoTo(2);
-                      setCurrentBanner(2);
-                      (TweenOne as any).ticker.clear(bannerRef?.autoPlayId);
-                    }}
-                    onMouseLeave={() => {
-                      bannerRef?.autoPlay();
-                    }}
-                  >
-                    <div>{intl.formatMessage({ id: 'pages.home.p7.2' })}</div>
-                  </div>
-                </Col>
-                <Col>
-                  <div
-                    className={`${styles.P7Button} ${currentBanner === 3 && styles.P7ButtonHover}`}
-                    onMouseEnter={() => {
-                      bannerRef?.slickGoTo(3);
-                      setCurrentBanner(3);
-                      (TweenOne as any).ticker.clear(bannerRef?.autoPlayId);
-                    }}
-                    onMouseLeave={() => {
-                      bannerRef?.autoPlay();
-                    }}
-                  >
-                    <div>{intl.formatMessage({ id: 'pages.home.p7.3' })}</div>
-                  </div>
-                </Col>
-                <Col>
-                  <div
-                    className={`${styles.P7Button} ${currentBanner === 4 && styles.P7ButtonHover}`}
-                    onMouseEnter={() => {
-                      bannerRef?.slickGoTo(4);
-                      setCurrentBanner(4);
-                      (TweenOne as any).ticker.clear(bannerRef?.autoPlayId);
-                    }}
-                    onMouseLeave={() => {
-                      bannerRef?.autoPlay();
-                    }}
-                  >
-                    <div>{intl.formatMessage({ id: 'pages.home.p7.4' })}</div>
-                  </div>
-                </Col>
-                <Col>
-                  <div
-                    className={`${styles.P7Button} ${currentBanner === 5 && styles.P7ButtonHover}`}
-                    onMouseEnter={() => {
-                      bannerRef?.slickGoTo(5);
-                      setCurrentBanner(5);
-                      (TweenOne as any).ticker.clear(bannerRef?.autoPlayId);
-                    }}
-                    onMouseLeave={() => {
-                      bannerRef?.autoPlay();
-                    }}
-                  >
-                    <div>{intl.formatMessage({ id: 'pages.home.p7.5' })}</div>
-                  </div>
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-        </QueueAnim>
-      </ScrollAnim.OverPack>
+    <div key={title}>
+      <div className={styles.P2StatValue} key={`${title}Number`}>
+        <div>{unit}</div>
+        <TweenOne animation={animationArgs} key={`${title}Value`} style={{ whiteSpace: 'nowrap' }}>
+          0
+        </TweenOne>
+        {!!suffix && (
+          <>
+            <div>{suffix}</div>
+            <span className={styles.P2StatSuffix}>+</span>
+          </>
+        )}
+      </div>
+      <div className={styles.P2StatTitle} key={`${title}Title`}>
+        {title}
+      </div>
     </div>
   );
+};
+
+type HomeProps = {
+  statsData: HomeStats | undefined | null;
+  incomePrices: number;
+};
+
+const Content2: React.FC<HomeProps> = ({ statsData, incomePrices }) => {
+  const intl = useIntl();
+
+  const statCards = useMemo(() => {
+    return (
+      <OverPack>
+        <Row className={styles.P2} justify={'center'} key={'statCards'}>
+          <Col span={16} key={'cardWidth'}>
+            <Row gutter={16} key={'cardContent'}>
+              <Col xs={24} lg={6} key={'card1'}>
+                {statisticValueFormat(
+                  intl.formatMessage({ id: 'component.card.stat.dao' }),
+                  statsData?.dao || 0,
+                )}
+              </Col>
+              <Col xs={24} lg={6} key={'card2'}>
+                {statisticValueFormat(
+                  intl.formatMessage({ id: 'component.card.stat.icpper' }),
+                  statsData?.icpper || 0,
+                )}
+              </Col>
+              <Col xs={24} lg={6} key={'card3'}>
+                {statisticValueFormat(
+                  intl.formatMessage({ id: 'component.card.stat.size' }),
+                  parseFloat(statsData?.size || '0') || 0,
+                )}
+              </Col>
+              <Col xs={24} lg={6} key={'card4'}>
+                {statisticValueFormat(
+                  intl.formatMessage({ id: 'component.card.stat.income' }),
+                  incomePrices || 0,
+                  '$',
+                  true,
+                )}
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+      </OverPack>
+    );
+  }, [incomePrices, intl, statsData?.dao, statsData?.icpper, statsData?.size]);
+  return <div className={styles.ContentTwo}>{statCards}</div>;
 };
 
 export default Content2;

@@ -5,6 +5,7 @@ import type { RequestConfig, RunTimeLayoutConfig } from 'umi';
 import { history } from 'umi';
 import RightHeader from '@/components/RightHeader';
 import LeftHeader from '@/components/LeftHeader';
+import HeaderContent from '@/components/HeaderContent';
 import Footer from '@/components/Footer';
 import { getUserProfile } from './services/icpdao-interface/user';
 import requestConfig from './utils/request';
@@ -79,6 +80,7 @@ export function rootContainer(container: any) {
 
 export const layout: RunTimeLayoutConfig = ({ initialState }) => {
   return {
+    headerContentRender: () => <HeaderContent />,
     rightContentRender: () => <RightHeader />,
     headerTitleRender: () => <LeftHeader />,
     disableContentMargin: false,

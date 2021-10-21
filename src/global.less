@@ -25,6 +25,18 @@ body,
 
   .ant-layout-footer {
     background: transparent !important;
+    box-shadow: @shadow-2 !important;
+  }
+
+  .ant-pro-global-footer {
+    margin-bottom: unset !important;
+  }
+
+  .ant-pro-global-footer-copyright {
+    height: 64px;
+    padding-top: 21px;
+    color: @text-color;
+    //font-size: 1.125rem;
   }
 
   .ant-layout-header {
@@ -37,7 +49,8 @@ body,
 
   .ant-pro-global-header {
     background: var(--header-background-color) !important;
-    box-shadow: unset !important;
+    //box-shadow: unset !important;
+    //box-shadow: 0px -5px 12px 0px rgba(0, 0, 0, 0.09);
   }
 
   .ant-pro-global-header-collapsed-button {
@@ -54,6 +67,10 @@ body,
 
   .ant-modal-close {
     color: var(--modal-close-button-color) !important;
+  }
+
+  .ant-modal-close-x {
+    font-size: 1.5rem;
   }
 
   .ant-modal-footer {

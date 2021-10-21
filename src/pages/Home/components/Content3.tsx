@@ -5,7 +5,7 @@ import { HeatmapLayer, LineLayer, MapboxScene, PointLayer, Marker } from '@antv/
 import geoData from '../../../assets/json/geo-data.json';
 import mockData from '../../../assets/json/mock-home-data.json';
 import gridData from '../../../assets/json/grid-data.json';
-import { Avatar } from 'antd';
+import { Avatar, Col, Row } from 'antd';
 
 const joinMockData = (geodata: any, mockdata: any) => {
   const mockDataObj: any = {};
@@ -50,9 +50,12 @@ const Content3: React.FC = () => {
 
   return (
     <div className={styles.ContentFour}>
-      <div key={'usersTitle'} className={styles.P8}>
-        <div dangerouslySetInnerHTML={{ __html: intl.formatMessage({ id: 'pages.home.p8' }) }} />
-      </div>
+      <Row key={'usersTitle'} className={styles.P8} justify={'center'}>
+        <Col
+          span={16}
+          dangerouslySetInnerHTML={{ __html: intl.formatMessage({ id: 'pages.home.p8' }) }}
+        />
+      </Row>
       <div key={'worksBanner'} className={styles.P9}>
         <MapboxScene
           option={{ logoVisible: false }}

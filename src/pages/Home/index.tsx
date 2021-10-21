@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import GlobalModal from '@/components/Modal';
 import { FormattedMessage, history, useIntl } from 'umi';
 import styles from './index.less';
@@ -7,31 +7,25 @@ import { acceptIcpperships } from '@/services/icpdao-interface/icpperships';
 import { useModel } from '@@/plugin-model/useModel';
 import GlobalTooltip from '@/components/Tooltip';
 import Content0 from './components/Content0';
-import Content1 from './components/Content1';
 import Content2 from './components/Content2';
+import Content1 from './components/Content1';
 import Content3 from './components/Content3';
-import Content4 from './components/Content4';
 import Footer from '@/components/Footer';
 import { useHomeStatsQueryQuery } from '@/services/dao/generated';
 import { useUniswapV3TokenListQuery } from '@/services/uniswap-v3/generated';
 
 export default (): React.ReactNode => {
   const { profile } = getUserInfo();
-  let defaultWelcome = false;
-  let welcome: { mentor: any; id: string } = { mentor: {}, id: '' };
-  if (profile && profile.icppership && profile.icppership.progress === 0) {
-    welcome = profile.icppership;
-    defaultWelcome = true;
-  }
 
   const intl = useIntl();
 
   const [mentorAcceptLoading, setMentorAcceptLoading] = useState(false);
-
-  const [mentorWelcomeVisible, setMentorWelcomeVisible] = useState(defaultWelcome);
+  const [welcome, setWelcome] = useState<{ mentor: any; id: string }>({ mentor: {}, id: '' });
+  const [mentorWelcomeVisible, setMentorWelcomeVisible] = useState(false);
   const { refresh } = useModel('@@initialState');
   const { chainId } = useModel('useWalletModel');
-  const { data, loading } = useHomeStatsQueryQuery({
+  const { openGuideEvent, closeGuideEvent } = useModel('useGuideModel');
+  const { data } = useHomeStatsQueryQuery({
     variables: { tokenChainId: chainId?.toString() || '1' },
   });
 
@@ -61,17 +55,31 @@ export default (): React.ReactNode => {
     uniswapV3Tokens?.tokens.forEach((tk) => {
       uniswapPrice[tk.id] = tk.volumeUSD / tk.volume;
     });
-    console.log({ uniswapPrice });
     data?.stats?.incomes
       ?.filter((ic) => ic?.tokenChainId === cid)
       .forEach((ic) => {
         if (!ic?.income || !ic?.tokenAddress || !uniswapPrice[ic.tokenAddress]) return;
         prices += uniswapPrice[ic.tokenAddress] * ic.income;
       });
-    return prices.toFixed(2);
+    return prices;
   }, [chainId, data?.stats?.incomes, uniswapV3Tokens?.tokens]);
 
-  console.log({ incomePrices });
+  const openModal = useCallback(() => {
+    const noLongerRemind = localStorage.getItem('no_longer_remind') || '0';
+    if (noLongerRemind !== '1') {
+      openGuideEvent.emit();
+    } else if (profile && profile.icppership && profile.icppership.progress === 0) {
+      setWelcome(profile.icppership);
+      setMentorWelcomeVisible(true);
+    }
+  }, [openGuideEvent, profile]);
+
+  closeGuideEvent.useSubscription(() => {
+    if (profile && profile.icppership && profile.icppership.progress === 0) {
+      setWelcome(profile.icppership);
+      setMentorWelcomeVisible(true);
+    }
+  });
 
   const handleAccept = async () => {
     setMentorAcceptLoading(true);
@@ -172,11 +180,10 @@ export default (): React.ReactNode => {
 
   return (
     <>
-      <Content0 />
-      <Content1 statsData={data?.stats} incomePrices={incomePrices} loading={loading} />
-      <Content2 />
+      <Content0 openModal={openModal} />
+      <Content1 />
+      <Content2 statsData={data?.stats} incomePrices={incomePrices} />
       <Content3 />
-      <Content4 />
       <Footer />
       {mentorWelcomeModal}
     </>
