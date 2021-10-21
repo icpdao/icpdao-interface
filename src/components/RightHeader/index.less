@@ -13,13 +13,18 @@
   display: flex;
   float: right;
   height: 48px;
+  margin-right: 68px;
   margin-left: auto;
   overflow: hidden;
+
+  @media (max-width: 768px) {
+    margin-right: 0;
+  }
   .action {
     display: flex;
     align-items: center;
     height: 48px;
-    padding: 0 12px;
+    padding-left: 4px;
     cursor: pointer;
     transition: all 0.3s;
     > span {
@@ -39,6 +44,7 @@
     }
   }
   .account {
+    margin-right: auto;
     .avatar {
       margin-right: 8px;
       color: @primary-color;
@@ -51,7 +57,7 @@
   }
   .loginButton {
     width: 128px;
-    margin-right: 24px;
+    margin-right: auto;
     text-transform: uppercase;
   }
 
@@ -103,5 +109,48 @@
     color: #a9a9bc;
     font-weight: 400;
     font-size: 18px;
+  }
+}
+
+.GuideTitle {
+  padding: 3rem 2.1875rem;
+  color: #fff;
+  font-size: 1.125rem;
+  line-height: 1.6875rem;
+}
+
+.GuideContent {
+  max-height: 21.875rem;
+  text-align: left;
+}
+
+.GuideFooter {
+  padding: 1rem 2.18rem;
+  text-align: left;
+}
+
+.GuidePopoverContent {
+  margin: 6px 9px;
+}
+
+.GuideIcon {
+  margin-top: 25px;
+  font-size: 23px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.GuideModal {
+  :global {
+    .ant-modal-header {
+      height: 9.375rem;
+      padding: unset !important;
+      background-color: #1890ff !important;
+      border-radius: 10px 10px 0 0 !important;
+    }
+    .ant-modal-footer {
+      padding: unset !important;
+      box-shadow: 0 -5px 12px 4px rgba(0, 0, 0, 0.09);
+    }
   }
 }

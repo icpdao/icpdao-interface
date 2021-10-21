@@ -46,10 +46,11 @@ const otherUserBreadcrumb = (userName: string) => {
 
 export default (props: {
   location: { query: { userName: string | undefined; daoId: string | undefined } };
+  match: { params: { subType?: string } };
 }): ReactNode => {
   const { initialState } = useModel('@@initialState');
   const access = useAccess();
-  const [tab, setTab] = useState<string>('job');
+  const [tab, setTab] = useState<string>(props.match.params.subType || 'job');
 
   if (!initialState) {
     return <PageLoading />;

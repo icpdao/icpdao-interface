@@ -23,7 +23,7 @@ import { getCurrentPage, getTimeDistanceHumanize } from '@/utils/utils';
 import { getMetamaskProvider } from '@/services/ethereum-connect';
 import moment from 'moment';
 import { updateUserProfile } from '@/services/icpdao-interface/user';
-import MentorWarningModal from '@/components/AccessButton/MentorWarningModal';
+import MentorWarningModal from '@/components/Modal/MentorWarningModal';
 
 const breadcrumb = (daoId: string, cycleId: string) => [
   { icon: <HomeOutlined />, path: '', breadcrumbName: 'HOME', menuId: 'home' },
@@ -196,6 +196,7 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
         key={'warningModal'}
         visible={warningModalVisible}
         setVisible={setWarningModalVisible}
+        noLongerRemindCheckbox={false}
       />
     );
   }, [warningModalVisible]);
@@ -217,7 +218,7 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
         console.log('Vote Failed');
       }
     },
-    [data?.cycle?.votes?.confirm, intl, updateAllVoteMutation],
+    [access, data?.cycle?.votes?.confirm, intl, updateAllVoteMutation],
   );
   const updatePairVote = useCallback(
     async (voteId: string, voteJobId: string) => {
@@ -236,7 +237,7 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
         console.log('Vote Failed');
       }
     },
-    [data?.cycle?.votes?.confirm, intl, updatePairVoteMutation],
+    [access, data?.cycle?.votes?.confirm, intl, updatePairVoteMutation],
   );
 
   useEffect(() => {
