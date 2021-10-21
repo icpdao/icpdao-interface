@@ -37,9 +37,9 @@ const OtherUserJobTable: React.FC<JobTableProps> = ({
       if (sorter && sorter.field && sorter.field.includes('size')) {
         sorted = JobSortedEnum.Size;
       }
-      if (sorter && sorter.field && sorter.field.includes('income')) {
-        sorted = JobSortedEnum.Income;
-      }
+      // if (sorter && sorter.field && sorter.field.includes('income')) {
+      //   sorted = JobSortedEnum;
+      // }
       let sortedType: SortedTypeEnum | undefined;
       if (sorter && sorter.order === 'ascend') {
         sortedType = SortedTypeEnum.Asc;

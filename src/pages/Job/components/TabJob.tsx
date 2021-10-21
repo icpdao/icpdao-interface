@@ -40,7 +40,13 @@ import { PlusOutlined, QuestionOutlined } from '@ant-design/icons';
 import { useRequest } from '@@/plugin-request/request';
 import { renderJobTag } from '@/utils/pageHelper';
 import { defaultPageSize } from '@/pages/Job/components/OtherUserJobTable';
-import { clearNewJobExpertMode, getNewJobExpertMode, setNewJobExpertMode } from '@/utils/utils';
+import {
+  clearNewJobExpertMode,
+  getNewJobExpertMode,
+  getUserInfo,
+  setNewJobExpertMode,
+} from '@/utils/utils';
+import MentorWarningModal from '@/components/Modal/MentorWarningModal';
 
 type TabJobProps = {
   daoId?: string;
@@ -85,6 +91,8 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
   const [newOrEditJobForm] = Form.useForm();
   const [adjustJobSizeForm] = Form.useForm();
   const [expert, setExpert] = useState<boolean>(false);
+  const [mentorWarningVisible, setMentorWarningVisible] = useState<boolean>(false);
+
   useEffect(() => {
     setExpert(getNewJobExpertMode());
   }, []);
@@ -1258,6 +1266,30 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
     jobList.data?.jobs?.total,
   ]);
 
+  const mentorWarning = useMemo(() => {
+    return (
+      <MentorWarningModal visible={mentorWarningVisible} setVisible={setMentorWarningVisible} />
+    );
+  }, [mentorWarningVisible]);
+
+  useEffect(() => {
+    const { profile } = getUserInfo();
+    if (
+      profile &&
+      profile.icppership &&
+      (profile.icppership.progress === 0 || profile.icppership.status === 2)
+    )
+      return;
+    const noLongerRemind = localStorage.getItem('mentor_no_longer_remind') || '0';
+    if (
+      jobList?.data?.jobs?.job &&
+      jobList?.data?.jobs?.job?.length >= 1 &&
+      noLongerRemind !== '1'
+    ) {
+      setMentorWarningVisible(true);
+    }
+  }, [jobList?.data?.jobs?.job]);
+
   if (daoListLoading) {
     return <PageLoading />;
   }
@@ -1273,6 +1305,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
       {newOrEditJobModal('edit_job')}
       {viewJobModal}
       {adjustJobSizeModal}
+      {mentorWarning}
     </>
   );
 };

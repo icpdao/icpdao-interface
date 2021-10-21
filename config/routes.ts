@@ -44,7 +44,7 @@
     component: './Dao',
   },
   {
-    path: '/job',
+    path: '/job/:subType?',
     component: './Job',
   },
   {

@@ -65,7 +65,7 @@ const loginOut = async () => {
 };
 
 const AvatarDropdown: React.FC<GlobalHeaderRightProps> = () => {
-  const { initialState, setInitialState, refresh } = useModel('@@initialState');
+  const { initialState, refresh } = useModel('@@initialState');
   const intl = useIntl();
   const { pathname } = useLocation();
 
@@ -78,7 +78,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = () => {
       }
       history.push(`${key}`);
     },
-    [initialState, setInitialState],
+    [initialState],
   );
 
   useEffect(() => {
