@@ -19,7 +19,7 @@ import {
   TimePicker,
 } from 'antd';
 import styles from './index.less';
-import type { Job, JobListQueryVariables, DaoSchema } from '@/services/dao/generated';
+import type { Job, JobListQueryVariables } from '@/services/dao/generated';
 import {
   useCreateJobMutation,
   useIssueInfoLazyQuery,
@@ -38,7 +38,7 @@ import { FormattedMessage, useIntl } from 'umi';
 import StatCard from '@/components/StatCard';
 import { PlusOutlined, QuestionOutlined } from '@ant-design/icons';
 import { useRequest } from '@@/plugin-request/request';
-import { renderJobTag } from '@/utils/pageHelper';
+import { renderIncomes, renderJobTag } from '@/utils/pageHelper';
 import { defaultPageSize } from '@/pages/Job/components/OtherUserJobTable';
 import {
   clearNewJobExpertMode,
@@ -47,6 +47,7 @@ import {
   setNewJobExpertMode,
 } from '@/utils/utils';
 import MentorWarningModal from '@/components/Modal/MentorWarningModal';
+import { useTokenPrice } from '@/pages/Dao/hooks/useTokenPrice';
 
 type TabJobProps = {
   daoId?: string;
@@ -109,7 +110,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
   });
   const [searchDateType, setSearchDateType] = useState<string>('date');
   // const [defaultDaoId, setDefaultDaoId] = useState(daoId || '');
-  const [currentDao, setCurrentDao] = useState<DaoSchema>();
+  const [currentDao, setCurrentDao] = useState<any>();
   const [newJobModalVisible, setNewJobModalVisible] = useState<boolean>(false);
   const [editJobModalVisible, setEditJobModalVisible] = useState<boolean>(false);
   const [viewJobModalVisible, setViewJobModalVisible] = useState<boolean>(false);
@@ -121,6 +122,13 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
   });
   const [choosePRData, setChoosePRData] = useState<choosePR[]>([]);
   const [backupChoosePRData, setBackupChoosePRData] = useState<choosePR[]>([]);
+  const { chainId, isConnected } = useModel('useWalletModel');
+  const queryChainId = useMemo(() => {
+    if (isConnected) {
+      return chainId?.toString() || ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
+    }
+    return ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
+  }, [chainId, isConnected]);
   const parseTime = useCallback(
     (date: any) => {
       if (!date) {
@@ -154,6 +162,8 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
   const [getJobList, jobList] = useJobListLazyQuery({
     fetchPolicy: 'no-cache',
   });
+
+  const { tokenPrice } = useTokenPrice(jobList?.data?.jobs?.stat?.incomes || []);
 
   const [getUserOpenPR, { data: userOpenPR, loading: getUserOpenPRLoading }] =
     useUserOpenPrLazyQuery({
@@ -1065,13 +1075,13 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
   const handlerUpdateCurrentDao = useCallback(
     (currentId = undefined) => {
       if (daoListData?.daos?.dao && daoListData?.daos?.dao.length > 0) {
-        let current: DaoSchema | undefined;
+        let current: any | undefined;
         daoListData?.daos?.dao.forEach((d) => {
           if (currentId && d?.datum && d?.datum?.id === currentId) {
-            current = d.datum;
+            current = d;
           }
         });
-        setCurrentDao(current || daoListData.daos.dao[0]?.datum || undefined);
+        setCurrentDao(current || daoListData.daos.dao[0] || undefined);
       }
     },
     [daoListData?.daos?.dao],
@@ -1079,16 +1089,17 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
 
   useEffect(() => {
     handlerUpdateCurrentDao(daoId);
-  }, [daoId, daoListData]);
+  }, [daoId, daoListData, handlerUpdateCurrentDao]);
 
   useEffect(() => {
     if (currentDao)
       setJobQueryVar((old) => ({
         ...old,
-        daoName: currentDao.name,
+        daoName: currentDao.datum.name,
         userName,
+        tokenChainId: queryChainId,
       }));
-  }, [currentDao, userName]);
+  }, [currentDao, userName, queryChainId]);
 
   useEffect(() => {
     if (jobQueryVar.daoName === '') return;
@@ -1110,6 +1121,8 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
           setJobQueryVar={setJobQueryVar}
           getJobList={getJobList}
           jobList={jobList}
+          tokenPrice={tokenPrice}
+          chainId={queryChainId}
         />
       );
     }
@@ -1120,6 +1133,8 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
         jobQueryVar={jobQueryVar}
         setJobQueryVar={setJobQueryVar}
         jobList={jobList}
+        tokenPrice={tokenPrice}
+        chainId={queryChainId}
       />
     );
   }, [
@@ -1130,6 +1145,8 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
     jobList,
     handlerOpenEditModal,
     getJobList,
+    tokenPrice,
+    queryChainId,
   ]);
 
   const handlerOpenNewJobModal = useCallback(() => {
@@ -1180,7 +1197,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
                 showSearch
                 className={styles.searchOrgNameSelect}
                 optionFilterProp="children"
-                value={currentDao?.id || ''}
+                value={currentDao?.datum?.id || ''}
                 filterOption={(input, option) =>
                   ((option?.label as string) || '').toLowerCase().indexOf(input.toLowerCase()) >= 0
                 }
@@ -1235,7 +1252,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
       </div>
     );
   }, [
-    currentDao?.id,
+    currentDao?.datum?.id,
     daoListData?.daos?.dao,
     handlerUpdateCurrentDao,
     parseTime,
@@ -1254,15 +1271,15 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
         title: intl.formatMessage({ id: 'component.card.stat.size' }),
       },
       {
-        number: jobList.data?.jobs?.stat?.tokenCount || 0,
-        title: currentDao?.tokenSymbol || intl.formatMessage({ id: 'component.card.stat.token' }),
+        number: renderIncomes(jobList.data?.jobs?.stat?.incomes || [], tokenPrice),
+        title: intl.formatMessage({ id: 'component.card.stat.token' }),
       },
     ];
   }, [
-    currentDao?.tokenSymbol,
+    tokenPrice,
     intl,
     jobList.data?.jobs?.stat?.size,
-    jobList.data?.jobs?.stat?.tokenCount,
+    jobList.data?.jobs?.stat?.incomes,
     jobList.data?.jobs?.total,
   ]);
 

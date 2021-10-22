@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import type { DaoJobsQueryVariables, JobQuery } from '@/services/dao/generated';
 import {
@@ -22,7 +22,7 @@ import { renderIncomes } from '@/utils/pageHelper';
 
 type DaoJobSatProps = {
   daoId: string;
-  tokenSymbol: string;
+  tokenSymbol?: string;
 };
 
 function PickerWithType({ type, onChange }: any) {
@@ -31,16 +31,22 @@ function PickerWithType({ type, onChange }: any) {
   return <DatePicker picker={type} onChange={onChange} />;
 }
 
-const DaoJobStat: React.FC<DaoJobSatProps> = ({ daoId, tokenSymbol }) => {
+const DaoJobStat: React.FC<DaoJobSatProps> = ({ daoId }) => {
   const intl = useIntl();
-  const { chainId } = useModel('useWalletModel');
+  const { chainId, isConnected } = useModel('useWalletModel');
+  const queryChainId = useMemo(() => {
+    if (isConnected) {
+      return chainId?.toString() || ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
+    }
+    return ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
+  }, [chainId, isConnected]);
   const [queryVariable, setQueryVariable] = useState<DaoJobsQueryVariables>({
     daoId,
     sorted: JobsQuerySortedEnum.Size,
     sortedType: JobsQuerySortedTypeEnum.Asc,
     first: 10,
     offset: 0,
-    tokenChainId: chainId?.toString() || '1',
+    tokenChainId: queryChainId,
   });
   const [searchDateType, setSearchDateType] = useState<string>('date');
   const parseTime = useCallback(
@@ -150,7 +156,7 @@ const DaoJobStat: React.FC<DaoJobSatProps> = ({ daoId, tokenSymbol }) => {
       number: parseFloat(data?.dao?.jobs?.stat?.size || '0').toFixed(1) || 0,
     },
     {
-      title: tokenSymbol || intl.formatMessage({ id: 'component.card.stat.income' }),
+      title: intl.formatMessage({ id: 'component.card.stat.income' }),
       number: renderIncomes(data?.dao?.jobs?.stat?.incomes || [], tokenPrice),
     },
   ];

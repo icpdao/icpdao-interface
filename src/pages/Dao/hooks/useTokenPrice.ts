@@ -6,7 +6,7 @@ export function useTokenPrice(incomes: Maybe<TokenIncomeSchema>[]) {
   const tokens = useMemo(() => {
     const ts: string[] = [];
     incomes.forEach((ins) => {
-      if (ins?.tokenAddress) ts.push(ins.tokenAddress);
+      if (ins?.tokenAddress && !ts.includes(ins.tokenAddress)) ts.push(ins.tokenAddress);
     });
     return ts;
   }, [incomes]);
