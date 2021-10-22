@@ -13,7 +13,6 @@ import {
 } from 'antd';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { FormattedMessage } from 'umi';
-import type { DaoCycleProps } from '@/pages/Dao/components/cycle/index';
 import type {
   CycleIcpperListQueryVariables,
   IcpperStatQuery,
@@ -22,6 +21,7 @@ import type {
 import {
   CycleIcpperStatSortedEnum,
   CycleIcpperStatSortedTypeEnum,
+  CycleSchema,
   CycleVoteResultPublishTaskStatusEnum,
   CycleVoteResultStatTaskStatusEnum,
   useBeginCycleVoteResultTaskMutation,
@@ -39,9 +39,25 @@ import styles from './index.less';
 import moment from 'moment';
 import GlobalModal from '@/components/Modal';
 import { colorTooltip, renderEi, renderSize } from '@/utils/pageHelper';
+import IncomesPopover from '@/components/IncomesPopover';
 
 const getJobListUrl = (record: any, daoId: string) => {
   return `/job?userName=${record.icpper?.githubLogin}&daoId=${daoId}`;
+};
+
+export type OwnerDaoCycleIcpperProps = {
+  cycleId: string;
+  cycle?: CycleSchema;
+  daoId?: string;
+  tokenPrice: Record<string, number>;
+  chainId: number;
+};
+
+export type DaoCycleIcpperProps = {
+  cycleId: string;
+  daoId?: string;
+  tokenPrice: Record<string, number>;
+  chainId: number;
 };
 
 const ownerColumns = (
@@ -52,6 +68,8 @@ const ownerColumns = (
   updateOwnerEI: (ownerEI: number) => void,
   beginOrEndEditing: (recordId: string) => void,
   isVoteResult: boolean,
+  tokenPrice: Record<string, number>,
+  chainId: number,
 ) => {
   return [
     {
@@ -86,8 +104,15 @@ const ownerColumns = (
     },
     {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.income" />,
-      dataIndex: ['datum', 'income'],
-      sorter: true,
+      key: 'incomes',
+      sorter: false,
+      render: (_: any, record: IcpperStatQuery) => (
+        <IncomesPopover
+          incomes={record.datum?.incomes || []}
+          chainId={chainId}
+          tokenPrice={tokenPrice}
+        />
+      ),
     },
     {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.ie" />,
@@ -178,7 +203,13 @@ const ownerColumns = (
   ];
 };
 
-const columns = (intl: any, daoId: string, isVoteResult: boolean) => {
+const columns = (
+  intl: any,
+  daoId: string,
+  isVoteResult: boolean,
+  tokenPrice: Record<string, number>,
+  chainId: number,
+) => {
   return [
     {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.icpper" />,
@@ -212,8 +243,15 @@ const columns = (intl: any, daoId: string, isVoteResult: boolean) => {
     },
     {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.income" />,
-      dataIndex: ['datum', 'income'],
-      sorter: true,
+      key: 'incomes',
+      sorter: false,
+      render: (_: any, record: IcpperStatQuery) => (
+        <IncomesPopover
+          incomes={record.datum?.incomes || []}
+          chainId={chainId}
+          tokenPrice={tokenPrice}
+        />
+      ),
     },
     {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_icpper.table.head.ie" />,
@@ -239,7 +277,13 @@ const columns = (intl: any, daoId: string, isVoteResult: boolean) => {
   ];
 };
 
-export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, daoId }) => {
+export const OwnerDaoCycleIcpper: React.FC<OwnerDaoCycleIcpperProps> = ({
+  cycle,
+  cycleId,
+  daoId,
+  tokenPrice,
+  chainId,
+}) => {
   const intl = useIntl();
   const [queryVariable, setQueryVariable] = useState<OwnerCycleIcpperListQueryVariables>({
     cycleId,
@@ -353,9 +397,6 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
     let sorted: CycleIcpperStatSortedEnum | undefined;
     if (sorter && sorter.field && sorter.field.includes('size')) {
       sorted = CycleIcpperStatSortedEnum.Size;
-    }
-    if (sorter && sorter.field && sorter.field.includes('income')) {
-      sorted = CycleIcpperStatSortedEnum.Income;
     }
     if (sorter && sorter.field && sorter.field.includes('jobCount')) {
       sorted = CycleIcpperStatSortedEnum.JobCount;
@@ -493,6 +534,8 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
           changeEditingOwnerEI,
           beginOrEndEditing,
           voteResultStatus === CycleVoteResultStatTaskStatusEnum.Success,
+          tokenPrice,
+          chainId,
         )}
         loading={loading}
         rowKey={(record) => record?.datum?.id || ''}
@@ -510,7 +553,12 @@ export const OwnerDaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycle, cycleId, d
   );
 };
 
-export const DaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycleId, daoId }) => {
+export const DaoCycleIcpper: React.FC<DaoCycleIcpperProps> = ({
+  cycleId,
+  daoId,
+  tokenPrice,
+  chainId,
+}) => {
   const intl = useIntl();
   const [queryVariable, setQueryVariable] = useState<CycleIcpperListQueryVariables>({
     cycleId,
@@ -523,9 +571,6 @@ export const DaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycleId, daoId }) => {
     let sorted: CycleIcpperStatSortedEnum | undefined;
     if (sorter && sorter.field && sorter.field.includes('size')) {
       sorted = CycleIcpperStatSortedEnum.Size;
-    }
-    if (sorter && sorter.field && sorter.field.includes('income')) {
-      sorted = CycleIcpperStatSortedEnum.Income;
     }
     if (sorter && sorter.field && sorter.field.includes('jobCount')) {
       sorted = CycleIcpperStatSortedEnum.JobCount;
@@ -557,6 +602,8 @@ export const DaoCycleIcpper: React.FC<DaoCycleProps> = ({ cycleId, daoId }) => {
           intl,
           daoId || '',
           data?.cycle?.voteResultStatTask?.status === CycleVoteResultStatTaskStatusEnum.Success,
+          tokenPrice,
+          chainId,
         )}
         loading={loading}
         rowKey={(record) => record?.datum?.id || ''}

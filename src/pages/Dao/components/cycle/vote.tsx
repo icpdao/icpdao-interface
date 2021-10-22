@@ -269,9 +269,6 @@ const DaoCycleVote: React.FC<DaoCycleProps> = ({ cycleId, cycle, userRole }) => 
       if (sorter && sorter.field && sorter.field.includes('size')) {
         sorted = JobsQuerySortedEnum.Size;
       }
-      if (sorter && sorter.field && sorter.field.includes('income')) {
-        sorted = JobsQuerySortedEnum.Income;
-      }
       let sortedType: JobsQuerySortedTypeEnum | undefined;
       if (sorter && sorter.order === 'ascend') {
         sortedType = JobsQuerySortedTypeEnum.Asc;

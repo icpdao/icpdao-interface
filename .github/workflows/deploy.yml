@@ -63,6 +63,7 @@ jobs:
           REACT_APP_ICPDAO_ETHEREUM_ETHERSCAN_KEY: ${{secrets.DEV__REACT_APP_ICPDAO_ETHEREUM_ETHERSCAN_KEY}}
           REACT_APP_ICPDAO_SENTRY_DSN: ${{secrets.DEV__REACT_APP_ICPDAO_SENTRY_DSN}}
           WEBSITE_BUCKET_NAME: ${{secrets.DEV__WEBSITE_BUCKET_NAME}}
+          ICPDAO_MINT_TOKEN_ETH_CHAIN_ID: ${{secrets.DEV__ICPDAO_MINT_TOKEN_ETH_CHAIN_ID}}
         run: |
           npm install -g serverless
           yarn
@@ -101,6 +102,7 @@ jobs:
           REACT_APP_ICPDAO_ETHEREUM_ALCHEMY_KEY: ${{secrets.PROD__REACT_APP_ICPDAO_ETHEREUM_ALCHEMY_KEY}}
           REACT_APP_ICPDAO_ETHEREUM_ETHERSCAN_KEY: ${{secrets.PROD__REACT_APP_ICPDAO_ETHEREUM_ETHERSCAN_KEY}}
           REACT_APP_ICPDAO_SENTRY_DSN: ${{secrets.PROD__REACT_APP_ICPDAO_SENTRY_DSN}}
+          ICPDAO_MINT_TOKEN_ETH_CHAIN_ID: ${{secrets.PROD__ICPDAO_MINT_TOKEN_ETH_CHAIN_ID}}
         run: |
           npm install -g serverless
           yarn

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import type { DaoIcppersQueryVariables, IcpperQuery } from '@/services/dao/generated';
 import {
   IcppersQuerySortedEnum,
@@ -21,19 +21,26 @@ import IncomesPopover from '@/components/IncomesPopover';
 
 type DaoIcpperStatProps = {
   daoId: string;
-  tokenSymbol: string;
+  tokenSymbol?: string;
 };
 
-const DaoIcpperStat: React.FC<DaoIcpperStatProps> = ({ daoId, tokenSymbol }) => {
+const DaoIcpperStat: React.FC<DaoIcpperStatProps> = ({ daoId }) => {
   const intl = useIntl();
-  const { chainId } = useModel('useWalletModel');
+  const { chainId, isConnected } = useModel('useWalletModel');
+  const queryChainId = useMemo(() => {
+    if (isConnected) {
+      return chainId?.toString() || ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
+    }
+    return ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
+  }, [chainId, isConnected]);
   const [queryVariable, setQueryVariable] = useState<DaoIcppersQueryVariables>({
     daoId,
     sorted: IcppersQuerySortedEnum.JoinTime,
     sortedType: IcppersQuerySortedTypeEnum.Desc,
     first: 10,
     offset: 0,
-    tokenChainId: chainId?.toString() || '1',
+    tokenChainId: queryChainId,
+    // tokenChainId: "1",
   });
   const { data, loading } = useDaoIcppersQuery({ variables: queryVariable });
   const { tokenPrice } = useTokenPrice(data?.dao?.icppers?.stat?.incomes || []);
@@ -128,7 +135,7 @@ const DaoIcpperStat: React.FC<DaoIcpperStatProps> = ({ daoId, tokenSymbol }) => 
       number: parseFloat(data?.dao?.icppers?.stat?.size || '0').toFixed(1) || 0,
     },
     {
-      title: tokenSymbol || intl.formatMessage({ id: 'component.card.stat.income' }),
+      title: intl.formatMessage({ id: 'component.card.stat.income' }),
       number: renderIncomes(data?.dao?.icppers?.stat?.incomes || [], tokenPrice),
     },
   ];

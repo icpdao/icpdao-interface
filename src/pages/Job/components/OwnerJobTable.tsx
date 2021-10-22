@@ -21,6 +21,7 @@ import {
 import { useModel } from '@@/plugin-model/useModel';
 import { getCurrentPage } from '@/utils/utils';
 import { renderJobTag } from '@/utils/pageHelper';
+import IncomesPopover from '@/components/IncomesPopover';
 
 interface JobTableProps {
   jobQueryVar: JobListQueryVariables;
@@ -30,6 +31,8 @@ interface JobTableProps {
   openEditModal: (record: Job) => void;
   openViewModal: (record: Job) => void;
   openAdjustSizeModal: (record: Job, status: 'increase' | 'decrease') => void;
+  tokenPrice: Record<string, number>;
+  chainId: number;
 }
 
 const SyncJobButton: React.FC<{ jobId: string }> = ({ jobId }) => {
@@ -53,6 +56,8 @@ const OwnerJobTable: React.FC<JobTableProps> = ({
   openEditModal,
   openViewModal,
   openAdjustSizeModal,
+  tokenPrice,
+  chainId,
 }) => {
   const intl = useIntl();
   const { initialState } = useModel('@@initialState');
@@ -127,11 +132,15 @@ const OwnerJobTable: React.FC<JobTableProps> = ({
       },
       {
         title: intl.formatMessage({ id: 'pages.job.table.income' }),
-        dataIndex: ['node', 'income'],
-        render: (_: any, record: Job) => {
-          if (record.node?.income) return <>{record.node.income}</>;
-          return <>-</>;
-        },
+        key: 'incomes',
+        sorter: false,
+        render: (_: any, record: Job) => (
+          <IncomesPopover
+            incomes={record.node?.incomes || []}
+            chainId={chainId}
+            tokenPrice={tokenPrice}
+          />
+        ),
       },
       {
         title: intl.formatMessage({ id: 'pages.job.table.operation' }),
@@ -196,6 +205,8 @@ const OwnerJobTable: React.FC<JobTableProps> = ({
     openEditModal,
     openViewModal,
     remove,
+    chainId,
+    tokenPrice,
   ]);
 
   if (!initialState) {

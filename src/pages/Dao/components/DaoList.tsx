@@ -149,10 +149,17 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
     pageSize,
   });
 
-  const { chainId } = useModel('useWalletModel');
+  const { chainId, isConnected } = useModel('useWalletModel');
+
+  const queryChainId = useMemo(() => {
+    if (isConnected) {
+      return chainId?.toString() || ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
+    }
+    return ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
+  }, [chainId, isConnected]);
 
   const daoQueryParams = useMemo<DaoQueryParams>(() => {
-    const tmp: any = { tokenChainId: chainId || '1', ...daoTableParams };
+    const tmp: any = { tokenChainId: queryChainId, ...daoTableParams };
     if (daoTableParams.current && daoTableParams.pageSize) {
       tmp.first = daoTableParams.pageSize;
       tmp.offset = daoTableParams.pageSize * (daoTableParams.current - 1);
@@ -160,7 +167,7 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
       delete tmp.pageSize;
     }
     return tmp;
-  }, [chainId, daoTableParams]);
+  }, [queryChainId, daoTableParams]);
 
   const onMenuClick = useCallback((e: any) => {
     setDaoTableParams((oldParams) => {
@@ -396,7 +403,7 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
       </div>
 
       <Table
-        columns={columns(renderFollowColumn, chainId || 1, tokenPrice)}
+        columns={columns(renderFollowColumn, queryChainId, tokenPrice)}
         loading={loading}
         rowKey="name"
         dataSource={daoData}

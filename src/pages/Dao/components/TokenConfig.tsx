@@ -41,7 +41,8 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId, tokenSymbol, subType }
   const [currentTokenSymbol, setCurrentTokenSymbol] = useState<string>();
   const [lpPoolAddress, setLPPoolAddress] = useState<string>('');
   const [currentTab, setCurrentTab] = useState<string>(subType || 'create');
-  const { contract, network, metamaskProvider, isConnected, event$ } = useModel('useWalletModel');
+  const { chainId, contract, network, metamaskProvider, isConnected, event$ } =
+    useModel('useWalletModel');
   const [updateDaoBaseInfo] = useUpdateDaoBaseInfoMutation();
 
   const goCurrentTab = useCallback(
@@ -83,6 +84,7 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId, tokenSymbol, subType }
           tokenAddress,
           tokenName: tokenInfo.name,
           tokenSymbol: tokenInfo.symbol,
+          tokenChainId: chainId,
         },
       });
     });
@@ -93,6 +95,7 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId, tokenSymbol, subType }
     tokenAddress,
     tokenContract,
     tokenSymbol,
+    chainId,
     updateDaoBaseInfo,
   ]);
 

@@ -3,9 +3,9 @@ import type { TablePaginationConfig } from 'antd';
 import { Avatar, Button, message, Select, Space, Table, Progress } from 'antd';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { FormattedMessage } from 'umi';
-import type { DaoCycleProps } from './index';
 import type { CycleJobListQueryVariables, JobQuery } from '@/services/dao/generated';
 import {
+  CycleSchema,
   CycleVotePairTaskStatusEnum,
   JobsQueryPairTypeEnum,
   JobsQuerySortedEnum,
@@ -23,6 +23,22 @@ import { history } from '@@/core/history';
 import styles from './index.less';
 import GlobalModal from '@/components/Modal';
 import moment from 'moment';
+import IncomesPopover from '@/components/IncomesPopover';
+
+export type OwnerDaoCycleJobProps = {
+  cycleId: string;
+  cycle?: CycleSchema;
+  daoId?: string;
+  tokenPrice: Record<string, number>;
+  chainId: number;
+};
+
+export type DaoCycleJobProps = {
+  cycleId: string;
+  daoId?: string;
+  tokenPrice: Record<string, number>;
+  chainId: number;
+};
 
 const ownerColumns = (
   daoId: string,
@@ -30,6 +46,8 @@ const ownerColumns = (
   disableUpdateJobPairType: boolean,
   updateJobPairType: (recordId: string, pairType: number) => void,
   updatingJobId: string,
+  tokenPrice: Record<string, number>,
+  chainId: number,
 ) => {
   return [
     {
@@ -74,9 +92,15 @@ const ownerColumns = (
     },
     {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_job.table.head.income" />,
-      dataIndex: ['datum', 'income'],
-      key: 'income',
-      sorter: true,
+      key: 'incomes',
+      sorter: false,
+      render: (_: any, record: JobQuery) => (
+        <IncomesPopover
+          incomes={record.datum?.incomes || []}
+          chainId={chainId}
+          tokenPrice={tokenPrice}
+        />
+      ),
     },
     {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_job.table.head.vote_type" />,
@@ -105,7 +129,7 @@ const ownerColumns = (
   ];
 };
 
-const columns = (daoId: string) => {
+const columns = (daoId: string, tokenPrice: Record<string, number>, chainId: number) => {
   return [
     {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_job.table.head.icpper" />,
@@ -146,9 +170,15 @@ const columns = (daoId: string) => {
     },
     {
       title: <FormattedMessage id="pages.dao.component.dao_cycle_job.table.head.income" />,
-      dataIndex: ['datum', 'income'],
-      key: 'income',
-      sorter: true,
+      key: 'incomes',
+      sorter: false,
+      render: (_: any, record: JobQuery) => (
+        <IncomesPopover
+          incomes={record.datum?.incomes || []}
+          chainId={chainId}
+          tokenPrice={tokenPrice}
+        />
+      ),
     },
   ];
 };
@@ -159,7 +189,13 @@ const convertFilterDefault = (pairType: JobsQueryPairTypeEnum | undefined | null
   return undefined;
 };
 
-export const OwnerDaoCycleJob: React.FC<DaoCycleProps> = ({ cycleId, cycle, daoId }) => {
+export const OwnerDaoCycleJob: React.FC<OwnerDaoCycleJobProps> = ({
+  cycleId,
+  cycle,
+  daoId,
+  tokenPrice,
+  chainId,
+}) => {
   const intl = useIntl();
   const [queryVariables, setQueryVariables] = useState<CycleJobListQueryVariables>({
     cycleId,
@@ -184,9 +220,6 @@ export const OwnerDaoCycleJob: React.FC<DaoCycleProps> = ({ cycleId, cycle, daoI
       let sorted: JobsQuerySortedEnum | undefined;
       if (sorter && sorter.field && sorter.field.includes('size')) {
         sorted = JobsQuerySortedEnum.Size;
-      }
-      if (sorter && sorter.field && sorter.field.includes('income')) {
-        sorted = JobsQuerySortedEnum.Income;
       }
       let sortedType: JobsQuerySortedTypeEnum | undefined;
       if (sorter && sorter.order === 'ascend') {
@@ -337,6 +370,8 @@ export const OwnerDaoCycleJob: React.FC<DaoCycleProps> = ({ cycleId, cycle, daoI
           disablePairingButton,
           updateJobPairType,
           updatingJobId,
+          tokenPrice,
+          chainId,
         )}
         loading={loading}
         rowKey={(record) => record?.datum?.id || ''}
@@ -354,7 +389,12 @@ export const OwnerDaoCycleJob: React.FC<DaoCycleProps> = ({ cycleId, cycle, daoI
   );
 };
 
-export const DaoCycleJob: React.FC<DaoCycleProps> = ({ cycleId, daoId }) => {
+export const DaoCycleJob: React.FC<DaoCycleJobProps> = ({
+  cycleId,
+  daoId,
+  tokenPrice,
+  chainId,
+}) => {
   const [queryVariables, setQueryVariables] = useState<CycleJobListQueryVariables>({
     cycleId,
     first: 10,
@@ -366,9 +406,6 @@ export const DaoCycleJob: React.FC<DaoCycleProps> = ({ cycleId, daoId }) => {
     let sorted: JobsQuerySortedEnum | undefined;
     if (sorter && sorter.field && sorter.field.includes('size')) {
       sorted = JobsQuerySortedEnum.Size;
-    }
-    if (sorter && sorter.field && sorter.field.includes('income')) {
-      sorted = JobsQuerySortedEnum.Income;
     }
     let sortedType: JobsQuerySortedTypeEnum | undefined;
     if (sorter && sorter.order === 'ascend') {
@@ -393,7 +430,7 @@ export const DaoCycleJob: React.FC<DaoCycleProps> = ({ cycleId, daoId }) => {
   return (
     <>
       <Table<JobQuery>
-        columns={columns(daoId || '')}
+        columns={columns(daoId || '', tokenPrice, chainId)}
         loading={loading}
         rowKey={(record) => record?.datum?.id || ''}
         dataSource={data?.cycle?.jobs?.nodes as any}

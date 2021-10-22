@@ -118,7 +118,7 @@ export default (props: {
           {tab === 'token' && (
             <TokenConfig
               daoId={daoId}
-              tokenSymbol={data?.dao?.datum?.tokenSymbol || ''}
+              tokenSymbol={data?.dao?.tokenInfo?.tokenSymbol || ''}
               subType={subType || 'create'}
             />
           )}
