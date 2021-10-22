@@ -236,7 +236,6 @@ mutation UpdateDAOLastCycleStep($daoId: String!, $nextStatus: UpdateDaoLastCycle
           voteEndAt
           voteResultPublishedAt
           voteResultStatAt
-          tokenReleasedAt
         }
       }
     }
