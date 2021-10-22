@@ -951,7 +951,6 @@ query DAOLastCycleStatus ($daoId: String!) {
         voteEndAt
         voteResultPublishedAt
         voteResultStatAt
-        tokenReleasedAt
       }
       step {
         status
