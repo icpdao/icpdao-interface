@@ -1,5 +1,5 @@
 import { Tabs } from 'antd';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import StatCard from '@/components/StatCard';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { FormattedMessage } from 'umi';
@@ -34,10 +34,16 @@ const DaoCycleIndex: React.FC<DaoCycleProps> = ({
   tokenSymbol,
 }) => {
   const intl = useIntl();
-  const { chainId } = useModel('useWalletModel');
+  const { chainId, isConnected } = useModel('useWalletModel');
+  const queryChainId = useMemo(() => {
+    if (isConnected) {
+      return chainId?.toString() || ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
+    }
+    return ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
+  }, [chainId, isConnected]);
   const [currentTab, setCurrentTab] = useState<string>(activeTab || 'icpper');
   const { data, loading, error } = useCycleStatDataQuery({
-    variables: { cycleId, tokenChainId: chainId?.toString() || '1' },
+    variables: { cycleId, tokenChainId: queryChainId },
   });
   const { tokenPrice } = useTokenPrice(data?.cycle?.stat?.incomes || []);
 
@@ -59,7 +65,7 @@ const DaoCycleIndex: React.FC<DaoCycleProps> = ({
       number: parseFloat(data?.cycle?.stat?.size || '0').toFixed(1) || 0,
     },
     {
-      title: tokenSymbol || intl.formatMessage({ id: 'component.card.stat.income' }),
+      title: intl.formatMessage({ id: 'component.card.stat.income' }),
       number: renderIncomes(data?.cycle?.stat?.incomes || [], tokenPrice),
     },
   ];
@@ -82,11 +88,17 @@ const DaoCycleIndex: React.FC<DaoCycleProps> = ({
               cycle={cycle}
               cycleId={cycleId}
               daoId={daoId}
-              tokenSymbol={tokenSymbol}
+              tokenPrice={tokenPrice}
+              chainId={queryChainId}
             />
           )}
           {currentTab === 'icpper' && userRole !== 'owner' && (
-            <DaoCycleIcpper cycleId={cycleId} daoId={daoId} tokenSymbol={tokenSymbol} />
+            <DaoCycleIcpper
+              cycleId={cycleId}
+              daoId={daoId}
+              tokenPrice={tokenPrice}
+              chainId={queryChainId}
+            />
           )}
         </TabPane>
 
@@ -96,11 +108,17 @@ const DaoCycleIndex: React.FC<DaoCycleProps> = ({
               cycle={cycle}
               cycleId={cycleId}
               daoId={daoId}
-              tokenSymbol={tokenSymbol}
+              tokenPrice={tokenPrice}
+              chainId={queryChainId}
             />
           )}
           {currentTab === 'job' && userRole !== 'owner' && (
-            <DaoCycleJob cycleId={cycleId} daoId={daoId} tokenSymbol={tokenSymbol} />
+            <DaoCycleJob
+              cycleId={cycleId}
+              daoId={daoId}
+              tokenPrice={tokenPrice}
+              chainId={queryChainId}
+            />
           )}
         </TabPane>
 

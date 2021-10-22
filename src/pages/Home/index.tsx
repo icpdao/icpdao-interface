@@ -23,15 +23,20 @@ export default (): React.ReactNode => {
   const [welcome, setWelcome] = useState<{ mentor: any; id: string }>({ mentor: {}, id: '' });
   const [mentorWelcomeVisible, setMentorWelcomeVisible] = useState(false);
   const { refresh } = useModel('@@initialState');
-  const { chainId } = useModel('useWalletModel');
+  const { chainId, isConnected } = useModel('useWalletModel');
   const { openGuideEvent, closeGuideEvent } = useModel('useGuideModel');
+  const queryChainId = useMemo(() => {
+    if (isConnected) {
+      return chainId?.toString() || ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
+    }
+    return ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
+  }, [chainId, isConnected]);
   const { data } = useHomeStatsQueryQuery({
-    variables: { tokenChainId: chainId?.toString() || '1' },
+    variables: { tokenChainId: queryChainId },
   });
 
   const queryTokenIds = useMemo(() => {
-    const cid = chainId?.toString() || '1';
-    if (cid !== '1') return [];
+    const cid = queryChainId;
     return (
       data?.stats?.incomes
         ?.filter((ic) => ic?.tokenChainId === cid)
@@ -40,7 +45,7 @@ export default (): React.ReactNode => {
         })
         .filter((ic) => !!ic) || []
     );
-  }, [chainId, data?.stats?.incomes]);
+  }, [queryChainId, data?.stats?.incomes]);
 
   console.log({ queryTokenIds });
 
@@ -49,7 +54,7 @@ export default (): React.ReactNode => {
   });
 
   const incomePrices = useMemo(() => {
-    const cid = chainId?.toString() || '1';
+    const cid = queryChainId;
     let prices = 0;
     const uniswapPrice: Record<string, number> = {};
     uniswapV3Tokens?.tokens.forEach((tk) => {
@@ -62,7 +67,7 @@ export default (): React.ReactNode => {
         prices += uniswapPrice[ic.tokenAddress] * ic.income;
       });
     return prices;
-  }, [chainId, data?.stats?.incomes, uniswapV3Tokens?.tokens]);
+  }, [queryChainId, data?.stats?.incomes, uniswapV3Tokens?.tokens]);
 
   const openModal = useCallback(() => {
     const noLongerRemind = localStorage.getItem('no_longer_remind') || '0';

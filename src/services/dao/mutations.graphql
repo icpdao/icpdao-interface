@@ -57,8 +57,8 @@ mutation FollowDAO($daoId: String!, $followType: DAOFollowTypeEnum!) {
   }
 }
 
-mutation UpdateDAOBaseInfo($id: String!, $desc: String, $logo: String, $tokenAddress: String, $tokenName: String, $tokenSymbol: String) {
-  updateDaoBaseInfo(id: $id, desc: $desc, logo: $logo, tokenAddress: $tokenAddress, tokenName: $tokenName, tokenSymbol: $tokenSymbol) {
+mutation UpdateDAOBaseInfo($id: String!, $desc: String, $logo: String, $tokenAddress: String, $tokenName: String, $tokenSymbol: String, $tokenChainId: String) {
+  updateDaoBaseInfo(id: $id, desc: $desc, logo: $logo, tokenAddress: $tokenAddress, tokenName: $tokenName, tokenSymbol: $tokenSymbol, tokenChainId: $tokenChainId) {
     dao {
       updateAt
     }
@@ -236,7 +236,6 @@ mutation UpdateDAOLastCycleStep($daoId: String!, $nextStatus: UpdateDaoLastCycle
           voteEndAt
           voteResultPublishedAt
           voteResultStatAt
-          tokenReleasedAt
         }
       }
     }

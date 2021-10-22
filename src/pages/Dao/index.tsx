@@ -199,6 +199,15 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
   if (!initialState) {
     return <PageLoading />;
   }
+
+  const { chainId, isConnected } = useModel('useWalletModel');
+  const queryChainId = useMemo(() => {
+    if (isConnected) {
+      return chainId?.toString() || ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
+    }
+    return ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
+  }, [chainId, isConnected]);
+
   const { daoId } = props.match.params;
   // const nowAt = getCurrentTimestamps();
 
@@ -210,7 +219,11 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
   ) => Promise<ApolloQueryResult<DaoHomeWithLoginQueryQuery>>;
   if (access.isLogin()) {
     const tmp = useDaoHomeWithLoginQueryQuery({
-      variables: { id: daoId, userId: initialState.currentUser()?.profile?.id },
+      variables: {
+        id: daoId,
+        userId: initialState.currentUser()?.profile?.id,
+        tokenChainId: queryChainId,
+      },
     });
     data = tmp.data;
     loading = tmp.loading;
@@ -218,7 +231,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
     refetch = tmp.refetch;
   } else {
     const tmp = useDaoHomeWithUnLoginQueryQuery({
-      variables: { id: daoId },
+      variables: { id: daoId, tokenChainId: queryChainId },
     });
     data = tmp.data;
     loading = tmp.loading;
@@ -547,18 +560,18 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
         <Divider />
         <Tabs defaultActiveKey={defaultActiveKey}>
           <TabPane tab={<FormattedMessage id={'pages.dao.home.tab.icpperStat'} />} key="icpperStat">
-            <DaoIcpperStat daoId={daoId} tokenSymbol={data?.dao?.datum?.tokenSymbol || ''} />
+            <DaoIcpperStat daoId={daoId} />
           </TabPane>
 
           <TabPane tab={<FormattedMessage id={'pages.dao.home.tab.jobStat'} />} key="jobStat">
-            <DaoJobStat daoId={daoId} tokenSymbol={data?.dao?.datum?.tokenSymbol || ''} />
+            <DaoJobStat daoId={daoId} />
           </TabPane>
 
           <TabPane tab={<FormattedMessage id={'pages.dao.home.tab.cycle'} />} key="cycle">
             <DaoCycle
               daoId={daoId}
               userRole={userRole}
-              tokenSymbol={data?.dao?.datum?.tokenSymbol || ''}
+              tokenSymbol={data?.dao?.tokenInfo?.tokenSymbol || ''}
             />
           </TabPane>
         </Tabs>

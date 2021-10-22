@@ -8,6 +8,9 @@ import { FormattedMessage } from 'umi';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { getFormatTime } from '@/utils/utils';
 import { renderEi, renderSize } from '@/utils/pageHelper';
+import { useTokenPrice } from '@/pages/Dao/hooks/useTokenPrice';
+import { useModel } from '@@/plugin-model/useModel';
+import IncomesPopover from '@/components/IncomesPopover';
 
 interface UserCycleIcpperStatTableProps {
   userName?: string;
@@ -22,6 +25,35 @@ const UserCycleIcpperStatTable: React.FC<UserCycleIcpperStatTableProps> = ({
 }) => {
   const intl = useIntl();
   const [refetchloading, setRefetchloading] = useState(false);
+
+  const { chainId, isConnected } = useModel('useWalletModel');
+  const queryChainId = useMemo(() => {
+    if (isConnected) {
+      return chainId?.toString() || ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
+    }
+    return ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
+  }, [chainId, isConnected]);
+
+  const { data, refetch, loading } = useUserCycleIcpperStatListQuery({
+    variables: {
+      userName: userName || '',
+      daoName: daoName || '',
+      first: pageSize,
+      offset: 0,
+    },
+  });
+
+  const allIncomes = useMemo(() => {
+    const res: any[] = [];
+    data?.icpperStats?.nodes?.forEach((item) => {
+      item?.datum?.incomes?.forEach((income) => {
+        res.push(income);
+      });
+    });
+    return res;
+  }, [data?.icpperStats?.nodes]);
+
+  const { tokenPrice } = useTokenPrice(allIncomes || []);
 
   const columns = useMemo(() => {
     return [
@@ -49,9 +81,13 @@ const UserCycleIcpperStatTable: React.FC<UserCycleIcpperStatTableProps> = ({
       {
         title: <FormattedMessage id="pages.job.cycle.table.head.income" />,
         width: '270px',
-        render: () => {
-          return <div>-</div>;
-        },
+        render: (_: any, record: IcpperStatQuery) => (
+          <IncomesPopover
+            incomes={record.datum?.incomes || []}
+            chainId={queryChainId}
+            tokenPrice={tokenPrice}
+          />
+        ),
       },
       {
         title: <FormattedMessage id="pages.job.cycle.table.head.ei" />,
@@ -61,16 +97,7 @@ const UserCycleIcpperStatTable: React.FC<UserCycleIcpperStatTableProps> = ({
         },
       },
     ];
-  }, [intl]);
-
-  const { data, refetch, loading } = useUserCycleIcpperStatListQuery({
-    variables: {
-      userName: userName || '',
-      daoName: daoName || '',
-      first: pageSize,
-      offset: 0,
-    },
-  });
+  }, [intl, tokenPrice, queryChainId]);
 
   const dataLoading = useMemo(() => {
     if (loading) {
