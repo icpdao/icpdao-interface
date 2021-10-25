@@ -38,7 +38,7 @@ import { FormattedMessage, useIntl } from 'umi';
 import StatCard from '@/components/StatCard';
 import { PlusOutlined, QuestionOutlined } from '@ant-design/icons';
 import { useRequest } from '@@/plugin-request/request';
-import { renderIncomes, renderJobTag } from '@/utils/pageHelper';
+import { renderIncomes, renderIncomesWithD, renderJobTag } from '@/utils/pageHelper';
 import { defaultPageSize } from '@/pages/Job/components/OtherUserJobTable';
 import {
   clearNewJobExpertMode,
@@ -68,7 +68,7 @@ type newJobFormData = {
   prs?: choosePR[];
   jobId?: string;
   jobStatus?: number | undefined;
-  jobIncome?: number | undefined;
+  jobIncome?: string | undefined;
 };
 
 const { Option } = Select;
@@ -1016,7 +1016,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
         })),
         jobId: record.node?.id || undefined,
         jobStatus: record.node?.status,
-        jobIncome: record.node?.income,
+        jobIncome: renderIncomesWithD(record.node?.incomes || []),
       });
       setNewJobModalVisible(false);
       setViewJobModalVisible(false);
@@ -1041,7 +1041,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
         })),
         jobId: record.node?.id || undefined,
         jobStatus: record.node?.status,
-        jobIncome: record.node?.income,
+        jobIncome: renderIncomesWithD(record.node?.incomes || []),
       });
       setNewJobModalVisible(false);
       setViewJobModalVisible(false);
@@ -1065,7 +1065,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
       })),
       jobId: record.node?.id || undefined,
       jobStatus: record.node?.status,
-      jobIncome: record.node?.income,
+      jobIncome: renderIncomesWithD(record.node?.incomes || []),
     });
     setNewJobModalVisible(false);
     setEditJobModalVisible(false);

@@ -152,3 +152,13 @@ export const renderIncomes = (
   });
   return `${allIncome.toFixed(2)}/$${allPrice.toFixed(2)}`;
 };
+
+export const renderIncomesWithD = (incomes: Maybe<TokenIncomeSchema>[]) => {
+  let allIncome = 0;
+  incomes.forEach((ins) => {
+    if (ins?.tokenAddress && ins?.income) {
+      allIncome += ins.income;
+    }
+  });
+  return `${allIncome.toFixed(2)}`;
+};

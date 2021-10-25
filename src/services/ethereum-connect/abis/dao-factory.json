@@ -44,6 +44,12 @@
       },
       {
         "indexed": false,
+        "internalType": "uint256",
+        "name": "_lpTotalAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
         "internalType": "address",
         "name": "_ownerAddress",
         "type": "address"
@@ -133,6 +139,11 @@
       {
         "internalType": "uint256",
         "name": "_lpRatio",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_lpTotalAmount",
         "type": "uint256"
       },
       {
