@@ -372,8 +372,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
       !tokenContract ||
       !daoId ||
       !anchor ||
-      !daoTokenMintSplitInfoResult.data?.dao?.tokenMintSplitInfo?.splitInfos ||
-      !noQuoteTokenTick
+      !daoTokenMintSplitInfoResult.data?.dao?.tokenMintSplitInfo?.splitInfos
     )
       return;
     try {
@@ -390,10 +389,10 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
         mintTokenAmountRatioList: splitInfos.map((pd) => pd?.ratio || 0),
         startTimestamp: anchor.lastTimestamp.toNumber(),
         endTimestamp: getTimestampByZone(previewMintEndTime[0], previewMintEndTime[1]),
-        tickLower: (advancedOP ? tickLower : noQuoteTokenTick[Bound.LOWER]) || 0,
-        tickUpper: (advancedOP ? tickUpper : noQuoteTokenTick[Bound.UPPER]) || 0,
-        // tickLower: tickLower || 0,
-        // tickUpper: tickUpper || 0,
+        tickLower:
+          (advancedOP ? tickLower : !!noQuoteTokenTick && noQuoteTokenTick[Bound.LOWER]) || 0,
+        tickUpper:
+          (advancedOP ? tickUpper : !!noQuoteTokenTick && noQuoteTokenTick[Bound.UPPER]) || 0,
       };
       setCurrentMintBody(mintBody);
       await mutationCreateTokenMintMutation({
@@ -412,6 +411,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
       });
       console.log({ createTokenMintMutationResult });
     } catch (e) {
+      console.log(e);
       setMintButtonLoading(false);
       setLoadingTransferComplete(false);
     }
@@ -715,7 +715,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
       )}
       <Form name={'tokenMintRecord'}>
         <Form.Item wrapperCol={{ offset: 3, span: 4 }}>
-          <Button type={'primary'} onClick={handlerOpenMintRecordView} block>
+          <Button type={'primary'} onClick={handlerOpenMintRecordView} style={{ width: '150px' }}>
             {intl.formatMessage({ id: 'pages.dao.config.tab.token.mint.record.button' })}
           </Button>
         </Form.Item>
