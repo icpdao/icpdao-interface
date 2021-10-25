@@ -100,6 +100,7 @@
   },
   "devDependencies": {
     "@ant-design/pro-cli": "^2.0.2",
+    "@antv/geo-coord": "^1.0.8",
     "@graphql-codegen/cli": "1.21.5",
     "@graphql-codegen/introspection": "1.18.2",
     "@graphql-codegen/typescript": "^1.22.1",
