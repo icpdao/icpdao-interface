@@ -47,6 +47,7 @@ export class DAOFactoryConnect extends BaseEthereumConnect {
       genesisTokenAddressList,
       genesisTokenAmountList,
       body.lpRatio,
+      body.lpTotalAmount,
       body.ownerAddress,
       {
         p: ethers.utils.parseUnits(mintArgs.p?.toString() || '0', 18),
