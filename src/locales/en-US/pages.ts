@@ -157,6 +157,7 @@ export default {
   'pages.dao.config.tab.token.create.form.upload': 'Upload',
   'pages.dao.config.tab.token.create.form.genesis': 'Genesis',
   'pages.dao.config.tab.token.create.form.lp_ratio': 'LP Ratio',
+  'pages.dao.config.tab.token.create.form.lp_total_amount': 'LP Total Amount',
   'pages.dao.config.tab.token.create.form.owner_address': 'Owner Address',
   'pages.dao.config.tab.token.create.form.token_name': 'Token Name',
   'pages.dao.config.tab.token.create.form.token_symbol': 'Token Symbol',

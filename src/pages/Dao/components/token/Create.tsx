@@ -27,8 +27,9 @@ import { ZeroAddress } from '@/services/ethereum-connect';
 import type { ETH_CONNECT } from '@/services/ethereum-connect/typings';
 import { useRequest } from '@@/plugin-request/request';
 import { useModel } from '@@/plugin-model/useModel';
-import { isAddress } from 'ethers/lib/utils';
+import { formatUnits, isAddress, parseUnits } from 'ethers/lib/utils';
 import IconFont from '@/components/IconFont';
+import { BigNumber } from 'ethers';
 
 type ValidateStatus = Parameters<typeof Form.Item>[0]['validateStatus'];
 
@@ -50,6 +51,7 @@ const genDefaultCreateForm: (value: string | undefined) => ETH_CONNECT.CreateTok
     ethDAOId: ethDAOId || '',
     genesis: [],
     lpRatio: 0,
+    lpTotalAmount: BigNumber.from(0),
     ownerAddress: '',
     tokenName: '',
     tokenSymbol: '',
@@ -76,6 +78,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
   setTokenAddress,
 }) => {
   const intl = useIntl();
+  const [form] = Form.useForm();
   const defaultCreateForm = genDefaultCreateForm(ethDAOId);
   const { isConnected, contract, event$ } = useModel('useWalletModel');
   const [createFormData, setCreateFormData] = useState<ETH_CONNECT.CreateToken>(defaultCreateForm);
@@ -92,6 +95,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
       if (!daoId) return;
       try {
         console.log('createData', createFormData);
+        console.log('createData lp total', createFormData.lpTotalAmount?.toString());
         const tx = await contract.daoFactory.createToken(createFormData);
         setPreviewCreateModal(false);
         setLoadingDeployComplete(true);
@@ -104,6 +108,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
         }
         setLoadingDeployComplete(false);
       } catch (e) {
+        console.log(e);
         setPreviewCreateModal(false);
         setLoadingDeployComplete(false);
       }
@@ -211,7 +216,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
         tip={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.loading' })}
         spinning={loadingDeployComplete}
       >
-        <Form labelCol={{ span: 4 }} wrapperCol={{ span: 16 }} name={'tokenCreate'}>
+        <Form labelCol={{ span: 4 }} wrapperCol={{ span: 16 }} name={'tokenCreate'} form={form}>
           <Form.Item
             label={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.form.genesis' })}
             tooltip={{
@@ -265,11 +270,35 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
           >
             <InputNumber
               min={0}
-              defaultValue={createFormData.lpRatio}
+              value={createFormData.lpRatio}
               onChange={(value) => {
                 setCreateFormData((old) => ({
                   ...old,
                   lpRatio: value,
+                }));
+              }}
+            />
+          </Form.Item>
+          <Form.Item
+            label={intl.formatMessage({
+              id: 'pages.dao.config.tab.token.create.form.lp_total_amount',
+            })}
+            tooltip={{
+              title: intl.formatMessage({
+                id: 'pages.dao.config.tab.token.create.form.lp_ratio.desc',
+              }),
+              icon: <IconFont type={'icon-question'} />,
+            }}
+            validateStatus={createFormValidMsg?.lpTotalAmount?.validateStatus}
+            help={createFormValidMsg?.lpTotalAmount?.help}
+          >
+            <InputNumber
+              min={'0'}
+              value={formatUnits(createFormData?.lpTotalAmount || 0, 18)}
+              onChange={(value) => {
+                setCreateFormData((old) => ({
+                  ...old,
+                  lpTotalAmount: parseUnits(value?.toString() || '0', 18),
                 }));
               }}
             />
@@ -391,7 +420,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
           </Form.Item>
           <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
             <Radio.Group
-              defaultValue={'normal'}
+              value={createFormData.mode}
               buttonStyle="solid"
               onChange={(v) =>
                 setCreateFormData((old) => ({
@@ -721,6 +750,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
       >
         <Descriptions title="Preview Create" bordered column={2}>
           <Descriptions.Item
+            span={2}
             label={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.form.genesis' })}
           >
             <ZoomInOutlined onClick={() => setPreviewGenesis(true)} />
@@ -729,6 +759,13 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
             label={intl.formatMessage({ id: 'pages.dao.config.tab.token.create.form.lp_ratio' })}
           >
             {createFormData.lpRatio}
+          </Descriptions.Item>
+          <Descriptions.Item
+            label={intl.formatMessage({
+              id: 'pages.dao.config.tab.token.create.form.lp_total_amount',
+            })}
+          >
+            {formatUnits(createFormData?.lpTotalAmount || '0', 18)}
           </Descriptions.Item>
           <Descriptions.Item
             span={2}

@@ -23,6 +23,7 @@ declare namespace ETH_CONNECT {
     ethDAOId: string;
     genesis?: TokenGenesis[];
     lpRatio?: number;
+    lpTotalAmount?: BigNumber;
     ownerAddress?: string;
     mintArgs?: {
       aNumerator?: number;
