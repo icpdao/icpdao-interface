@@ -703,7 +703,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
               {intl.formatMessage({ id: 'pages.dao.config.tab.token.add_lp.notfound' })}
               <LinkOutlined
                 onClick={() => {
-                  if (setCurrentTab) setCurrentTab('create');
+                  if (setCurrentTab) setCurrentTab('createPool');
                 }}
               />
             </div>
