@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styles from './index.less';
 import {
   AimOutlined,
@@ -23,6 +23,7 @@ const Wallet: React.FC = () => {
     setIsConnected,
     setNetwork,
     accounts,
+    account,
     setAccounts,
   } = useModel('useWalletModel');
 
@@ -75,13 +76,12 @@ const Wallet: React.FC = () => {
     (event: { key: string; keyPath: string[] }) => {
       const { key } = event;
       if (key === 'disconnect') {
-        setIsConnected(false);
         setMetamaskDisconnect();
+        setIsConnected(false);
       }
     },
     [setIsConnected],
   );
-  const account = useMemo(() => (accounts.length > 0 ? accounts[0] : ''), [accounts]);
 
   event$.useSubscription(() => {
     setConnectWalletModal(true);

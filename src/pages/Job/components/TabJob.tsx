@@ -75,8 +75,8 @@ const { Option } = Select;
 
 const githubIssueLinkReg = /https:\/\/github.com\/(.+)\/(.+)\/issues\/(\d+)/;
 const githubPRLinkReg = /https:\/\/github.com\/(.+)\/(.+)\/pull\/(\d+)/;
-const workInfoURL =
-  'https://icpdao.gitbook.io/icpdao/yong-hu-zhi-dao/biao-ji-gong-xian-tou-piao/biao-ji-gong-xian';
+// const workInfoURL =
+//   'https://icpdao.gitbook.io/icpdao/yong-hu-zhi-dao/biao-ji-gong-xian-tou-piao/biao-ji-gong-xian';
 
 function PickerWithType({ type, onChange, size }: any) {
   if (type === 'time')
@@ -92,6 +92,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
   const [newOrEditJobForm] = Form.useForm();
   const [adjustJobSizeForm] = Form.useForm();
   const [expert, setExpert] = useState<boolean>(false);
+  const [howWorkModalVisible, setHowWorkModalVisible] = useState<boolean>(false);
   const [mentorWarningVisible, setMentorWarningVisible] = useState<boolean>(false);
 
   useEffect(() => {
@@ -1158,8 +1159,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
       return (
         <Space size={'middle'} style={{ float: 'right', marginLeft: 'auto' }}>
           <Button
-            href={workInfoURL}
-            target={'_blank'}
+            onClick={() => setHowWorkModalVisible(true)}
             size={'large'}
             block
             icon={<QuestionOutlined />}
@@ -1180,7 +1180,12 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
         </Space>
       );
     return (
-      <Button href={workInfoURL} target={'_blank'} size={'large'} block icon={<QuestionOutlined />}>
+      <Button
+        onClick={() => setHowWorkModalVisible(true)}
+        size={'large'}
+        block
+        icon={<QuestionOutlined />}
+      >
         {intl.formatMessage({ id: 'pages.job.table.info' })}
       </Button>
     );
@@ -1316,6 +1321,32 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
       <div className={styles.statCard}>
         <StatCard data={stat} />
       </div>
+      <Modal
+        key={'howWorkModal'}
+        maskClosable={true}
+        bodyStyle={{
+          paddingTop: 62,
+          textAlign: 'center',
+          fontWeight: 400,
+          padding: '8px 8px 0 8px',
+        }}
+        destroyOnClose={true}
+        width={800}
+        visible={howWorkModalVisible}
+        footer={null}
+        onOk={() => setHowWorkModalVisible(false)}
+        onCancel={() => setHowWorkModalVisible(false)}
+      >
+        <iframe
+          width="100%"
+          height="450px"
+          src="https://www.youtube.com/embed/3NAu34guPkU"
+          title="YouTube video player"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      </Modal>
       {searchForm}
       {jobTable}
       {newOrEditJobModal('new_job')}
