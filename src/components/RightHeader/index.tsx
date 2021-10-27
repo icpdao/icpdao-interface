@@ -1,10 +1,8 @@
-import type { MenuTheme } from 'antd';
 import { Space } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useModel, setLocale } from 'umi';
 import Avatar from './AvatarDropdown';
 import styles from './index.less';
-
 // import IconFont from '@/components/IconFont';
 // import { updateTheme } from '@/components/RightHeader/Theme';
 // import { getTheme } from '@/utils/utils';
@@ -13,13 +11,10 @@ import Guide from './Guide';
 // import { updateTheme } from '@/components/RightHeader/Theme';
 import { useAccess } from '@@/plugin-access/access';
 
-import IconFont from '@/components/IconFont';
-import { getTheme } from '@/utils/utils';
-
 const GlobalHeaderRight: React.FC = () => {
   const { initialState } = useModel('@@initialState');
-  const [theme, setTheme] = useState<MenuTheme>(getTheme());
-  const willTheme: MenuTheme = theme === 'dark' ? 'light' : 'dark';
+  // const [theme, setTheme] = useState<MenuTheme>(getTheme());
+  // const willTheme: MenuTheme = theme === 'dark' ? 'light' : 'dark';
   useEffect(() => {
     // updateTheme(false);
     setLocale('en-US', false);
@@ -33,14 +28,14 @@ const GlobalHeaderRight: React.FC = () => {
   return (
     <Space size={20} className={styles.right}>
       <div>
-        <IconFont
-          type={`icon-${willTheme}-theme`}
-          className={styles.switchTheme}
-          onClick={() => {
-            updateTheme(willTheme === 'dark');
-            setTheme(willTheme);
-          }}
-        />
+        {/* <IconFont */}
+        {/*   type={`icon-${willTheme}-theme`} */}
+        {/*   className={styles.switchTheme} */}
+        {/*   onClick={() => { */}
+        {/*     updateTheme(willTheme === 'dark'); */}
+        {/*     setTheme(willTheme); */}
+        {/*   }} */}
+        {/* /> */}
       </div>
       <Guide isLogin={access.isLogin()} />
       <Wallet />
