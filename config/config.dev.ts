@@ -3,7 +3,7 @@ import { defineConfig } from 'umi';
 
 export default defineConfig({
   plugins: [
-    require.resolve('../src/plugins/disable-theme-less'),
+    // require.resolve('../src/plugins/disable-theme-less'),
     // https://github.com/zthxxx/react-dev-inspector
     'react-dev-inspector/plugins/umi/react-inspector',
   ],
