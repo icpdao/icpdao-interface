@@ -5,6 +5,7 @@ import { join } from 'path';
 import defaultSettings from './defaultSettings';
 import proxy from './proxy';
 import routes from './routes';
+import winPath from 'slash2';
 
 const {
   REACT_APP_ENV,
@@ -86,4 +87,34 @@ export default defineConfig({
       mock: false,
     },
   ],
+  cssLoader: {
+    modules: {
+      getLocalIdent: function getLocalIdent(context: any, _: any, localName: any) {
+        if (
+          context.resourcePath.includes('node_modules') ||
+          context.resourcePath.includes('ant.design.pro.less') ||
+          context.resourcePath.includes('global.less')
+        ) {
+          return localName;
+        }
+
+        const match = context.resourcePath.match(/src(.*)/);
+
+        if (match && match[1]) {
+          const antdProPath = match[1].replace('.less', '');
+          const arr = winPath(antdProPath)
+            .split('/')
+            .map(function (a: any) {
+              return a.replace(/([A-Z])/g, '-$1');
+            })
+            .map(function (a: any) {
+              return a.toLowerCase();
+            });
+          return 'antd-pro'.concat(arr.join('-'), '-').concat(localName).replace(/--/g, '-');
+        }
+
+        return localName;
+      },
+    },
+  },
 });
