@@ -10,7 +10,7 @@ import styles from './index.less';
 // import { getTheme } from '@/utils/utils';
 import Wallet from './Wallet';
 import Guide from './Guide';
-import { updateTheme } from '@/components/RightHeader/Theme';
+// import { updateTheme } from '@/components/RightHeader/Theme';
 import { useAccess } from '@@/plugin-access/access';
 
 import IconFont from '@/components/IconFont';
@@ -21,7 +21,7 @@ const GlobalHeaderRight: React.FC = () => {
   const [theme, setTheme] = useState<MenuTheme>(getTheme());
   const willTheme: MenuTheme = theme === 'dark' ? 'light' : 'dark';
   useEffect(() => {
-    updateTheme(false);
+    // updateTheme(false);
     setLocale('en-US', false);
   });
   const access = useAccess();
