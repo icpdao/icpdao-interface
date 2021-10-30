@@ -285,7 +285,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
             })}
             tooltip={{
               title: intl.formatMessage({
-                id: 'pages.dao.config.tab.token.create.form.lp_ratio.desc',
+                id: 'pages.dao.config.tab.token.create.form.lp_total_amount.desc',
               }),
               icon: <IconFont type={'icon-question'} />,
             }}
