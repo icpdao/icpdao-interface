@@ -24,6 +24,7 @@ const Wallet: React.FC = () => {
     setNetwork,
     accounts,
     account,
+    chainId,
     setAccounts,
   } = useModel('useWalletModel');
 
@@ -89,6 +90,24 @@ const Wallet: React.FC = () => {
 
   return (
     <>
+      {chainId?.toString() != ICPDAO_MINT_TOKEN_ETH_CHAIN_ID && isConnected && (
+        <Modal
+          visible
+          bodyStyle={{
+            paddingTop: 62,
+            textAlign: 'center',
+            fontWeight: 400,
+            padding: '62px 30px 20px 30px',
+          }}
+          style={{ top: '15px' }}
+          keyboard={false}
+          zIndex={2001}
+          footer={null}
+          title={null}
+        >
+          ICPDAO is under testing, Please switch the network of metamask to Ropsten.
+        </Modal>
+      )}
       <Modal
         visible={connectWalletModal}
         maskClosable={true}
