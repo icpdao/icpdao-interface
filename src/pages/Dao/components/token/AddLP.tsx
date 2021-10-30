@@ -392,7 +392,7 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
                 onClick={() => setPreviewAddLP(true)}
               >
                 {intl.formatMessage({
-                  id: 'pages.dao.config.tab.token.create_pool.form.button.create',
+                  id: 'pages.dao.config.tab.token.add_lp.form.button.add',
                 })}
               </Button>
             )}
