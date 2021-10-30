@@ -29,7 +29,7 @@ const statisticValueFormat = (
   };
   if (formatMoney) {
     animationArgs.Children.formatMoney = { thousand: ',', decimal: '.' };
-    animationArgs.Children.floatLength = 2;
+    animationArgs.Children.floatLength = 1;
   }
   return (
     <div key={title}>
