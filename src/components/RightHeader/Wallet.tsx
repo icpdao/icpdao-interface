@@ -90,7 +90,7 @@ const Wallet: React.FC = () => {
 
   return (
     <>
-      {chainId?.toString() !== '3' && isConnected && (
+      {ICPDAO_ENV === 'PROD' && chainId?.toString() !== '3' && isConnected && (
         <Modal
           visible
           bodyStyle={{
