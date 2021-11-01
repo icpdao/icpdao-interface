@@ -20,6 +20,7 @@ const {
   REACT_APP_ICPDAO_ETHEREUM_ETHERSCAN_KEY,
   REACT_APP_ICPDAO_SENTRY_DSN,
   ICPDAO_MINT_TOKEN_ETH_CHAIN_ID,
+  ICPDAO_ENV,
 } = process.env;
 
 export default defineConfig({
@@ -42,6 +43,7 @@ export default defineConfig({
     PROD_ENV_HOSTNAME: 'app.icpdao.co',
     UMI_ENV,
     ICPDAO_MINT_TOKEN_ETH_CHAIN_ID,
+    ICPDAO_ENV,
   },
   layout: {
     // https://umijs.org/zh-CN/plugins/plugin-layout
