@@ -105,7 +105,8 @@ const Wallet: React.FC = () => {
           footer={null}
           title={null}
         >
-          ICPDAO is under testing, Please switch the network of metamask to Ropsten.
+          <div>ICPDAO is under testing, Please switch the network of metamask to Ropsten.</div>
+          <img src="https://dev.app.icpdao.co/static/files/ropsten_tip.jpg" />
         </Modal>
       )}
       <Modal
