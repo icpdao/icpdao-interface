@@ -47,7 +47,14 @@ const DaoCycle: React.FC<DaoCycleProps> = ({ daoId, userRole, tokenSymbol }) => 
             className={styles.tabSelect}
             value={cycleId}
             style={{ width: 300 }}
-            onChange={(value) => setCycleId(value as string)}
+            onChange={(value) => {
+              data?.dao?.cycles?.nodes?.forEach((c) => {
+                if (c?.datum?.id === (value as string)) {
+                  setCycleId(value as string);
+                  setCurrentCycle(c?.datum as CycleSchema);
+                }
+              });
+            }}
             options={options}
           />
           <DaoCycleIndex
