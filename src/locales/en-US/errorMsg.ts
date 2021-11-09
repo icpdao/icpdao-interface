@@ -51,4 +51,7 @@ export default {
   'error.cycle_ei_update.time': 'Not within EI modification time',
   'error.cycle_ei_update.value_invalid': 'Error updating EI',
   'error.dao_List.no_user': 'Query failed',
+  'error.bind_account.discord_not_found': 'The link may have expired, please try again',
+  'error.bind_account.discord_existed':
+    "This account has already been bound, please don't duplicate it.",
 };
