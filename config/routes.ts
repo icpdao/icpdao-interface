@@ -56,6 +56,10 @@
     component: './Staking',
   },
   {
+    path: '/bind/discord/:tmpId',
+    component: './Single/Discord',
+  },
+  {
     component: './Result/404',
   },
 ];

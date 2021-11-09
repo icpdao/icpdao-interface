@@ -28,7 +28,9 @@ export const getGithubOAuthUrl = () => {
   return `https://github.com/login/oauth/authorize?${params.toString()}`;
 };
 
-export const LoginButton: React.FC = () => {
+export const LoginButton: React.FC<{ size?: 'small' | 'middle' | 'large' | undefined }> = (
+  props,
+) => {
   const intl = useIntl();
   const loginText = intl.formatMessage({
     id: 'component.header.button.login',
@@ -44,7 +46,12 @@ export const LoginButton: React.FC = () => {
   }, []);
   return (
     <div className={styles.loginButton}>
-      <Button href={githubOAuth} icon={<GithubOutlined style={{ fontSize: 17 }} />} block>
+      <Button
+        href={githubOAuth}
+        icon={<GithubOutlined style={{ fontSize: 17 }} />}
+        block
+        size={props.size || undefined}
+      >
         {loginText}
       </Button>
     </div>
