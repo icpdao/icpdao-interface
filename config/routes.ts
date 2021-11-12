@@ -10,6 +10,11 @@
   {
     path: '/login/auth_callback',
     component: './Login/AuthCallback',
+    hideInMenu: true,
+    hideInBreadcrumb: true,
+    headerRender: false,
+    footerRender: false,
+    menuHeaderRender: false,
   },
   {
     path: '/account/icpper',
@@ -58,6 +63,11 @@
   {
     path: '/bind/discord/:tmpId',
     component: './Single/Discord',
+    hideInMenu: true,
+    hideInBreadcrumb: true,
+    headerRender: false,
+    footerRender: false,
+    menuHeaderRender: false,
   },
   {
     component: './Result/404',

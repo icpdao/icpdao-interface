@@ -1,8 +1,7 @@
 import { ReactNode } from 'react';
-import { PageContainer } from '@ant-design/pro-layout';
 import { Button, Col, message, Row } from 'antd';
 import discordLOGO from '@/assets/image/discord-logo.png';
-import logoLong from '../../../public/logo_long.png';
+import logoLong from '@/assets/image/icpdao-logo.png';
 import styles from './index.less';
 import { useAccess } from '@@/plugin-access/access';
 import { LoginButton } from '@/components/RightHeader/AvatarDropdown';
@@ -43,40 +42,45 @@ export default (props: { match: { params: { tmpId: string } } }): ReactNode => {
 
   if (access.noLogin()) {
     return (
-      <PageContainer ghost header={undefined}>
-        <Row justify={'center'} style={{ marginTop: '200px' }}>
+      <div>
+        <Row justify={'center'} style={{ marginTop: '350px' }}>
           <Col span={6}>
             <LoginButton size={'large'} />
           </Col>
         </Row>
-      </PageContainer>
+      </div>
     );
   }
 
   return (
-    <PageContainer ghost header={undefined}>
-      <Row justify={'center'} style={{ marginTop: '150px' }}>
+    <div>
+      <Row justify={'center'} style={{ marginTop: '196px' }}>
         <Col>
           <div className={styles.DiscordConnectText}>
-            Are you sure you want to link the discord account to your ICPDAO account?
+            Are you sure to connect Discord to ICPDAO?
           </div>
         </Col>
       </Row>
-      <Row justify={'center'} gutter={120} style={{ marginTop: '70px' }}>
-        <Col>
-          <img src={discordLOGO} width={'200px'} alt="discord" />
+      <Row justify={'center'} gutter={120} style={{ marginTop: '110px' }}>
+        <Col span={'126px'}>
+          <img src={discordLOGO} width={'126px'} alt="discord" />
         </Col>
-        <Col>
-          <img src={logoLong} width={'200px'} height={'80px'} alt="icpdao" />
+        <Col span={'200px'} className={styles.Spinner}>
+          <div className={styles.Bounce1} />
+          <div className={styles.Bounce2} />
+          <div className={styles.Bounce3} />
+        </Col>
+        <Col span={'126px'}>
+          <img src={logoLong} width={'126px'} alt="icpdao" />
         </Col>
       </Row>
-      <Row justify={'center'} style={{ marginTop: '100px' }}>
+      <Row justify={'center'} style={{ marginTop: '104px' }}>
         <Col span={6}>
           <Button type={'primary'} size={'large'} loading={loading} block onClick={handlerConnect}>
             Connect
           </Button>
         </Col>
       </Row>
-    </PageContainer>
+    </div>
   );
 };
