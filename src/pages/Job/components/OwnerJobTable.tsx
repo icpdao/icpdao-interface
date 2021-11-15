@@ -9,7 +9,7 @@ import {
   useDeleteJobMutation,
   useSyncJobMutation,
 } from '@/services/dao/generated';
-import { PageLoading } from '@ant-design/pro-layout';
+// import { PageLoading } from '@ant-design/pro-layout';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import {
   ArrowDownOutlined,
@@ -210,7 +210,7 @@ const OwnerJobTable: React.FC<JobTableProps> = ({
   ]);
 
   if (!initialState) {
-    return <PageLoading />;
+    return <div>222222</div>;
   }
 
   return (

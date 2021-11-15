@@ -4,7 +4,7 @@ import type { TablePaginationConfig } from 'antd';
 import { Form, Space, Table, Typography } from 'antd';
 import type { Job, JobListQueryVariables } from '@/services/dao/generated';
 import { JobSortedEnum, SortedTypeEnum } from '@/services/dao/generated';
-import { PageLoading } from '@ant-design/pro-layout';
+// import { PageLoading } from '@ant-design/pro-layout';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { useModel } from '@@/plugin-model/useModel';
 import { getCurrentPage } from '@/utils/utils';
@@ -64,7 +64,7 @@ const OtherUserJobTable: React.FC<JobTableProps> = ({
   );
 
   if (!initialState) {
-    return <PageLoading />;
+    return <div>111111</div>;
   }
 
   const columns = [
