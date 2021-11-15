@@ -53,6 +53,10 @@
     component: './Job',
   },
   {
+    path: '/job2/:subType?',
+    component: './Job',
+  },
+  {
     path: '/dao/:daoId/:cycleId/vote',
     component: './Dao/Vote',
   },
