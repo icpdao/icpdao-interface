@@ -3,7 +3,7 @@ import { Select } from 'antd';
 
 import { useUserJobDaoListQuery } from '@/services/dao/generated';
 import UserCycleIcpperStatTable from '@/pages/Job/components/UserCycleIcpperStatTable';
-// import { PageLoading } from '@ant-design/pro-layout';
+import { PageLoading } from '@ant-design/pro-layout';
 
 import styles from './TabCycle.less';
 
@@ -47,7 +47,7 @@ const TabCycle: React.FC<TabCycleProps> = ({ daoId, userName }) => {
   }, [data]);
 
   if (loading || error) {
-    return <div>333333</div>;
+    return <PageLoading />;
   }
 
   return (

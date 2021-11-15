@@ -43,3 +43,6 @@ build
 
 src/services/**/generated.ts
 src/services/**/graphql.schema.json
+
+# Local Netlify folder
+.netlify
