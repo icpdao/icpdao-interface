@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Settings as LayoutSettings } from '@ant-design/pro-layout';
-import { PageLoading } from '@ant-design/pro-layout';
+// import { PageLoading } from '@ant-design/pro-layout';
 import type { RequestConfig, RunTimeLayoutConfig } from 'umi';
 import { history } from 'umi';
 import RightHeader from '@/components/RightHeader';
@@ -25,7 +25,7 @@ import client from '@/utils/apolloClient';
 const githubCallback = '/login/auth_callback';
 
 export const initialStateConfig = {
-  loading: <PageLoading />,
+  loading: <div>init loading</div>,
 };
 
 export async function getInitialState(): Promise<{

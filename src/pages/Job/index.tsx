@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
-import { PageContainer, PageLoading } from '@ant-design/pro-layout';
+import { PageContainer } from '@ant-design/pro-layout';
 import { Tabs } from 'antd';
 import { FormattedMessage, useAccess } from 'umi';
 import GlobalBreadcrumb from '@/components/Breadcrumb';
@@ -53,7 +53,7 @@ export default (props: {
   const [tab, setTab] = useState<string>(props.match.params.subType || 'job');
 
   if (!initialState) {
-    return <PageLoading />;
+    return <div>loading</div>;
   }
 
   const currentLoginUserName = initialState.currentUser().profile?.github_login;
