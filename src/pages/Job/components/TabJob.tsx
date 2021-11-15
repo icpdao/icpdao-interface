@@ -30,7 +30,7 @@ import {
   useUserOpenPrLazyQuery,
 } from '@/services/dao/generated';
 import moment from 'moment';
-import { PageLoading } from '@ant-design/pro-layout';
+// import { PageLoading } from '@ant-design/pro-layout';
 import OwnerJobTable from '@/pages/Job/components/OwnerJobTable';
 import OtherUserJobTable from '@/pages/Job/components/OtherUserJobTable';
 import { useModel } from '@@/plugin-model/useModel';
@@ -1313,7 +1313,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
   }, [jobList?.data?.jobs?.job]);
 
   if (daoListLoading) {
-    return <PageLoading />;
+    return <div>444444</div>;
   }
 
   return (
