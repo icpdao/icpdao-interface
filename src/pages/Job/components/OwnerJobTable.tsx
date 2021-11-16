@@ -227,7 +227,7 @@ const OwnerJobTable: React.FC<JobTableProps> = ({
           }}
           pagination={{
             pageSize: jobQueryVar.first || 10,
-            total: jobList?.data?.data?.jobs?.total || 0,
+            total: jobList?.data?.jobs?.total || 0,
             current: getCurrentPage(jobQueryVar.offset || 0, jobQueryVar.first || 10),
           }}
         />
