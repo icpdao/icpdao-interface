@@ -1,7 +1,8 @@
 import type { IcpperStatQuery, Maybe, TokenIncomeSchema } from '@/services/dao/generated';
-import { getEIColor } from '@/utils/utils';
+import { getEIColor, MaxCycleEndAt } from '@/utils/utils';
 import { Tag, Tooltip } from 'antd';
 import { ExclamationCircleFilled } from '@ant-design/icons';
+import { DaoJobConfig } from '@/services/dao/generated';
 
 export const colorTooltip = (color: string, tipsText: string) => {
   if (tipsText === '') return <></>;
@@ -161,4 +162,14 @@ export const renderIncomesWithD = (incomes: Maybe<TokenIncomeSchema>[]) => {
     }
   });
   return `${allIncome.toFixed(2)}`;
+};
+
+export const isManualCycle = (data: DaoJobConfig) => {
+  return (
+    data.existedLastCycle?.endAt === MaxCycleEndAt &&
+    data.existedLastCycle.pairBeginAt === MaxCycleEndAt &&
+    data.existedLastCycle.pairEndAt === MaxCycleEndAt &&
+    data.existedLastCycle.voteBeginAt === MaxCycleEndAt &&
+    data.existedLastCycle.voteEndAt === MaxCycleEndAt
+  );
 };
