@@ -14,7 +14,7 @@ import { getFormatTime, getTimeDistanceHumanize } from '@/utils/utils';
 import { useIntl } from 'umi';
 import { history } from '@@/core/history';
 import StepPairing from '@/pages/Dao/components/step/pairing';
-import { LoadingOutlined } from '@ant-design/icons';
+import { Loading3QuartersOutlined } from '@ant-design/icons';
 
 const { Step } = Steps;
 
@@ -325,19 +325,19 @@ const DaoStepStatus: React.FC<{ daoId: string; isOwner: boolean }> = ({ daoId, i
             title={CycleStepEnum.Job}
             status={handlerStepStatus(0)}
             description={stepJobDesc}
-            icon={current === CycleStepEnum.Job && <LoadingOutlined />}
+            icon={current === CycleStepEnum.Job && <Loading3QuartersOutlined />}
           />
           <Step
             title={CycleStepEnum.Pair}
             status={handlerStepStatus(1)}
             description={stepPairDesc}
-            icon={current === CycleStepEnum.Pair && <LoadingOutlined />}
+            icon={current === CycleStepEnum.Pair && <Loading3QuartersOutlined />}
           />
           <Step
             title={CycleStepEnum.Vote}
             status={handlerStepStatus(2)}
             description={stepVoteDesc}
-            icon={current === CycleStepEnum.Vote && <LoadingOutlined />}
+            icon={current === CycleStepEnum.Vote && <Loading3QuartersOutlined />}
           />
         </Steps>
       </Row>

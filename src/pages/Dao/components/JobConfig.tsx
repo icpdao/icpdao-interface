@@ -5,6 +5,7 @@ import {
   useUpdateDaoJobConfigMutation,
   useDaoJobConfigPreviewNextCycleQuery,
   useUpdateDaoJobConfigManualMutation,
+  useDaoNextCycleLazyQuery,
 } from '@/services/dao/generated';
 import { Form, Button, Select, Row, Col, message, Space, Skeleton, Radio } from 'antd';
 import { useIntl } from '@@/plugin-locale/localeExports';
@@ -170,6 +171,7 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
   const { data, loading, error, refetch } = useDaoJobConfigQuery({
     variables: { daoId },
   });
+  const [getDaoNextCycle, daoNextCycle] = useDaoNextCycleLazyQuery({ fetchPolicy: 'no-cache' });
 
   const [manual, setManual] = useState<boolean>(false);
 
@@ -177,6 +179,11 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
     if (!data?.daoJobConfig?.datum?.manual) return;
     setManual(data.daoJobConfig.datum.manual);
   }, [data?.daoJobConfig?.datum?.manual]);
+
+  useEffect(() => {
+    if (data?.daoJobConfig?.datum?.manual) return;
+    getDaoNextCycle({ variables: { daoId } });
+  }, [daoId, data?.daoJobConfig?.datum?.manual, getDaoNextCycle]);
 
   const formInitData = useMemo(() => {
     return formatJobConfigData(data);
@@ -187,8 +194,8 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
   }, [data]);
 
   const nextCycle = useMemo(() => {
-    return data?.daoJobConfig?.getNextCycle;
-  }, [data]);
+    return daoNextCycle?.data?.daoJobConfig?.getNextCycle;
+  }, [daoNextCycle?.data?.daoJobConfig?.getNextCycle]);
 
   const previewNextCycleQuery = useDaoJobConfigPreviewNextCycleQuery({
     skip: true,
@@ -239,7 +246,7 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
     return nextCycle;
   }, [nextCycle, previewNextCycle, showPreview]);
 
-  if (loading || error) {
+  if (loading || error || daoNextCycle.loading) {
     return <Skeleton active />;
   }
 
