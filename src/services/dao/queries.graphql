@@ -51,6 +51,11 @@ query DAOJobConfig($daoId: String!) {
       voteBeginAt
       voteEndAt
     }
+  }
+}
+
+query DAONextCycle($daoId: String!) {
+  daoJobConfig(daoId: $daoId) {
     getNextCycle {
       timeZone
       beginAt

@@ -5,6 +5,7 @@ import {
   useUpdateDaoJobConfigMutation,
   useDaoJobConfigPreviewNextCycleQuery,
   useUpdateDaoJobConfigManualMutation,
+  useDaoNextCycleLazyQuery,
 } from '@/services/dao/generated';
 import { Form, Button, Select, Row, Col, message, Space, Skeleton, Radio } from 'antd';
 import { useIntl } from '@@/plugin-locale/localeExports';
@@ -13,6 +14,7 @@ import styles from './index.less';
 import DayHourCascader from '@/pages/Dao/components/DayHourCascader';
 import { getFormatTime } from '@/utils/utils';
 import IconFont from '@/components/IconFont';
+import { isManualCycle } from '@/utils/pageHelper';
 
 type JobConfigProps = {
   daoId: string;
@@ -170,13 +172,25 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
   const { data, loading, error, refetch } = useDaoJobConfigQuery({
     variables: { daoId },
   });
+  const [getDaoNextCycle, daoNextCycle] = useDaoNextCycleLazyQuery({ fetchPolicy: 'no-cache' });
 
   const [manual, setManual] = useState<boolean>(false);
 
+  const currentCycleIsManual = useMemo(() => {
+    if (!data?.daoJobConfig) return true;
+    return isManualCycle(data?.daoJobConfig);
+  }, [data?.daoJobConfig]);
+
   useEffect(() => {
-    if (!data?.daoJobConfig?.datum?.manual) return;
+    if (!data?.daoJobConfig?.datum?.manual || loading) return;
     setManual(data.daoJobConfig.datum.manual);
-  }, [data?.daoJobConfig?.datum?.manual]);
+  }, [data?.daoJobConfig?.datum?.manual, loading]);
+
+  useEffect(() => {
+    if (!data?.daoJobConfig) return;
+    if (data?.daoJobConfig?.datum?.manual || loading) return;
+    if (!isManualCycle(data?.daoJobConfig)) getDaoNextCycle({ variables: { daoId } });
+  }, [daoId, data?.daoJobConfig, data?.daoJobConfig?.datum?.manual, getDaoNextCycle, loading]);
 
   const formInitData = useMemo(() => {
     return formatJobConfigData(data);
@@ -187,8 +201,8 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
   }, [data]);
 
   const nextCycle = useMemo(() => {
-    return data?.daoJobConfig?.getNextCycle;
-  }, [data]);
+    return daoNextCycle?.data?.daoJobConfig?.getNextCycle;
+  }, [daoNextCycle?.data?.daoJobConfig?.getNextCycle]);
 
   const previewNextCycleQuery = useDaoJobConfigPreviewNextCycleQuery({
     skip: true,
@@ -239,7 +253,7 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
     return nextCycle;
   }, [nextCycle, previewNextCycle, showPreview]);
 
-  if (loading || error) {
+  if (loading || error || daoNextCycle.loading) {
     return <Skeleton active />;
   }
 
@@ -254,8 +268,8 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
         initialValues={formInitData}
         onFinish={async (values) => {
           setSaveLoading(true);
-          if (values.manual) {
-            await updateDaoJobConfigManual({ variables: { daoId, manual: values.manual } });
+          if (manual) {
+            await updateDaoJobConfigManual({ variables: { daoId, manual } });
             await refetch();
             message.success(intl.formatMessage({ id: 'pages.dao.config.tab.job.form.success' }));
             setShowPreview(false);
@@ -271,6 +285,8 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
           }
           try {
             updateData.daoId = daoId;
+            updateData.manual = manual;
+            console.log({ manual });
             await updateDaoJobConfig({
               variables: updateData,
             });
@@ -368,7 +384,7 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
           <Button htmlType="submit" type="primary" loading={saveLoading}>
             {intl.formatMessage({ id: 'pages.dao.config.tab.job.form.save' })}
           </Button>
-          {!manual && (
+          {!manual && !currentCycleIsManual && (
             <Button
               type="primary"
               style={{ margin: '0 8px' }}
@@ -380,7 +396,7 @@ const DAOJobConfig: React.FC<JobConfigProps> = ({ daoId, nextStep }) => {
           )}
         </Form.Item>
       </Form>
-      {!manual && (
+      {!manual && !currentCycleIsManual && (
         <>
           <CycleInfo
             title={intl.formatMessage({
