@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Form,
   Upload,
@@ -30,6 +30,7 @@ import { useModel } from '@@/plugin-model/useModel';
 import { formatUnits, isAddress, parseUnits } from 'ethers/lib/utils';
 import IconFont from '@/components/IconFont';
 import { BigNumber } from 'ethers';
+import { useSubgraphV1ExistedTokenInfoLazyQuery } from '@/services/subgraph-v1/generated';
 
 type ValidateStatus = Parameters<typeof Form.Item>[0]['validateStatus'];
 
@@ -90,6 +91,56 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
   const [loadingDeployComplete, setLoadingDeployComplete] = useState<boolean>(false);
   const [disableConfirmReCreateButton, setDisableConfirmReCreateButton] = useState<boolean>(true);
 
+  const [getExistedTokenInfo, existedTokenInfo] = useSubgraphV1ExistedTokenInfoLazyQuery();
+
+  useEffect(() => {
+    if (tokenAddress && tokenAddress !== ZeroAddress) {
+      getExistedTokenInfo({ variables: { tokenId: tokenAddress.toLowerCase() } });
+    }
+  }, [getExistedTokenInfo, tokenAddress]);
+
+  useEffect(() => {
+    if (!existedTokenInfo.loading && existedTokenInfo.data?.token) {
+      let mode = 'normal';
+      if (
+        !(
+          existedTokenInfo.data.token.mintArgs.aDenominator === 10 &&
+          existedTokenInfo.data.token.mintArgs.bNumerator === 1 &&
+          existedTokenInfo.data.token.mintArgs.c === 0 &&
+          existedTokenInfo.data.token.mintArgs.d === 0
+        )
+      ) {
+        mode = 'expert';
+      }
+      setCreateFormData({
+        ethDAOId: existedTokenInfo.data?.token.daoID,
+        genesis: [],
+        lpRatio: existedTokenInfo.data.token.lpRatio,
+        lpTotalAmount: BigNumber.from(existedTokenInfo.data.token.lpTotalAmount),
+        ownerAddress: existedTokenInfo.data.token.owner,
+        tokenName: existedTokenInfo.data.token.name,
+        tokenSymbol: existedTokenInfo.data.token.symbol,
+        mode,
+        mintChangeDays: mode === 'normal' ? existedTokenInfo.data.token.mintArgs.bDenominator : 30,
+        mintValue:
+          mode === 'normal'
+            ? parseInt(formatUnits(BigNumber.from(existedTokenInfo.data.token.mintArgs.p), 18))
+            : 10,
+        mintChangeValue:
+          mode === 'normal' ? existedTokenInfo.data.token.mintArgs.aNumerator / 10 : 0.5,
+        mintArgs: {
+          aNumerator: existedTokenInfo.data.token.mintArgs.aNumerator,
+          aDenominator: existedTokenInfo.data.token.mintArgs.aDenominator,
+          bNumerator: existedTokenInfo.data.token.mintArgs.bNumerator,
+          bDenominator: existedTokenInfo.data.token.mintArgs.bDenominator,
+          c: existedTokenInfo.data.token.mintArgs.c,
+          d: existedTokenInfo.data.token.mintArgs.d,
+          p: parseInt(formatUnits(BigNumber.from(existedTokenInfo.data.token.mintArgs.p), 18)),
+        },
+      });
+    }
+  }, [existedTokenInfo?.data?.token, existedTokenInfo.loading]);
+
   const { loading, run } = useRequest(
     async () => {
       if (!daoId) return;
@@ -103,7 +154,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
         const deployEvent = receipt.events.pop();
         console.log(deployEvent.args);
         if (setTokenAddress && deployEvent.args && deployEvent.args.length > 0) {
-          setCreateFormData(defaultCreateForm);
+          // setCreateFormData(defaultCreateForm);
           setTokenAddress(deployEvent.args[deployEvent.args.length - 1] || '');
         }
         setLoadingDeployComplete(false);
