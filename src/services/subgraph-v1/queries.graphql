@@ -8,7 +8,40 @@ query SubgraphV1TokenListByDAOId($tokenIds: [ID!]) {
     symbol
     name
     owner
+    mintArgs {
+      p
+      c
+      d
+      aDenominator
+      aNumerator
+      bDenominator
+      bNumerator
+    }
     createdAtBlockNumber
     createdAtTimestamp
   }
 }
+
+query SubgraphV1ExistedTokenInfo($tokenId: ID!) {
+  token(id: $tokenId) {
+    id
+    daoID
+    symbol
+    name
+    owner
+    lpRatio
+    lpTotalAmount
+    mintArgs {
+      p
+      c
+      d
+      aDenominator
+      aNumerator
+      bDenominator
+      bNumerator
+    }
+    createdAtBlockNumber
+    createdAtTimestamp
+  }
+}
+
