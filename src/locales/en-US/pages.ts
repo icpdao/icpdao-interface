@@ -177,6 +177,7 @@ export default {
   'pages.dao.config.tab.token.create.form.expert': 'Advanced',
   'pages.dao.config.tab.token.create.form.button.create': 'Create',
   'pages.dao.config.tab.token.create.form.button.recreate': 'ReCreate',
+  'pages.dao.config.tab.token.create.form.button.lock_recreate': 'Unlock',
   'pages.dao.config.tab.token.create.form.mint_value.desc':
     'After creating the Token, the number of initial daily mining，e.g. Bitcoin, the initial number of mining is 50 every 10 minutes',
   'pages.dao.config.tab.token.create.form.mint_change_days.desc':

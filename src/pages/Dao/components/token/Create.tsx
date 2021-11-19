@@ -90,12 +90,14 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
   const [confirmReCreateModal, setConfirmReCreateModal] = useState<boolean>(false);
   const [loadingDeployComplete, setLoadingDeployComplete] = useState<boolean>(false);
   const [disableConfirmReCreateButton, setDisableConfirmReCreateButton] = useState<boolean>(true);
+  const [lockRecreateFormEdit, setLockRecreateFormEdit] = useState<boolean>(false);
 
   const [getExistedTokenInfo, existedTokenInfo] = useSubgraphV1ExistedTokenInfoLazyQuery();
 
   useEffect(() => {
     if (tokenAddress && tokenAddress !== ZeroAddress) {
       getExistedTokenInfo({ variables: { tokenId: tokenAddress.toLowerCase() } });
+      setLockRecreateFormEdit(true);
     }
   }, [getExistedTokenInfo, tokenAddress]);
 
@@ -280,6 +282,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
             help={createFormValidMsg?.genesis?.help}
           >
             <Upload
+              disabled={lockRecreateFormEdit}
               maxCount={1}
               beforeUpload={(file) => {
                 return readUploadExcel(file);
@@ -299,7 +302,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
               }}
               accept={allowUploadGenesisFileType.join(',')}
             >
-              <Button icon={<UploadOutlined />}>
+              <Button icon={<UploadOutlined />} disabled={lockRecreateFormEdit}>
                 &nbsp;
                 <FormattedMessage id={'pages.dao.config.tab.token.create.form.upload'} />
               </Button>
@@ -320,6 +323,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
             help={createFormValidMsg?.lpRatio?.help}
           >
             <InputNumber
+              disabled={lockRecreateFormEdit}
               min={0}
               value={createFormData.lpRatio}
               onChange={(value) => {
@@ -344,6 +348,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
             help={createFormValidMsg?.lpTotalAmount?.help}
           >
             <InputNumber
+              disabled={lockRecreateFormEdit}
               min={'0'}
               value={formatUnits(createFormData?.lpTotalAmount || 0, 18)}
               onChange={(value) => {
@@ -368,6 +373,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
             help={createFormValidMsg?.ownerAddress?.help}
           >
             <Input
+              disabled={lockRecreateFormEdit}
               value={createFormData.ownerAddress}
               style={{ width: 400 }}
               onChange={(e) => {
@@ -405,6 +411,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
             help={createFormValidMsg?.tokenName?.help}
           >
             <Input
+              disabled={lockRecreateFormEdit}
               value={createFormData.tokenName}
               style={{ width: 400 }}
               onChange={(e) => {
@@ -444,6 +451,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
             help={createFormValidMsg?.tokenSymbol?.help}
           >
             <Input
+              disabled={lockRecreateFormEdit}
               value={createFormData.tokenSymbol}
               style={{ width: 400 }}
               onChange={(e) => {
@@ -471,6 +479,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
           </Form.Item>
           <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
             <Radio.Group
+              disabled={lockRecreateFormEdit}
               value={createFormData.mode}
               buttonStyle="solid"
               onChange={(v) =>
@@ -504,6 +513,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
                 help={createFormValidMsg?.mintValue?.help}
               >
                 <InputNumber
+                  disabled={lockRecreateFormEdit}
                   value={createFormData.mintValue}
                   min={0}
                   step={'1'}
@@ -529,6 +539,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
                 help={createFormValidMsg?.mintChangeDays?.help}
               >
                 <InputNumber
+                  disabled={lockRecreateFormEdit}
                   value={createFormData.mintChangeDays}
                   min={1}
                   step={'1'}
@@ -554,6 +565,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
                 help={createFormValidMsg?.mintChangeValue?.help}
               >
                 <InputNumber
+                  disabled={lockRecreateFormEdit}
                   value={createFormData.mintChangeValue}
                   min={0.1}
                   step={0.1}
@@ -724,11 +736,23 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
             </Form.Item>
           )}
           <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
-            {tokenAddress !== ZeroAddress ? (
+            {!!tokenAddress && tokenAddress !== ZeroAddress && lockRecreateFormEdit && (
+              <Button
+                type="primary"
+                htmlType="submit"
+                onClick={() => setLockRecreateFormEdit(false)}
+              >
+                <FormattedMessage
+                  id={`pages.dao.config.tab.token.create.form.button.lock_recreate`}
+                />
+              </Button>
+            )}
+            {!!tokenAddress && tokenAddress !== ZeroAddress && !lockRecreateFormEdit && (
               <Button type="primary" htmlType="submit" onClick={() => handlerReCreate()}>
                 <FormattedMessage id={`pages.dao.config.tab.token.create.form.button.recreate`} />
               </Button>
-            ) : (
+            )}
+            {!!tokenAddress && tokenAddress === ZeroAddress && (
               <Button type="primary" htmlType="submit" onClick={() => handlerCreate()}>
                 <FormattedMessage id={`pages.dao.config.tab.token.create.form.button.create`} />
               </Button>
