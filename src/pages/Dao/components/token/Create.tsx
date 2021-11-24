@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Form,
   Upload,
@@ -31,6 +31,7 @@ import { formatUnits, isAddress, parseUnits } from 'ethers/lib/utils';
 import IconFont from '@/components/IconFont';
 import { BigNumber } from 'ethers';
 import { useSubgraphV1ExistedTokenInfoLazyQuery } from '@/services/subgraph-v1/generated';
+import { getFormatTime } from '@/utils/utils';
 
 type ValidateStatus = Parameters<typeof Form.Item>[0]['validateStatus'];
 
@@ -142,6 +143,23 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
       });
     }
   }, [existedTokenInfo?.data?.token, existedTokenInfo.loading]);
+
+  const createdTimeDesc = useMemo(() => {
+    if (!!existedTokenInfo.data && !!existedTokenInfo.data.token?.createdAtTimestamp) {
+      return (
+        <div>
+          Created At:{' '}
+          <span style={{ color: '#ff7a45' }}>
+            {getFormatTime(
+              parseInt(existedTokenInfo.data.token?.createdAtTimestamp, 10) || 0,
+              'LL',
+            )}
+          </span>
+        </div>
+      );
+    }
+    return <></>;
+  }, [existedTokenInfo.data]);
 
   const { loading, run } = useRequest(
     async () => {
@@ -258,6 +276,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
                 <div>
                   {intl.formatMessage({ id: 'pages.dao.config.tab.token.create.existed.p2' })}
                 </div>
+                {createdTimeDesc}
               </>
             }
             type="info"
