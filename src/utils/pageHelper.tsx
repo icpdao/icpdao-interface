@@ -1,8 +1,11 @@
 import type { IcpperStatQuery, Maybe, TokenIncomeSchema } from '@/services/dao/generated';
-import { getEIColor, MaxCycleEndAt } from '@/utils/utils';
+import { getEIColor, getFormatTime, MaxCycleEndAt } from '@/utils/utils';
 import { Tag, Tooltip } from 'antd';
 import { ExclamationCircleFilled } from '@ant-design/icons';
 import { DaoJobConfig } from '@/services/dao/generated';
+import { Token } from '@/services/subgraph-v1/generated';
+import { formatUnits } from 'ethers/lib/utils';
+import { BigNumber } from 'ethers';
 
 export const colorTooltip = (color: string, tipsText: string) => {
   if (tipsText === '') return <></>;
@@ -172,4 +175,65 @@ export const isManualCycle = (data: DaoJobConfig) => {
     data.existedLastCycle.voteBeginAt === MaxCycleEndAt &&
     data.existedLastCycle.voteEndAt === MaxCycleEndAt
   );
+};
+
+export const descToken = (token: Token) => {
+  const desc = [];
+  if (
+    token.mintArgs.aDenominator === 10 &&
+    token.mintArgs.bNumerator === 1 &&
+    token.mintArgs.c === 0 &&
+    token.mintArgs.d === 0
+  ) {
+    if (token.createdAtTimestamp) {
+      desc.push(
+        <div key={'create'}>{`- Created At: ${getFormatTime(
+          parseInt(token.createdAtTimestamp, 10) || 0,
+          'LL',
+        )}`}</div>,
+      );
+    }
+    if (token.mintArgs.p) {
+      desc.push(
+        <div key={'p'}>{`- Release ${formatUnits(
+          BigNumber.from(token.mintArgs.p),
+          18,
+        )} per day`}</div>,
+      );
+    }
+    if (token.mintArgs.aNumerator && token.mintArgs.bDenominator) {
+      desc.push(
+        <div key={'a'}>{`- Becomes ${
+          token.mintArgs.aNumerator / 10
+        } times the original amount every ${token.mintArgs.bDenominator} days`}</div>,
+      );
+    }
+    if (token.lpRatio && token.lpTotalAmount) {
+      desc.push(
+        <div key={'lp'}>{`- Periodically provides unilateral liquidity to uniswap, at a rate of ${
+          token.lpRatio
+        } of mining, with a cumulative maximum of ${formatUnits(
+          BigNumber.from(token.lpTotalAmount),
+          18,
+        )}`}</div>,
+      );
+    }
+    if (token.mintArgs.aNumerator > 10) {
+      desc.push(<div key={'maxi'}>{`- Unlimited maximum issuance`}</div>);
+    } else {
+      const n = (365 * 100) / token.mintArgs.bDenominator;
+      const y = (365 * 100) % token.mintArgs.bDenominator;
+      const a1 = parseInt(formatUnits(BigNumber.from(token.mintArgs.p), 18), 10);
+      const q = token.mintArgs.aNumerator / 10;
+      const nTotal = (token.mintArgs.bDenominator * a1 * (1 - q ** n)) / (1 - q);
+      const total = Math.floor(nTotal + y * a1 * q ** (n - 1));
+      desc.push(
+        <div key={'maxi'}>{`- Maximum issuance is approximately ${total} + ${formatUnits(
+          BigNumber.from(token.lpTotalAmount),
+          18,
+        )} (100 years)`}</div>,
+      );
+    }
+  }
+  return desc;
 };
