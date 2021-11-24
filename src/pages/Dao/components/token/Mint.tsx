@@ -715,7 +715,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
       )}
       <Form name={'tokenMintRecord'}>
         <Form.Item wrapperCol={{ offset: 3, span: 4 }}>
-          <Button type={'primary'} onClick={handlerOpenMintRecordView} style={{ width: '150px' }}>
+          <Button type={'primary'} onClick={handlerOpenMintRecordView} style={{ width: '180px' }}>
             {intl.formatMessage({ id: 'pages.dao.config.tab.token.mint.record.button' })}
           </Button>
         </Form.Item>
