@@ -118,6 +118,7 @@ export default {
   'pages.account.mentor.table.column.3': 'Number of instructors',
   'pages.account.wallet.tips':
     'PLEASE ENTER YOUR WALLET ADDRESS, SO WE KNOW WHERE TO SEND TOKEN TO YOU.',
+  'pages.account.wallet.save_success': 'Save Success!',
   'pages.account.wallet.label': 'Wallet address :',
   'pages.account.wallet.save': 'SAVE',
   'pages.account.wallet.input.placeholder':

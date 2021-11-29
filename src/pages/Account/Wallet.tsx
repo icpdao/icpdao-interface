@@ -5,7 +5,7 @@ import styles from './index.less';
 import GlobalBreadcrumb from '@/components/Breadcrumb';
 import { HomeOutlined } from '@ant-design/icons';
 import { useModel } from '@@/plugin-model/useModel';
-import { Form, Input, Button } from 'antd';
+import { Form, Input, Button, message } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
 import { updateUserProfile } from '@/services/icpdao-interface/user';
 import PermissionErrorPage from '@/pages/Result/403';
@@ -28,9 +28,10 @@ export default (): ReactNode => {
       await updateUserProfile({ erc20_address: values.erc20Address });
       if (initialState?.fetchUserInfo) await initialState.fetchUserInfo();
       setSubmitButtonLoading(false);
+      message.success(intl.formatMessage({ id: 'pages.account.wallet.save_success' }));
       return true;
     },
-    [setSubmitButtonLoading, initialState],
+    [initialState, intl],
   );
 
   if (!isLogin()) {

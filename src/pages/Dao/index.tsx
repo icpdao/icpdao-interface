@@ -13,13 +13,18 @@ import {
   Tag,
   Typography,
   Upload,
-  Badge,
   Tooltip,
 } from 'antd';
 import { FormattedMessage, history, useAccess } from 'umi';
 import styles from './index.less';
 import GlobalBreadcrumb from '@/components/Breadcrumb';
-import { GithubOutlined, HomeOutlined, LoadingOutlined, SettingOutlined } from '@ant-design/icons';
+import {
+  GithubOutlined,
+  HomeOutlined,
+  LoadingOutlined,
+  SecurityScanFilled,
+  SettingOutlined,
+} from '@ant-design/icons';
 import { useModel } from '@@/plugin-model/useModel';
 import type {
   DaoHomeWithLoginQueryQuery,
@@ -264,23 +269,24 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
   ]);
 
   const tokenBadge = useMemo(() => {
+    if (!existedTokenResult.loading && !existedTokenResult.data?.token) return <></>;
     if (existedTokenResult.loading || !existedTokenResult.data?.token) return <LoadingOutlined />;
-    if (!existedTokenResult.loading && !existedTokenResult.data?.token)
-      return <Badge count={'NO TOKEN'} style={{ backgroundColor: '#8c8c8c' }} />;
     const desc = descToken(existedTokenResult.data.token as Token);
     if (desc.length === 0)
       return (
-        <Badge
-          count={existedTokenResult.data.token.symbol}
-          style={{ backgroundColor: '#52c41a' }}
-        />
+        <div>
+          <SecurityScanFilled
+            style={{ fontSize: '24px', color: '#F2C94C', verticalAlign: 'center' }}
+          />
+        </div>
       );
     return (
       <Tooltip placement="right" title={desc} overlayStyle={{ maxWidth: '29.875rem' }}>
-        <Badge
-          count={existedTokenResult.data.token.symbol}
-          style={{ backgroundColor: '#52c41a' }}
-        />
+        <div>
+          <SecurityScanFilled
+            style={{ fontSize: '24px', color: '#F2C94C', verticalAlign: 'center' }}
+          />
+        </div>
       </Tooltip>
     );
   }, [existedTokenResult?.data?.token, existedTokenResult.loading]);
