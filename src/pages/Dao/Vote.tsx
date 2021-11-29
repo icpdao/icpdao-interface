@@ -351,6 +351,13 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
   }, [data?.cycle?.votes?.confirm, data?.cycle?.votes?.nodes]);
 
   const statCardData = useMemo(() => {
+    if (!data?.cycle?.votes || data?.cycle?.votes?.total === 0)
+      return [
+        {
+          title: intl.formatMessage({ id: 'pages.dao.vote.card.ticket' }),
+          number: data?.cycle?.votes?.total || 0,
+        },
+      ];
     return [
       {
         title: intl.formatMessage({ id: 'pages.dao.vote.card.ticket' }),
@@ -428,27 +435,41 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
             )}
           </Tooltip>
           <StatCard data={statCardData} />
-          <div className={styles.VoteFilterSelect}>
-            <Select
-              defaultValue={CycleVoteFilterEnum.All}
-              onChange={handlerFilterVote}
-              style={{ width: 200 }}
-            >
-              <Select.Option value={CycleVoteFilterEnum.All}>ALL</Select.Option>
-              <Select.Option value={CycleVoteFilterEnum.UnVote}>TO VOTE</Select.Option>
-              <Select.Option value={CycleVoteFilterEnum.Voted}>VOTED</Select.Option>
-            </Select>
-          </div>
+          {!!data?.cycle?.votes?.total && data?.cycle?.votes?.total > 0 && (
+            <div className={styles.VoteFilterSelect}>
+              <Select
+                defaultValue={CycleVoteFilterEnum.All}
+                onChange={handlerFilterVote}
+                style={{ width: 200 }}
+              >
+                <Select.Option value={CycleVoteFilterEnum.All}>ALL</Select.Option>
+                <Select.Option value={CycleVoteFilterEnum.UnVote}>TO VOTE</Select.Option>
+                <Select.Option value={CycleVoteFilterEnum.Voted}>VOTED</Select.Option>
+              </Select>
+            </div>
+          )}
           <Skeleton active loading={loading} />
-          {!loading && voteList()}
-          <div className={styles.pagination}>
-            <Pagination
-              pageSize={pageSize}
-              current={getCurrentPage(queryVariables.offset || 0, pageSize)}
-              total={data?.cycle?.votes?.total || 0}
-              onChange={(page) => changePage(page)}
-            />
-          </div>
+          {!!data?.cycle?.votes?.total && data?.cycle?.votes?.total > 0 && !loading && voteList()}
+          {data?.cycle?.votes?.total === 0 && !loading && (
+            <div style={{ marginTop: '55px' }}>
+              <p>According to the system algorithm, you get 0 voting rights in this cycle!</p>
+              <p>
+                After the end of each cycle, the ICP system will match the number of jobs you have
+                marked. In rare cases, 0 voting rights will appear. Therefore, please pay attention
+                when you mark the job next time!
+              </p>
+            </div>
+          )}
+          {!!data?.cycle?.votes?.total && data?.cycle?.votes?.total > 0 && (
+            <div className={styles.pagination}>
+              <Pagination
+                pageSize={pageSize}
+                current={getCurrentPage(queryVariables.offset || 0, pageSize)}
+                total={data?.cycle?.votes?.total || 0}
+                onChange={(page) => changePage(page)}
+              />
+            </div>
+          )}
         </div>
         {warningModal}
       </PageContainer>
