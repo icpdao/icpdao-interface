@@ -7,6 +7,7 @@ import {
   UnlockOutlined,
   DownOutlined,
   GithubOutlined,
+  BranchesOutlined,
 } from '@ant-design/icons';
 import { Avatar, Button, Menu, Spin } from 'antd';
 import { history, useIntl, useModel, useLocation, useAccess } from 'umi';
@@ -142,7 +143,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = () => {
           {intl.formatMessage({ id: 'component.globalHeader.avatar.dropdown.dao' })}
         </Menu.Item>
         <Menu.Item key="/job">
-          <DeploymentUnitOutlined />
+          <BranchesOutlined />
           {intl.formatMessage({ id: 'component.globalHeader.avatar.dropdown.job' })}
         </Menu.Item>
         <Menu.Item key="/account/logout">
