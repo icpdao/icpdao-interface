@@ -963,3 +963,81 @@ query DAOLastCycleStatus ($daoId: String!) {
     }
   }
 }
+
+query CycleNeedRepeatUNVote($cycleId: String!) {
+  cycle(id: $cycleId) {
+    votes(filter: need_repeat_un_vote) {
+      total
+    }
+  }
+}
+
+query CycleNeedRepeatAll($cycleId: String!) {
+  cycle(id: $cycleId) {
+    datum {
+      beginAt
+      endAt
+      voteBeginAt
+      voteEndAt
+    }
+    votes(filter: need_repeat_all) {
+      userUnVoteTotal
+      userVotedTotal
+      confirm
+      nodes {
+        datum {
+          id
+          isResultPublic
+          voteJobId
+          voteResultStatTypeAll
+          voteType
+          voterId
+        }
+        leftJob {
+          datum {
+            title
+            githubRepoOwner
+            githubRepoName
+            githubIssueNumber
+            size
+            pairType
+            id
+          }
+          user {
+            id
+            githubLogin
+            nickname
+          }
+        }
+        rightJob {
+          datum {
+            title
+            githubRepoOwner
+            githubRepoName
+            githubIssueNumber
+            pairType
+            size
+            id
+          }
+          user {
+            id
+            githubLogin
+            nickname
+          }
+        }
+        voteJob {
+          datum {
+            id
+          }
+        }
+        voter {
+          id
+          githubLogin
+          nickname
+        }
+        selfVoteResultTypeAll
+      }
+      total
+    }
+  }
+}
