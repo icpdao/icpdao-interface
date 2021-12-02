@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import type { TablePaginationConfig } from 'antd';
 import {
   Avatar,
@@ -27,6 +27,7 @@ import {
   useBeginCycleVoteResultTaskMutation,
   useBeginPublishCycleTaskMutation,
   useCycleIcpperListQuery,
+  useCycleNeedRepeatUnVoteQuery,
   useCyclePublishStatusQuery,
   useCycleVoteResultStatusQuery,
   useOwnerCycleIcpperListQuery,
@@ -313,6 +314,8 @@ export const OwnerDaoCycleIcpper: React.FC<OwnerDaoCycleIcpperProps> = ({
       variables: { cycleId },
     },
   );
+  const { data: needRepeatUnVoteData, loading: needRepeatUnVoteLoading } =
+    useCycleNeedRepeatUnVoteQuery({ variables: { cycleId } });
   const [beginCycleVoteResultTaskMutation] = useBeginCycleVoteResultTaskMutation();
   const [beginPublishCycleTaskMutation] = useBeginPublishCycleTaskMutation();
   const [updateOwnerEiMutation] = useUpdateOwnerEiMutation();
@@ -421,7 +424,11 @@ export const OwnerDaoCycleIcpper: React.FC<OwnerDaoCycleIcpperProps> = ({
   useEffect(() => {
     setCanUpdateOwnerEI(!!cycle && !!cycle.voteResultStatAt && !cycle.voteResultPublishedAt);
   }, [cycle]);
-  if (loading || error) {
+  const unVoteWithRepeatTotal = useMemo(() => {
+    return needRepeatUnVoteData?.cycle?.votes?.total || 0;
+  }, [needRepeatUnVoteData?.cycle?.votes?.total]);
+
+  if (loading || error || needRepeatUnVoteLoading) {
     return <Skeleton active />;
   }
 
@@ -436,28 +443,41 @@ export const OwnerDaoCycleIcpper: React.FC<OwnerDaoCycleIcpperProps> = ({
     voteResultStatus === CycleVoteResultStatTaskStatusEnum.Stating;
   return (
     <>
-      {voteResultStatus === CycleVoteResultStatTaskStatusEnum.Success && (
-        <Button
-          type="primary"
-          size="large"
-          disabled={disablePublishButton}
-          className={styles.ownerButton}
-          onClick={() => setPublishModalVisible(true)}
-        >
-          {intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.button.publish' })}
-        </Button>
-      )}
+      {voteResultStatus === CycleVoteResultStatTaskStatusEnum.Success &&
+        unVoteWithRepeatTotal === 0 && (
+          <Button
+            type="primary"
+            size="large"
+            disabled={disablePublishButton}
+            className={styles.ownerButton}
+            onClick={() => setPublishModalVisible(true)}
+          >
+            {intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.button.publish' })}
+          </Button>
+        )}
 
-      {voteResultStatus !== CycleVoteResultStatTaskStatusEnum.Success && (
+      {voteResultStatus !== CycleVoteResultStatTaskStatusEnum.Success &&
+        unVoteWithRepeatTotal === 0 && (
+          <Button
+            type="primary"
+            size="large"
+            loading={loadingCountEIButton}
+            disabled={disableCountEIButton}
+            className={styles.ownerButton}
+            onClick={() => setResultModalVisible(true)}
+          >
+            {intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.button.count_ei' })}
+          </Button>
+        )}
+
+      {unVoteWithRepeatTotal > 0 && (
         <Button
           type="primary"
           size="large"
-          loading={loadingCountEIButton}
-          disabled={disableCountEIButton}
           className={styles.ownerButton}
-          onClick={() => setResultModalVisible(true)}
+          onClick={() => history.push(`/dao/${daoId}/${cycleId}/repeat`)}
         >
-          {intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.button.count_ei' })}
+          {intl.formatMessage({ id: 'pages.dao.component.dao_cycle_icpper.button.repeat_unvote' })}
         </Button>
       )}
 

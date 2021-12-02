@@ -402,6 +402,7 @@ export default {
   'pages.dao.component.dao_cycle.tab.vote': 'Vote',
   'pages.dao.component.dao_cycle_icpper.button.publish': 'Publish',
   'pages.dao.component.dao_cycle_icpper.button.count_ei': 'Count EI',
+  'pages.dao.component.dao_cycle_icpper.button.repeat_unvote': 'Repeat UnVote',
   'pages.dao.component.dao_cycle_icpper.table.head.icpper': 'Icpper',
   'pages.dao.component.dao_cycle_icpper.table.head.job': 'Job',
   'pages.dao.component.dao_cycle_icpper.table.head.size': 'Size',
