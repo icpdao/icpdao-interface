@@ -10,10 +10,13 @@ import type { JobItemQuery, DaoCycleVoteListQueryVariables } from '@/services/da
 import {
   CycleVoteFilterEnum,
   CycleVoteResultTypeAllResultTypeEnum,
+  useCycleNeedRepeatAllQuery,
   useDaoCycleVoteListQuery,
   useUpdateAllVoteMutation,
   useUpdatePairVoteMutation,
   useUpdateVoteConfirmMutation,
+  useVoteRepeatConfirmMutation,
+  useVoteRepeatPairVoteMutation,
 } from '@/services/dao/generated';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import StatCard from '@/components/StatCard';
@@ -166,8 +169,25 @@ const pairTypeVote = (
 
 const pageSize = 20;
 
-export default (props: { match: { params: { cycleId: string; daoId: string } } }): ReactNode => {
-  const { cycleId, daoId } = props.match.params;
+const useVoteQuery = (voteType: string) => {
+  if (voteType === 'repeat') return useCycleNeedRepeatAllQuery;
+  return useDaoCycleVoteListQuery;
+};
+
+const useUpdatePairVote = (voteType: string) => {
+  if (voteType === 'repeat') return useVoteRepeatPairVoteMutation;
+  return useUpdatePairVoteMutation;
+};
+
+const useUpdateVoteConfirm = (voteType: string) => {
+  if (voteType === 'repeat') return useVoteRepeatConfirmMutation;
+  return useUpdateVoteConfirmMutation;
+};
+
+export default (props: {
+  match: { params: { cycleId: string; daoId: string; voteType: string } };
+}): ReactNode => {
+  const { cycleId, daoId, voteType } = props.match.params;
   const intl = useIntl();
   const [confirmButtonLoading, setConfirmButtonLoading] = useState<boolean>(false);
   const [voteLoading, setVoteLoading] = useState<Record<string, boolean>>({});
@@ -178,13 +198,15 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
     first: pageSize,
     offset: 0,
   });
-  const { data, loading, refetch } = useDaoCycleVoteListQuery({
+
+  const { data, loading, refetch } = useVoteQuery(voteType)({
     variables: queryVariables,
     fetchPolicy: 'no-cache',
   });
+
   const [updateAllVoteMutation, updateAllVoteResult] = useUpdateAllVoteMutation();
-  const [updatePairVoteMutation, updatePairVoteResult] = useUpdatePairVoteMutation();
-  const [updateVoteConfirm] = useUpdateVoteConfirmMutation();
+  const [updatePairVoteMutation, updatePairVoteResult] = useUpdatePairVote(voteType)();
+  const [updateVoteConfirm] = useUpdateVoteConfirm(voteType)();
 
   const access = useAccess();
 
@@ -242,15 +264,12 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
 
   useEffect(() => {
     if (
-      updatePairVoteResult.data?.updatePairVote?.ok === false ||
+      (updatePairVoteResult.data as any)?.updatePairVote?.ok === false ||
+      (updatePairVoteResult.data as any)?.updatePairVoteWithRepeat?.ok === false ||
       updateAllVoteResult.data?.updateAllVote?.ok === false
     )
       message.success(intl.formatMessage({ id: 'pages.dao.vote.failed' }));
-  }, [
-    intl,
-    updateAllVoteResult.data?.updateAllVote?.ok,
-    updatePairVoteResult.data?.updatePairVote?.ok,
-  ]);
+  }, [intl, updateAllVoteResult.data?.updateAllVote?.ok, updatePairVoteResult.data]);
 
   useEffect(() => {
     if (!updatePairVoteResult.loading || !updateAllVoteResult.loading)
@@ -351,7 +370,7 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
   }, [data?.cycle?.votes?.confirm, data?.cycle?.votes?.nodes]);
 
   const statCardData = useMemo(() => {
-    if (!data?.cycle?.votes || data?.cycle?.votes?.total === 0)
+    if (!data?.cycle?.votes || data?.cycle?.votes?.total === 0 || voteType === 'repeat')
       return [
         {
           title: intl.formatMessage({ id: 'pages.dao.vote.card.ticket' }),
@@ -376,12 +395,7 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
         ),
       },
     ];
-  }, [
-    data?.cycle?.votes?.total,
-    data?.cycle?.votes?.userUnVoteTotal,
-    data?.cycle?.votes?.userVotedTotal,
-    intl,
-  ]);
+  }, [data?.cycle?.votes, intl, voteType]);
 
   const handlerFilterVote = useCallback((filter) => {
     setQueryVariables((old) => ({
@@ -435,7 +449,7 @@ export default (props: { match: { params: { cycleId: string; daoId: string } } }
             )}
           </Tooltip>
           <StatCard data={statCardData} />
-          {!!data?.cycle?.votes?.total && data?.cycle?.votes?.total > 0 && (
+          {!!data?.cycle?.votes?.total && data?.cycle?.votes?.total > 0 && voteType !== 'repeat' && (
             <div className={styles.VoteFilterSelect}>
               <Select
                 defaultValue={CycleVoteFilterEnum.All}

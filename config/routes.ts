@@ -57,7 +57,7 @@
     component: './Job',
   },
   {
-    path: '/dao/:daoId/:cycleId/vote',
+    path: '/dao/:daoId/:cycleId/:voteType',
     component: './Dao/Vote',
   },
   {

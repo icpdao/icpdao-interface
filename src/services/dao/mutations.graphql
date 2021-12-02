@@ -249,3 +249,15 @@ mutation SyncJob($jobId: String!) {
     ok
   }
 }
+
+mutation VoteRepeatPairVote($voteId: String!, $voteJobId: String!) {
+  updatePairVoteWithRepeat(id: $voteId, voteJobId: $voteJobId) {
+    ok
+  }
+}
+
+mutation VoteRepeatConfirm($cycleId: String!, $signatureMsg: String!, $signatureAddress: String!, $signature: String!) {
+  updateVoteConfirmWithRepeat(cycleId: $cycleId, signatureMsg: $signatureMsg, signatureAddress: $signatureAddress, signature: $signature) {
+    ok
+  }
+}
