@@ -272,11 +272,22 @@ export default (props: {
   }, [intl, updateAllVoteResult.data?.updateAllVote?.ok, updatePairVoteResult.data]);
 
   useEffect(() => {
-    if (!updatePairVoteResult.loading || !updateAllVoteResult.loading)
+    if (
+      (!updatePairVoteResult.loading &&
+        ((updatePairVoteResult.data as any)?.updatePairVote?.ok === true ||
+          (updatePairVoteResult.data as any)?.updatePairVoteWithRepeat?.ok === true)) ||
+      (!updateAllVoteResult.loading && updateAllVoteResult.data?.updateAllVote?.ok === true)
+    )
       refetch().then(() => {
         setVoteLoading({});
       });
-  }, [refetch, updateAllVoteResult.loading, updatePairVoteResult.loading]);
+  }, [
+    refetch,
+    updateAllVoteResult.data,
+    updateAllVoteResult.loading,
+    updatePairVoteResult.data,
+    updatePairVoteResult.loading,
+  ]);
 
   const changePage = useCallback((page: number) => {
     setQueryVariables((old) => ({
@@ -285,7 +296,7 @@ export default (props: {
     }));
   }, []);
 
-  const voteList = useCallback(() => {
+  const voteList = useMemo(() => {
     const listDom: any[] = [];
     let lastV: number | undefined;
     data?.cycle?.votes?.nodes?.forEach((v) => {
@@ -463,7 +474,7 @@ export default (props: {
             </div>
           )}
           <Skeleton active loading={loading} />
-          {!!data?.cycle?.votes?.total && data?.cycle?.votes?.total > 0 && !loading && voteList()}
+          {!!data?.cycle?.votes?.total && data?.cycle?.votes?.total > 0 && !loading && voteList}
           {data?.cycle?.votes?.total === 0 && !loading && (
             <div style={{ marginTop: '55px' }}>
               <p>According to the system algorithm, you get 0 voting rights in this cycle!</p>
