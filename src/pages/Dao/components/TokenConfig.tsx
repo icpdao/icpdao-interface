@@ -53,11 +53,16 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId, tokenSymbol, subType }
     [daoId],
   );
 
+  const factoryContractChecked = useMemo(async () => {
+    if (!contract.daoFactory) return;
+    return await contract.daoFactory.check();
+  }, [contract.daoFactory]);
+
   useEffect(() => {
     if (!data?.daoTokenConfig?.ethDaoId) return;
-    contract.daoFactory.getTokenAddress(data.daoTokenConfig.ethDaoId).then((v: string) => {
-      setTokenAddress(v);
-      console.log({ tokenAddress: v });
+    contract.daoFactory.getTokenAddress(data.daoTokenConfig.ethDaoId).then((v: any) => {
+      console.log(v);
+      setTokenAddress(v.token);
     });
   }, [contract.daoFactory, data?.daoTokenConfig?.ethDaoId]);
 
@@ -103,7 +108,7 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId, tokenSymbol, subType }
     event$?.emit();
   }, [event$]);
 
-  if (loading || error || !tokenAddress) return <Skeleton active />;
+  if (loading || error || !tokenAddress || !factoryContractChecked) return <Skeleton active />;
 
   return (
     <>
