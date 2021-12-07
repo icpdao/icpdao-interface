@@ -13,7 +13,8 @@ import { EthereumChainId } from '@/utils/utils';
 import JSBI from 'jsbi';
 import { ADDRESS_ZERO } from '@uniswap/v3-sdk';
 
-export const DAOFactoryAddress = '0x031c10878D1BA2F04e520Ab3A3E9c82c001c2f29';
+export const DAOFactoryAddress = '0xd4C76f2C30c31470518D175A47Ca2Faec98a2274';
+export const DAOFactoryVersion = JSBI.BigInt(1);
 export const DAOStakingAddress = ADDRESS_ZERO;
 export const ZeroAddress = ADDRESS_ZERO;
 export const BIG_INT_ZERO = JSBI.BigInt(0);
