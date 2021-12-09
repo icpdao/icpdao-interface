@@ -258,8 +258,9 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
     if (!data?.dao?.datum || !daoTokenConfigData?.daoTokenConfig?.ethDaoId) return;
     contract.daoFactory
       .getTokenAddress(daoTokenConfigData?.daoTokenConfig?.ethDaoId)
-      .then((v: string) => {
-        if (v !== ZeroAddress) queryExistedToken({ variables: { tokenId: v.toLowerCase() } });
+      .then((v: any) => {
+        if (v.token !== ZeroAddress)
+          queryExistedToken({ variables: { tokenId: v.token.toLowerCase() } });
       });
   }, [
     contract.daoFactory,

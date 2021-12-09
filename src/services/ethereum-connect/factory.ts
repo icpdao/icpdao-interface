@@ -1,4 +1,4 @@
-import { BaseEthereumConnect, DAOFactoryContract, ZeroAddress } from './index';
+import { BaseEthereumConnect, DAOFactoryContract, DAOFactoryVersion, ZeroAddress } from './index';
 import type { ETH_CONNECT } from './typings';
 import type { BigNumber } from 'ethers';
 import { ethers } from 'ethers';
@@ -11,8 +11,11 @@ export class DAOFactoryConnect extends BaseEthereumConnect {
     this.actionContract = DAOFactoryContract(this.metamaskProvider);
   }
 
+  async check() {
+    return (await this.contract.VERSION) === DAOFactoryVersion;
+  }
+
   async getTokenAddress(ethDAOId: string) {
-    console.log({ ethDAOId });
     // cause different network, so, should try/catch this place
     try {
       return await this.contract.tokens(ethDAOId);
