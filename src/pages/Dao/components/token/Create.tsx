@@ -106,7 +106,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
 
   useEffect(() => {
     if (tokenAddress) {
-      // setLockRecreateFormEdit(true);
+      setLockRecreateFormEdit(true);
     }
   }, [tokenAddress]);
 
