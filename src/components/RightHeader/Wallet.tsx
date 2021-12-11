@@ -6,46 +6,29 @@ import {
   WalletOutlined,
   DisconnectOutlined,
 } from '@ant-design/icons';
-import { Modal, Card, Space, Menu } from 'antd';
+import { Modal, Card, Space, Menu, Button } from 'antd';
 import HeaderDropdown from '../HeaderDropdown';
 import IconFont from '@/components/IconFont';
 import { FormattedMessage } from 'umi';
+import { Injected, setMetamaskDisconnect } from '@/utils/utils';
+import { useWallet } from '@/hooks/useWallet';
+import { useWeb3React } from '@web3-react/core';
 import { useModel } from '@@/plugin-model/useModel';
-import { EthereumNetwork, setMetamaskConnect, setMetamaskDisconnect } from '@/utils/utils';
 
 const Wallet: React.FC = () => {
   const [connectWalletModal, setConnectWalletModal] = useState<boolean>(false);
-  const [tipsSwitchNetwork, setTipsSwitchNetwork] = useState<boolean>(true);
-  const {
-    event$,
-    network,
-    metamaskProvider,
-    isConnected,
-    setIsConnected,
-    setNetwork,
-    accounts,
-    account,
-    chainId,
-    setAccounts,
-  } = useModel('useWalletModel');
+  const [switchNetworkTips, setSwitchNetworkTips] = useState<boolean>(true);
 
-  const connectMetamask = useCallback(async () => {
-    if (!metamaskProvider) {
-      window.location.href = 'https://metamask.io/';
-      return;
-    }
-    setAccounts(await metamaskProvider.request({ method: 'eth_requestAccounts' }));
-    setNetwork(EthereumNetwork[await metamaskProvider.request({ method: 'eth_chainId' })]);
-  }, [metamaskProvider, setAccounts, setNetwork]);
+  const { network, connectMetamask, disconnectMetamask, account, defaultChainId, chainId, active } =
+    useWallet(useWeb3React());
+
+  const { event$ } = useModel('useWalletModel');
 
   useEffect(() => {
-    console.log(accounts);
-    if (accounts.length > 0) {
-      setMetamaskConnect();
-      setIsConnected(true);
+    if (account) {
       setConnectWalletModal(false);
     }
-  }, [accounts, setIsConnected]);
+  }, [account]);
 
   const getConnectWalletBody = useCallback(() => {
     return (
@@ -75,15 +58,28 @@ const Wallet: React.FC = () => {
   }, [connectMetamask]);
 
   const handlerClickMenu = useCallback(
-    (event: { key: string; keyPath: string[] }) => {
+    async (event: { key: string; keyPath: string[] }) => {
       const { key } = event;
       if (key === 'disconnect') {
         setMetamaskDisconnect();
-        setIsConnected(false);
+        await disconnectMetamask();
       }
     },
-    [setIsConnected],
+    [disconnectMetamask],
   );
+
+  const switchNetwork = useCallback(() => {
+    if (!active) return;
+    Injected.getProvider().then((provider) => {
+      provider.send(
+        {
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: `0x${defaultChainId.toString(16)}` }],
+        },
+        () => {},
+      );
+    });
+  }, [active, defaultChainId]);
 
   event$.useSubscription(() => {
     setConnectWalletModal(true);
@@ -91,9 +87,9 @@ const Wallet: React.FC = () => {
 
   return (
     <>
-      {ICPDAO_ENV === 'PROD' && chainId?.toString() !== '3' && isConnected && (
+      {ICPDAO_ENV === 'PROD' && chainId?.toString() !== '3' && active && (
         <Modal
-          visible={tipsSwitchNetwork}
+          visible={switchNetworkTips}
           bodyStyle={{
             paddingTop: 62,
             textAlign: 'center',
@@ -105,9 +101,12 @@ const Wallet: React.FC = () => {
           zIndex={2001}
           footer={null}
           title={null}
-          onCancel={() => setTipsSwitchNetwork(false)}
+          onCancel={() => setSwitchNetworkTips(false)}
         >
           <div>ICPDAO is under testing, Please switch the network of metamask to Ropsten.</div>
+          <Button type={'primary'} onClick={switchNetwork}>
+            Switch Network
+          </Button>
         </Modal>
       )}
       <Modal
@@ -127,10 +126,10 @@ const Wallet: React.FC = () => {
       >
         {getConnectWalletBody()}
       </Modal>
-      {!isConnected && (
+      {!active && (
         <WalletOutlined onClick={() => setConnectWalletModal(true)} className={styles.walletIcon} />
       )}
-      {isConnected && (
+      {active && (
         <HeaderDropdown
           overlay={
             <Menu className={styles.menu} onClick={handlerClickMenu}>

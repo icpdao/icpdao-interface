@@ -1,5 +1,5 @@
 import { Tabs } from 'antd';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import StatCard from '@/components/StatCard';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { FormattedMessage } from 'umi';
@@ -10,9 +10,10 @@ import styles from './index.less';
 import type { CycleSchema } from '@/services/dao/generated';
 import { useCycleStatDataQuery } from '@/services/dao/generated';
 import { PageLoading } from '@ant-design/pro-layout';
-import { useModel } from '@@/plugin-model/useModel';
 import { renderIncomes } from '@/utils/pageHelper';
 import { useTokenPrice } from '@/pages/Dao/hooks/useTokenPrice';
+import { useWallet } from '@/hooks/useWallet';
+import { useWeb3React } from '@web3-react/core';
 
 const { TabPane } = Tabs;
 
@@ -34,16 +35,11 @@ const DaoCycleIndex: React.FC<DaoCycleProps> = ({
   tokenSymbol,
 }) => {
   const intl = useIntl();
-  const { chainId, isConnected } = useModel('useWalletModel');
-  const queryChainId = useMemo(() => {
-    if (isConnected) {
-      return chainId?.toString() || ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
-    }
-    return ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
-  }, [chainId, isConnected]);
+  const { queryChainId } = useWallet(useWeb3React());
+
   const [currentTab, setCurrentTab] = useState<string>(activeTab || 'icpper');
   const { data, loading, error } = useCycleStatDataQuery({
-    variables: { cycleId, tokenChainId: queryChainId },
+    variables: { cycleId, tokenChainId: queryChainId.toString() },
   });
   const { tokenPrice } = useTokenPrice(data?.cycle?.stat?.incomes || []);
 

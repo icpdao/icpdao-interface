@@ -13,9 +13,8 @@ import {
   Skeleton,
 } from 'antd';
 import { request, useIntl } from 'umi';
-import { useModel } from '@@/plugin-model/useModel';
 import type { TokenConfigComponentsProps } from '@/pages/Dao/components/TokenConfig';
-import { getMetamaskProvider, ZeroAddress } from '@/services/ethereum-connect';
+import { ZeroAddress } from '@/services/ethereum-connect';
 import { EthereumChainId } from '@/utils/utils';
 import Web3 from 'web3';
 import { ERC20Connect } from '@/services/ethereum-connect/erc20';
@@ -39,6 +38,8 @@ import JSBI from 'jsbi';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { ETH_CONNECT } from '@/services/ethereum-connect/typings';
 import IconFont from '@/components/IconFont';
+import { useWallet } from '@/hooks/useWallet';
+import { useWeb3React } from '@web3-react/core';
 
 type TokenToSelect = {
   address: string;
@@ -84,7 +85,7 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
 }) => {
   const intl = useIntl();
 
-  const { metamaskProvider, network, contract, account, chainId } = useModel('useWalletModel');
+  const { library, network, contract, account, chainId } = useWallet(useWeb3React());
 
   // -------- help state
   const [loadingTransferComplete, setLoadingTransferComplete] = useState<boolean>(false);
@@ -142,28 +143,22 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
       currencyIdNew === 'ETH' ||
       quoteCurrency.wrapped.address === WETH9[EthereumChainId[network]].address
     ) {
-      getMetamaskProvider(metamaskProvider)
-        ?.getBalance(account)
-        .then((ethBalance: BigNumber) => {
-          const amount = ethBalance ? JSBI.BigInt(ethBalance.toString()) : undefined;
-          if (amount && quoteCurrency) {
-            setMaxQuoteTokenAmount(CurrencyAmount.fromRawAmount(quoteCurrency, amount));
-          }
-        });
+      library?.getBalance(account).then((ethBalance: BigNumber) => {
+        const amount = ethBalance ? JSBI.BigInt(ethBalance.toString()) : undefined;
+        if (amount && quoteCurrency) {
+          setMaxQuoteTokenAmount(CurrencyAmount.fromRawAmount(quoteCurrency, amount));
+        }
+      });
       return;
     }
-    const quoteTokenContract = new ERC20Connect(
-      quoteCurrency.wrapped.address,
-      network,
-      metamaskProvider,
-    );
+    const quoteTokenContract = new ERC20Connect(quoteCurrency.wrapped.address, network, library);
     quoteTokenContract.getBalanceOf(account).then((value) => {
       const amount = value ? JSBI.BigInt(value.toString()) : undefined;
       if (amount && quoteCurrency) {
         setMaxQuoteTokenAmount(CurrencyAmount.fromRawAmount(quoteCurrency, amount));
       }
     });
-  }, [account, quoteCurrency, metamaskProvider, network, quoteTokenRecord]);
+  }, [account, quoteCurrency, library, network, quoteTokenRecord]);
 
   const balances: (CurrencyAmount<Currency> | undefined)[] = useMemo(() => {
     return [maxBaseTokenAmount, maxQuoteTokenAmount];
@@ -306,11 +301,7 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
       setApprovedQuoteToken(true);
       return;
     }
-    const quoteTokenContract = new ERC20Connect(
-      quoteCurrency.wrapped.address,
-      network,
-      metamaskProvider,
-    );
+    const quoteTokenContract = new ERC20Connect(quoteCurrency.wrapped.address, network, library);
     quoteTokenContract.getAllowance(account, tokenAddress).then((allowance: BigNumber) => {
       if (parseFloat(formattedAmounts[Field.CURRENCY_B] || '0') < 1) {
         setApprovedQuoteToken(BigNumber.from(1).lte(allowance));
@@ -318,24 +309,12 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
       }
       setApprovedQuoteToken(BigNumber.from(formattedAmounts[Field.CURRENCY_B]).lte(allowance));
     });
-  }, [
-    account,
-    quoteCurrency,
-    formattedAmounts,
-    metamaskProvider,
-    network,
-    quoteTokenRecord,
-    tokenAddress,
-  ]);
+  }, [account, quoteCurrency, formattedAmounts, library, network, quoteTokenRecord, tokenAddress]);
 
   const handlerApprovedQuoteToken = useCallback(async () => {
     if (!quoteCurrency || !account || !tokenAddress) return;
     try {
-      const quoteTokenContract = new ERC20Connect(
-        quoteCurrency.wrapped.address,
-        network,
-        metamaskProvider,
-      );
+      const quoteTokenContract = new ERC20Connect(quoteCurrency.wrapped.address, network, library);
       const tx = await quoteTokenContract?.approve(tokenAddress);
       if (!tx) return;
       setApproveQuoteTokenButtonLoading(true);
@@ -347,7 +326,7 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
     } catch (e) {
       setApproveQuoteTokenButtonLoading(false);
     }
-  }, [account, quoteCurrency, metamaskProvider, network, tokenAddress]);
+  }, [account, quoteCurrency, library, network, tokenAddress]);
 
   const handlerCreateLPPool = useCallback(async () => {
     console.log({ network, account, position });
@@ -401,7 +380,7 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
       if (rt.length > 0) {
         setCurrentSearchQuoteToken(rt);
       } else if (Web3.utils.isAddress(value)) {
-        const erc20 = await new ERC20Connect(value, network, metamaskProvider).getToken();
+        const erc20 = await new ERC20Connect(value, network, library).getToken();
         console.log({ [value]: erc20 });
         setCurrentSearchQuoteToken([erc20]);
       } else {
@@ -409,7 +388,7 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
       }
       setQuoteTokenSelectLoading(false);
     },
-    [coinGeckoObj, network, metamaskProvider],
+    [coinGeckoObj, network, library],
   );
 
   const quoteTokenSelect = useMemo(() => {

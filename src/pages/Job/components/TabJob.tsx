@@ -48,6 +48,8 @@ import {
 } from '@/utils/utils';
 import MentorWarningModal from '@/components/Modal/MentorWarningModal';
 import { useTokenPrice } from '@/pages/Dao/hooks/useTokenPrice';
+import { useWallet } from '@/hooks/useWallet';
+import { useWeb3React } from '@web3-react/core';
 
 type TabJobProps = {
   daoId?: string;
@@ -123,13 +125,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
   });
   const [choosePRData, setChoosePRData] = useState<choosePR[]>([]);
   const [backupChoosePRData, setBackupChoosePRData] = useState<choosePR[]>([]);
-  const { chainId, isConnected } = useModel('useWalletModel');
-  const queryChainId = useMemo(() => {
-    if (isConnected) {
-      return chainId?.toString() || ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
-    }
-    return ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
-  }, [chainId, isConnected]);
+  const { queryChainId } = useWallet(useWeb3React());
   const parseTime = useCallback(
     (date: any) => {
       if (!date) {
@@ -1098,7 +1094,7 @@ const TabJob: React.FC<TabJobProps> = ({ daoId, userName }) => {
         ...old,
         daoName: currentDao.datum.name,
         userName,
-        tokenChainId: queryChainId,
+        tokenChainId: queryChainId.toString(),
       }));
   }, [currentDao, userName, queryChainId]);
 

@@ -1,6 +1,7 @@
 import type { MenuTheme } from 'antd';
 import moment from 'moment';
 import momentTZ from 'moment-timezone';
+import { InjectedConnector } from '@web3-react/injected-connector';
 
 moment.locale('en');
 
@@ -12,11 +13,12 @@ const reg =
 export const isUrl = (path: string): boolean => reg.test(path);
 
 export const setMetamaskDisconnect = () => {
-  return window.localStorage.setItem('metamask', 'disconnect');
+  return window.localStorage.setItem('metamask', '0');
 };
 
 export const setMetamaskConnect = () => {
-  return window.localStorage.setItem('metamask', 'connect');
+  const expiresAt = moment.now() + 43200;
+  return window.localStorage.setItem('metamask', expiresAt.toString(10));
 };
 
 export const setRedirectURL = (redirect: string) => {
@@ -40,7 +42,7 @@ export const getNewJobExpertMode = () => {
 };
 
 export const getMetamask = () => {
-  return window.localStorage.getItem('metamask');
+  return parseInt(window.localStorage.getItem('metamask') || '0', 10) >= moment.now();
 };
 
 export const getAuthorization = () => {
@@ -259,3 +261,7 @@ export const EthereumChainId = {
   goerli: 5,
   kovan: 42,
 };
+
+export const Injected = new InjectedConnector({
+  supportedChainIds: [1, 3, 4, 5, 42],
+});

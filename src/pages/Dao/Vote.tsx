@@ -23,10 +23,11 @@ import StatCard from '@/components/StatCard';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import { Button, Card, Empty, message, Pagination, Row, Select, Skeleton, Tooltip } from 'antd';
 import { getCurrentPage, getTimeDistanceHumanize } from '@/utils/utils';
-import { getMetamaskProvider } from '@/services/ethereum-connect';
 import moment from 'moment';
 import { updateUserProfile } from '@/services/icpdao-interface/user';
 import MentorWarningModal from '@/components/Modal/MentorWarningModal';
+import { useWallet } from '@/hooks/useWallet';
+import { useWeb3React } from '@web3-react/core';
 
 const breadcrumb = (daoId: string, cycleId: string) => [
   { icon: <HomeOutlined />, path: '', breadcrumbName: 'HOME', menuId: 'home' },
@@ -192,7 +193,8 @@ export default (props: {
   const [confirmButtonLoading, setConfirmButtonLoading] = useState<boolean>(false);
   const [voteLoading, setVoteLoading] = useState<Record<string, boolean>>({});
   const { initialState } = useModel('@@initialState');
-  const { isConnected, metamaskProvider, event$ } = useModel('useWalletModel');
+  const { active, library } = useWallet(useWeb3React());
+  const { event$ } = useModel('useWalletModel');
   const [queryVariables, setQueryVariables] = useState<DaoCycleVoteListQueryVariables>({
     cycleId,
     first: pageSize,
@@ -337,7 +339,7 @@ export default (props: {
 
   const handleSubmit = useCallback(async () => {
     if (!initialState) return;
-    const provider = getMetamaskProvider(metamaskProvider);
+    const provider = library;
     if (!provider) return;
     try {
       const signer = provider.getSigner();
@@ -362,7 +364,7 @@ export default (props: {
     } catch (e) {
       setConfirmButtonLoading(false);
     }
-  }, [cycleId, daoId, initialState, intl, metamaskProvider, refetch, updateVoteConfirm]);
+  }, [cycleId, daoId, initialState, intl, library, refetch, updateVoteConfirm]);
 
   const handlerMetamaskConnect = useCallback(() => {
     event$?.emit();
@@ -421,83 +423,105 @@ export default (props: {
 
   const endLeftTimes = getTimeDistanceHumanize(data?.cycle?.datum?.voteEndAt || 0);
 
-  return (
-    <>
-      <PageContainer
-        ghost
-        header={{
-          breadcrumbRender: () => <GlobalBreadcrumb routes={breadcrumb(daoId, cycleId)} />,
-        }}
-      >
-        <div className={styles.first}>
-          <Tooltip
-            placement="right"
-            title={intl.formatMessage(
-              { id: 'pages.dao.vote.submit.tips' },
-              { end_left_times: endLeftTimes },
+  return useMemo(
+    () => (
+      <>
+        <PageContainer
+          ghost
+          header={{
+            breadcrumbRender: () => <GlobalBreadcrumb routes={breadcrumb(daoId, cycleId)} />,
+          }}
+        >
+          <div className={styles.first}>
+            <Tooltip
+              placement="right"
+              title={intl.formatMessage(
+                { id: 'pages.dao.vote.submit.tips' },
+                { end_left_times: endLeftTimes },
+              )}
+            >
+              {active ? (
+                <Button
+                  type="primary"
+                  loading={confirmButtonLoading}
+                  className={styles.submitButton}
+                  onClick={handleSubmit}
+                  disabled={!canSubmitConfirm}
+                >
+                  {intl.formatMessage({ id: 'pages.dao.vote.submit' })}
+                </Button>
+              ) : (
+                <Button
+                  type="primary"
+                  onClick={() => handlerMetamaskConnect()}
+                  className={styles.submitButton}
+                >
+                  {intl.formatMessage({
+                    id: 'pages.common.connect',
+                  })}
+                </Button>
+              )}
+            </Tooltip>
+            <StatCard data={statCardData} />
+            {!!data?.cycle?.votes?.total && data?.cycle?.votes?.total > 0 && voteType !== 'repeat' && (
+              <div className={styles.VoteFilterSelect}>
+                <Select
+                  defaultValue={CycleVoteFilterEnum.All}
+                  onChange={handlerFilterVote}
+                  style={{ width: 200 }}
+                >
+                  <Select.Option value={CycleVoteFilterEnum.All}>ALL</Select.Option>
+                  <Select.Option value={CycleVoteFilterEnum.UnVote}>TO VOTE</Select.Option>
+                  <Select.Option value={CycleVoteFilterEnum.Voted}>VOTED</Select.Option>
+                </Select>
+              </div>
             )}
-          >
-            {isConnected ? (
-              <Button
-                type="primary"
-                loading={confirmButtonLoading}
-                className={styles.submitButton}
-                onClick={handleSubmit}
-                disabled={!canSubmitConfirm}
-              >
-                {intl.formatMessage({ id: 'pages.dao.vote.submit' })}
-              </Button>
-            ) : (
-              <Button
-                type="primary"
-                onClick={() => handlerMetamaskConnect()}
-                className={styles.submitButton}
-              >
-                {intl.formatMessage({
-                  id: 'pages.common.connect',
-                })}
-              </Button>
+            <Skeleton active loading={loading} />
+            {!!data?.cycle?.votes?.total && data?.cycle?.votes?.total > 0 && !loading && voteList}
+            {data?.cycle?.votes?.total === 0 && !loading && (
+              <div style={{ marginTop: '55px' }}>
+                <p>According to the system algorithm, you get 0 voting rights in this cycle!</p>
+                <p>
+                  After the end of each cycle, the ICP system will match the number of jobs you have
+                  marked. In rare cases, 0 voting rights will appear. Therefore, please pay
+                  attention when you mark the job next time!
+                </p>
+              </div>
             )}
-          </Tooltip>
-          <StatCard data={statCardData} />
-          {!!data?.cycle?.votes?.total && data?.cycle?.votes?.total > 0 && voteType !== 'repeat' && (
-            <div className={styles.VoteFilterSelect}>
-              <Select
-                defaultValue={CycleVoteFilterEnum.All}
-                onChange={handlerFilterVote}
-                style={{ width: 200 }}
-              >
-                <Select.Option value={CycleVoteFilterEnum.All}>ALL</Select.Option>
-                <Select.Option value={CycleVoteFilterEnum.UnVote}>TO VOTE</Select.Option>
-                <Select.Option value={CycleVoteFilterEnum.Voted}>VOTED</Select.Option>
-              </Select>
-            </div>
-          )}
-          <Skeleton active loading={loading} />
-          {!!data?.cycle?.votes?.total && data?.cycle?.votes?.total > 0 && !loading && voteList}
-          {data?.cycle?.votes?.total === 0 && !loading && (
-            <div style={{ marginTop: '55px' }}>
-              <p>According to the system algorithm, you get 0 voting rights in this cycle!</p>
-              <p>
-                After the end of each cycle, the ICP system will match the number of jobs you have
-                marked. In rare cases, 0 voting rights will appear. Therefore, please pay attention
-                when you mark the job next time!
-              </p>
-            </div>
-          )}
-          {!!data?.cycle?.votes?.total && data?.cycle?.votes?.total > 0 && (
-            <div className={styles.pagination}>
-              <Pagination
-                pageSize={pageSize}
-                current={getCurrentPage(queryVariables.offset || 0, pageSize)}
-                total={data?.cycle?.votes?.total || 0}
-                onChange={(page) => changePage(page)}
-              />
-            </div>
-          )}
-        </div>
-        {warningModal}
-      </PageContainer>
-    </>
+            {!!data?.cycle?.votes?.total && data?.cycle?.votes?.total > 0 && (
+              <div className={styles.pagination}>
+                <Pagination
+                  pageSize={pageSize}
+                  current={getCurrentPage(queryVariables.offset || 0, pageSize)}
+                  total={data?.cycle?.votes?.total || 0}
+                  onChange={(page) => changePage(page)}
+                />
+              </div>
+            )}
+          </div>
+          {warningModal}
+        </PageContainer>
+      </>
+    ),
+    [
+      active,
+      canSubmitConfirm,
+      changePage,
+      confirmButtonLoading,
+      cycleId,
+      daoId,
+      data?.cycle?.votes?.total,
+      endLeftTimes,
+      handleSubmit,
+      handlerFilterVote,
+      handlerMetamaskConnect,
+      intl,
+      loading,
+      queryVariables.offset,
+      statCardData,
+      voteList,
+      voteType,
+      warningModal,
+    ],
   );
 };

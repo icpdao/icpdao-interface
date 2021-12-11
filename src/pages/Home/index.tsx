@@ -13,6 +13,8 @@ import Content3 from './components/Content3';
 import Footer from '@/components/Footer';
 import { useHomeStatsQueryQuery } from '@/services/dao/generated';
 import { useUniswapV3TokenListQuery } from '@/services/uniswap-v3/generated';
+import { useWallet } from '@/hooks/useWallet';
+import { useWeb3React } from '@web3-react/core';
 
 export default (): React.ReactNode => {
   const { profile } = getUserInfo();
@@ -23,20 +25,15 @@ export default (): React.ReactNode => {
   const [welcome, setWelcome] = useState<{ mentor: any; id: string }>({ mentor: {}, id: '' });
   const [mentorWelcomeVisible, setMentorWelcomeVisible] = useState(false);
   const { refresh } = useModel('@@initialState');
-  const { chainId, isConnected } = useModel('useWalletModel');
+  const { queryChainId } = useWallet(useWeb3React());
   const { openGuideEvent, closeGuideEvent } = useModel('useGuideModel');
-  const queryChainId = useMemo(() => {
-    if (isConnected) {
-      return chainId?.toString() || ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
-    }
-    return ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
-  }, [chainId, isConnected]);
+
   const { data } = useHomeStatsQueryQuery({
-    variables: { tokenChainId: queryChainId },
+    variables: { tokenChainId: queryChainId.toString() },
   });
 
   const queryTokenIds = useMemo(() => {
-    const cid = queryChainId;
+    const cid = queryChainId.toString();
     return (
       data?.stats?.incomes
         ?.filter((ic) => ic?.tokenChainId === cid)
@@ -54,7 +51,7 @@ export default (): React.ReactNode => {
   });
 
   const incomePrices = useMemo(() => {
-    const cid = queryChainId;
+    const cid = queryChainId.toString();
     let prices = 0;
     const uniswapPrice: Record<string, number> = {};
     uniswapV3Tokens?.tokens.forEach((tk) => {
