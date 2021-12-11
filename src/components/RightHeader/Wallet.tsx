@@ -15,6 +15,7 @@ import { EthereumNetwork, setMetamaskConnect, setMetamaskDisconnect } from '@/ut
 
 const Wallet: React.FC = () => {
   const [connectWalletModal, setConnectWalletModal] = useState<boolean>(false);
+  const [tipsSwitchNetwork, setTipsSwitchNetwork] = useState<boolean>(true);
   const {
     event$,
     network,
@@ -92,7 +93,7 @@ const Wallet: React.FC = () => {
     <>
       {ICPDAO_ENV === 'PROD' && chainId?.toString() !== '3' && isConnected && (
         <Modal
-          visible
+          visible={tipsSwitchNetwork}
           bodyStyle={{
             paddingTop: 62,
             textAlign: 'center',
@@ -104,9 +105,9 @@ const Wallet: React.FC = () => {
           zIndex={2001}
           footer={null}
           title={null}
+          onCancel={() => setTipsSwitchNetwork(false)}
         >
           <div>ICPDAO is under testing, Please switch the network of metamask to Ropsten.</div>
-          <img src="https://dev.app.icpdao.co/static/files/ropsten_tip.jpg" />
         </Modal>
       )}
       <Modal
