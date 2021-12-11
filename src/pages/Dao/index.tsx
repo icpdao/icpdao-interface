@@ -55,6 +55,8 @@ import type { Token } from '@/services/subgraph-v1/generated';
 import { useSubgraphV1ExistedTokenInfoLazyQuery } from '@/services/subgraph-v1/generated';
 import { ZeroAddress } from '@/services/ethereum-connect';
 import { descToken } from '@/utils/pageHelper';
+import { useWallet } from '@/hooks/useWallet';
+import { useWeb3React } from '@web3-react/core';
 
 const { TabPane } = Tabs;
 
@@ -213,13 +215,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
     return <PageLoading />;
   }
 
-  const { chainId, isConnected } = useModel('useWalletModel');
-  const queryChainId = useMemo(() => {
-    if (isConnected) {
-      return chainId?.toString() || ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
-    }
-    return ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
-  }, [chainId, isConnected]);
+  const { queryChainId } = useWallet(useWeb3React());
 
   let data: DaoHomeWithLoginQueryQuery | undefined;
   let loading: boolean;
@@ -232,7 +228,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
       variables: {
         id: daoId,
         userId: initialState.currentUser()?.profile?.id,
-        tokenChainId: queryChainId,
+        tokenChainId: queryChainId.toString(),
       },
     });
     data = tmp.data;
@@ -241,7 +237,7 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
     refetch = tmp.refetch;
   } else {
     const tmp = useDaoHomeWithUnLoginQueryQuery({
-      variables: { id: daoId, tokenChainId: queryChainId },
+      variables: { id: daoId, tokenChainId: queryChainId.toString() },
     });
     data = tmp.data;
     loading = tmp.loading;
@@ -253,13 +249,13 @@ export default (props: { match: { params: { daoId: string } } }): ReactNode => {
   });
 
   const { data: daoTokenConfigData } = useDaoTokenConfigQuery({ variables: { daoId } });
-  const { contract } = useModel('useWalletModel');
+  const { contract } = useWallet(useWeb3React());
   useEffect(() => {
     if (!data?.dao?.datum || !daoTokenConfigData?.daoTokenConfig?.ethDaoId) return;
     contract.daoFactory
       .getTokenAddress(daoTokenConfigData?.daoTokenConfig?.ethDaoId)
       .then((v: any) => {
-        if (v.token !== ZeroAddress)
+        if (v && v.token !== ZeroAddress)
           queryExistedToken({ variables: { tokenId: v.token.toLowerCase() } });
       });
   }, [

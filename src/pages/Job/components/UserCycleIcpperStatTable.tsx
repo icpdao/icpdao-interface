@@ -9,8 +9,9 @@ import { useIntl } from '@@/plugin-locale/localeExports';
 import { getFormatTime } from '@/utils/utils';
 import { renderEi, renderSize } from '@/utils/pageHelper';
 import { useTokenPrice } from '@/pages/Dao/hooks/useTokenPrice';
-import { useModel } from '@@/plugin-model/useModel';
 import IncomesPopover from '@/components/IncomesPopover';
+import { useWallet } from '@/hooks/useWallet';
+import { useWeb3React } from '@web3-react/core';
 
 interface UserCycleIcpperStatTableProps {
   userName?: string;
@@ -26,13 +27,7 @@ const UserCycleIcpperStatTable: React.FC<UserCycleIcpperStatTableProps> = ({
   const intl = useIntl();
   const [refetchloading, setRefetchloading] = useState(false);
 
-  const { chainId, isConnected } = useModel('useWalletModel');
-  const queryChainId = useMemo(() => {
-    if (isConnected) {
-      return chainId?.toString() || ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
-    }
-    return ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
-  }, [chainId, isConnected]);
+  const { queryChainId } = useWallet(useWeb3React());
 
   const { data, refetch, loading } = useUserCycleIcpperStatListQuery({
     variables: {
@@ -131,8 +126,8 @@ const UserCycleIcpperStatTable: React.FC<UserCycleIcpperStatTableProps> = ({
         bordered
         dataSource={data?.icpperStats?.nodes as any}
         columns={columns}
-        onChange={(pagination) => {
-          tableChange(pagination);
+        onChange={async (pagination) => {
+          await tableChange(pagination);
         }}
         pagination={{
           pageSize,

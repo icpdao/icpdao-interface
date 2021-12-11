@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import type { TokenConfigComponentsProps } from '@/pages/Dao/components/TokenConfig';
 import { useIntl } from 'umi';
-import { useModel } from '@@/plugin-model/useModel';
 import { ZeroAddress } from '@/services/ethereum-connect';
 import { Alert, Button, Descriptions, Form, InputNumber, Radio, Skeleton, Spin } from 'antd';
 import GlobalModal from '@/components/Modal';
@@ -14,6 +13,8 @@ import type { FeeAmount, Pool } from '@uniswap/v3-sdk';
 import JSBI from 'jsbi';
 import { Bound, Field, formatTickPrice, PoolState, useUniswap } from '@/pages/Dao/hooks/useUniswap';
 import IconFont from '@/components/IconFont';
+import { useWallet } from '@/hooks/useWallet';
+import { useWeb3React } from '@web3-react/core';
 
 const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
   tokenAddress,
@@ -22,7 +23,7 @@ const TokenAddLP: React.FC<TokenConfigComponentsProps> = ({
   tokenContract,
 }) => {
   const intl = useIntl();
-  const { network, contract, account, chainId } = useModel('useWalletModel');
+  const { network, contract, account, chainId } = useWallet(useWeb3React());
   const [loadingTransferComplete, setLoadingTransferComplete] = useState<boolean>(false);
   const [advancedOP, setAdvancedOP] = useState<boolean>(false);
   const [previewAddLP, setPreviewAddLP] = useState<boolean>(false);
