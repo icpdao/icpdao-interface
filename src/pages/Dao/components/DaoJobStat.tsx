@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import type { DaoJobsQueryVariables, JobQuery } from '@/services/dao/generated';
 import {
@@ -15,10 +15,11 @@ import { getCurrentPage } from '@/utils/utils';
 import { FormattedMessage } from 'umi';
 import { UserOutlined } from '@ant-design/icons';
 import { history } from '@@/core/history';
-import { useModel } from '@@/plugin-model/useModel';
 import { useTokenPrice } from '@/pages/Dao/hooks/useTokenPrice';
 import IncomesPopover from '@/components/IncomesPopover';
 import { renderIncomes } from '@/utils/pageHelper';
+import { useWallet } from '@/hooks/useWallet';
+import { useWeb3React } from '@web3-react/core';
 
 type DaoJobSatProps = {
   daoId: string;
@@ -33,20 +34,15 @@ function PickerWithType({ type, onChange }: any) {
 
 const DaoJobStat: React.FC<DaoJobSatProps> = ({ daoId }) => {
   const intl = useIntl();
-  const { chainId, isConnected } = useModel('useWalletModel');
-  const queryChainId = useMemo(() => {
-    if (isConnected) {
-      return chainId?.toString() || ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
-    }
-    return ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
-  }, [chainId, isConnected]);
+  const { queryChainId } = useWallet(useWeb3React());
+
   const [queryVariable, setQueryVariable] = useState<DaoJobsQueryVariables>({
     daoId,
     sorted: JobsQuerySortedEnum.Size,
     sortedType: JobsQuerySortedTypeEnum.Asc,
     first: 10,
     offset: 0,
-    tokenChainId: queryChainId,
+    tokenChainId: queryChainId.toString(),
   });
   const [searchDateType, setSearchDateType] = useState<string>('date');
   const parseTime = useCallback(
@@ -136,7 +132,7 @@ const DaoJobStat: React.FC<DaoJobSatProps> = ({ daoId }) => {
       render: (_: any, record: JobQuery) => (
         <IncomesPopover
           incomes={record.datum?.incomes || []}
-          chainId={chainId}
+          chainId={queryChainId}
           tokenPrice={tokenPrice}
         />
       ),

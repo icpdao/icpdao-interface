@@ -5,7 +5,6 @@ import { useIntl } from '@@/plugin-locale/localeExports';
 import styles from './index.less';
 import TokenCreate from '@/pages/Dao/components/token/Create';
 import { useDaoTokenConfigQuery, useUpdateDaoBaseInfoMutation } from '@/services/dao/generated';
-import { useModel } from '@@/plugin-model/useModel';
 import TokenCreateLP from '@/pages/Dao/components/token/CreateLP';
 import TokenAddLP from '@/pages/Dao/components/token/AddLP';
 import TokenManager from '@/pages/Dao/components/token/Manager';
@@ -13,6 +12,9 @@ import TokenMint from '@/pages/Dao/components/token/Mint';
 import { DAOTokenConnect } from '@/services/ethereum-connect/token';
 import { ZeroAddress } from '@/services/ethereum-connect';
 import { history } from 'umi';
+import { useWallet } from '@/hooks/useWallet';
+import { useWeb3React } from '@web3-react/core';
+import { useModel } from '@@/plugin-model/useModel';
 
 const { TabPane } = Tabs;
 
@@ -41,8 +43,8 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId, tokenSymbol, subType }
   const [currentTokenSymbol, setCurrentTokenSymbol] = useState<string>();
   const [lpPoolAddress, setLPPoolAddress] = useState<string>('');
   const [currentTab, setCurrentTab] = useState<string>(subType || 'create');
-  const { chainId, contract, network, metamaskProvider, isConnected, event$ } =
-    useModel('useWalletModel');
+  const { chainId, contract, network, library, active, queryChainId } = useWallet(useWeb3React());
+  const { event$ } = useModel('useWalletModel');
   const [updateDaoBaseInfo] = useUpdateDaoBaseInfoMutation();
 
   const goCurrentTab = useCallback(
@@ -68,8 +70,8 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId, tokenSymbol, subType }
 
   const tokenContract = useMemo(() => {
     if (!tokenAddress || tokenAddress === ZeroAddress) return undefined;
-    return new DAOTokenConnect(tokenAddress, network, metamaskProvider);
-  }, [metamaskProvider, network, tokenAddress]);
+    return new DAOTokenConnect(tokenAddress, network, library);
+  }, [library, network, tokenAddress]);
 
   useEffect(() => {
     if (!tokenContract) return;
@@ -89,19 +91,20 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId, tokenSymbol, subType }
           tokenAddress,
           tokenName: tokenInfo.name,
           tokenSymbol: tokenInfo.symbol,
-          tokenChainId: chainId,
+          tokenChainId: queryChainId.toString(),
         },
       });
     });
   }, [
     daoId,
-    metamaskProvider,
+    library,
     network,
     tokenAddress,
     tokenContract,
     tokenSymbol,
     chainId,
     updateDaoBaseInfo,
+    queryChainId,
   ]);
 
   const handlerMetamaskConnect = useCallback(() => {
@@ -112,14 +115,14 @@ const TokenConfig: React.FC<TokenConfigProps> = ({ daoId, tokenSymbol, subType }
 
   return (
     <>
-      {!isConnected && (
+      {!active && (
         <Button type="primary" onClick={() => handlerMetamaskConnect()}>
           {intl.formatMessage({
             id: 'pages.common.connect',
           })}
         </Button>
       )}
-      {isConnected && (
+      {active && (
         <Tabs
           className={styles.tokenConfigTabs}
           activeKey={currentTab}

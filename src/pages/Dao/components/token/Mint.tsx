@@ -16,7 +16,6 @@ import {
   useSyncTokenMintRecordEventMutation,
 } from '@/services/dao/generated';
 import { ZeroAddress } from '@/services/ethereum-connect';
-import { useModel } from '@@/plugin-model/useModel';
 import {
   Alert,
   Avatar,
@@ -52,6 +51,8 @@ import type { Currency, CurrencyAmount, Token } from '@uniswap/sdk-core';
 import type { FeeAmount, Pool } from '@uniswap/v3-sdk';
 import { Bound, Field, PoolState, useUniswap } from '@/pages/Dao/hooks/useUniswap';
 import IconFont from '@/components/IconFont';
+import { useWallet } from '@/hooks/useWallet';
+import { useWeb3React } from '@web3-react/core';
 
 const previewTableColumns = [
   {
@@ -98,7 +99,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
   tokenSymbol,
 }) => {
   const intl = useIntl();
-  const { network, contract, account, chainId } = useModel('useWalletModel');
+  const { network, contract, account, chainId, queryChainId } = useWallet(useWeb3React());
   const [cycles, setCycles] = useState<Record<string, CycleQuery>>({});
   const [selectCycles, setSelectCycles] = useState<CycleQuery[]>([]);
   const [currentSelectCycle, setCurrentSelectCycle] = useState<string>('');
@@ -329,7 +330,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
         variables: {
           daoId,
           lastTimestamp: anc.lastTimestamp.toString(),
-          tokenChainId: chainId?.toString() || '1',
+          tokenChainId: queryChainId.toString(),
           tokenAddress,
         },
       });
@@ -405,7 +406,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
           endTimestamp: mintBody.endTimestamp,
           tickLower: mintBody.tickLower,
           tickUpper: mintBody.tickUpper,
-          chainId: EthereumChainId[network]?.toString() || '1',
+          chainId: queryChainId.toString(),
           tokenSymbol: tokenSymbol || '',
         },
       });
@@ -528,7 +529,7 @@ const TokenMint: React.FC<TokenConfigComponentsProps> = ({
       variables: {
         daoId,
         tokenContractAddress: tokenAddress,
-        chainId: EthereumChainId[network],
+        chainId: queryChainId.toString(),
         first: 100,
         offset: 0,
       },

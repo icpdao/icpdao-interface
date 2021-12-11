@@ -14,10 +14,11 @@ import { useAccess } from '@@/plugin-access/access';
 import { getGithubOAuthUrl } from '@/components/RightHeader/AvatarDropdown';
 import AccessButton from '@/components/AccessButton';
 import { AccessEnum } from '@/access';
-import { useModel } from '@@/plugin-model/useModel';
 import { useUniswapV3TokenListQuery } from '@/services/uniswap-v3/generated';
 import { renderIncomes } from '@/utils/pageHelper';
 import IncomesPopover from '@/components/IncomesPopover';
+import { useWallet } from '@/hooks/useWallet';
+import { useWeb3React } from '@web3-react/core';
 
 const { Search } = Input;
 
@@ -149,17 +150,10 @@ const DaoTable: React.FC<DaoTableProps> = ({ menuList }) => {
     pageSize,
   });
 
-  const { chainId, isConnected } = useModel('useWalletModel');
-
-  const queryChainId = useMemo(() => {
-    if (isConnected) {
-      return chainId?.toString() || ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
-    }
-    return ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
-  }, [chainId, isConnected]);
+  const { queryChainId } = useWallet(useWeb3React());
 
   const daoQueryParams = useMemo<DaoQueryParams>(() => {
-    const tmp: any = { tokenChainId: queryChainId, ...daoTableParams };
+    const tmp: any = { tokenChainId: queryChainId.toString(), ...daoTableParams };
     if (daoTableParams.current && daoTableParams.pageSize) {
       tmp.first = daoTableParams.pageSize;
       tmp.offset = daoTableParams.pageSize * (daoTableParams.current - 1);

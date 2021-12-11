@@ -26,12 +26,14 @@ import type { TokenConfigComponentsProps } from '@/pages/Dao/components/TokenCon
 import { ZeroAddress } from '@/services/ethereum-connect';
 import type { ETH_CONNECT } from '@/services/ethereum-connect/typings';
 import { useRequest } from '@@/plugin-request/request';
-import { useModel } from '@@/plugin-model/useModel';
 import { formatUnits, isAddress, parseUnits } from 'ethers/lib/utils';
 import IconFont from '@/components/IconFont';
 import { BigNumber } from 'ethers';
 import { useSubgraphV1ExistedTokenInfoLazyQuery } from '@/services/subgraph-v1/generated';
 import { getFormatTime } from '@/utils/utils';
+import { useWallet } from '@/hooks/useWallet';
+import { useWeb3React } from '@web3-react/core';
+import { useModel } from '@@/plugin-model/useModel';
 
 type ValidateStatus = Parameters<typeof Form.Item>[0]['validateStatus'];
 
@@ -82,7 +84,8 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
   const intl = useIntl();
   const [form] = Form.useForm();
   const defaultCreateForm = genDefaultCreateForm(ethDAOId);
-  const { isConnected, contract, event$ } = useModel('useWalletModel');
+  const { active, contract } = useWallet(useWeb3React());
+  const { event$ } = useModel('useWalletModel');
   const [createFormData, setCreateFormData] = useState<ETH_CONNECT.CreateToken>(defaultCreateForm);
   const [createFormValidMsg, setCreateFormValidMsg] = useState<Record<string, validate>>();
   const [previewGenesis, setPreviewGenesis] = useState<boolean>(false);
@@ -829,7 +832,7 @@ const TokenCreate: React.FC<TokenConfigComponentsProps> = ({
         key={'previewCreate'}
         visible={previewCreateModal}
         onOk={async () => {
-          if (!isConnected) {
+          if (!active) {
             event$?.emit();
             return true;
           }

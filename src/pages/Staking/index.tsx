@@ -22,7 +22,6 @@ import { FormattedMessage } from 'umi';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import logo from '@/assets/image/logo.png';
 import { BigNumber, ethers } from 'ethers';
-import { useModel } from '@@/plugin-model/useModel';
 import { ERC20Connect } from '@/services/ethereum-connect/erc20';
 import type { Token } from '@uniswap/sdk-core';
 import { formatUnits, isAddress, parseUnits } from 'ethers/lib/utils';
@@ -30,6 +29,9 @@ import { DeleteOutlined } from '@ant-design/icons';
 import GlobalModal from '@/components/Modal';
 import { DAOStakingAddress } from '@/services/ethereum-connect';
 import IconFont from '@/components/IconFont';
+import { useWallet } from '@/hooks/useWallet';
+import { useWeb3React } from '@web3-react/core';
+import { useModel } from '@@/plugin-model/useModel';
 
 const { TabPane } = Tabs;
 
@@ -41,8 +43,8 @@ type previewBonus = {
 
 export default (): ReactNode => {
   const intl = useIntl();
-  const { event$, isConnected, contract, accounts, network, metamaskProvider } =
-    useModel('useWalletModel');
+  const { active, contract, account, network, library } = useWallet(useWeb3React());
+  const { event$ } = useModel('useWalletModel');
   const [icpd, setICPD] = useState<string>('');
   const [icpdApproved, setICPDApproved] = useState<boolean>(false);
   const [tokenList, setTokenList] = useState<Token[]>([]);
@@ -68,11 +70,6 @@ export default (): ReactNode => {
   const [loadingUnStakeButton, setLoadingUnStakeButton] = useState<boolean>(false);
   const [previewBonus, setPreviewBonus] = useState<boolean>(false);
 
-  const account = useMemo(() => {
-    if (accounts.length === 0) return undefined;
-    return accounts[0];
-  }, [accounts]);
-
   useMemo(async () => {
     if (!account) return;
     const userInfo = await contract.daoStaking.getUserInfo(account);
@@ -85,7 +82,7 @@ export default (): ReactNode => {
     if (!userInfo.tokens || userInfo.tokens.length <= 0) return;
     const tls: Promise<Token>[] = [];
     userInfo.tokens.forEach((t: string) => {
-      const erc20Contract = new ERC20Connect(t, network, metamaskProvider);
+      const erc20Contract = new ERC20Connect(t, network, library);
       tls.push(erc20Contract.getToken());
     });
     const tlo: Record<string, Token> = {};
@@ -95,20 +92,20 @@ export default (): ReactNode => {
     setTokenList(Object.values(tlo));
     setTokenInfoObject(tlo);
     console.log(userInfo, tls);
-  }, [account, contract.daoStaking, metamaskProvider, network]);
+  }, [account, contract.daoStaking, library, network]);
 
   useMemo(async () => {
     if (!icpd || !account) return;
-    const icpdContract = new ERC20Connect(icpd, network, metamaskProvider);
+    const icpdContract = new ERC20Connect(icpd, network, library);
     const allowance = (await icpdContract?.getAllowance(account, DAOStakingAddress)) || 0;
     console.log({ allowance: parseInt(formatUnits(allowance), 10) });
     setICPDApproved(allowance.gt(depositInputValue));
-  }, [account, depositInputValue, icpd, metamaskProvider, network]);
+  }, [account, depositInputValue, icpd, library, network]);
 
   const handlerApprovedICPD = useCallback(async () => {
     if (!icpd || !account) return;
     try {
-      const icpdContract = new ERC20Connect(icpd, network, metamaskProvider);
+      const icpdContract = new ERC20Connect(icpd, network, library);
       setLoadingApproveButton(true);
       const tx = await icpdContract?.approve(DAOStakingAddress);
       if (!tx) return;
@@ -117,7 +114,7 @@ export default (): ReactNode => {
     } finally {
       setLoadingApproveButton(false);
     }
-  }, [account, icpd, metamaskProvider, network]);
+  }, [account, icpd, library, network]);
 
   const handlerMetamaskConnect = useCallback(() => {
     event$?.emit();
@@ -184,7 +181,7 @@ export default (): ReactNode => {
 
     for (let i = 0; i < tokens.length; i += 1) {
       address.push(tokens[i]);
-      symbols.push(new ERC20Connect(tokens[i], network, metamaskProvider).getTokenSymbol());
+      symbols.push(new ERC20Connect(tokens[i], network, library).getTokenSymbol());
     }
     (await Promise.all(symbols)).forEach((v, i) => {
       ta.push({
@@ -197,7 +194,7 @@ export default (): ReactNode => {
     setPreviewBonusData(ta);
     setPreviewBonus(true);
     setLoadingWithdrawButton(false);
-  }, [account, contract.daoStaking, metamaskProvider, network]);
+  }, [account, contract.daoStaking, library, network]);
 
   const handlerTokenSearch = useCallback(
     async (value) => {
@@ -206,7 +203,7 @@ export default (): ReactNode => {
       }
       setLoadingTokenListSelect(true);
       if (isAddress(value)) {
-        const erc20 = await new ERC20Connect(value, network, metamaskProvider).getToken();
+        const erc20 = await new ERC20Connect(value, network, library).getToken();
         setCacheTokenList([erc20]);
         setTokenInfoObject((old) => ({ ...old, [value]: erc20 }));
       } else {
@@ -214,7 +211,7 @@ export default (): ReactNode => {
       }
       setLoadingTokenListSelect(false);
     },
-    [metamaskProvider, network],
+    [library, network],
   );
 
   const handlerAddTokenList = useCallback(async () => {
@@ -286,7 +283,7 @@ export default (): ReactNode => {
                       </Form.Item>
                       <Form.Item>
                         {/* eslint-disable-next-line no-nested-ternary */}
-                        {isConnected ? (
+                        {active ? (
                           icpdApproved ? (
                             <Button
                               onClick={handlerDeposit}
@@ -352,7 +349,7 @@ export default (): ReactNode => {
                         </Typography.Link>
                       </Form.Item>
                       <Form.Item>
-                        {isConnected ? (
+                        {active ? (
                           <Button
                             onClick={handlerWithdraw}
                             loading={loadingUnStakeButton}

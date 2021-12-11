@@ -1,4 +1,3 @@
-import React from 'react';
 import type { Settings as LayoutSettings } from '@ant-design/pro-layout';
 import { PageLoading } from '@ant-design/pro-layout';
 import type { RequestConfig, RunTimeLayoutConfig } from 'umi';
@@ -21,6 +20,8 @@ import {
 import type { MenuTheme } from 'antd';
 import { ApolloProvider } from '@apollo/client';
 import client from '@/utils/apolloClient';
+import { Web3ReactProvider } from '@web3-react/core';
+import { ethers } from 'ethers';
 
 const githubCallback = '/login/auth_callback';
 
@@ -59,23 +60,37 @@ export async function getInitialState(): Promise<{
 
 export const request: RequestConfig = requestConfig;
 
-const ApolloProviderRoot = ({ children, routes }: any) => {
-  return (
-    <ApolloProvider client={client}>
-      {React.cloneElement(children, {
-        ...children.props,
-        routes,
-      })}
-    </ApolloProvider>
-  );
-};
+function getLibrary(provider: any) {
+  return new ethers.providers.Web3Provider(provider); // this will vary according to whether you use e.g. ethers or web3.js
+}
 
-const ProviderRoot = ({ children, routes }: any) => {
-  return <>{ApolloProviderRoot({ children, routes })}</>;
-};
+// const getProviderRoot = ({ children, routes }: any) => {
+//   return (
+//     <ApolloProvider client={client}>
+//       <Web3ReactProvider getLibrary={getLibrary}>
+//         {React.cloneElement(children, {
+//           ...children.props,
+//           routes,
+//         })}
+//       </Web3ReactProvider>
+//     </ApolloProvider>
+//   );
+// }
+
+// const ProviderRoot = ({ children, routes }: any) => {
+//   return <>{getProviderRoot({ children, routes })}</>;
+// };
+//
+// export function rootContainer(container: any) {
+//   return React.createElement(ProviderRoot, null, container);
+// }
 
 export function rootContainer(container: any) {
-  return React.createElement(ProviderRoot, null, container);
+  return (
+    <ApolloProvider client={client}>
+      <Web3ReactProvider getLibrary={getLibrary}>{container}</Web3ReactProvider>
+    </ApolloProvider>
+  );
 }
 
 export const layout: RunTimeLayoutConfig = ({ initialState }) => {

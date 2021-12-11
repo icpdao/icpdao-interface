@@ -29,23 +29,11 @@ export function getProvider(network: string) {
   });
 }
 
-export function getInfuraProvider(network: string) {
-  return new ethers.providers.InfuraProvider(
-    getNetwork(network),
-    REACT_APP_ICPDAO_ETHEREUM_INFURA_KEY,
-  );
-}
-
 export function getEtherscanProvider(network: string) {
   return new ethers.providers.EtherscanProvider(
     getNetwork(network),
     REACT_APP_ICPDAO_ETHEREUM_ETHERSCAN_KEY,
   );
-}
-
-export function getMetamaskProvider(provider: any) {
-  if (!provider) return undefined;
-  return new ethers.providers.Web3Provider(provider);
 }
 
 export function DAOFactoryContract(provider: any) {
@@ -94,7 +82,7 @@ export class BaseEthereumConnect {
 
   constructor(network: string, metamaskProvider: any) {
     this.provider = getProvider(network);
-    this.metamaskProvider = getMetamaskProvider(metamaskProvider);
+    this.metamaskProvider = metamaskProvider;
     this.network = network;
     this.chainId = EthereumChainId[network];
   }

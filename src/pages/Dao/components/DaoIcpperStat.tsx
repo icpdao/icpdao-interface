@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import type { DaoIcppersQueryVariables, IcpperQuery } from '@/services/dao/generated';
 import {
   IcppersQuerySortedEnum,
@@ -14,10 +14,11 @@ import { FormattedMessage } from 'umi';
 import { UserOutlined } from '@ant-design/icons';
 import { history } from '@@/core/history';
 import styles from './index.less';
-import { useModel } from '@@/plugin-model/useModel';
 import { useTokenPrice } from '@/pages/Dao/hooks/useTokenPrice';
 import { renderIncomes } from '@/utils/pageHelper';
 import IncomesPopover from '@/components/IncomesPopover';
+import { useWallet } from '@/hooks/useWallet';
+import { useWeb3React } from '@web3-react/core';
 
 type DaoIcpperStatProps = {
   daoId: string;
@@ -26,20 +27,15 @@ type DaoIcpperStatProps = {
 
 const DaoIcpperStat: React.FC<DaoIcpperStatProps> = ({ daoId }) => {
   const intl = useIntl();
-  const { chainId, isConnected } = useModel('useWalletModel');
-  const queryChainId = useMemo(() => {
-    if (isConnected) {
-      return chainId?.toString() || ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
-    }
-    return ICPDAO_MINT_TOKEN_ETH_CHAIN_ID;
-  }, [chainId, isConnected]);
+  const { queryChainId } = useWallet(useWeb3React());
+
   const [queryVariable, setQueryVariable] = useState<DaoIcppersQueryVariables>({
     daoId,
     sorted: IcppersQuerySortedEnum.JoinTime,
     sortedType: IcppersQuerySortedTypeEnum.Desc,
     first: 10,
     offset: 0,
-    tokenChainId: queryChainId,
+    tokenChainId: queryChainId.toString(),
     // tokenChainId: "1",
   });
   const { data, loading } = useDaoIcppersQuery({ variables: queryVariable });
@@ -110,7 +106,11 @@ const DaoIcpperStat: React.FC<DaoIcpperStatProps> = ({ daoId }) => {
       key: 'income',
       sorter: false,
       render: (_: any, record: IcpperQuery) => (
-        <IncomesPopover incomes={record.incomes || []} chainId={chainId} tokenPrice={tokenPrice} />
+        <IncomesPopover
+          incomes={record.incomes || []}
+          chainId={queryChainId}
+          tokenPrice={tokenPrice}
+        />
       ),
     },
     {
