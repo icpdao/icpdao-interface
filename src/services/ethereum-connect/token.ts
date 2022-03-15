@@ -1,7 +1,7 @@
 import { DAOTokenContract } from './index';
 import { ERC20Connect } from '@/services/ethereum-connect/erc20';
 import type { ETH_CONNECT } from '@/services/ethereum-connect/typings';
-import { WETH9 } from '@uniswap/sdk-core';
+import { WETH9_EXTENDED } from '@/pages/Dao/hooks/useUniswap';
 
 export class DAOTokenConnect extends ERC20Connect {
   constructor(tokenAddress: string, network: string, metamaskProvider: any) {
@@ -31,7 +31,7 @@ export class DAOTokenConnect extends ERC20Connect {
     const contractWithSigner = this.actionContract.connect(signer);
     console.log({ body });
     let value = '0';
-    if (WETH9[this.chainId].address === body.quoteTokenAddress) {
+    if (WETH9_EXTENDED[this.chainId].address === body.quoteTokenAddress) {
       value = body.quoteTokenAmount;
     }
     return await contractWithSigner.createLPPoolOrLinkLPPool(

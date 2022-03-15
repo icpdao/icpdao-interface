@@ -21,7 +21,7 @@ import { ERC20Connect } from '@/services/ethereum-connect/erc20';
 import styles from './index.less';
 import GlobalModal from '@/components/Modal';
 import type { Currency } from '@uniswap/sdk-core';
-import { CurrencyAmount, Token, WETH9 } from '@uniswap/sdk-core';
+import { CurrencyAmount, Token } from '@uniswap/sdk-core';
 import {
   Bound,
   currencyId,
@@ -66,14 +66,22 @@ const getCoinGecko = async (network: string) => {
   const compoundTokenList: TokenToSelects = await request(
     'https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json',
   );
+  // const uniswapLabsList: TokenToSelects = await request(
+  //   'https://tokens.uniswap.org/',
+  // );
   const chainId = EthereumChainId[network];
-  const weth9 = WETH9[chainId];
+  const weth9 = WETH9_EXTENDED[chainId];
   const quoteTokens: Record<string, Token> = { [weth9.address]: weth9 };
   compoundTokenList.tokens.forEach((t) => {
     if (t.chainId === chainId) {
       quoteTokens[t.address] = new Token(t.chainId, t.address, t.decimals, t.symbol, t.name);
     }
   });
+  // uniswapLabsList.tokens.forEach((t) => {
+  //   if (t.chainId === chainId) {
+  //     quoteTokens[t.address] = new Token(t.chainId, t.address, t.decimals, t.symbol, t.name);
+  //   }
+  // });
   return quoteTokens;
 };
 
@@ -141,7 +149,7 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
     const currencyIdNew = currencyId(quoteCurrency);
     if (
       currencyIdNew === 'ETH' ||
-      quoteCurrency.wrapped.address === WETH9[EthereumChainId[network]].address
+      quoteCurrency.wrapped.address === WETH9_EXTENDED[EthereumChainId[network]].address
     ) {
       library?.getBalance(account).then((ethBalance: BigNumber) => {
         const amount = ethBalance ? JSBI.BigInt(ethBalance.toString()) : undefined;
@@ -296,7 +304,7 @@ const TokenCreateLP: React.FC<TokenConfigComponentsProps> = ({
     if (!quoteCurrency || !account || !tokenAddress) return;
     if (
       quoteCurrency.isNative ||
-      quoteCurrency.wrapped.address === WETH9[EthereumChainId[network]].address
+      quoteCurrency.wrapped.address === WETH9_EXTENDED[EthereumChainId[network]].address
     ) {
       setApprovedQuoteToken(true);
       return;

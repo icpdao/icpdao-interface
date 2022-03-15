@@ -22,11 +22,15 @@ export const UniswapPoolAddress = '0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8';
 export const UniswapV3PositionsAddress = '0xC36442b4a4522E871399CD717aBDD847Ab11FE88';
 
 export function getProvider(network: string) {
-  return ethers.getDefaultProvider(getNetwork(network), {
-    infura: REACT_APP_ICPDAO_ETHEREUM_INFURA_KEY,
-    alchemy: REACT_APP_ICPDAO_ETHEREUM_ALCHEMY_KEY,
-    etherscan: REACT_APP_ICPDAO_ETHEREUM_ETHERSCAN_KEY,
-  });
+  // return ethers.getDefaultProvider(getNetwork(network), {
+  // infura: REACT_APP_ICPDAO_ETHEREUM_INFURA_KEY,
+  // alchemy: REACT_APP_ICPDAO_ETHEREUM_ALCHEMY_KEY,
+  // etherscan: REACT_APP_ICPDAO_ETHEREUM_ETHERSCAN_KEY,
+  // });
+  return new ethers.providers.AlchemyProvider(
+    getNetwork(network),
+    REACT_APP_ICPDAO_ETHEREUM_ALCHEMY_KEY,
+  );
 }
 
 export function getEtherscanProvider(network: string) {
