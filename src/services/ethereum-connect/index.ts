@@ -13,7 +13,18 @@ import { EthereumChainId } from '@/utils/utils';
 import JSBI from 'jsbi';
 import { ADDRESS_ZERO } from '@uniswap/v3-sdk';
 
+export const DAOFactoryAddressInfo = {
+  homestead: '0x7b728FD84995fAC43A500Ae144A1e121916E5c07',
+  ropsten: '0x7b728FD84995fAC43A500Ae144A1e121916E5c07',
+  rinkeby: '0x7b728FD84995fAC43A500Ae144A1e121916E5c07',
+  goerli: '0x7b728FD84995fAC43A500Ae144A1e121916E5c07',
+  kovan: '0x7b728FD84995fAC43A500Ae144A1e121916E5c07',
+  matic: '0x0000000000000000000000000000000000000000',
+  maticmum: '0xac6faA8065c6aC2FbF42ac21553F64c00181BD40',
+};
+
 export const DAOFactoryAddress = '0x7b728FD84995fAC43A500Ae144A1e121916E5c07';
+
 export const DAOFactoryVersion = JSBI.BigInt(1);
 export const DAOStakingAddress = ADDRESS_ZERO;
 export const ZeroAddress = ADDRESS_ZERO;
@@ -40,8 +51,12 @@ export function getEtherscanProvider(network: string) {
   );
 }
 
-export function DAOFactoryContract(provider: any) {
-  return new ethers.Contract(DAOFactoryAddress, DAOFactoryABI, provider);
+export function DAOFactoryContract(network: string, provider: any) {
+  let address = DAOFactoryAddress;
+  if (network) {
+    address = DAOFactoryAddressInfo[network];
+  }
+  return new ethers.Contract(address, DAOFactoryABI, provider);
 }
 
 export function DAOStakingContract(provider: any) {

@@ -6,8 +6,8 @@ import { ethers } from 'ethers';
 export class DAOFactoryConnect extends BaseEthereumConnect {
   constructor(network: string, metamaskProvider: any) {
     super(network, metamaskProvider);
-    this.contract = DAOFactoryContract(this.provider);
-    this.actionContract = DAOFactoryContract(this.metamaskProvider);
+    this.contract = DAOFactoryContract(network, this.provider);
+    this.actionContract = DAOFactoryContract(network, this.metamaskProvider);
   }
 
   async check() {
