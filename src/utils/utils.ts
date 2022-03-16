@@ -244,6 +244,8 @@ export const EthereumNetwork = {
   '0x4': 'rinkeby',
   '0x5': 'goerli',
   '0x2a': 'kovan',
+  '0x89': 'matic',
+  '0x13881': 'maticmum',
 };
 
 export const EthereumNetworkById = {
@@ -252,6 +254,8 @@ export const EthereumNetworkById = {
   4: 'rinkeby',
   5: 'goerli',
   42: 'kovan',
+  137: 'matic',
+  80001: 'maticmum',
 };
 
 export const EthereumChainId = {
@@ -260,8 +264,10 @@ export const EthereumChainId = {
   rinkeby: 4,
   goerli: 5,
   kovan: 42,
+  matic: 137,
+  maticmum: 80001,
 };
 
 export const Injected = new InjectedConnector({
-  supportedChainIds: [1, 3, 4, 5, 42],
+  supportedChainIds: [1, 3, 4, 5, 42, 137, 80001],
 });

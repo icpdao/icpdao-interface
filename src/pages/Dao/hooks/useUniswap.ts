@@ -27,12 +27,16 @@ export enum SupportedChainId {
   GOERLI = 5,
   KOVAN = 42,
 
+  POLYGON = 137,
+  MUMBAI = 80001,
+
   ARBITRUM_ONE = 42161,
   ARBITRUM_RINKEBY = 421611,
   OPTIMISM = 10,
   OPTIMISTIC_KOVAN = 69,
 }
 
+// XXX may be not use
 export const L1_CHAIN_IDS = [
   SupportedChainId.MAINNET,
   SupportedChainId.ROPSTEN,
@@ -58,6 +62,7 @@ export enum PoolState {
   INVALID,
 }
 
+// XXX may be not use
 export function constructSameAddressMap<T extends string>(
   address: T,
   additionalNetworks: SupportedChainId[] = [],
@@ -71,6 +76,7 @@ export function constructSameAddressMap<T extends string>(
     }, {});
 }
 
+// XXX may be not use
 export const MULTICALL_ADDRESS: AddressMap = {
   ...constructSameAddressMap('0x1F98415757620B543A52E61c46B32eB19261F984', [
     SupportedChainId.OPTIMISTIC_KOVAN,
@@ -80,6 +86,7 @@ export const MULTICALL_ADDRESS: AddressMap = {
   [SupportedChainId.ARBITRUM_RINKEBY]: '0xa501c031958F579dB7676fF1CE78AD305794d579',
 };
 
+// XXX may be not use
 export const V3_CORE_FACTORY_ADDRESSES: AddressMap = constructSameAddressMap(V3_FACTORY_ADDRESS, [
   SupportedChainId.OPTIMISM,
   SupportedChainId.OPTIMISTIC_KOVAN,
@@ -116,6 +123,20 @@ export const WETH9_EXTENDED: Record<number, Token> = {
     18,
     'WETH',
     'Wrapped Ether',
+  ),
+  [SupportedChainId.POLYGON]: new Token(
+    SupportedChainId.POLYGON,
+    '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',
+    18,
+    'WMATIC',
+    'Wrapped Matic',
+  ),
+  [SupportedChainId.MUMBAI]: new Token(
+    SupportedChainId.MUMBAI,
+    '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889',
+    18,
+    'WMATIC',
+    'Wrapped Matic',
   ),
 };
 
@@ -319,9 +340,9 @@ export function useUniswap(
   priceUpper: Price<Token, Token> | undefined;
   tickLower: number | undefined;
   tickUpper: number | undefined;
-  getNoQuoteTokenPrice: (
-    currentTick: any,
-  ) => { [bound in Bound]?: Price<Token, Token> | undefined };
+  getNoQuoteTokenPrice: (currentTick: any) => {
+    [bound in Bound]?: Price<Token, Token> | undefined;
+  };
   getNoQuoteTokenTick: (currentTick: any) => { [bound in Bound]?: number | undefined };
 } {
   const {
